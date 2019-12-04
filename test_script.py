@@ -5,7 +5,7 @@ Write a simple script to:
     1. Select halos that follow the following criteria:
     2. Calculate what their smallest pericenter was and what time it happened at
     3. Plot the distance of the halo from the host as a function of time
-    4. Save this data to a file 
+    4. Save this data to a file
 """
 
 # Import all of the tools for analysis

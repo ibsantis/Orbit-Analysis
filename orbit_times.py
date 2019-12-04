@@ -4,7 +4,7 @@
 This is going to contain all of the functions that I make for my orbital
 analysis pipeline.
 
-[Give some important notes here]  
+[Give some important notes here]
 """
 
 
