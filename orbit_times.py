@@ -168,8 +168,8 @@ class OrbitAnalysis:
         time_spl = []
         # Loop over the number of subhalos
         for k in range(0, len(distances)):
-            temp_halo_1 = np.flip(distances[k]) # Now goes from z_form to z = 0 (un-normalized)
-            temp_halo_2 = np.flip(distances_norm[k]) # (normalized)
+            temp_halo_1 = distances[k] # Now goes from z = 0 to z_form (un-normalized)
+            temp_halo_2 = distances_norm[k] # (normalized)
             peri_list = []
             time_list = []
             # Want initial element to be this because we check +- 4 neighbors on each side
@@ -183,9 +183,9 @@ class OrbitAnalysis:
                 if (temp_peri < temp_halo_1[i+1]) and (temp_peri < temp_halo_1[i+2]) and (temp_peri < temp_halo_1[i+3])and (temp_peri < temp_halo_1[i+4]) and (temp_peri < temp_halo_1[i-1]) and (temp_peri < temp_halo_1[i-2]) and (temp_peri < temp_halo_1[i-3])and (temp_peri < temp_halo_1[i-4]) and (temp_peri/virial_radii[i] < 1):
                     temp_check[i] = 1
                     peri_list.append(temp_halo_1[i])
-                    time_list.append(np.flip(time_array['time'])[len(temp_halo_1)-i])
+                    time_list.append(time_array['time'][600-i])
                     temp_peri_spl.append(temp_halo_1[i-4:i+4])
-                    temp_time_spl.append(np.flip(time_array['time'])[len(temp_halo_1)-i-4:len(temp_halo_1)-i+4])
+                    temp_time_spl.append(time_array['time'][600-i-4:600-i+4])
                     temp_peri = temp_halo_1[i+1]
                 else:
                     temp_peri = temp_halo_1[i+1]
