@@ -223,6 +223,6 @@ class OrbitAnalysis:
                 temp_time_new_spl = []
                 pericenter_spline.append(temp_peri_new_spl)
                 time_spline.append(temp_time_new_spl)
-        d['pericenter'] = pericenter_spline
+        d['pericenter.dist'] = pericenter_spline
         d['pericenter.time'] = time_spline
         return d
