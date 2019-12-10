@@ -226,3 +226,19 @@ class OrbitAnalysis:
         d['pericenter.dist'] = pericenter_spline
         d['pericenter.time'] = time_spline
         return d
+
+    def angular_momentum(self, tree, sub_inds):
+        d = dict();
+        ang_mom_vec_tot = []
+        ang_mom_norm_tot = []
+        for i in range(0, len(sub_inds)):
+            lr = (tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,2]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,1]) - (tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,1]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,2])
+            lphi = (-1)*((tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,0]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,1]) - (tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,1]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,0]))
+            lz = (tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,0]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,2]) - (tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,2]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,0])
+            ang_mom_vec_subhalo = np.asarray([(lr[j], lphi[j], lz[j]) for j in range(0, len(lr))])
+            ang_mom_norm_subhalo = np.linalg.norm(ang_mom_vec_subhalo,axis=1)
+            ang_mom_vec_tot.append(ang_mom_vec_subhalo)
+            ang_mom_norm_tot.append(ang_mom_norm_subhalo)
+        d['ang.mom.vector'] = ang_mom_vec_tot
+        d['ang.mom.total'] = ang_mom_norm_tot
+        return d
