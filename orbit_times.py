@@ -228,13 +228,35 @@ class OrbitAnalysis:
         return d
 
     def angular_momentum(self, tree, sub_inds):
+        """
+        Reads in the tree and subhalo indices and returns a dictionary that contains
+        the angular momentum vectors and their magnitudes.
+
+        tree: dictionary
+        sub_inds: list of arrays
+
+        NOTES:
+            - Returns a dictionary:
+                - d['ang.mom.vector'] is a list of arrays, where each array contains
+                  angular momentum values for each subhalo.
+                    - Goes from z = 0 to z = z_form
+                    - Each vector is ordered (lr, lphi, lz)
+                    - d['ang.mom.vector'][i]: array of angular momentum vectors for subhalo i
+                    - d['ang.mom.vector'][i][j]: jth angular momentum vector for subhalo i (at time j)
+                - d['ang.mom.total'] is a list of arrays, where each array contains
+                  the norm of the angular momentum vector for each subhalo.
+                    - Goes from z = 0 to z = z_form
+                    - d['ang.mom.total'][i]: array of angular momentum magnitudes for subhalo i
+                    - d['ang.mom.vector'][i][j]: jth angular momentum value for subhalo i (at time j)
+            - tree is organized as (r, z, phi)
+        """
         d = dict();
         ang_mom_vec_tot = []
         ang_mom_norm_tot = []
         for i in range(0, len(sub_inds)):
-            lr = (tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,2]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,1]) - (tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,1]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,2])
+            lr = (-1)*tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,1]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,2]
             lphi = (-1)*((tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,0]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,1]) - (tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,1]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,0]))
-            lz = (tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,0]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,2]) - (tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,2]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,0])
+            lz = tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,0]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,2]
             ang_mom_vec_subhalo = np.asarray([(lr[j], lphi[j], lz[j]) for j in range(0, len(lr))])
             ang_mom_norm_subhalo = np.linalg.norm(ang_mom_vec_subhalo,axis=1)
             ang_mom_vec_tot.append(ang_mom_vec_subhalo)
