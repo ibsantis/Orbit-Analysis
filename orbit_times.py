@@ -14,6 +14,8 @@ This package is written to help compute:
 
 from scipy.interpolate import interp1d
 import numpy as np
+import matplotlib
+from matplotlib import pyplot as plt
 
 class OrbitAnalysis:
 
@@ -264,3 +266,107 @@ class OrbitAnalysis:
         d['ang.mom.vector'] = ang_mom_vec_tot
         d['ang.mom.total'] = ang_mom_norm_tot
         return d
+
+    def angular_momentum_plot(self, ell, subhalo_num, infall, infall_array, time_array, comp, file_name):
+        """
+        Plot any component of angular momentumn for a subhalo
+
+        ell: ?
+        subhalo_num: integer
+                     The halo in particular you want to plot (starts from 0)
+        time_array: dictionary
+        comp: string
+              This is the component of angular momentum that you want to plot
+        file_name: string
+        """
+        plt.figure(figsize=(10, 8))
+        if comp == 'r':
+            ls = ell['ang.mom.vector'][subhalo_num][:,0]
+            comp_str = '$_{r}$'
+        elif comp == 'phi':
+            ls = ell['ang.mom.vector'][subhalo_num][:,1]
+            comp_str = '$_{\phi}$'
+        elif comp == 'z':
+            ls = ell['ang.mom.vector'][subhalo_num][:,2]
+            comp_str = '$_{z}$'
+        elif comp == 'all':
+            ls = ell['ang.mom.total'][subhalo_num]
+            comp_str = '$_{tot}$'
+        times = np.flip(time_array['time'], axis=0)[:len(ls)]
+        plt.plot(times, ls)
+        plt.xlim(0, 13.8)
+        plt.ylim(np.nanmin(ls)-300, np.nanmax(ls)+300)
+        if infall == True:
+            infall_time = np.flip(time_array['time'])[infall_array['snapshot'][subhalo_num]]
+            plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
+        plt.xlabel('time [Gyr]', fontsize=28)
+        plt.ylabel('L'+comp_str+' [km s$^{-1}$ kpc]', fontsize=28)
+        plt.title('Halo '+str(subhalo_num+1), fontsize=24)
+        plt.tick_params(axis='both', which='major', labelsize=24)
+        plt.tight_layout()
+        plt.savefig('/home1/05400/ibsantis/scripts/orbit_plots/'+file_name+'.pdf')
+        plt.close()
+
+    def velocity_plot(self, tree, sub_inds, subhalo_num, comp, infall, infall_array, time_array, file_name):
+        """
+        Plot any component of velocity for a subhalo
+        """
+        plt.figure(figsize=(10, 8))
+        if comp == 'r':
+            vs = tree.prop('host.velocity.cylindrical', sub_inds[subhalo_num])[:,0]
+            comp_str = '$_{r}$'
+        elif comp == 'phi':
+            vs = tree.prop('host.velocity.cylindrical', sub_inds[subhalo_num])[:,2]
+            comp_str = '$_{\phi}$'
+        elif comp == 'z':
+            vs = tree.prop('host.velocity.cylindrical', sub_inds[subhalo_num])[:,1]
+            comp_str = '$_{z}$'
+        elif comp == 'all':
+            vs = tree.prop('host.velocity.cylindrical.total', sub_inds[subhalo_num])
+            comp_str = '$_{tot}$'
+        times = np.flip(time_array['time'], axis=0)[:len(vs)]
+        plt.plot(times, vs)
+        plt.xlim(0, 13.8)
+        plt.ylim(np.nanmin(vs), np.nanmax(vs))
+        if infall == True:
+            infall_time = np.flip(time_array['time'])[infall_array['snapshot'][subhalo_num]]
+            plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
+        plt.xlabel('time [Gyr]', fontsize=28)
+        plt.ylabel('v'+comp_str+' [km s$^{-1}$]', fontsize=28)
+        plt.title('Halo '+str(subhalo_num+1), fontsize=24)
+        plt.tick_params(axis='both', which='major', labelsize=24)
+        plt.tight_layout()
+        plt.savefig('/home1/05400/ibsantis/scripts/orbit_plots/'+file_name+'.pdf')
+        plt.close()
+
+    def distance_plot(self, tree, sub_inds, subhalo_num, comp, infall, infall_array, time_array, file_name):
+        """
+        Plot any component of velocity for a subhalo
+        """
+        plt.figure(figsize=(10, 8))
+        if comp == 'r':
+            ds = tree.prop('host.distance.cylindrical', sub_inds[subhalo_num])[:,0]
+            comp_str = '$_{r}$'
+        elif comp == 'phi':
+            ds = tree.prop('host.distance.cylindrical', sub_inds[subhalo_num])[:,2]
+            comp_str = '$_{\phi}$'
+        elif comp == 'z':
+            ds = tree.prop('host.distance.cylindrical', sub_inds[subhalo_num])[:,1]
+            comp_str = '$_{z}$'
+        elif comp == 'all':
+            ds = tree.prop('host.distance.cylindrical.total', sub_inds[subhalo_num])
+            comp_str = '$_{tot}$'
+        times = np.flip(time_array['time'], axis=0)[:len(ds)]
+        plt.plot(times, ds)
+        plt.xlim(0, 13.8)
+        plt.ylim(np.nanmin(ds), np.nanmax(ds))
+        if infall == True:
+            infall_time = np.flip(time_array['time'])[infall_array['snapshot'][subhalo_num]]
+            plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
+        plt.xlabel('time [Gyr]', fontsize=28)
+        plt.ylabel('d'+comp_str+' [kpc]', fontsize=28)
+        plt.title('Halo '+str(subhalo_num+1), fontsize=24)
+        plt.tick_params(axis='both', which='major', labelsize=24)
+        plt.tight_layout()
+        plt.savefig('/home1/05400/ibsantis/scripts/orbit_plots/'+file_name+'.pdf')
+        plt.close()
