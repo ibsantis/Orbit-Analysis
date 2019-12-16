@@ -165,6 +165,7 @@ class OrbitAnalysis:
         d = dict();
         pericenters_raw = []
         time_raw = []
+        host_peri_rad = []
         check = []
         peri_spl = []
         time_spl = []
@@ -174,6 +175,7 @@ class OrbitAnalysis:
             temp_halo_2 = distances_norm[k] # (normalized)
             peri_list = []
             time_list = []
+            peri_rad_list = []
             # Want initial element to be this because we check +- 4 neighbors on each side
             temp_peri = temp_halo_1[4]
             temp_check = np.zeros(len(temp_halo_1))
@@ -186,6 +188,7 @@ class OrbitAnalysis:
                     temp_check[i] = 1
                     peri_list.append(temp_halo_1[i])
                     time_list.append(time_array['time'][600-i])
+                    peri_rad_list.append(virial_radii[i])
                     temp_peri_spl.append(temp_halo_1[i-4:i+4])
                     temp_time_spl.append(time_array['time'][600-i-4:600-i+4])
                     temp_peri = temp_halo_1[i+1]
@@ -193,6 +196,7 @@ class OrbitAnalysis:
                     temp_peri = temp_halo_1[i+1]
             pericenters_raw.append(peri_list)
             time_raw.append(time_list)
+            host_peri_rad.append(peri_rad_list)
             check.append(temp_check)
             peri_spl.append(temp_peri_spl)
             time_spl.append(temp_time_spl)
@@ -204,6 +208,7 @@ class OrbitAnalysis:
             else:
                 peri_bool.append(False)
         d['pericenter.check'] = peri_bool
+        d['pericenter.host.r200'] = host_peri_rad
         # Do the spline fitting
         pericenter_spline = []
         time_spline = []
