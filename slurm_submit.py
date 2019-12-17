@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #SBATCH --job-name=test_script
-#SBATCH --partition=high2    # peloton node: 32 cores, 7.8 GB per core, 250 GB total
+#SBATCH --partition=skx-normal    # peloton node: 32 cores, 7.8 GB per core, 250 GB total
 ##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 ##SBATCH --mem=62G    # need to specify memory if you set the number of tasks (--ntasks) below
 #SBATCH --nodes=1    # if you specify this, the number of nodes, do not set memory (--mem) above
