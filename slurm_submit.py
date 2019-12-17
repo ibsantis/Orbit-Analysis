@@ -13,6 +13,7 @@
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
+#SBATCH --account=TG-AST140064
 
 import os
 from utilities.basic import io as ut_io    # if you want to use my print diagnostics
