@@ -59,7 +59,7 @@ halt = halo.io.IO.read_tree(simulation_directory='/scratch/projects/xsede/Galaxi
 orbits = ot.OrbitAnalysis()
 #################################################################################################
 # Select the luminous subhalos first
-subhalo_inds = get_luminous_halos(halt) # Originally "halt_inds_w_star_all_new"
+subhalo_inds = orbits.get_luminous_halos(halt) # Originally "halt_inds_w_star_all_new"
 
 ####
 # New test
@@ -68,21 +68,38 @@ subhalo_inds_new = orbits.get_luminous_halos(halt)
 
 # Get the distances from the host for each halo for all snapshots
 # This goes from z = 0 to z'
-halt_dists = halo_distances(halt, subhalo_inds) # Originally had the function written out here
+halt_dists = orbits.halo_distances(halt, subhalo_inds) # Originally had the function written out here
 
 # Make a plot of this halo's distance vs time
 # Ignoring first four snapshots because there aren't any halos there...
 plt.figure(1)
-plt.figure(figsize=(10, 8))
+plt.figure(figsize=(8, 6))
 for i in range(0, len(halt_dists)):
     snapshots = np.flip(np.arange(4,601))[:len(halt_dists[i])]
     plt.plot(snapshots, halt_dists[i])
-plt.xlabel('snapshot (time)', fontsize=28)
-plt.ylabel('d$_{\\rm host}$ [kpc]', fontsize=28)
-plt.title('Luminous subhalos in '+gal1, fontsize=32)
-plt.tick_params(axis='both', which='major', labelsize=24)
+plt.xlabel('snapshot (time)', fontsize=22)
+plt.ylabel('d$_{\\rm host}$ [kpc]', fontsize=22)
+plt.title('Luminous subhalos in '+gal1, fontsize=26)
+plt.tick_params(axis='both', which='major', labelsize=18)
 plt.tight_layout()
-plt.savefig(home_dir+'/orbit_plots/d_host_'+gal1+'.pdf')
+plt.savefig(home_dir+'/orbit_plots/d_host_'+gal1+'_finesst.pdf')
+plt.close()
+
+####### TEMPPPPP
+new_data = halt_dists[1:-1:4]
+plt.figure(1)
+plt.figure(figsize=(7, 4))
+for i in range(0, len(new_data)):
+    snapshots = np.flip(np.arange(4,601))[:len(new_data[i])]
+    plt.plot(snapshots, new_data[i])
+plt.xlabel('snapshot (time)', fontsize=22)
+plt.ylabel('d$_{\\rm host}$ [kpc]', fontsize=22)
+plt.ylim(0.1,1200)
+plt.xlim(-0.1, 600.1)
+plt.title('Satellite dwarf galaxies in '+gal1, fontsize=22)
+plt.tick_params(axis='both', which='major', labelsize=14)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_plots/d_host_'+gal1+'_finesst.pdf')
 plt.close()
 
 
