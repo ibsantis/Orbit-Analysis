@@ -82,26 +82,8 @@ plt.ylabel('d$_{\\rm host}$ [kpc]', fontsize=22)
 plt.title('Luminous subhalos in '+gal1, fontsize=26)
 plt.tick_params(axis='both', which='major', labelsize=18)
 plt.tight_layout()
-plt.savefig(home_dir+'/orbit_plots/d_host_'+gal1+'_finesst.pdf')
+plt.savefig(home_dir+'/orbit_data/plots/d_host_'+gal1+'.pdf')
 plt.close()
-
-####### TEMPPPPP
-new_data = halt_dists[1:-1:4]
-plt.figure(1)
-plt.figure(figsize=(7, 4))
-for i in range(0, len(new_data)):
-    snapshots = np.flip(np.arange(4,601))[:len(new_data[i])]
-    plt.plot(snapshots, new_data[i])
-plt.xlabel('snapshot (time)', fontsize=22)
-plt.ylabel('d$_{\\rm host}$ [kpc]', fontsize=22)
-plt.ylim(0.1,1200)
-plt.xlim(-0.1, 600.1)
-plt.title('Satellite dwarf galaxies in '+gal1, fontsize=22)
-plt.tick_params(axis='both', which='major', labelsize=14)
-plt.tight_layout()
-plt.savefig(home_dir+'/orbit_plots/d_host_'+gal1+'_finesst.pdf')
-plt.close()
-
 
 # Figure out what the virial radius is for the host and make another plot
 # These go from z = 0 to z'
@@ -126,7 +108,7 @@ plt.ylabel('d$_{\\rm host}$/R$_{\\rm host,200m}$', fontsize=28)
 plt.title('Luminous subhalos in '+gal1, fontsize=32)
 plt.tick_params(axis='both', which='major', labelsize=24)
 plt.tight_layout()
-plt.savefig(home_dir+'/orbit_plots/d_host_'+gal1+'_norm.pdf')
+plt.savefig(home_dir+'/orbit_data/plots/d_host_'+gal1+'_norm.pdf')
 plt.close()
 
 
@@ -232,7 +214,7 @@ plt.title('m12i, Halo 33', fontsize=24)
 plt.legend(['data', 'cubic'], loc='best', prop={'size': 14})
 plt.tick_params(axis='both', which='major', labelsize=24)
 plt.tight_layout()
-plt.savefig(home_dir+'/orbit_plots/spl_halo_33_norm.pdf')
+plt.savefig(home_dir+'/orbit_data/plots/spl_halo_33_norm.pdf')
 plt.close()
 
 ###############################################
@@ -302,5 +284,5 @@ plt.title('m12i, Halo 33', fontsize=24)
 plt.legend(['data', 'cubic'], loc='best', prop={'size': 14})
 plt.tick_params(axis='both', which='major', labelsize=24)
 plt.tight_layout()
-plt.savefig(home_dir+'/orbit_plots/spl_halo_33.pdf')
+plt.savefig(home_dir+'/orbit_data/plots/spl_halo_33.pdf')
 plt.close()
