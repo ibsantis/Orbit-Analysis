@@ -29,7 +29,7 @@ from scipy.interpolate import interp1d
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'm12i'
+gal1 = 'm12f'
 loc = 'stampede'
 
 if gal1 == 'Romeo':
@@ -101,7 +101,7 @@ data_dict['halo.indices'] = halo_inds
 data_dict['halo.potential.mean'] = halo_potentials_mean
 data_dict['halo.potential.median'] = halo_potentials_median
 #
-file_save = open(home_dir+'/orbit_data/pickles/'+galaxy+'_halo_potentials_new_gizmo.p','wb')
+file_save = open(home_dir+'/orbit_data/pickles/'+galaxy+'_halo_potentials.p','wb')
 pickle.dump(data_dict, file_save)
 file_save.close()
-print('All done?')
+print('All done!')
