@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 # Stampede2 SKX node: 48 cores, 4 GB per core, 192 GB total
-#SBATCH --job-name=m12f_halo_potentials
+#SBATCH --job-name=m12m_halo_potentials
 #SBATCH --partition=skx-normal
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=48    # MPI tasks per node
 #SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
 #SBATCH --time=01:00:00
-#SBATCH --output=/home1/05400/ibsantis/scripts/gizmo_jobs/m12f_halo_potentials_%j.txt
+#SBATCH --output=/home1/05400/ibsantis/scripts/gizmo_jobs/m12m_halo_potentials_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
