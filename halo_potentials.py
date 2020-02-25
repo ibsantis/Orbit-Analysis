@@ -91,6 +91,7 @@ for i in range(0, 599):
     part_at_z = gizmo.io.Read.read_snapshots('star', 'snapshot', ss[i], simulation_directory=simulation_dir, properties=['position', 'potential'], assign_host_coordinates=False)
     halo_potentials_mean.append(np.asarray([np.mean(part_at_z['star']['potential'][halt['star.indices'][halo_inds[i][j]]]) for j in range(0, len(halo_inds[i]))]))
     halo_potentials_median.append(np.asarray([np.median(part_at_z['star']['potential'][halt['star.indices'][halo_inds[i][j]]]) for j in range(0, len(halo_inds[i]))]))
+    print(i)
 end = time.time()
 print('Finished calculating the halo potentials in', end-start, 'seconds')
 
