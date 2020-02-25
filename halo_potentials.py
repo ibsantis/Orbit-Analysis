@@ -98,8 +98,8 @@ print('Finished calculating the halo potentials in', end-start, 'seconds')
 data_dict = dict()
 # Halo indices will be arrays of indices at each snapshot. (has length = 601)
 data_dict['halo.indices'] = halo_inds
-data_dict['halo.potential.mean'] = pot_mean_all
-data_dict['halo.potential.median'] = pot_med_all
+data_dict['halo.potential.mean'] = halo_potentials_mean
+data_dict['halo.potential.median'] = halo_potentials_median
 #
 file_save = open(home_dir+'/orbit_data/pickles/'+galaxy+'_halo_potentials.p','wb')
 pickle.dump(data_dict, file_save)
