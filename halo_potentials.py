@@ -15,6 +15,7 @@
 """
 
 # Import all of the tools for analysis
+import time
 import halo_analysis as halo
 import gizmo_analysis as gizmo
 import utilities as ut
