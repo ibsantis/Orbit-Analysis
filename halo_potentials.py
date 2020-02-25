@@ -100,7 +100,7 @@ data_dict['halo.indices'] = halo_inds
 data_dict['halo.potential.mean'] = pot_mean_all
 data_dict['halo.potential.median'] = pot_med_all
 #
-file_save = open(home_dir'/orbit_data/pickles/'+galaxy+'_halo_potentials.p','wb')
+file_save = open(home_dir+'/orbit_data/pickles/'+galaxy+'_halo_potentials.p','wb')
 pickle.dump(data_dict, file_save)
 file_save.close()
 print('All done?')
