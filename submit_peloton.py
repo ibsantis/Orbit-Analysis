@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#SBATCH --job-name=m12i_potentials
+#SBATCH --job-name=m12f_potentials
 #SBATCH --partition=high2    # peloton node: 32 cores, 7.8 GB per core, 250 GB total
 ##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=125G
@@ -8,7 +8,7 @@
 #SBATCH --ntasks-per-node=32    # MPI tasks per node
 #SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
 #SBATCH --time=02:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/m12i_potentials_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/m12f_potentials_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end

@@ -29,7 +29,7 @@ from scipy.interpolate import interp1d
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'm12i'
+gal1 = 'm12f'
 loc = 'peloton'
 
 if gal1 == 'Romeo':
