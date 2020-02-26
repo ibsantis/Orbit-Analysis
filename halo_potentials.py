@@ -29,8 +29,8 @@ from scipy.interpolate import interp1d
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'm12m'
-loc = 'stampede'
+gal1 = 'm12i'
+loc = 'peloton'
 
 if gal1 == 'Romeo':
     gal2 = 'Juliet'
@@ -54,14 +54,17 @@ else:
 
 if loc == 'mac':
     home_dir = '/Users/isaiahsantistevan/simulation'
+elif loc == 'peloton':
+    home_dir = '/home/ibsantis/scripts'
+    simulation_dir = '/home/awetzel/scratch/'+galaxy+'/'+galaxy+resolution
 else:
     home_dir = '/home1/05400/ibsantis/scripts'
-simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+galaxy+resolution
+    simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+galaxy+resolution
 print('Set paths')
 
 # Read in the entire tree
 snaps = ut.simulation.read_snapshot_times(directory=simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
-halt = halo.io.IO.read_tree(simulation_directory='/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/m12i_res7100')
+halt = halo.io.IO.read_tree(simulation_directory=simulation_dir)
 
 # Set up array of snapshot values starting from 600 to 0 (redshift 0 to 99)
 ss = np.flip(np.arange(601))
