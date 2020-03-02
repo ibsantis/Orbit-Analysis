@@ -22,6 +22,7 @@ import utilities as ut
 import orbit_times as ot
 import numpy as np
 import pickle
+import h5py
 import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib import patches
@@ -29,7 +30,7 @@ from scipy.interpolate import interp1d
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'm12m'
+gal1 = 'm12b'
 loc = 'peloton'
 
 if gal1 == 'Romeo':
@@ -54,9 +55,12 @@ else:
 
 if loc == 'mac':
     home_dir = '/Users/isaiahsantistevan/simulation'
-elif loc == 'peloton':
+elif loc == 'peloton' and num_gal == 1:
     home_dir = '/home/ibsantis/scripts'
     simulation_dir = '/home/awetzel/scratch/'+galaxy+'/'+galaxy+resolution
+elif loc == 'peloton' and num_gal == 2:
+    home_dir = '/home/ibsantis/scripts'
+    simulation_dir = '/home/awetzel/scratch/m12_elvis/'+galaxy+resolution
 else:
     home_dir = '/home1/05400/ibsantis/scripts'
     simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+galaxy+resolution
@@ -92,7 +96,7 @@ start = time.time()
 # Only go until snapshot = 2 because there are no stars at snapshot = 1
 for i in range(0, 599):
     part_at_z = gizmo.io.Read.read_snapshots('star', 'snapshot', ss[i], simulation_directory=simulation_dir, properties=['position', 'potential'], assign_host_coordinates=False)
-    halo_potentials_mean.append(np.asarray([np.mean(part_at_z['star']['potential'][halt['star.indices'][halo_inds[i][j]]]) for j in range(0, len(halo_inds[i]))]))
+    #halo_potentials_mean.append(np.asarray([np.mean(part_at_z['star']['potential'][halt['star.indices'][halo_inds[i][j]]]) for j in range(0, len(halo_inds[i]))]))
     halo_potentials_median.append(np.asarray([np.median(part_at_z['star']['potential'][halt['star.indices'][halo_inds[i][j]]]) for j in range(0, len(halo_inds[i]))]))
     print(i)
 end = time.time()
@@ -101,11 +105,14 @@ print('Finished calculating the halo potentials in', end-start, 'seconds')
 # Throw the data in a dictionary and save it to a file
 data_dict = dict()
 # Halo indices will be arrays of indices at each snapshot. (has length = 601)
-data_dict['halo.indices'] = halo_inds
-data_dict['halo.potential.mean'] = halo_potentials_mean
-data_dict['halo.potential.median'] = halo_potentials_median
+data_dict['halo.indices'] = np.asarray(halo_inds)
+#data_dict['halo.potential.mean'] = halo_potentials_mean
+data_dict['halo.potentials'] = np.asarray(halo_potentials_median)
 #
-file_save = open(home_dir+'/orbit_data/pickles/'+galaxy+'_halo_potentials.p','wb')
-pickle.dump(data_dict, file_save)
-file_save.close()
+#file_save = open(home_dir+'/orbit_data/pickles/'+galaxy+'_halo_potentials.p','wb')
+#pickle.dump(data_dict, file_save)
+#file_save.close()
+
+# Save the file to hdf5 format
+ut.io.file_hdf5(gal1+'_halo_potentials', data_dict)
 print('All done!')
