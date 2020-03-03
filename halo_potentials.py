@@ -30,7 +30,7 @@ from scipy.interpolate import interp1d
 print('Read in the tools')
 
 # Loop through this list of simulation names (LG pairs only need to be looped over once)
-names = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'Romeo', 'Thelma', 'Romulus']
+names = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w']
 
 for n in names:
 
@@ -93,15 +93,17 @@ for n in names:
         3. Save the data to a dictionary.
     """
     # Set up empty lists
-    halo_potentials = []
+    halo_potentials = np.zeros(len(halt['mass']), int)
 
     start = time.time()
     # Loop over snapshots
     # Only go until snapshot = 2 because there are no stars at snapshot = 1
     for i in range(0, 599):
         part_at_z = gizmo.io.Read.read_snapshots('star', 'snapshot', ss[i], simulation_directory=simulation_dir, properties='potential', assign_host_coordinates=False)
-        halo_potentials.append(np.asarray([np.median(part_at_z['star']['potential'][halt['star.indices'][halo_inds[i][j]]]) for j in range(0, len(halo_inds[i]))]))
-        print(i)
+        #halo_potentials.append(np.asarray([np.median(part_at_z['star']['potential'][halt['star.indices'][halo_inds[i][j]]]) for j in range(0, len(halo_inds[i]))]))
+        for j in range(0, len(halo_inds[i])):
+            halo_potentials[halo_inds[i][j]] = np.median(part_at_z['star']['potential'][halt['star.indices'][halo_inds[i][j]]])
+        print('Done with snapshot', i)
     end = time.time()
     print('Finished calculating the halo potentials in', end-start, 'seconds')
 
@@ -109,7 +111,7 @@ for n in names:
     data_dict = dict()
     # Halo indices will be arrays of indices at each snapshot. (has length = 601)
     data_dict['halo.indices'] = np.asarray(halo_inds)
-    data_dict['halo.potentials'] = np.asarray(halo_potentials)
+    data_dict['halo.potentials'] = halo_potentials
 
     # Save the file to hdf5 format
     ut.io.file_hdf5('/home/ibsantis/scripts/orbit_data/pickles/'+galaxy+'_halo_potentials', data_dict)
