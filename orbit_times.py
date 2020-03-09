@@ -100,7 +100,7 @@ class OrbitAnalysis:
 
     def first_infall_times(self, distances_norm, time_array):
         """
-        Reads in normalized subhalo distancs and snapshot information and returns
+        Reads in normalized subhalo distances and snapshot information and returns
         the snapshots and times when the subhalos first fell into the host
 
         distances_norm: list of arrays (given in kpc physical)
@@ -375,3 +375,24 @@ class OrbitAnalysis:
         plt.tight_layout()
         plt.savefig('/home1/05400/ibsantis/scripts/orbit_plots/'+file_name+'.pdf')
         plt.close()
+
+    def orbit_energy(self, tree, potential, sub_inds):
+        """
+        Reads in the tree, a subhalo's index and progenitor indices, and an array
+        of subhalo gravitational potentials and calculates the total orbital energy
+        for a subhalo and it's progenitor subhalos (i.e., the energy across time).
+
+        Energy is defined as E = (1/2)*velocity**2 + potential
+
+        tree : dictionary
+        sub_inds : list of arrays
+        potential : array
+
+        NOTES:
+            - Returns an array the size of an element of sub_inds
+                - To be more explicit, returns values for the subhalo of interest
+                  across the entire time range that it existed
+            - Only handles ONE subhalo at a time.
+        """
+        energy = 0.5*tree.prop('host.velocity.total')[sub_inds]**2 + potential['halo.potentials'][sub_inds]
+        return energy
