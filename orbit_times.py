@@ -98,6 +98,27 @@ class OrbitAnalysis:
                 distances_norm.append(distances[i][:len(host_halo_radii)]/host_halo_radii)
         return distances_norm
 
+    def halo_velocites(self, tree, sub_inds):
+        """
+            Reads in the subhalo indices and tree, then returns the subhalo velocities
+            from the tree.
+
+            tree: dictionary
+            sub_inds: list of arrays
+
+            NOTES:
+                - Returns a list of length equal to the number of subhalos
+                - For each subhalo, the length of the list is equal to the number
+                  of snapshots that it has existed for
+                - Lists are ordered however the subhalo indices are ordered
+                    - If used in conjunction with get_luminous_halos, they go from
+                      z = 0 to z = z_form
+
+            Returns a list of lists
+        """
+        velocites = [[tree.prop('host.velocity.total', sub_inds[i][j]) for j in range(0, len(sub_inds[i]))] for i in range(0, len(sub_inds))]
+        return velocites
+
     def first_infall_times(self, distances_norm, time_array):
         """
         Reads in normalized subhalo distances and snapshot information and returns
@@ -125,25 +146,30 @@ class OrbitAnalysis:
         for i in range(0, len(distances_norm)):
             # Check to see if the subhalo is within the virial radius of the host
             if len(np.where(distances_norm[i] < 1)[0]) != 0:
-                first_infall_snap.append(np.max(np.where(distances_norm[i] < 1)[0]))
+                first_infall_snap.append(600-np.max(np.where(distances_norm[i] < 1)[0]))
             else:
                 first_infall_snap.append(-1)
-        # Save the snapshot that this happens at (but these snapshots are counted from 600 backward,
-        # i.e., if d['snapshot'] = 590, this is really snapshot 10)
+        # Save the snapshot that this happens at
         d['snapshot'] = np.asarray(first_infall_snap)
         infall_mask = (d['snapshot'] > 0)
-        d['time'] = np.flip(time_array['time'])[d['snapshot'][infall_mask]]
+        infall_times = []
+        for i in range(0, len(d['snapshot'])):
+            if d['snapshot'][i] > 0:
+                infall_times.append(time_array['time'][d['snapshot'][i]])
+            else:
+                infall_times.append(-1)
+        d['time'] = np.asarray(infall_times)
         d['check'] = infall_mask
         return d
 
-    def pericenter_interp(self, distances, distances_norm, virial_radii, time_array):
+    def pericenter_interp(self, distances, velocities, virial_radii, time_array):
         """
-        Reads in subhalo distances, normalized subhalo distances, host virial radii across time,
+        Reads in subhalo distances, velocites, host virial radii across time,
         and snapshot information and returns a dictionary of pericenter distances, times, and a
         boolean array.
 
         distances: list of lists (given in kpc physical)
-        distances_norm: list of arrays (given in kpc physical)
+        velocites: list of lists (km / s)
         virial radii: array (given in kpc physical)
         time_array: dictionary
 
@@ -151,8 +177,13 @@ class OrbitAnalysis:
             - Returns a dictionary
                 - d['pericenter.check'] is a list of booleans
                   Tells you if the subhalo has experienced a pericenter
+                - d['pericenter.host.r200'] is a list of lists
+                  Tells you the virial radius of the host at time of subhalo
+                  pericenter
                 - d['pericenter'] is a list of lists
                   Tells you the pericenter distances (in kpc physical)
+                - d['pericenter.velocity'] is a list of lists
+                  Tells you the velocity (in km/s) at time of pericenter
                 - d['pericenter.time'] is a list of lists
                   Tells you what the age of the Universe was when the subhalo
                   experienced a pericenter
@@ -163,42 +194,38 @@ class OrbitAnalysis:
         """
         # Set up a dictionary to save values to
         d = dict();
-        pericenters_raw = []
-        time_raw = []
         host_peri_rad = []
         check = []
         peri_spl = []
+        peri_vel_spl = []
         time_spl = []
         # Loop over the number of subhalos
         for k in range(0, len(distances)):
-            temp_halo_1 = distances[k] # Now goes from z = 0 to z_form (un-normalized)
-            temp_halo_2 = distances_norm[k] # (normalized)
-            peri_list = []
-            time_list = []
+            temp_halo_d = distances[k] # Now goes from z = 0 to z_form (un-normalized)
+            temp_halo_v = velocities[k] # Same as above
             peri_rad_list = []
             # Want initial element to be this because we check +- 4 neighbors on each side
-            temp_peri = temp_halo_1[4]
-            temp_check = np.zeros(len(temp_halo_1))
+            temp_peri = temp_halo_d[4]
+            temp_check = np.zeros(len(temp_halo_d))
             temp_peri_spl = []
+            temp_peri_vel_spl = []
             temp_time_spl = []
             # Loop through each subhalo
-            for i in range(4, len(temp_halo_2)-4):
+            for i in range(4, len(temp_halo_d)-4):
                 # Check its neighbors and if it is within virial radius
-                if (temp_peri < temp_halo_1[i+1]) and (temp_peri < temp_halo_1[i+2]) and (temp_peri < temp_halo_1[i+3])and (temp_peri < temp_halo_1[i+4]) and (temp_peri < temp_halo_1[i-1]) and (temp_peri < temp_halo_1[i-2]) and (temp_peri < temp_halo_1[i-3])and (temp_peri < temp_halo_1[i-4]) and (temp_peri/virial_radii[i] < 1):
+                if (temp_peri < temp_halo_d[i+1]) and (temp_peri < temp_halo_d[i+2]) and (temp_peri < temp_halo_d[i+3])and (temp_peri < temp_halo_d[i+4]) and (temp_peri < temp_halo_d[i-1]) and (temp_peri < temp_halo_d[i-2]) and (temp_peri < temp_halo_d[i-3])and (temp_peri < temp_halo_d[i-4]) and (temp_peri/virial_radii[i] < 1):
                     temp_check[i] = 1
-                    peri_list.append(temp_halo_1[i])
-                    time_list.append(time_array['time'][600-i])
                     peri_rad_list.append(virial_radii[i])
-                    temp_peri_spl.append(temp_halo_1[i-4:i+4])
+                    temp_peri_spl.append(temp_halo_d[i-4:i+4])
+                    temp_peri_vel_spl.append(temp_halo_v[i-4:i+4])
                     temp_time_spl.append(time_array['time'][600-i-4:600-i+4])
-                    temp_peri = temp_halo_1[i+1]
+                    temp_peri = temp_halo_d[i+1]
                 else:
-                    temp_peri = temp_halo_1[i+1]
-            pericenters_raw.append(peri_list)
-            time_raw.append(time_list)
+                    temp_peri = temp_halo_d[i+1]
             host_peri_rad.append(peri_rad_list)
             check.append(temp_check)
             peri_spl.append(temp_peri_spl)
+            peri_vel_spl.append(temp_peri_vel_spl)
             time_spl.append(temp_time_spl)
         # Create a mask that tells you whether or not halo experienced pericenter
         peri_bool = []
@@ -207,31 +234,140 @@ class OrbitAnalysis:
                 peri_bool.append(True)
             else:
                 peri_bool.append(False)
-        d['pericenter.check'] = peri_bool
+        d['pericenter.check'] = np.asarray(peri_bool)
+        # Save the virial radii of the host at pericenter times
         d['pericenter.host.r200'] = host_peri_rad
         # Do the spline fitting
         pericenter_spline = []
+        peri_vel_spline = []
         time_spline = []
+        # Loop over all of the subhalos
         for i in range(0, len(peri_spl)):
+            # Check if subhalo experienced pericenter. If so, continue.
             if (len(peri_spl[i]) != 0):
                 temp_peri_new_spl = []
+                temp_peri_vel_new_spl = []
                 temp_time_new_spl = []
+                # Loop over the number of pericenter events
                 for j in range(0, len(peri_spl[i])):
                     temp_dist = peri_spl[i][j]
+                    temp_vel = peri_vel_spl[i][j]
                     temp_time = time_spl[i][j]
+                    # Work on distance
                     f = interp1d(temp_time, temp_dist, kind='cubic')
+                    f2 = interp1d(temp_time, temp_vel, kind='cubic')
                     x_new = np.linspace(temp_time[0], temp_time[-1], 100)
                     temp_peri_new_spl.append(np.min(f(x_new)))
                     temp_time_new_spl.append(x_new[np.where(f(x_new) == np.min(f(x_new)))[0][0]])
+                    temp_peri_vel_new_spl.append(f2(x_new)[np.where(f(x_new) == np.min(f(x_new)))[0][0]])
                 pericenter_spline.append(temp_peri_new_spl)
+                peri_vel_spline.append(temp_peri_vel_new_spl)
                 time_spline.append(temp_time_new_spl)
             else:
                 temp_peri_new_spl = []
+                temp_peri_vel_new_spl = []
                 temp_time_new_spl = []
                 pericenter_spline.append(temp_peri_new_spl)
+                peri_vel_spline.append(temp_peri_vel_new_spl)
                 time_spline.append(temp_time_new_spl)
         d['pericenter.dist'] = pericenter_spline
+        d['pericenter.vel'] = peri_vel_spline
         d['pericenter.time'] = time_spline
+        return d
+
+    def apocenter_interp(self, distances, velocities, time_array):
+        """
+        Reads in a list of subhalo distances and velocities, as well as
+        snapshot information, and returns a dictionary of apocenter distances,
+        velocities, and times.
+
+        distances: list of lists (given in kpc physical)
+        velocites: list of lists (km / s)
+        time_array: dictionary
+
+        NOTES:
+            - Returns a dictionary
+                - d['apocenter.check']
+                - d['apocenter']
+                - d['apocenter.velocity']
+                - d['apocenter.time']
+            - Loops through an array and checks to see if a value is larger than
+              4 of its neighbors on either side. If True, saves some values.
+        """
+        # Set up some initial variables
+        d = dict();
+        check = []
+        apo_spl = []
+        apo_vel_spl = []
+        time_spl = []
+        # Loop through the number of subhalos
+        for k in range(0, len(distances)):
+            temp_halo_d = distances[k] # Now goes from z = 0 to z_form (un-normalized)
+            temp_halo_v = velocities[k] # Same as above
+            # Want initial element to be this because we check +- 4 neighbors on each side
+            temp_apo = temp_halo_d[4]
+            temp_check = np.zeros(len(temp_halo_d))
+            temp_apo_spl = []
+            temp_apo_vel_spl = []
+            temp_time_spl = []
+            # Loop through each subhalo
+            for i in range(4, len(temp_halo_d)-4):
+                if (temp_apo > temp_halo_d[i+1]) and (temp_apo > temp_halo_d[i+2]) and (temp_apo > temp_halo_d[i+3])and (temp_apo > temp_halo_d[i+4]) and (temp_apo > temp_halo_d[i-1]) and (temp_apo > temp_halo_d[i-2]) and (temp_apo > temp_halo_d[i-3])and (temp_apo > temp_halo_d[i-4]):
+                    temp_check[i] = 1
+                    temp_apo_spl.append(temp_halo_d[i-4:i+4])
+                    temp_apo_vel_spl.append(temp_halo_v[i-4:i+4])
+                    temp_time_spl.append(time_array['time'][600-i-4:600-i+4])
+                    temp_apo = temp_halo_d[i+1]
+                else:
+                    temp_apo = temp_halo_d[i+1]
+            check.append(temp_check)
+            apo_spl.append(temp_apo_spl)
+            apo_vel_spl.append(temp_apo_vel_spl)
+            time_spl.append(temp_time_spl)
+        # Create a mask that tells you whether or not halo experienced apocenter
+        apo_bool = []
+        for i in range(0, len(check)):
+            if (np.sum(check[i]) > 0):
+                apo_bool.append(True)
+            else:
+                apo_bool.append(False)
+        d['apocenter.check'] = np.asarray(apo_bool)
+        # Do the spline fitting
+        apocenter_spline = []
+        apo_vel_spline = []
+        time_spline = []
+        # Loop over all of the subhalos
+        for i in range(0, len(apo_spl)):
+            # Check if subhalo experienced apocenter. If so, continue.
+            if (len(apo_spl[i]) != 0):
+                temp_apo_new_spl = []
+                temp_apo_vel_new_spl = []
+                temp_time_new_spl = []
+                # Loop over the number of apocenter events
+                for j in range(0, len(apo_spl[i])):
+                    temp_dist = apo_spl[i][j]
+                    temp_vel = apo_vel_spl[i][j]
+                    temp_time = time_spl[i][j]
+                    # Work on distance
+                    f = interp1d(temp_time, temp_dist, kind='cubic')
+                    f2 = interp1d(temp_time, temp_vel, kind='cubic')
+                    x_new = np.linspace(temp_time[0], temp_time[-1], 100)
+                    temp_apo_new_spl.append(np.max(f(x_new)))
+                    temp_time_new_spl.append(x_new[np.where(f(x_new) == np.max(f(x_new)))[0][0]])
+                    temp_apo_vel_new_spl.append(f2(x_new)[np.where(f(x_new) == np.max(f(x_new)))[0][0]])
+                apocenter_spline.append(temp_apo_new_spl)
+                apo_vel_spline.append(temp_apo_vel_new_spl)
+                time_spline.append(temp_time_new_spl)
+            else:
+                temp_apo_new_spl = []
+                temp_apo_vel_new_spl = []
+                temp_time_new_spl = []
+                apocenter_spline.append(temp_apo_new_spl)
+                apo_vel_spline.append(temp_apo_vel_new_spl)
+                time_spline.append(temp_time_new_spl)
+        d['apocenter.dist'] = apocenter_spline
+        d['apocenter.vel'] = apo_vel_spline
+        d['apocenter.time'] = time_spline
         return d
 
     def angular_momentum(self, tree, sub_inds):
@@ -272,7 +408,31 @@ class OrbitAnalysis:
         d['ang.mom.total'] = ang_mom_norm_tot
         return d
 
-    def angular_momentum_plot(self, ell, subhalo_num, infall, infall_array, time_array, comp, file_name):
+    def orbit_energy(self, tree, potential, sub_inds):
+        """
+        Reads in the tree, a subhalo's index and progenitor indices, and an array
+        of subhalo gravitational potentials and calculates the total orbital energy
+        for a subhalo and it's progenitor subhalos (i.e., the energy across time).
+
+        Energy is defined as E = (1/2)*velocity**2 + potential
+
+        tree : dictionary
+        sub_inds : list of arrays
+        potential : array
+
+        NOTES:
+            - Returns an array the size of an element of sub_inds
+                - To be more explicit, returns values for the subhalo of interest
+                  across the entire time range that it existed
+            - Only handles ONE subhalo at a time.
+        """
+        energy = 0.5*tree.prop('host.velocity.total')[sub_inds]**2 + potential['halo.potentials'][sub_inds]
+        return energy
+
+#### Maybe separate the functions above into one class and the ones below into
+# a plotting class?
+
+    def angular_momentum_plot(self, ell, subhalo_num, comp, infall_array, pericenter_array, apocenter_array, time_array, file_name):
         """
         Plot any component of angular momentumn for a subhalo
 
@@ -301,18 +461,27 @@ class OrbitAnalysis:
         plt.plot(times, ls)
         plt.xlim(0, 13.8)
         plt.ylim(np.nanmin(ls)-300, np.nanmax(ls)+300)
+        infall = infall_array['check'][subhalo_num]
+        peri = pericenter_array['pericenter.check'][subhalo_num]
+        apo = apocenter_array['apocenter.check'][subhalo_num]
         if infall == True:
-            infall_time = np.flip(time_array['time'])[infall_array['snapshot'][subhalo_num]]
+            infall_time = infall_array['time'][subhalo_num]
             plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
+        if peri == True:
+            peri_times = np.asarray(pericenter_array['pericenter.time'][subhalo_num])
+            [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
+        if apo == True:
+            apo_times = np.asarray(apocenter_array['apocenter.time'][subhalo_num])
+            [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
         plt.xlabel('time [Gyr]', fontsize=28)
         plt.ylabel('L'+comp_str+' [km s$^{-1}$ kpc]', fontsize=28)
-        plt.title('Halo '+str(subhalo_num+1), fontsize=24)
+        plt.title('Subhalo '+str(subhalo_num), fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
         plt.tight_layout()
-        plt.savefig('/home1/05400/ibsantis/scripts/orbit_plots/'+file_name+'.pdf')
+        plt.savefig('/home/ibsantis/scripts/orbit_data/plots/'+file_name+'.pdf')
         plt.close()
 
-    def velocity_plot(self, tree, sub_inds, subhalo_num, comp, infall, infall_array, time_array, file_name):
+    def velocity_plot(self, tree, sub_inds, subhalo_num, comp, infall_array, pericenter_array, apocenter_array, time_array, file_name):
         """
         Plot any component of velocity for a subhalo
         """
@@ -333,20 +502,29 @@ class OrbitAnalysis:
         plt.plot(times, vs)
         plt.xlim(0, 13.8)
         plt.ylim(np.nanmin(vs), np.nanmax(vs))
+        infall = infall_array['check'][subhalo_num]
+        peri = pericenter_array['pericenter.check'][subhalo_num]
+        apo = apocenter_array['apocenter.check'][subhalo_num]
         if infall == True:
-            infall_time = np.flip(time_array['time'])[infall_array['snapshot'][subhalo_num]]
+            infall_time = infall_array['time'][subhalo_num]
             plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
+        if peri == True:
+            peri_times = np.asarray(pericenter_array['pericenter.time'][subhalo_num])
+            [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
+        if apo == True:
+            apo_times = np.asarray(apocenter_array['apocenter.time'][subhalo_num])
+            [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
         plt.xlabel('time [Gyr]', fontsize=28)
         plt.ylabel('v'+comp_str+' [km s$^{-1}$]', fontsize=28)
-        plt.title('Halo '+str(subhalo_num+1), fontsize=24)
+        plt.title('Subhalo '+str(subhalo_num), fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
         plt.tight_layout()
-        plt.savefig('/home1/05400/ibsantis/scripts/orbit_plots/'+file_name+'.pdf')
+        plt.savefig('/home/ibsantis/scripts/orbit_data/plots/'+file_name+'.pdf')
         plt.close()
 
-    def distance_plot(self, tree, sub_inds, subhalo_num, comp, infall, infall_array, time_array, file_name):
+    def distance_plot(self, tree, sub_inds, subhalo_num, comp, infall_array, pericenter_array, apocenter_array, time_array, file_name):
         """
-        Plot any component of velocity for a subhalo
+        Plot any component of distance for a subhalo
         """
         plt.figure(figsize=(10, 8))
         if comp == 'r':
@@ -365,34 +543,22 @@ class OrbitAnalysis:
         plt.plot(times, ds)
         plt.xlim(0, 13.8)
         plt.ylim(np.nanmin(ds), np.nanmax(ds))
+        infall = infall_array['check'][subhalo_num]
+        peri = pericenter_array['pericenter.check'][subhalo_num]
+        apo = apocenter_array['apocenter.check'][subhalo_num]
         if infall == True:
-            infall_time = np.flip(time_array['time'])[infall_array['snapshot'][subhalo_num]]
+            infall_time = infall_array['time'][subhalo_num]
             plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
+        if peri == True:
+            peri_times = np.asarray(pericenter_array['pericenter.time'][subhalo_num])
+            [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
+        if apo == True:
+            apo_times = np.asarray(apocenter_array['apocenter.time'][subhalo_num])
+            [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
         plt.xlabel('time [Gyr]', fontsize=28)
         plt.ylabel('d'+comp_str+' [kpc]', fontsize=28)
-        plt.title('Halo '+str(subhalo_num+1), fontsize=24)
+        plt.title('Subhalo '+str(subhalo_num), fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
         plt.tight_layout()
-        plt.savefig('/home1/05400/ibsantis/scripts/orbit_plots/'+file_name+'.pdf')
+        plt.savefig('/home/ibsantis/scripts/orbit_data/plots/'+file_name+'.pdf')
         plt.close()
-
-    def orbit_energy(self, tree, potential, sub_inds):
-        """
-        Reads in the tree, a subhalo's index and progenitor indices, and an array
-        of subhalo gravitational potentials and calculates the total orbital energy
-        for a subhalo and it's progenitor subhalos (i.e., the energy across time).
-
-        Energy is defined as E = (1/2)*velocity**2 + potential
-
-        tree : dictionary
-        sub_inds : list of arrays
-        potential : array
-
-        NOTES:
-            - Returns an array the size of an element of sub_inds
-                - To be more explicit, returns values for the subhalo of interest
-                  across the entire time range that it existed
-            - Only handles ONE subhalo at a time.
-        """
-        energy = 0.5*tree.prop('host.velocity.total')[sub_inds]**2 + potential['halo.potentials'][sub_inds]
-        return energy
