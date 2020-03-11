@@ -450,11 +450,18 @@ class OrbitAnalysis:
         energy = 0.5*tree.prop('host.velocity.total')[sub_inds]**2 + potential['halo.potentials'][sub_inds]
         return energy
 
-orbits = OrbitAnalysis()
-
 class OrbitPlot:
 
-    def orbit_energy_plot(self, energy_list, subhalo_num, infall_array, pericenter_array, apocenter_array, time_array, file_name):
+    def orbit_energy_plot(
+        self,
+        energy_list,
+        subhalo_num,
+        infall_array,
+        pericenter_array,
+        apocenter_array,
+        time_array,
+        file_name
+    ):
         """
         DESCRIPTION:
             Plots the orbital energy of a subhalo across time .
@@ -695,5 +702,3 @@ class OrbitPlot:
         plt.tight_layout()
         plt.savefig('/home/ibsantis/scripts/orbit_data/plots/'+file_name+'.pdf')
         plt.close()
-
-orbit_plot = OrbitPlot()
