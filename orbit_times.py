@@ -21,19 +21,19 @@ class OrbitAnalysis:
 
     def get_luminous_halos(self, tree):
         """
+        DESCRIPTION:
             Reads in the halo tree, and returns the indices of luminous subhalos
             along with their progenitor indices.
 
+        VARIABLES:
             tree: dictionary
 
-            NOTES:
-                - Returns an array of length equal to the number of luminous subhalos
-                - For each subhalo, the length of the array is equal to the number of
-                  snapshots that is has existed for
-                - For each subhalo, the arrays are ordered going from
-                  z = 0 to z = z_form
-
-            Returns a list of arrays
+        NOTES:
+            - Returns an array of length equal to the number of luminous subhalos
+            - For each subhalo, the length of the array is equal to the number of
+              snapshots that is has existed for
+            - For each subhalo, the arrays are ordered going from
+              z = 0 to z = z_form
         """
 
         # Select the subhalo indices at z = 0
@@ -50,43 +50,43 @@ class OrbitAnalysis:
 
     def halo_distances(self, tree, sub_inds):
         """
+        DESCRIPTION:
             Reads in the subhalo indices and tree, then returns the subhalo distances
             from the tree.
 
+        VARIABLES:
             tree: dictionary
             sub_inds: list of arrays
 
-            NOTES:
-                - Returns a list of length equal to the number of subhalos
-                - For each subhalo, the length of the list is equal to the number
-                  of snapshots that it has existed for
-                - Lists are ordered however the subhalo indices are ordered
-                    - If used in conjunction with get_luminous_halos, they go from
-                      z = 0 to z = z_form
-
-            Returns a list of lists
+        NOTES:
+            - Returns a list of length equal to the number of subhalos
+            - For each subhalo, the length of the list is equal to the number
+              of snapshots that it has existed for
+            - Lists are ordered however the subhalo indices are ordered
+                - If used in conjunction with get_luminous_halos, they go from
+                  z = 0 to z = z_form
         """
         distances = [[tree.prop('host.distance.total', sub_inds[i][j]) for j in range(0, len(sub_inds[i]))] for i in range(0, len(sub_inds))]
         return distances
 
     def halo_distances_norm(self, distances, host_halo_radii):
         """
+        DESCRIPTION:
             Reads in distances (for each subhalo) and the host radii (at all
             snapshots that it exists)
 
+        VARIABLES:
             distances: list of lists (given in kpc physical)
             host_halo_radii: array (given in kpc physical)
 
-            NOTES:
-                - Returns a list of length equal to the number of subhalos
-                - For each subhalo, the length of their array is equal to either
-                  the number of snapshots the subhalo exists for, or the number of
-                  snapshots the hosts exists for; takes the smaller value
-                - Lists are ordered however the subhalo indices are ordered
-                    - If used in conjunction with get_luminous_halos, they go from
-                    z = 0 to z = z_form
-
-            Returns a list of arrays
+        NOTES:
+            - Returns a list of length equal to the number of subhalos
+            - For each subhalo, the length of their array is equal to either
+              the number of snapshots the subhalo exists for, or the number of
+              snapshots the hosts exists for; takes the smaller value
+            - Lists are ordered however the subhalo indices are ordered
+                - If used in conjunction with get_luminous_halos, they go from
+                z = 0 to z = z_form
         """
         distances_norm = []
         for i in range(0, len(distances)):
@@ -100,32 +100,34 @@ class OrbitAnalysis:
 
     def halo_velocites(self, tree, sub_inds):
         """
+        DESCRIPTION:
             Reads in the subhalo indices and tree, then returns the subhalo velocities
             from the tree.
 
+        VARIABLES:
             tree: dictionary
             sub_inds: list of arrays
 
-            NOTES:
-                - Returns a list of length equal to the number of subhalos
-                - For each subhalo, the length of the list is equal to the number
-                  of snapshots that it has existed for
-                - Lists are ordered however the subhalo indices are ordered
-                    - If used in conjunction with get_luminous_halos, they go from
-                      z = 0 to z = z_form
-
-            Returns a list of lists
+        NOTES:
+            - Returns a list of length equal to the number of subhalos
+            - For each subhalo, the length of the list is equal to the number
+              of snapshots that it has existed for
+            - Lists are ordered however the subhalo indices are ordered
+                - If used in conjunction with get_luminous_halos, they go from
+                  z = 0 to z = z_form
         """
         velocites = [[tree.prop('host.velocity.total', sub_inds[i][j]) for j in range(0, len(sub_inds[i]))] for i in range(0, len(sub_inds))]
         return velocites
 
     def first_infall_times(self, distances_norm, time_array):
         """
-        Reads in normalized subhalo distances and snapshot information and returns
-        the snapshots and times when the subhalos first fell into the host
+        DESCRIPTION:
+            Reads in normalized subhalo distances and snapshot information and returns
+            the snapshots and times when the subhalos first fell into the host
 
-        distances_norm: list of arrays (given in kpc physical)
-        time_array: dictionary (given in Gyr)
+        VARIABLES:
+            distances_norm: list of arrays (given in kpc physical)
+            time_array: dictionary (given in Gyr)
 
         NOTES:
             - Returns a dictionary
@@ -136,8 +138,6 @@ class OrbitAnalysis:
                 - d['check'] is a boolean array that tells you if the halo has
                   fallen into the host
             - Times given correspond to the age of the Universe (Gyr)
-
-        Returns dictionary
         """
         # Set up a dictionary to store the information you want
         d = dict();
@@ -164,14 +164,16 @@ class OrbitAnalysis:
 
     def pericenter_interp(self, distances, velocities, virial_radii, time_array):
         """
-        Reads in subhalo distances, velocites, host virial radii across time,
-        and snapshot information and returns a dictionary of pericenter distances, times, and a
-        boolean array.
+        DESCRIPTION:
+            Reads in subhalo distances, velocites, host virial radii across time,
+            and snapshot information and returns a dictionary of pericenter distances, times, and a
+            boolean array.
 
-        distances: list of lists (given in kpc physical)
-        velocites: list of lists (km / s)
-        virial radii: array (given in kpc physical)
-        time_array: dictionary
+        VARIABLES:
+            distances: list of lists (given in kpc physical)
+            velocites: list of lists (km / s)
+            virial radii: array (given in kpc physical)
+            time_array: dictionary
 
         NOTES:
             - Returns a dictionary
@@ -277,22 +279,35 @@ class OrbitAnalysis:
 
     def apocenter_interp(self, distances, velocities, time_array, infall_array):
         """
-        Reads in a list of subhalo distances and velocities, as well as
-        snapshot information, and returns a dictionary of apocenter distances,
-        velocities, and times.
+        DESCRIPTION:
+            Reads in a list of subhalo distances and velocities, as well as
+            snapshot information, and returns a dictionary of apocenter distances,
+            velocities, and times.
 
-        distances: list of lists (given in kpc physical)
-        velocites: list of lists (km / s)
-        time_array: dictionary
+        VARIABLES:
+            distances: list of lists (given in kpc physical)
+            velocites: list of lists (km / s)
+            time_array: dictionary
+            infall_array: dictionary
 
         NOTES:
             - Returns a dictionary
-                - d['apocenter.check']
-                - d['apocenter']
-                - d['apocenter.velocity']
-                - d['apocenter.time']
-            - Loops through an array and checks to see if a value is larger than
-              4 of its neighbors on either side. If True, saves some values.
+                - d['apocenter.check'] is a list of booleans
+                  These will tell you if there was an apocenter event for
+                  a specific halo.
+                - d['apocenter.dist'] is a list of lists
+                  Tells you the apocenter distances (in kpc physical)
+                - d['apocenter.velocity'] is a list of lists
+                  Tells you the velocites of the subhalos at apocenter
+                  (in km/s physical)
+                - d['apocenter.time'] is a list of lists
+                  Tells you the age of the Universe when a subhalo reached
+                  apocenter.
+            - Loops through an array and checks to see:
+                - If the subhalo has fallen into the host
+                - If the subhalo distance at this time is larger than the
+                  distances at 4 snapshots on either side of this element.
+                If True, saves the values listed above.
         """
         # Set up some initial variables
         d = dict();
@@ -375,11 +390,13 @@ class OrbitAnalysis:
 
     def angular_momentum(self, tree, sub_inds):
         """
-        Reads in the tree and subhalo indices and returns a dictionary that contains
-        the angular momentum vectors and their magnitudes.
+        DESCRIPTION:
+            Reads in the tree and subhalo indices and returns a dictionary that contains
+            the angular momentum vectors and their magnitudes.
 
-        tree: dictionary
-        sub_inds: list of arrays
+        VARIABLES:
+            tree     : dictionary
+            sub_inds : list of arrays
 
         NOTES:
             - Returns a dictionary:
@@ -394,7 +411,7 @@ class OrbitAnalysis:
                     - Goes from z = 0 to z = z_form
                     - d['ang.mom.total'][i]: array of angular momentum magnitudes for subhalo i
                     - d['ang.mom.vector'][i][j]: jth angular momentum value for subhalo i (at time j)
-            - tree is organized as (r, z, phi)
+            - 'tree' is organized as (r, z, phi)
         """
         d = dict();
         ang_mom_vec_tot = []
@@ -413,17 +430,18 @@ class OrbitAnalysis:
 
     def orbit_energy(self, tree, potential, sub_inds):
         """
-        Reads in the tree, a subhalo's index and progenitor indices, and an array
-        of subhalo gravitational potentials and calculates the total orbital energy
-        for a subhalo and it's progenitor subhalos (i.e., the energy across time).
+        DESCRIPTION:
+            Reads in the tree, a subhalo's index and progenitor indices, and an array
+            of subhalo gravitational potentials and calculates the total orbital energy
+            for a subhalo and it's progenitor subhalos (i.e., the energy across time).
 
-        Energy is defined as E = (1/2)*velocity**2 + potential
-
-        tree : dictionary
-        sub_inds : list of arrays
-        potential : array
+        VARIABLES:
+            tree      : dictionary
+            sub_inds  : list of arrays
+            potential : array
 
         NOTES:
+            - Energy is defined as E = (1/2)*velocity**2 + potential
             - Returns an array the size of an element of sub_inds
                 - To be more explicit, returns values for the subhalo of interest
                   across the entire time range that it existed
@@ -435,17 +453,84 @@ class OrbitAnalysis:
 #### Maybe separate the functions above into one class and the ones below into
 # a plotting class?
 
+class OrbitAnalysisPlot:
+
+    def orbit_energy_plot(self, energy_list, subhalo_num, infall_array, pericenter_array, apocenter_array, time_array, file_name):
+        """
+        DESCRIPTION:
+            Plots the orbital energy of a subhalo across time .
+
+        VARIABLES:
+            energy_list      : list of lists
+            subhalo_num      : integer
+                               The subhalo that you want to plot (starts at zero)
+            infall_array     : dictionary
+            pericenter_array : dictionary
+            apocenter_array  : dictionary
+            time_array       : dictionary
+            file_name        : string
+
+        NOTES:
+            - This requires that you use the function "orbit_energy()" to generate
+              the orbital energies for all subhalos and save them all into one list.
+            - Will plot a black vertical line indicating when the subhalo first
+              fell into the host.
+            - Will plot a red vertical line indicating when the subhalo experienced
+              an apocenter event.
+            - Will plot a green vertical line indicating when the subhalo
+              experienced a pericenter event.
+        """
+        plt.figure(figsize=(10, 8))
+        halo_energy = energy_list[subhalo_num]
+        times = np.flip(time_array['time'], axis=0)[:len(halo_energy)]
+        plt.plot(times, halo_energy)
+        plt.xlim(0, 13.8)
+        plt.ylim(np.nanmin(halo_energy)-300, np.nanmax(halo_energy)+300)
+        infall = infall_array['check'][subhalo_num]
+        peri = pericenter_array['pericenter.check'][subhalo_num]
+        apo = apocenter_array['apocenter.check'][subhalo_num]
+        if infall == True:
+            infall_time = infall_array['time'][subhalo_num]
+            plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
+        if peri == True:
+            peri_times = np.asarray(pericenter_array['pericenter.time'][subhalo_num])
+            [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
+        if apo == True:
+            apo_times = np.asarray(apocenter_array['apocenter.time'][subhalo_num])
+            [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
+        plt.xlabel('time [Gyr]', fontsize=28)
+        plt.ylabel('(1/2)*v$^2$ + U [km$^2$ s$^{-2}$]', fontsize=28)
+        plt.title('Subhalo '+str(subhalo_num), fontsize=24)
+        plt.tick_params(axis='both', which='major', labelsize=24)
+        plt.tight_layout()
+        plt.savefig('/home/ibsantis/scripts/orbit_data/plots/'+file_name+'.pdf')
+        plt.close()
+
     def angular_momentum_plot(self, ell, subhalo_num, comp, infall_array, pericenter_array, apocenter_array, time_array, file_name):
         """
-        Plot any component of angular momentumn for a subhalo
+        DESCRIPTION:
+            Plot any component of angular momentumn for a subhalo across time
 
-        ell: ?
-        subhalo_num: integer
-                     The halo in particular you want to plot (starts from 0)
-        time_array: dictionary
-        comp: string
-              This is the component of angular momentum that you want to plot
-        file_name: string
+        VARIABLES:
+            ell              : dictionary
+            subhalo_num      : integer
+                               The subhalo you want to plot (starts from zero)
+            comp             : string
+                               This is the component of angular momentum that you want to plot
+            infall_array     : dictionary
+            pericenter_array : dictionary
+            apocenter_array  : dictionary
+            time_array       : dictionary
+            file_name        : string
+
+        NOTES:
+            - This requires you to use the function "angular_momentum()" beforehand
+            - Will plot a black vertical line indicating when the subhalo first
+              fell into the host.
+            - Will plot a red vertical line indicating when the subhalo experienced
+              an apocenter event.
+            - Will plot a green vertical line indicating when the subhalo
+              experienced a pericenter event.
         """
         plt.figure(figsize=(10, 8))
         if comp == 'r':
@@ -486,7 +571,30 @@ class OrbitAnalysis:
 
     def velocity_plot(self, tree, sub_inds, subhalo_num, comp, infall_array, pericenter_array, apocenter_array, time_array, file_name):
         """
-        Plot any component of velocity for a subhalo
+        DESCRIPTION:
+            Plot any component of velocity for a subhalo across time
+
+        VARIABLES:
+            tree             : dictionary
+            sub_inds         : list of lists
+            subhalo_num      : integer
+                               The subhalo you want to plot (starts at zero)
+            comp             : string
+                               Component of velocity you want to plot.
+                               Choose between r, phi, z, or all (total magnitude)
+            infall_array     : dictionary
+            pericenter_array : dictionary
+            apocenter_array  : dictionary
+            time_array       : dictionary
+            file_name        : string
+
+        NOTES:
+            - Will plot a black vertical line indicating when the subhalo first
+              fell into the host.
+            - Will plot a red vertical line indicating when the subhalo experienced
+              an apocenter event.
+            - Will plot a green vertical line indicating when the subhalo
+              experienced a pericenter event.
         """
         plt.figure(figsize=(10, 8))
         if comp == 'r':
@@ -527,7 +635,30 @@ class OrbitAnalysis:
 
     def distance_plot(self, tree, sub_inds, subhalo_num, comp, infall_array, pericenter_array, apocenter_array, time_array, file_name):
         """
-        Plot any component of distance for a subhalo
+        DESCRIPTION:
+            Plot any component of distance for a subhalo across time.
+
+        VARIABLES:
+            tree             : dictionary
+            sub_inds         : list of lists
+            subhalo_num      : integer
+                               The subhalo you want to plot (starts at zero)
+            comp             : string
+                               Component of distance/position you want to plot.
+                               Choose between r, phi, z, or all (total magnitude)
+            infall_array     : dictionary
+            pericenter_array : dictionary
+            apocenter_array  : dictionary
+            time_array       : dictionary
+            file_name        : string
+
+        NOTES:
+            - Will plot a black vertical line indicating when the subhalo first
+              fell into the host.
+            - Will plot a red vertical line indicating when the subhalo experienced
+              an apocenter event.
+            - Will plot a green vertical line indicating when the subhalo
+              experienced a pericenter event.
         """
         plt.figure(figsize=(10, 8))
         if comp == 'r':
