@@ -275,7 +275,7 @@ class OrbitAnalysis:
         d['pericenter.time'] = time_spline
         return d
 
-    def apocenter_interp(self, distances, velocities, time_array):
+    def apocenter_interp(self, distances, velocities, time_array, infall_array):
         """
         Reads in a list of subhalo distances and velocities, as well as
         snapshot information, and returns a dictionary of apocenter distances,
@@ -306,20 +306,23 @@ class OrbitAnalysis:
             temp_halo_v = velocities[k] # Same as above
             # Want initial element to be this because we check +- 4 neighbors on each side
             temp_apo = temp_halo_d[4]
+            temp_apo_time = time_array['time'][600-4]
             temp_check = np.zeros(len(temp_halo_d))
             temp_apo_spl = []
             temp_apo_vel_spl = []
             temp_time_spl = []
             # Loop through each subhalo
             for i in range(4, len(temp_halo_d)-4):
-                if (temp_apo > temp_halo_d[i+1]) and (temp_apo > temp_halo_d[i+2]) and (temp_apo > temp_halo_d[i+3])and (temp_apo > temp_halo_d[i+4]) and (temp_apo > temp_halo_d[i-1]) and (temp_apo > temp_halo_d[i-2]) and (temp_apo > temp_halo_d[i-3])and (temp_apo > temp_halo_d[i-4]):
+                if (infall_array['time'][k] != -1) and (temp_apo > temp_halo_d[i+1]) and (temp_apo > temp_halo_d[i+2]) and (temp_apo > temp_halo_d[i+3])and (temp_apo > temp_halo_d[i+4]) and (temp_apo > temp_halo_d[i-1]) and (temp_apo > temp_halo_d[i-2]) and (temp_apo > temp_halo_d[i-3]) and (temp_apo > temp_halo_d[i-4]) and (temp_apo_time > infall_array['time'][k]):
                     temp_check[i] = 1
                     temp_apo_spl.append(temp_halo_d[i-4:i+4])
                     temp_apo_vel_spl.append(temp_halo_v[i-4:i+4])
                     temp_time_spl.append(time_array['time'][600-i-4:600-i+4])
                     temp_apo = temp_halo_d[i+1]
+                    temp_apo_time = time_array['time'][600-(i+1)]
                 else:
                     temp_apo = temp_halo_d[i+1]
+                    temp_apo_time = time_array['time'][600-(i+1)]
             check.append(temp_check)
             apo_spl.append(temp_apo_spl)
             apo_vel_spl.append(temp_apo_vel_spl)
