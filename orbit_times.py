@@ -450,10 +450,9 @@ class OrbitAnalysis:
         energy = 0.5*tree.prop('host.velocity.total')[sub_inds]**2 + potential['halo.potentials'][sub_inds]
         return energy
 
-#### Maybe separate the functions above into one class and the ones below into
-# a plotting class?
+orbits = OrbitAnalysis()
 
-class OrbitAnalysisPlot:
+class OrbitPlot:
 
     def orbit_energy_plot(self, energy_list, subhalo_num, infall_array, pericenter_array, apocenter_array, time_array, file_name):
         """
@@ -696,3 +695,5 @@ class OrbitAnalysisPlot:
         plt.tight_layout()
         plt.savefig('/home/ibsantis/scripts/orbit_data/plots/'+file_name+'.pdf')
         plt.close()
+
+orbit_plot = OrbitPlot()
