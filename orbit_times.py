@@ -512,7 +512,17 @@ class OrbitPlot:
         plt.savefig('/home/ibsantis/scripts/orbit_data/plots/'+file_name+'.pdf')
         plt.close()
 
-    def angular_momentum_plot(self, ell, subhalo_num, comp, infall_array, pericenter_array, apocenter_array, time_array, file_name):
+    def angular_momentum_plot(
+        self,
+        ell,
+        subhalo_num,
+        comp,
+        infall_array,
+        pericenter_array,
+        apocenter_array,
+        time_array,
+        file_name
+    ):
         """
         DESCRIPTION:
             Plot any component of angular momentumn for a subhalo across time
@@ -575,7 +585,18 @@ class OrbitPlot:
         plt.savefig('/home/ibsantis/scripts/orbit_data/plots/'+file_name+'.pdf')
         plt.close()
 
-    def velocity_plot(self, tree, sub_inds, subhalo_num, comp, infall_array, pericenter_array, apocenter_array, time_array, file_name):
+    def velocity_plot(
+        self,
+        tree,
+        sub_inds,
+        subhalo_num,
+        comp,
+        infall_array,
+        pericenter_array,
+        apocenter_array,
+        time_array,
+        file_name
+    ):
         """
         DESCRIPTION:
             Plot any component of velocity for a subhalo across time
@@ -639,7 +660,18 @@ class OrbitPlot:
         plt.savefig('/home/ibsantis/scripts/orbit_data/plots/'+file_name+'.pdf')
         plt.close()
 
-    def distance_plot(self, tree, sub_inds, subhalo_num, comp, infall_array, pericenter_array, apocenter_array, time_array, file_name):
+    def distance_plot(
+        self,
+        tree,
+        sub_inds,
+        subhalo_num,
+        comp,
+        infall_array,
+        pericenter_array,
+        apocenter_array,
+        time_array,
+        file_name
+    ):
         """
         DESCRIPTION:
             Plot any component of distance for a subhalo across time.
