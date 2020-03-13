@@ -5,11 +5,23 @@ Intended for use with the FIRE-2 simulations
 
 @author: Isaiah Santistevan <ibsantistevan@ucdavis.edu>
 
-This package is written to help compute:
+This package is written to help compute the following subhalo orbital parameters
+with the OrbitAnalysis class:
     - Infall times of subhalos around a host halo
-    - Pericenter distances and times
-    - Orbit energy
+    - Pericenter distances, velocities, and times
+    - Apoventer distances, velocities, and times
     - Orbit angular momentum
+    - Orbit energy
+
+There is also a OrbitPlot class which can generate the following kinds of figures:
+    - Distance of subhalo vs time
+        - Can plot r, phi, and z components, or the total distance magnitude
+    - Velocity of subhalo vs time
+        - Can plot r, phi, and z components, or the total velocity magnitude
+    - Angular momentum of subhalo vs time
+        - Can plot r, phi, and z components, or the total angular
+          momentum magnitude
+    - Orbit energy vs time
 """
 
 from scipy.interpolate import interp1d
@@ -98,7 +110,7 @@ class OrbitAnalysis:
                 distances_norm.append(distances[i][:len(host_halo_radii)]/host_halo_radii)
         return distances_norm
 
-    def halo_velocites(self, tree, sub_inds):
+    def halo_velocities(self, tree, sub_inds):
         """
         DESCRIPTION:
             Reads in the subhalo indices and tree, then returns the subhalo velocities
@@ -639,7 +651,7 @@ class OrbitPlot:
         times = np.flip(time_array['time'], axis=0)[:len(vs)]
         plt.plot(times, vs)
         plt.xlim(0, 13.8)
-        plt.ylim(np.nanmin(vs), np.nanmax(vs))
+        plt.ylim(0, np.nanmax(vs))
         infall = infall_array['check'][subhalo_num]
         peri = pericenter_array['pericenter.check'][subhalo_num]
         apo = apocenter_array['apocenter.check'][subhalo_num]
@@ -714,7 +726,7 @@ class OrbitPlot:
         times = np.flip(time_array['time'], axis=0)[:len(ds)]
         plt.plot(times, ds)
         plt.xlim(0, 13.8)
-        plt.ylim(np.nanmin(ds), np.nanmax(ds))
+        plt.ylim(0, np.nanmax(ds))
         infall = infall_array['check'][subhalo_num]
         peri = pericenter_array['pericenter.check'][subhalo_num]
         apo = apocenter_array['apocenter.check'][subhalo_num]
