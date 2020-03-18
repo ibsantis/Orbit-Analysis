@@ -315,10 +315,17 @@ class OrbitAnalysis:
                 - d['apocenter.time'] is a list of lists
                   Tells you the age of the Universe when a subhalo reached
                   apocenter.
+                - d['max.dist'] is an array
+                  Tells you the maximum distance that a subhalo reached
+                - d['max.dist.snap'] is an array
+                  Tells you the snapshot when the subhalo was at max distance
+                - d['max.dist.time'] is an array
+                  Tells you the age of the Universe when the subhalo was at
+                  max distance
             - Loops through an array and checks to see:
                 - If the subhalo has fallen into the host
                 - If the subhalo distance at this time is larger than the
-                  distances at 4 snapshots on either side of this element.
+                  distances at 10 snapshots on either side of this element.
                 If True, saves the values listed above.
         """
         # Set up some initial variables
@@ -335,23 +342,23 @@ class OrbitAnalysis:
             temp_halo_d = distances[k] # Now goes from z = 0 to z_form (un-normalized)
             temp_halo_v = velocities[k] # Same as above
             # Save the max distance and the snapshot/time this happens at
-            max_dist[k] = np.max(distances[k])
-            max_dist_snap = np.flip(time_array['index'])[np.where(distances[k] == np.max(distances[k]))[0][0]]
-            max_dist_time = np.flip(time_array['time'])[np.where(distances[k] == np.max(distances[k]))[0][0]]
-            # Want initial element to be this because we check +- 4 neighbors on each side
-            temp_apo = temp_halo_d[4]
-            temp_apo_time = time_array['time'][600-4]
+            max_dist[k] = np.nanmax(distances[k])
+            max_dist_snap[k] = np.flip(time_array['index'])[np.where(distances[k] == np.nanmax(distances[k]))[0][0]]
+            max_dist_time[k] = np.flip(time_array['time'])[np.where(distances[k] == np.nanmax(distances[k]))[0][0]]
+            # Want initial element to be this because we check +- 10 neighbors on each side
+            temp_apo = temp_halo_d[10]
+            temp_apo_time = time_array['time'][600-10]
             temp_check = np.zeros(len(temp_halo_d))
             temp_apo_spl = []
             temp_apo_vel_spl = []
             temp_time_spl = []
             # Loop through each subhalo
-            for i in range(4, len(temp_halo_d)-4):
-                if (infall_array['time'][k] != -1) and (temp_apo > temp_halo_d[i+1]) and (temp_apo > temp_halo_d[i+2]) and (temp_apo > temp_halo_d[i+3])and (temp_apo > temp_halo_d[i+4]) and (temp_apo > temp_halo_d[i-1]) and (temp_apo > temp_halo_d[i-2]) and (temp_apo > temp_halo_d[i-3]) and (temp_apo > temp_halo_d[i-4]) and (temp_apo_time > infall_array['time'][k]):
+            for i in range(10, len(temp_halo_d)-10):
+                if (infall_array['time'][k] != -1) and (temp_apo > temp_halo_d[i+1]) and (temp_apo > temp_halo_d[i+2]) and (temp_apo > temp_halo_d[i+3]) and (temp_apo > temp_halo_d[i+4]) and (temp_apo > temp_halo_d[i+5]) and (temp_apo > temp_halo_d[i+6]) and (temp_apo > temp_halo_d[i+7]) and (temp_apo > temp_halo_d[i+8]) and (temp_apo > temp_halo_d[i+9]) and (temp_apo > temp_halo_d[i+10]) and (temp_apo > temp_halo_d[i-1]) and (temp_apo > temp_halo_d[i-2]) and (temp_apo > temp_halo_d[i-3]) and (temp_apo > temp_halo_d[i-4]) and (temp_apo > temp_halo_d[i-5]) and (temp_apo > temp_halo_d[i-6]) and (temp_apo > temp_halo_d[i-7]) and (temp_apo > temp_halo_d[i-8]) and (temp_apo > temp_halo_d[i-9]) and (temp_apo > temp_halo_d[i-10]) and (temp_apo_time > infall_array['time'][k]):
                     temp_check[i] = 1
-                    temp_apo_spl.append(temp_halo_d[i-4:i+4])
-                    temp_apo_vel_spl.append(temp_halo_v[i-4:i+4])
-                    temp_time_spl.append(time_array['time'][600-i-4:600-i+4])
+                    temp_apo_spl.append(temp_halo_d[i-10:i+10])
+                    temp_apo_vel_spl.append(temp_halo_v[i-10:i+10])
+                    temp_time_spl.append(time_array['time'][600-i-10:600-i+10])
                     temp_apo = temp_halo_d[i+1]
                     temp_apo_time = time_array['time'][600-(i+1)]
                 else:
@@ -630,7 +637,8 @@ class OrbitPlot:
                                The subhalo you want to plot (starts at zero)
             comp             : string
                                Component of velocity you want to plot.
-                               Choose between r, phi, z, or all (total magnitude)
+                               Choose between r, phi, z, radial, tangential, or
+                               all (total magnitude)
             infall_array     : dictionary
             pericenter_array : dictionary
             apocenter_array  : dictionary
@@ -655,6 +663,12 @@ class OrbitPlot:
         elif comp == 'z':
             vs = tree.prop('host.velocity.cylindrical', sub_inds[subhalo_num])[:,1]
             comp_str = '$_{z}$'
+        elif comp == 'rad':
+            vs = tree.prop('host.velocity.rad', sub_inds[subhalo_num])
+            comp_str = '$_{rad}$'
+        elif comp == 'tan':
+            vs = tree.prop('host.velocity.tan', sub_inds[subhalo_num])
+            comp_str = '$_{tan}$'
         elif comp == 'all':
             vs = tree.prop('host.velocity.cylindrical.total', sub_inds[subhalo_num])
             comp_str = '$_{tot}$'
