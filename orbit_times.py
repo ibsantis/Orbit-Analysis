@@ -327,10 +327,17 @@ class OrbitAnalysis:
         apo_spl = []
         apo_vel_spl = []
         time_spl = []
+        max_dist = np.zeros(len(distances))
+        max_dist_snap = np.zeros(len(distances))
+        max_dist_time = np.zeros(len(distances))
         # Loop through the number of subhalos
         for k in range(0, len(distances)):
             temp_halo_d = distances[k] # Now goes from z = 0 to z_form (un-normalized)
             temp_halo_v = velocities[k] # Same as above
+            # Save the max distance and the snapshot/time this happens at
+            max_dist[k] = np.max(distances[k])
+            max_dist_snap = np.flip(time_array['index'])[np.where(distances[k] == np.max(distances[k]))[0][0]]
+            max_dist_time = np.flip(time_array['time'])[np.where(distances[k] == np.max(distances[k]))[0][0]]
             # Want initial element to be this because we check +- 4 neighbors on each side
             temp_apo = temp_halo_d[4]
             temp_apo_time = time_array['time'][600-4]
@@ -398,6 +405,9 @@ class OrbitAnalysis:
         d['apocenter.dist'] = apocenter_spline
         d['apocenter.vel'] = apo_vel_spline
         d['apocenter.time'] = time_spline
+        d['max.dist'] = max_dist
+        d['max.dist.snap'] = max_dist_snap
+        d['max.dist.time'] = max_dist_time
         return d
 
     def angular_momentum(self, tree, sub_inds):
