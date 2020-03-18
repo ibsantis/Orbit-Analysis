@@ -476,13 +476,16 @@ class OrbitAnalysis:
                   across the entire time range that it existed
             - Only handles ONE subhalo at a time.
         """
-        energy = 0.5*tree.prop('host.velocity.total')[sub_inds]**2 + potential['halo.potentials'][sub_inds]
+        energy = 0.5*tree.prop('host.velocity.total', sub_inds)**2 + potential['halo.potentials'][sub_inds]
         return energy
 
 class OrbitPlot:
 
     def orbit_energy_plot(
         self,
+        etype,
+        tree,
+        sub_inds,
         energy_list,
         subhalo_num,
         infall_array,
@@ -496,7 +499,13 @@ class OrbitPlot:
             Plots the orbital energy of a subhalo across time .
 
         VARIABLES:
-            energy_list      : list of lists
+            etype             : string
+                               The type of energy you want to plot
+                               Choose from: potential, kinetic, total
+            energy_list      : Depends on "type"
+                               Potential: array
+                               Kinetic  : array
+                               Total    : array
             subhalo_num      : integer
                                The subhalo that you want to plot (starts at zero)
             infall_array     : dictionary
@@ -516,8 +525,18 @@ class OrbitPlot:
               experienced a pericenter event.
         """
         plt.figure(figsize=(10, 8))
-        halo_energy = energy_list[subhalo_num]
-        times = np.flip(time_array['time'], axis=0)[:len(halo_energy)]
+        if etype == 'potential':
+            halo_energy = energy_list[subhalo_num]
+            times = np.flip(time_array['time'], axis=0)[:len(halo_energy)]
+            ystr = 'U [km$^2$ s$^{-2}$]'
+        if etype == 'kinetic':
+            halo_energy = 0.5*tree.prop('host.velocity.total', sub_inds[subhalo_num])**2
+            times = np.flip(time_array['time'], axis=0)[:len(halo_energy)]
+            ystr = 'K [km$^2$ s$^{-2}$]'
+        if etype == 'total':
+            halo_energy = energy_list[subhalo_num]
+            times = np.flip(time_array['time'], axis=0)[:len(halo_energy)]
+            ystr = 'E$_{\\rm tot}$ [km$^2$ s$^{-2}$]'
         plt.plot(times, halo_energy)
         plt.xlim(0, 13.8)
         plt.ylim(np.nanmin(halo_energy)-300, np.nanmax(halo_energy)+300)
@@ -534,7 +553,7 @@ class OrbitPlot:
             apo_times = np.asarray(apocenter_array['apocenter.time'][subhalo_num])
             [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
         plt.xlabel('time [Gyr]', fontsize=28)
-        plt.ylabel('(1/2)*v$^2$ + U [km$^2$ s$^{-2}$]', fontsize=28)
+        plt.ylabel(ystr, fontsize=28)
         plt.title('Subhalo '+str(subhalo_num), fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
         plt.tight_layout()
