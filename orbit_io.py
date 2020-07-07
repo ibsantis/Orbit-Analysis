@@ -48,21 +48,18 @@ class OrbitAnalysis:
             tree: dictionary
 
         NOTES:
-            - Returns an array of length equal to the number of luminous subhalos
-            - For each subhalo, the length of the array is equal to the number of
-              snapshots that is has existed for
-            - For each subhalo, the arrays are ordered going from
-              z = 0 to z = z_form
-
-
-              NEW: Want to return an array of shape (33, 601)
-
-              example:
-                xx = (-1)*np.ones((len(z0_inds_w_star), 601), int)
-                for i in range(0, len(z0_inds_w_star)):
-                    temp = halt.prop('progenitor.main.indices', z0_inds_w_star[i])
-                    for j in range(0, len(temp)):
-                        xx[i,j] = temp[j]
+            - Returns a 2D array:
+                - Each row corresponds to a luminous subhalo
+                - The first element in a row is the index of the luminous
+                  subhalo at z = 0
+                - Each other element in a row corresponds to the subhalo's main
+                  progenitor
+            - Elements that are negative correspond to times when it did not
+              exist
+            - For each subhalo (row), the arrays are ordered from
+              z = 0 to z = z_form (i.e., from present-day to the past)
+            - Each row has a length of 597. There are no halos that exist in
+              snapshots 0,1,2,3.
         """
         # Select the subhalo indices at z = 0
         z0_inds = ut.array.get_indices(halt['snapshot'], 600)
@@ -74,25 +71,32 @@ class OrbitAnalysis:
     def halo_distances(self, tree, sub_inds):
         """
         DESCRIPTION:
-            Reads in the subhalo indices and tree, then returns 1D the subhalo distances
-            from the tree.
+            Reads in the halo tree and subhalo indices, then returns a 2D array,
+            where each row contains subhalo distances from the main host galaxy.
 
         VARIABLES:
             tree: dictionary
-            sub_inds: list of arrays
+            sub_inds: 2D array
 
         NOTES:
-            - Returns a list of length equal to the number of subhalos
-            - For each subhalo, the length of the list is equal to the number
-              of snapshots that it has existed for
-            - Lists are ordered however the subhalo indices are ordered
-                - If used in conjunction with get_luminous_halos, they go from
-                  z = 0 to z = z_form
+            - Returns a 2D array:
+                - Each row corresponds to a different subhalo
+                - Each element in a row contains the 1D distance from the host
+                  galaxy for the subhalo
+                - Each row starts at z = 0, and goes back in time
+                - Negative elements correspond to times when the subhalo
+                  did not exist
+            - The 2D array is ordered however the subhalo indices are ordered
         """
+        # Set up null 2D array with the same shape as the subhalo index array
         distances = (-1)*np.ones(sub_inds.shape)
+        # Loop over the number of subhalos
         for i in range(0, len(sub_inds)):
+            # Mask only the subhalos that exist (non-negative elements)
             mask = (sub_inds[i] >= 0)
+            # Loop over the number of snapshots a subhalo exists
             for j in range(0, len(sub_inds[i][mask])):
+                # Fill in the null array with 1D distances
                 distances[i][j] = tree.prop('host.distance.total'. sub_inds[i])[j]
         return distances
 
