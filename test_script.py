@@ -12,7 +12,7 @@ Write a simple script to:
 import halo_analysis as halo
 import gizmo_analysis as gizmo
 import utilities as ut
-import orbit_times as ot
+import orbit_io
 import numpy as np
 import h5py
 import matplotlib
@@ -60,12 +60,24 @@ print('Set paths')
 
 # Read in the entire tree
 snaps = ut.simulation.read_snapshot_times(directory=simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
-halt = halo.io.IO.read_tree(simulation_directory=simulation_dir)
+halt = halo.io.IO.read_tree(simulation_directory=simulation_dir, file_kind='hdf5', species='star')
 # Read in the halo potential file
 halo_potential = ut.io.file_hdf5(home_dir+'/orbit_data/pickles/'+galaxy+'_halo_potentials.hdf5')
 print('Done reading in the data.')
 
-orbits = ot.OrbitAnalysis()
+orbits = orbit_io.OrbitAnalysis()
+subhalo_inds = orbits.get_luminous_halos(halt)
+halt_dists = orbits.halo_distances(halt, subhalo_inds) # Originally had the function written out here
+halt_vels = orbits.halo_velocities(halt, subhalo_inds)
+host_radii = halt['radius'][subhalo_inds[0]] # Want to divide the other distances by this distance
+halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
+infall_info = orbits.first_infall_times(halt_dists_norm, snaps)
+peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps)
+apos = orbits.apocenter_interp(distances=halt_dists, velocities=halt_vels, time_array=snaps, infall_array=infall_info)
+angs = orbits.angular_momentum(tree=halt, sub_inds=subhalo_inds)
+energies = [orbits.orbit_energy(tree=halt, potential=halo_potential, sub_inds=subhalo_inds[i]) for i in range(0, len(subhalo_inds))]
+
+
 #################################################################################################
 # Select the luminous subhalos first
 subhalo_inds = orbits.get_luminous_halos(halt) # Originally "halt_inds_w_star_all_new"
@@ -74,6 +86,7 @@ subhalo_inds = orbits.get_luminous_halos(halt) # Originally "halt_inds_w_star_al
 # Get the distances from the host for each halo for all snapshots
 # This goes from z = 0 to z'
 halt_dists = orbits.halo_distances(halt, subhalo_inds) # Originally had the function written out here
+halt_vels = orbits.halo_velocities(halt, subhalo_inds)
 
 # Make a plot of this halo's distance vs time
 # Ignoring first four snapshots because there aren't any halos there...
@@ -319,4 +332,31 @@ plt.legend(['data', 'cubic'], loc='best', prop={'size': 14})
 plt.tick_params(axis='both', which='major', labelsize=24)
 plt.tight_layout()
 plt.savefig(home_dir+'/orbit_data/plots/spl_apo_vel_subhalo_23.pdf')
+plt.close()
+
+########
+
+orbit_plot = orbit_io.OrbitPlot()
+sub = 39
+orbit_plot.distance_plot(tree=halt, sub_inds=subhalo_inds, subhalo_num=sub, comp='all', infall_array=infall_info, pericenter_array=peris, apocenter_array=apos, time_array=snaps, file_name='/'+gal1+'/distance_total_subhalo'+str(sub)+'_'+gal1)
+orbit_plot.velocity_plot(tree=halt, sub_inds=subhalo_inds, subhalo_num=sub, comp='all', infall_array=infall_info, pericenter_array=peris, apocenter_array=apos, time_array=snaps, file_name='/'+gal1+'/velocity_total_subhalo'+str(sub)+'_'+gal1)
+orbit_plot.angular_momentum_plot(ell=angs, subhalo_num=sub, comp='all', infall_array=infall_info, pericenter_array=peris, apocenter_array=apos, time_array=snaps, file_name='/'+gal1+'/ang_total_subhalo'+str(sub)+'_'+gal1)
+
+#########
+
+kin = 0.5*halt.prop('host.velocity.total', subhalo_inds[3])**2
+times = np.flip(snaps['time'], axis=0)[:len(energies[3])]
+plt.figure(1)
+plt.figure(figsize=(10, 8))
+plt.plot(times, halo_potential['halo.potentials'][subhalo_inds[3]], label='U')
+plt.plot(times, kin, label='K')
+plt.plot(times, energies[3], label='E$_{tot}$', alpha=0.5, linestyle='dotted')
+plt.xlim(0, 13.8)
+plt.xlabel('time [Gyr]', fontsize=28)
+plt.ylabel('Energy', fontsize=28)
+plt.title('Subhalo 3, m12i', fontsize=24)
+plt.legend(loc='best', prop={'size': 24})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/sub3m12i_energies.pdf')
 plt.close()

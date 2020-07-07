@@ -9,19 +9,26 @@ This package is written to help compute the following subhalo orbital parameters
 with the OrbitAnalysis class:
     - Infall times of subhalos around a host halo
     - Pericenter distances, velocities, and times
-    - Apoventer distances, velocities, and times
+    - Apocenter distances, velocities, and times
     - Orbit angular momentum
     - Orbit energy
 
-There is also a OrbitPlot class which can generate the following kinds of figures:
+There is also a class named OrbitPlot which can generate the following kinds of
+figures:
     - Distance of subhalo vs time
-        - Can plot r, phi, and z components, or the total distance magnitude
+        - r, phi, and z components
+        - total distance magnitude
     - Velocity of subhalo vs time
-        - Can plot r, phi, and z components, or the total velocity magnitude
+        - r, phi, and z components
+        - radial or tangential components
+        - total velocity magnitude
     - Angular momentum of subhalo vs time
-        - Can plot r, phi, and z components, or the total angular
-          momentum magnitude
+        - r, phi, and z components
+        - total angular momentum magnitude
     - Orbit energy vs time
+        - potential
+        - kinetic
+        - total energy (potential + kinetic)
 """
 
 from scipy.interpolate import interp1d
@@ -46,24 +53,28 @@ class OrbitAnalysis:
               snapshots that is has existed for
             - For each subhalo, the arrays are ordered going from
               z = 0 to z = z_form
-        """
 
+
+              NEW: Want to return an array of shape (33, 601)
+
+              example:
+                xx = (-1)*np.ones((len(z0_inds_w_star), 601), int)
+                for i in range(0, len(z0_inds_w_star)):
+                    temp = halt.prop('progenitor.main.indices', z0_inds_w_star[i])
+                    for j in range(0, len(temp)):
+                        xx[i,j] = temp[j]
+        """
         # Select the subhalo indices at z = 0
-        z0_inds = np.where(tree['snapshot'] == 600)[0]
-        # Create a mask for subhalos with stars
-        mask = (tree['star.mass'][z0_inds] > 0)
-        # Select luminous subhalos with mask and find their progenitor indices
-        z0_inds_w_star = z0_inds[mask]
+        z0_inds = ut.array.get_indices(halt['snapshot'], 600)
+        # Select luminous subhalos at z = 0 and find their progenitor indices
+        z0_inds_w_star = ut.array.get_indices(halt['star.mass'], [1, np.inf], z0_inds)
         z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
-        # Select indices for each subhalo that are non-negative (indices where subhalo exists)
-        prog_mask = [(z0_inds_w_star_prog[i] >= 0) for i in range(0, len(z0_inds_w_star_prog))]
-        sub_inds_w_prog = [z0_inds_w_star_prog[i][prog_mask[i]] for i in range(0, len(z0_inds_w_star_prog))]
-        return sub_inds_w_prog
+        return z0_inds_w_star_prog
 
     def halo_distances(self, tree, sub_inds):
         """
         DESCRIPTION:
-            Reads in the subhalo indices and tree, then returns the subhalo distances
+            Reads in the subhalo indices and tree, then returns 1D the subhalo distances
             from the tree.
 
         VARIABLES:
@@ -78,13 +89,17 @@ class OrbitAnalysis:
                 - If used in conjunction with get_luminous_halos, they go from
                   z = 0 to z = z_form
         """
-        distances = [[tree.prop('host.distance.total', sub_inds[i][j]) for j in range(0, len(sub_inds[i]))] for i in range(0, len(sub_inds))]
+        distances = (-1)*np.ones(sub_inds.shape)
+        for i in range(0, len(sub_inds)):
+            mask = (sub_inds[i] >= 0)
+            for j in range(0, len(sub_inds[i][mask])):
+                distances[i][j] = tree.prop('host.distance.total'. sub_inds[i])[j]
         return distances
 
     def halo_distances_norm(self, distances, host_halo_radii):
         """
         DESCRIPTION:
-            Reads in distances (for each subhalo) and the host radii (at all
+            Reads in 1D distances (for each subhalo) and the host radii (at all
             snapshots that it exists)
 
         VARIABLES:
@@ -113,7 +128,7 @@ class OrbitAnalysis:
     def halo_velocities(self, tree, sub_inds):
         """
         DESCRIPTION:
-            Reads in the subhalo indices and tree, then returns the subhalo velocities
+            Reads in the subhalo indices and tree, then returns the 1D subhalo velocities
             from the tree.
 
         VARIABLES:
@@ -484,7 +499,7 @@ class OrbitPlot:
     def orbit_energy_plot(
         self,
         tree,
-        etpye,
+        etype,
         energy_list,
         sub_inds,
         subhalo_num,
