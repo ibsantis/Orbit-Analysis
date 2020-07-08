@@ -120,7 +120,7 @@ class OrbitAnalysis:
                 - If used in conjunction with get_luminous_halos, they go from
                 z = 0 to z = z_form
         """
-        distances_norm = (-1)*np.ones(sub_inds.shape)
+        distances_norm = (-1)*np.ones(distances.shape)
         for i in range(0, len(distances_norm)):
             mask = (distances[i] >= 0)
             temp = distances[i][mask]/host_halo_radii[:len(distances[i][mask])]
