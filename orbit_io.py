@@ -46,7 +46,7 @@ class OrbitAnalysis:
             along with their progenitor indices.
 
         VARIABLES:
-            tree: dictionary
+            tree : dictionary
 
         NOTES:
             - Returns a 2D array:
@@ -76,8 +76,8 @@ class OrbitAnalysis:
             where each row contains subhalo distances from the main host galaxy.
 
         VARIABLES:
-            tree: dictionary
-            sub_inds: 2D array
+            tree     : dictionary
+            sub_inds : 2D array
 
         NOTES:
             - Returns a 2D array:
@@ -96,20 +96,21 @@ class OrbitAnalysis:
             # Mask only the subhalos that exist (non-negative elements)
             mask = (sub_inds[i] >= 0)
             # Loop over the number of snapshots a subhalo exists
-            for j in range(0, len(sub_inds[i][mask])):
+            for j, val in enumerate(tree.prop('host.distance.total', sub_inds[i][mask])):
                 # Fill in the null array with 1D distances
-                distances[i][j] = tree.prop('host.distance.total', sub_inds[i][mask])[j]
+                distances[i][j] = val
         return distances
 
     def halo_distances_norm(self, distances, host_halo_radii):
         """
         DESCRIPTION:
             Reads in 1D distances (for each subhalo) and the host radii (at all
-            snapshots that it exists)
+            snapshots that it exists), then returns the subhalo distances
+            normalized by the host radii (at all snapshots it exists).
 
         VARIABLES:
-            distances: list of lists (given in kpc physical)
-            host_halo_radii: array (given in kpc physical)
+            distances       : 2D array (given in kpc physical)
+            host_halo_radii : 1D array (given in kpc physical)
 
         NOTES:
             - Returns a list of length equal to the number of subhalos
@@ -131,23 +132,35 @@ class OrbitAnalysis:
     def halo_velocities(self, tree, sub_inds):
         """
         DESCRIPTION:
-            Reads in the subhalo indices and tree, then returns the 1D subhalo velocities
-            from the tree.
+            Reads in the halo tree and subhalo indices, then returns a 2D array,
+            where each row contains subhalo velocities (in km/s, physical) from
+            the main host galaxy.
 
         VARIABLES:
-            tree: dictionary
-            sub_inds: list of arrays
+            tree     : dictionary
+            sub_inds : 2D array
 
         NOTES:
-            - Returns a list of length equal to the number of subhalos
-            - For each subhalo, the length of the list is equal to the number
-              of snapshots that it has existed for
-            - Lists are ordered however the subhalo indices are ordered
-                - If used in conjunction with get_luminous_halos, they go from
-                  z = 0 to z = z_form
+            - Returns a 2D array:
+                - Each row corresponds to a different subhalo
+                - Each element in a row contains the 1D velocity from the host
+                  galaxy for the subhalo
+                - Each row starts at z = 0, and goes back in time
+                - Negative elements correspond to times when the subhalo
+                  did not exist
+            - The 2D array is ordered however the subhalo indices are ordered
         """
-        velocites = [[tree.prop('host.velocity.total', sub_inds[i][j]) for j in range(0, len(sub_inds[i]))] for i in range(0, len(sub_inds))]
-        return velocites
+        # Set up null 2D array with the same shape as the subhalo index array
+        velocities = (-1)*np.ones(sub_inds.shape)
+        # Loop over the number of subhalos
+        for i in range(0, len(sub_inds)):
+            # Mask only the subhalos that exist (non-negative elements)
+            mask = (sub_inds[i] >= 0)
+            # Loop over the number of snapshots a subhalo exists
+            for j, val in enumerate(tree.prop('host.velocity.total', sub_inds[i][mask])):
+                # Fill in the null array with 1D distances
+                velocities[i][j] = val
+        return velocities
 
     def first_infall_times(self, distances_norm, time_array):
         """
