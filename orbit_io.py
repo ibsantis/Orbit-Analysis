@@ -31,6 +31,7 @@ figures:
         - total energy (potential + kinetic)
 """
 
+import utilities as ut
 from scipy.interpolate import interp1d
 import numpy as np
 import matplotlib
