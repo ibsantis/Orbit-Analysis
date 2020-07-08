@@ -63,9 +63,9 @@ class OrbitAnalysis:
               snapshots 0,1,2,3.
         """
         # Select the subhalo indices at z = 0
-        z0_inds = ut.array.get_indices(halt['snapshot'], 600)
+        z0_inds = ut.array.get_indices(tree['snapshot'], 600)
         # Select luminous subhalos at z = 0 and find their progenitor indices
-        z0_inds_w_star = ut.array.get_indices(halt['star.mass'], [1, np.inf], z0_inds)
+        z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [1, np.inf], z0_inds)
         z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
         return z0_inds_w_star_prog
 
