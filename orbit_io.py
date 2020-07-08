@@ -97,7 +97,7 @@ class OrbitAnalysis:
             # Loop over the number of snapshots a subhalo exists
             for j in range(0, len(sub_inds[i][mask])):
                 # Fill in the null array with 1D distances
-                distances[i][j] = tree.prop('host.distance.total'. sub_inds[i])[j]
+                distances[i][j] = tree.prop('host.distance.total', sub_inds[i][mask])[j]
         return distances
 
     def halo_distances_norm(self, distances, host_halo_radii):
@@ -119,14 +119,12 @@ class OrbitAnalysis:
                 - If used in conjunction with get_luminous_halos, they go from
                 z = 0 to z = z_form
         """
-        distances_norm = []
-        for i in range(0, len(distances)):
-            # For when the host has existed longer than the subhalo
-            if len(host_halo_radii) > len(distances[i]):
-                distances_norm.append(distances[i]/host_halo_radii[:len(distances[i])])
-            # For when the subhalo has existed longer than the halo
-            else:
-                distances_norm.append(distances[i][:len(host_halo_radii)]/host_halo_radii)
+        distances_norm = (-1)*np.ones(sub_inds.shape)
+        for i in range(0, len(distances_norm)):
+            mask = (distances[i] >= 0)
+            temp = distances[i][mask]/host_halo_radii[:len(distances[i][mask])]
+            for j, val in enumerate(temp):
+                distances_norm[i][j] = val
         return distances_norm
 
     def halo_velocities(self, tree, sub_inds):
