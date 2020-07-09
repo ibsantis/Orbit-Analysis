@@ -184,25 +184,30 @@ class OrbitAnalysis:
         """
         # Set up a dictionary to store the information you want
         d = dict();
-        first_infall_snap = []
-        # Loop over normalized distances
+        #
+        # Initialize some arrays for the dictionary
+        first_infall_snap = (-1)*np.ones(len(distances_norm), int)
+        first_infall_times = (-1)*np.ones(len(distances_norm))
+        first_infall_times_lookback = (-1)*np.ones(len(distances_norm))
+        infall_check = np.zeros(len(distances_norm), bool)
+        #
+        # Set up lookback time array
+        lookback = time_array['time'][-1] - time_array['time']
+        # Loop over subhalos (normalized distance arrays)
         for i in range(0, len(distances_norm)):
             # Check to see if the subhalo is within the virial radius of the host
-            if len(np.where(distances_norm[i] < 1)[0]) != 0:
-                first_infall_snap.append(600-np.max(np.where(distances_norm[i] < 1)[0]))
-            else:
-                first_infall_snap.append(-1)
-        # Save the snapshot that this happens at
-        d['snapshot'] = np.asarray(first_infall_snap)
-        infall_mask = (d['snapshot'] > 0)
-        infall_times = []
-        for i in range(0, len(d['snapshot'])):
-            if d['snapshot'][i] > 0:
-                infall_times.append(time_array['time'][d['snapshot'][i]])
-            else:
-                infall_times.append(-1)
-        d['time'] = np.asarray(infall_times)
-        d['check'] = infall_mask
+            if len(np.where(np.abs(distances_norm[i]) < 1)[0]) != 0:
+                # If it is, get the snapshot
+                first_infall_snap[i] = 600-np.max(np.where(np.abs(distances_norm[i]) < 1)[0])
+                first_infall_times[i] = time_array['time'][first_infall_snap[i]]
+                first_infall_times_lookback[i] = lookback[first_infall_snap[i]]
+                if first_infall_snap[i] >= 0:
+                    infall_check[i] = True
+        # Assign arrays to dictionary elements
+        d['snapshot'] = first_infall_snap
+        d['time'] = first_infall_times
+        d['time.lb'] = first_infall_times_lookback
+        d['check'] = infall_check
         return d
 
     def pericenter_interp(self, distances, velocities, virial_radii, time_array):
