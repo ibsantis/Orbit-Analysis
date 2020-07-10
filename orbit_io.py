@@ -198,7 +198,7 @@ class OrbitAnalysis:
             # Check to see if the subhalo is within the virial radius of the host
             if len(np.where(np.abs(distances_norm[i]) < 1)[0]) != 0:
                 # If it is, get the snapshot
-                first_infall_snap[i] = 600-np.max(np.where(np.abs(distances_norm[i]) < 1)[0])
+                first_infall_snap[i] = time_array['index'][-1]-np.max(np.where(np.abs(distances_norm[i]) < 1)[0])
                 first_infall_times[i] = time_array['time'][first_infall_snap[i]]
                 first_infall_times_lookback[i] = lookback[first_infall_snap[i]]
                 if first_infall_snap[i] >= 0:

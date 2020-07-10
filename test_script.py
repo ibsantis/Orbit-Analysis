@@ -69,7 +69,7 @@ orbits = orbit_io.OrbitAnalysis()
 subhalo_inds = orbits.get_luminous_halos(halt)
 halt_dists = orbits.halo_distances(halt, subhalo_inds) # Originally had the function written out here
 halt_vels = orbits.halo_velocities(halt, subhalo_inds)
-host_radii = halt['radius'][subhalo_inds[0]] # Want to divide the other distances by this distance
+host_radii = halt['radius'][subhalo_inds[0][subhalo_inds[0] >= 0]] # Want to divide the other distances by this distance
 halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
 infall_info = orbits.first_infall_times(halt_dists_norm, snaps)
 peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps)
