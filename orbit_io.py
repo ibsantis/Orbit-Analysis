@@ -249,6 +249,7 @@ class OrbitAnalysis:
         peri_spl = []
         peri_vel_spl = []
         time_spl = []
+        #
         # Loop over the number of subhalos
         for k in range(0, len(distances)):
             temp_halo_d = distances[k] # Now goes from z = 0 to z_form (un-normalized)
@@ -260,6 +261,7 @@ class OrbitAnalysis:
             temp_peri_spl = []
             temp_peri_vel_spl = []
             temp_time_spl = []
+            #
             # Loop through each subhalo
             for i in range(4, len(temp_halo_d)-4):
                 # Check its neighbors and if it is within virial radius
@@ -272,22 +274,23 @@ class OrbitAnalysis:
                     temp_peri = temp_halo_d[i+1]
                 else:
                     temp_peri = temp_halo_d[i+1]
-            host_peri_rad.append(peri_rad_list)
+            host_peri_rad.append(np.asarray(peri_rad_list))
             check.append(temp_check)
             peri_spl.append(temp_peri_spl)
             peri_vel_spl.append(temp_peri_vel_spl)
             time_spl.append(temp_time_spl)
+        #
         # Create a mask that tells you whether or not halo experienced pericenter
-        peri_bool = []
+        peri_bool = np.zeros(len(check), bool)
         for i in range(0, len(check)):
             if (np.sum(check[i]) > 0):
-                peri_bool.append(True)
-            else:
-                peri_bool.append(False)
-        d['pericenter.check'] = np.asarray(peri_bool)
+                peri_bool[i] = True
+        d['pericenter.check'] = peri_bool
+        #
         # Save the virial radii of the host at pericenter times
-        d['pericenter.host.r200'] = host_peri_rad
-        # Do the spline fitting
+        d['pericenter.host.r200'] = np.asarray(host_peri_rad)
+        #
+        # Set up empty lists for spline fitting
         pericenter_spline = []
         peri_vel_spline = []
         time_spline = []
@@ -310,19 +313,20 @@ class OrbitAnalysis:
                     temp_peri_new_spl.append(np.min(f(x_new)))
                     temp_time_new_spl.append(x_new[np.where(f(x_new) == np.min(f(x_new)))[0][0]])
                     temp_peri_vel_new_spl.append(f2(x_new)[np.where(f(x_new) == np.min(f(x_new)))[0][0]])
-                pericenter_spline.append(temp_peri_new_spl)
-                peri_vel_spline.append(temp_peri_vel_new_spl)
-                time_spline.append(temp_time_new_spl)
+                pericenter_spline.append(np.asarray(temp_peri_new_spl))
+                peri_vel_spline.append(np.asarray(temp_peri_vel_new_spl))
+                time_spline.append(np.asarray(temp_time_new_spl))
             else:
                 temp_peri_new_spl = []
                 temp_peri_vel_new_spl = []
                 temp_time_new_spl = []
-                pericenter_spline.append(temp_peri_new_spl)
-                peri_vel_spline.append(temp_peri_vel_new_spl)
-                time_spline.append(temp_time_new_spl)
-        d['pericenter.dist'] = pericenter_spline
-        d['pericenter.vel'] = peri_vel_spline
-        d['pericenter.time'] = time_spline
+                pericenter_spline.append(np.asarray(temp_peri_new_spl))
+                peri_vel_spline.append(np.asarray(temp_peri_vel_new_spl))
+                time_spline.append(np.asarray(temp_time_new_spl))
+        #
+        d['pericenter.dist'] = np.asarray(pericenter_spline)
+        d['pericenter.vel'] = np.asarray(peri_vel_spline)
+        d['pericenter.time'] = np.asarray(time_spline)
         return d
 
     def apocenter_interp(self, distances, velocities, time_array, infall_array):
