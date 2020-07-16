@@ -242,7 +242,7 @@ class OrbitAnalysis:
               distance is within the virial radius of the host. If True, saves some
               values.
         """
-        # Set up a dictionary to save values to
+        # Set up a dictionary and lists to save values to
         d = dict();
         host_peri_rad = []
         check = []
@@ -274,7 +274,7 @@ class OrbitAnalysis:
                     temp_peri = temp_halo_d[i+1]
                 else:
                     temp_peri = temp_halo_d[i+1]
-            host_peri_rad.append(np.asarray(peri_rad_list))
+            host_peri_rad.append(peri_rad_list)
             check.append(temp_check)
             peri_spl.append(temp_peri_spl)
             peri_vel_spl.append(temp_peri_vel_spl)
@@ -287,12 +287,23 @@ class OrbitAnalysis:
                 peri_bool[i] = True
         d['pericenter.check'] = peri_bool
         #
-        # Save the virial radii of the host at pericenter times
-        d['pericenter.host.r200'] = np.asarray(host_peri_rad)
+        # Find maximum number of pericenter events
+        N = np.max([len(host_peri_rad[i]) for i in range(0, len(host_peri_rad))])
+        #
+        # Initialize array with size (number subhalos) x (number of pericenter events)
+        host_peri_rad_array = (-1)*np.ones((len(distances), N))
+        #
+        # Store host radii in 2D array
+        for i in range(0, len(host_peri_rad)):
+            if len(host_peri_rad[i]) != 0:
+                for j in range(0, len(host_peri_rad[i])):
+                    host_peri_rad_array[i,j] = host_peri_rad[i][j]
+        # Save the 2D array to dictionary
+        d['pericenter.host.r200'] = host_peri_rad_array
         #
         # Set up empty lists for spline fitting
         pericenter_spline = []
-        peri_vel_spline = []
+        pericenter_vel_spline = []
         time_spline = []
         # Loop over all of the subhalos
         for i in range(0, len(peri_spl)):
@@ -313,20 +324,42 @@ class OrbitAnalysis:
                     temp_peri_new_spl.append(np.min(f(x_new)))
                     temp_time_new_spl.append(x_new[np.where(f(x_new) == np.min(f(x_new)))[0][0]])
                     temp_peri_vel_new_spl.append(f2(x_new)[np.where(f(x_new) == np.min(f(x_new)))[0][0]])
-                pericenter_spline.append(np.asarray(temp_peri_new_spl))
-                peri_vel_spline.append(np.asarray(temp_peri_vel_new_spl))
-                time_spline.append(np.asarray(temp_time_new_spl))
+                pericenter_spline.append(temp_peri_new_spl)
+                pericenter_vel_spline.append(temp_peri_vel_new_spl)
+                time_spline.append(temp_time_new_spl)
             else:
                 temp_peri_new_spl = []
                 temp_peri_vel_new_spl = []
                 temp_time_new_spl = []
-                pericenter_spline.append(np.asarray(temp_peri_new_spl))
-                peri_vel_spline.append(np.asarray(temp_peri_vel_new_spl))
-                time_spline.append(np.asarray(temp_time_new_spl))
+                pericenter_spline.append(temp_peri_new_spl)
+                pericenter_vel_spline.append(temp_peri_vel_new_spl)
+                time_spline.append(temp_time_new_spl)
         #
-        d['pericenter.dist'] = np.asarray(pericenter_spline)
-        d['pericenter.vel'] = np.asarray(peri_vel_spline)
-        d['pericenter.time'] = np.asarray(time_spline)
+        # Initialize arrays with size (number subhalos) x (number of pericenter events)
+        pericenter_spline_array = (-1)*np.ones((len(distances), N))
+        pericenter_vel_spline_array = (-1)*np.ones((len(distances), N))
+        time_spline_array = (-1)*np.ones((len(distances), N))
+        #
+        # Store the data in 2D arrays
+        for i in range(0, len(pericenter_spline)):
+            if len(pericenter_spline[i]) != 0:
+                for j in range(0, len(pericenter_spline[i])):
+                    pericenter_spline_array[i,j] = pericenter_spline[i][j]
+                    pericenter_vel_spline_array[i,j] = pericenter_vel_spline[i][j]
+                    time_spline_array[i,j] = time_spline[i][j]
+        #
+        # Save 2D arrays to dictionary
+        d['pericenter.dist'] = pericenter_spline_array
+        d['pericenter.vel'] = pericenter_vel_spline_array
+        d['pericenter.time'] = time_spline_array
+        #
+        # Find lookback time and save to 2D array
+        time_lb_spline_array = (-1)*np.ones((len(distances), N))
+        mask = (time_spline_array > 0)
+        time_lb_spline_array[mask] = (time_array['time'][-1] - time_spline_array[mask])
+        #
+        d['pericenter.time.lb'] = time_lb_spline_array
+        #
         return d
 
     def apocenter_interp(self, distances, velocities, time_array, infall_array):
