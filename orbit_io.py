@@ -214,8 +214,8 @@ class OrbitAnalysis:
         """
         DESCRIPTION:
             Reads in subhalo distances, velocites, host virial radii across time,
-            and snapshot information and returns a dictionary of pericenter distances, times, and a
-            boolean array.
+            and snapshot information and returns a dictionary of pericenter
+            distances, velocities, and times.
 
         VARIABLES:
             distances: list of lists (given in kpc physical)
@@ -224,23 +224,42 @@ class OrbitAnalysis:
             time_array: dictionary
 
         NOTES:
-            - Returns a dictionary
-                - d['pericenter.check'] is a list of booleans
-                  Tells you if the subhalo has experienced a pericenter
-                - d['pericenter.host.r200'] is a list of lists
-                  Tells you the virial radius of the host at time of subhalo
-                  pericenter
-                - d['pericenter'] is a list of lists
-                  Tells you the pericenter distances (in kpc physical)
-                - d['pericenter.velocity'] is a list of lists
-                  Tells you the velocity (in km/s) at time of pericenter
-                - d['pericenter.time'] is a list of lists
-                  Tells you what the age of the Universe was when the subhalo
-                  experienced a pericenter
             - Loops through an array and checks to see if a value is smaller than
               4 of its neighbors on either side. If True, also checks to see if this
               distance is within the virial radius of the host. If True, saves some
               values.
+            - Returns a dictionary
+                - d['pericenter.check'] is a 1D array of booleans
+                  Each element tells you if the subhalo has experienced a pericenter
+                - d['pericenter.host.r200'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row of the array corresponds to a different subhalo
+                  Each element in a row gives the virial radius of the host
+                    when the subhalo reached pericenter
+                  If there were no pericenters, the values are set to -1
+                - d['pericenter'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row of the array corresponds to a different subhalo
+                  Each element in a row gives the pericenter distance (in kpc physical)
+                - d['pericenter.velocity'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row of the array corresponds to a different subhalo
+                  Each element in a row gives the pericenter velocity (in kpc physical)
+                - d['pericenter.time'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row of the array corresponds to a different subhalo
+                  Each element in a row gives the age of the Universe when the
+                    subhalo experienced a pericenter
+                - d['pericenter.time.lb'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row of the array corresponds to a different subhalo
+                  Each element in a row gives the lookback time when the
+                    subhalo experienced a pericenter
         """
         # Set up a dictionary and lists to save values to
         d = dict();
@@ -390,11 +409,10 @@ class OrbitAnalysis:
                   apocenter.
                 - d['max.dist'] is an array
                   Tells you the maximum distance that a subhalo reached
-                - d['max.dist.snap'] is an array
-                  Tells you the snapshot when the subhalo was at max distance
                 - d['max.dist.time'] is an array
                   Tells you the age of the Universe when the subhalo was at
                   max distance
+                - LOOKBACK
             - Loops through an array and checks to see:
                 - If the subhalo has fallen into the host
                 - If the subhalo distance at this time is larger than the
@@ -408,16 +426,20 @@ class OrbitAnalysis:
         apo_vel_spl = []
         time_spl = []
         max_dist = np.zeros(len(distances))
-        max_dist_snap = np.zeros(len(distances))
         max_dist_time = np.zeros(len(distances))
+        max_dist_time_lb = np.zeros(len(distances))
+        #
         # Loop through the number of subhalos
         for k in range(0, len(distances)):
+            #
             temp_halo_d = distances[k] # Now goes from z = 0 to z_form (un-normalized)
             temp_halo_v = velocities[k] # Same as above
-            # Save the max distance and the snapshot/time this happens at
+            #
+            # Save the max distance a subhalo ever experienced and the times this happens at
             max_dist[k] = np.nanmax(distances[k])
-            max_dist_snap[k] = np.flip(time_array['index'])[np.where(distances[k] == np.nanmax(distances[k]))[0][0]]
             max_dist_time[k] = np.flip(time_array['time'])[np.where(distances[k] == np.nanmax(distances[k]))[0][0]]
+            max_dist_time_lb[k] = (time_array['time'][-1] - max_dist_time[k])
+            #
             # Want initial element to be this because we check +- 10 neighbors on each side
             temp_apo = temp_halo_d[10]
             temp_apo_time = time_array['time'][600-10]
@@ -425,8 +447,10 @@ class OrbitAnalysis:
             temp_apo_spl = []
             temp_apo_vel_spl = []
             temp_time_spl = []
+            #
             # Loop through each subhalo
             for i in range(10, len(temp_halo_d)-10):
+                # Check to make sure that this is the local maximum
                 if (infall_array['time'][k] != -1) and (temp_apo > temp_halo_d[i+1]) and (temp_apo > temp_halo_d[i+2]) and (temp_apo > temp_halo_d[i+3]) and (temp_apo > temp_halo_d[i+4]) and (temp_apo > temp_halo_d[i+5]) and (temp_apo > temp_halo_d[i+6]) and (temp_apo > temp_halo_d[i+7]) and (temp_apo > temp_halo_d[i+8]) and (temp_apo > temp_halo_d[i+9]) and (temp_apo > temp_halo_d[i+10]) and (temp_apo > temp_halo_d[i-1]) and (temp_apo > temp_halo_d[i-2]) and (temp_apo > temp_halo_d[i-3]) and (temp_apo > temp_halo_d[i-4]) and (temp_apo > temp_halo_d[i-5]) and (temp_apo > temp_halo_d[i-6]) and (temp_apo > temp_halo_d[i-7]) and (temp_apo > temp_halo_d[i-8]) and (temp_apo > temp_halo_d[i-9]) and (temp_apo > temp_halo_d[i-10]) and (temp_apo_time > infall_array['time'][k]):
                     temp_check[i] = 1
                     temp_apo_spl.append(temp_halo_d[i-10:i+10])
@@ -441,17 +465,17 @@ class OrbitAnalysis:
             apo_spl.append(temp_apo_spl)
             apo_vel_spl.append(temp_apo_vel_spl)
             time_spl.append(temp_time_spl)
+            #
         # Create a mask that tells you whether or not halo experienced apocenter
-        apo_bool = []
+        apo_bool = np.zeros(len(check), bool)
         for i in range(0, len(check)):
             if (np.sum(check[i]) > 0):
-                apo_bool.append(True)
-            else:
-                apo_bool.append(False)
-        d['apocenter.check'] = np.asarray(apo_bool)
+                apo_bool[i] True
+        d['apocenter.check'] = apo_bool
+        #
         # Do the spline fitting
         apocenter_spline = []
-        apo_vel_spline = []
+        apocenter_vel_spline = []
         time_spline = []
         # Loop over all of the subhalos
         for i in range(0, len(apo_spl)):
@@ -473,21 +497,42 @@ class OrbitAnalysis:
                     temp_time_new_spl.append(x_new[np.where(f(x_new) == np.max(f(x_new)))[0][0]])
                     temp_apo_vel_new_spl.append(f2(x_new)[np.where(f(x_new) == np.max(f(x_new)))[0][0]])
                 apocenter_spline.append(temp_apo_new_spl)
-                apo_vel_spline.append(temp_apo_vel_new_spl)
+                apocenter_vel_spline.append(temp_apo_vel_new_spl)
                 time_spline.append(temp_time_new_spl)
             else:
                 temp_apo_new_spl = []
                 temp_apo_vel_new_spl = []
                 temp_time_new_spl = []
                 apocenter_spline.append(temp_apo_new_spl)
-                apo_vel_spline.append(temp_apo_vel_new_spl)
+                apocenter_vel_spline.append(temp_apo_vel_new_spl)
                 time_spline.append(temp_time_new_spl)
-        d['apocenter.dist'] = apocenter_spline
-        d['apocenter.vel'] = apo_vel_spline
-        d['apocenter.time'] = time_spline
+        #
+        # Create null arrays that are of size (number of subhalos) x (max number of apocenter events any halo experiences)
+        N = np.max([len(apocenter_spline[i]) for i in range(0, len(apocenter_spline))])
+        apocenter_spline_array = (-1)*np.ones((len(distances), N))
+        apocenter_vel_spline_array = (-1)*np.ones((len(distances), N))
+        time_spline_array = (-1)*np.ones((len(distances), N))
+        #
+        # Fill in the 2D arrays with the spline data
+        for i in range(0, len(apocenter_spline)):
+            if len(apocenter_spline[i]) != 0:
+                for j in range(0, len(apocenter_spline[i])):
+                    apocenter_spline_array[i,j] = apocenter_spline[i][j]
+                    apocenter_vel_spline_array[i,j] = apocenter_vel_spline[i][j]
+                    time_spline_array[i,j] = time_spline[i][j]
+        #
+        # Find lookback time and save to 2D array
+        time_lb_spline_array = (-1)*np.ones((len(distances), N))
+        mask = (time_spline_array > 0)
+        time_lb_spline_array[mask] = (time_array['time'][-1] - time_spline_array[mask])
+        #
+        d['apocenter.dist'] = apocenter_spline_array
+        d['apocenter.vel'] = apocenter_vel_spline_array
+        d['apocenter.time'] = time_spline_array
+        d['apocenter.time.lb'] = time_lb_spline_array
         d['max.dist'] = max_dist
-        d['max.dist.snap'] = max_dist_snap
         d['max.dist.time'] = max_dist_time
+        d['max.dist.time.lb'] = max_dist_time_lb
         return d
 
     def angular_momentum(self, tree, sub_inds):
