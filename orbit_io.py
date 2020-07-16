@@ -470,7 +470,7 @@ class OrbitAnalysis:
         apo_bool = np.zeros(len(check), bool)
         for i in range(0, len(check)):
             if (np.sum(check[i]) > 0):
-                apo_bool[i] True
+                apo_bool[i] = True
         d['apocenter.check'] = apo_bool
         #
         # Do the spline fitting
