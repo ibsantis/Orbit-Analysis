@@ -113,13 +113,14 @@ class OrbitAnalysis:
             host_halo_radii : 1D array (given in kpc physical)
 
         NOTES:
-            - Returns a list of length equal to the number of subhalos
-            - For each subhalo, the length of their array is equal to either
-              the number of snapshots the subhalo exists for, or the number of
-              snapshots the hosts exists for; takes the smaller value
+            - Returns a 2D array:
+                - Each row corresponds to a different subhalo
+                - Each element in a row contains the normalized distance from
+                  the host galaxy
+                - Each row starts at z = 0, and goes back in time
+                - Negative elements correspond to times when the subhalo
+                  did not exist
             - Lists are ordered however the subhalo indices are ordered
-                - If used in conjunction with get_luminous_halos, they go from
-                z = 0 to z = z_form
         """
         distances_norm = (-1)*np.ones(distances.shape)
         for i in range(0, len(distances_norm)):
@@ -169,18 +170,21 @@ class OrbitAnalysis:
             the snapshots and times when the subhalos first fell into the host
 
         VARIABLES:
-            distances_norm: list of arrays (given in kpc physical)
-            time_array: dictionary (given in Gyr)
+            distances_norm : 2D array (given in kpc physical)
+            time_array     : dictionary (given in Gyr)
 
         NOTES:
             - Returns a dictionary
-                - d['snapshot'] is an array of length equal to the number of
-                  subhalos
-                - d['time'] is an array of length equal to the number of subhalos
-                  that have fallen into the host
                 - d['check'] is a boolean array that tells you if the halo has
                   fallen into the host
+                - d['snapshot'] is a 1D array that gives the snapshot at infall
+                - d['time'] is a 1D array that gives the age of the Universe when
+                  a subhalo first fell into the host galaxy
+                - d['time.lb'] is a 1D array that gives the lookback time when
+                  a subhalo first fell into the host galaxy
             - Times given correspond to the age of the Universe (Gyr)
+            - Negative elements correspond to subhalos that have not fallen into
+              the host galaxy
         """
         # Set up a dictionary to store the information you want
         d = dict();
@@ -204,10 +208,10 @@ class OrbitAnalysis:
                 if first_infall_snap[i] >= 0:
                     infall_check[i] = True
         # Assign arrays to dictionary elements
+        d['check'] = infall_check
         d['snapshot'] = first_infall_snap
         d['time'] = first_infall_times
         d['time.lb'] = first_infall_times_lookback
-        d['check'] = infall_check
         return d
 
     def pericenter_interp(self, distances, velocities, virial_radii, time_array):
@@ -218,16 +222,18 @@ class OrbitAnalysis:
             distances, velocities, and times.
 
         VARIABLES:
-            distances: list of lists (given in kpc physical)
-            velocites: list of lists (km / s)
-            virial radii: array (given in kpc physical)
-            time_array: dictionary
+            distances    : 2D array (given in kpc physical)
+            velocites    : 2D array (km / s)
+            virial radii : 1D array (given in kpc physical)
+            time_array   : dictionary
 
         NOTES:
             - Loops through an array and checks to see if a value is smaller than
               4 of its neighbors on either side. If True, also checks to see if this
               distance is within the virial radius of the host. If True, saves some
               values.
+            - If a subhalo does not experience pericenter, the distances, velocities,
+              times, and host radii values are set to -1
             - Returns a dictionary
                 - d['pericenter.check'] is a 1D array of booleans
                   Each element tells you if the subhalo has experienced a pericenter
@@ -237,7 +243,6 @@ class OrbitAnalysis:
                   Each row of the array corresponds to a different subhalo
                   Each element in a row gives the virial radius of the host
                     when the subhalo reached pericenter
-                  If there were no pericenters, the values are set to -1
                 - d['pericenter'] is a 2D array
                   Array shape: (number of subhalos) x (max number of pericenters
                                                        any halo experienced)
@@ -386,38 +391,54 @@ class OrbitAnalysis:
         DESCRIPTION:
             Reads in a list of subhalo distances and velocities, as well as
             snapshot information, and returns a dictionary of apocenter distances,
-            velocities, and times.
+            velocities, and times, as well as maximum distances a subhalo
+            experiences, and the times this happens.
 
         VARIABLES:
-            distances: list of lists (given in kpc physical)
-            velocites: list of lists (km / s)
-            time_array: dictionary
-            infall_array: dictionary
+            distances    : 2D array (given in kpc physical)
+            velocites    : 2D array (km / s)
+            time_array   : dictionary
+            infall_array : dictionary
 
         NOTES:
-            - Returns a dictionary
-                - d['apocenter.check'] is a list of booleans
-                  These will tell you if there was an apocenter event for
-                  a specific halo.
-                - d['apocenter.dist'] is a list of lists
-                  Tells you the apocenter distances (in kpc physical)
-                - d['apocenter.velocity'] is a list of lists
-                  Tells you the velocites of the subhalos at apocenter
-                  (in km/s physical)
-                - d['apocenter.time'] is a list of lists
-                  Tells you the age of the Universe when a subhalo reached
-                  apocenter.
-                - d['max.dist'] is an array
-                  Tells you the maximum distance that a subhalo reached
-                - d['max.dist.time'] is an array
-                  Tells you the age of the Universe when the subhalo was at
-                  max distance
-                - LOOKBACK
             - Loops through an array and checks to see:
                 - If the subhalo has fallen into the host
                 - If the subhalo distance at this time is larger than the
                   distances at 10 snapshots on either side of this element.
-                If True, saves the values listed above.
+                - If True, saves the values listed above.
+            - Returns a dictionary
+                - d['apocenter.check'] is a 1D array of booleans
+                  These will tell you if there was an apocenter event for
+                  a specific halo.
+                - d['apocenter.dist'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row corresponds to a different subhalo
+                  Each element gives the apocenter distance (in kpc physical)
+                - d['apocenter.velocity'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row corresponds to a different subhalo
+                  Each element gives the apocenter velocity (in km/s)
+                - d['apocenter.time'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row corresponds to a different subhalo
+                  Each element gives the age of the Universe at apocenter
+                - d['apocenter.time.lb'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row corresponds to a different subhalo
+                  Each element gives the lookback time at apocenter
+                - d['max.dist'] is a 1D array
+                  Each element gives the maximum distance that a subhalo reached
+                - d['max.dist.time'] is a 1D array
+                  Tells you the age of the Universe when the subhalo was at
+                  max distance
+                - d['max.dist.time.lb'] is a 1D array
+                  Tells you the lookback time when the subhalo was at max distance
+            - If a subhalo never reaches apocenter, then distances, velocities,
+              and times are set to -1
         """
         # Set up some initial variables
         d = dict();
