@@ -564,22 +564,21 @@ class OrbitAnalysis:
 
         VARIABLES:
             tree     : dictionary
-            sub_inds : list of arrays
+            sub_inds : 2D array
 
         NOTES:
             - Returns a dictionary:
-                - d['ang.mom.vector'] is a list of arrays, where each array contains
-                  angular momentum values for each subhalo.
-                    - Goes from z = 0 to z = z_form
+                - d['ang.mom.vector'] is a 3D array
+                    - Array shape: (number of subhalos) x (total number of snapshots)
+                                    x 3 (for each component of the vector)
+                    - d['ang.mom.vector'][i,j,k] gives the k-th angular momentum
+                      component of the i-th subhalo at snapshot j
+                      - j starts at z = 0 and goes back in time
                     - Each vector is ordered (lr, lphi, lz)
-                    - d['ang.mom.vector'][i]: array of angular momentum vectors for subhalo i
-                    - d['ang.mom.vector'][i][j]: jth angular momentum vector for subhalo i (at time j)
-                - d['ang.mom.total'] is a list of arrays, where each array contains
-                  the norm of the angular momentum vector for each subhalo.
-                    - Goes from z = 0 to z = z_form
-                    - d['ang.mom.total'][i]: array of angular momentum magnitudes for subhalo i
-                    - d['ang.mom.vector'][i][j]: jth angular momentum value for subhalo i (at time j)
-            - 'tree' is organized as (r, z, phi)
+                - d['ang.mom.total'] is a 2D array
+                    - Array shape: (number of subhalos) x (total number of snapshots)
+                    - d['ang.mom.vector'][i,j]: jth angular momentum value for subhalo i (at time j)
+                        - j starts at z = 0 and goes back in time
         """
         # Initialize a dictionary to save values to and some arrays
         d = dict();
@@ -612,15 +611,16 @@ class OrbitAnalysis:
                 angular_momentum_3d[i][j] = ang_mom_vec_tot[i][j]
         #
         # Create an array that will store the total angular momentum of each subhalo across time
-        angular_momentum_norm = (-1)*np.ones((len(sub_inds), len(sub_inds[0])))
+        angular_momentum_1d = (-1)*np.ones((len(sub_inds), len(sub_inds[0])))
         #
         # Loop over the number of subhalos
         for i in range(0, len(ang_mom_norm_tot)):
             for j in range(0, len(ang_mom_norm_tot[i])):
-                angular_momentum_norm[i][j] = ang_mom_norm_tot[i][j]
+                angular_momentum_1d[i][j] = ang_mom_norm_tot[i][j]
         #
+        # Save arrays to dictionary
         d['ang.mom.vector'] = angular_momentum_3d
-        d['ang.mom.total'] = angular_momentum_norm
+        d['ang.mom.total'] = angular_momentum_1d
         return d
 
     def orbit_energy(self, tree, potential, sub_inds):
@@ -632,17 +632,26 @@ class OrbitAnalysis:
 
         VARIABLES:
             tree      : dictionary
-            sub_inds  : list of arrays
-            potential : array
+            sub_inds  : 2D array
+            potential : 1D array
 
         NOTES:
             - Energy is defined as E = (1/2)*velocity**2 + potential
-            - Returns an array the size of an element of sub_inds
-                - To be more explicit, returns values for the subhalo of interest
-                  across the entire time range that it existed
-            - Only handles ONE subhalo at a time.
+            - Returns a 2D array:
+                - Shape: (number of subhalos) x (total number of snapshots)
+                - Each element corresponds to a different subhalo
+                - Each element starts at z = 0 and goes back in time
         """
-        energy = 0.5*tree.prop('host.velocity.total', sub_inds)**2 + potential['halo.potentials'][sub_inds]
+        # Set up an empty array to save to
+        energy = (-1)*np.ones((sub_inds.shape))
+        #
+        # Loop through each subhalo
+        for i in range(0, len(sub_inds)):
+            # Create a mask to only select subhalos that exist
+            mask = (sub_inds[i] >= 0)
+            #
+            # Calculate the total energy and save it to the array
+            energy[i][mask] = 0.5*tree.prop('host.velocity.total', sub_inds[i][mask])**2 + potential['halo.potentials'][sub_inds[i][mask]]
         return energy
 
 class OrbitPlot:
