@@ -581,19 +581,46 @@ class OrbitAnalysis:
                     - d['ang.mom.vector'][i][j]: jth angular momentum value for subhalo i (at time j)
             - 'tree' is organized as (r, z, phi)
         """
+        # Initialize a dictionary to save values to and some arrays
         d = dict();
         ang_mom_vec_tot = []
         ang_mom_norm_tot = []
+        #
+        # Loop over all of the subhalos
         for i in range(0, len(sub_inds)):
-            lr = (-1)*tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,1]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,2]
-            lphi = (-1)*((tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,0]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,1]) - (tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,1]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,0]))
-            lz = tree.prop('host.distance.principal.cylindrical', sub_inds[i])[:,0]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i])[:,2]
+            # Mask out indices where the halo didn't exist (negative indices)
+            mask = (sub_inds[i] >= 0)
+            #
+            # Calculate the different components of angular momentum
+            lr = (-1)*tree.prop('host.distance.principal.cylindrical', sub_inds[i][mask])[:,2]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i][mask])[:,1]
+            lphi = (-1)*((tree.prop('host.distance.principal.cylindrical', sub_inds[i][mask])[:,0]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i][mask])[:,2]) - (tree.prop('host.distance.principal.cylindrical', sub_inds[i][mask])[:,2]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i][mask])[:,0]))
+            lz = tree.prop('host.distance.principal.cylindrical', sub_inds[i][mask])[:,0]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i][mask])[:,1]
+            #
+            # Save the values to arrays
             ang_mom_vec_subhalo = np.asarray([(lr[j], lphi[j], lz[j]) for j in range(0, len(lr))])
             ang_mom_norm_subhalo = np.linalg.norm(ang_mom_vec_subhalo,axis=1)
             ang_mom_vec_tot.append(ang_mom_vec_subhalo)
             ang_mom_norm_tot.append(ang_mom_norm_subhalo)
-        d['ang.mom.vector'] = ang_mom_vec_tot
-        d['ang.mom.total'] = ang_mom_norm_tot
+        #
+        # Create an array that will store the 3D angular momentum of each subhalo across time
+        angular_momentum_3d = (-1)*np.ones((len(sub_inds), len(sub_inds[0]), 3))
+        #
+        # Loop over the number of subhalos
+        for i in range(0, len(ang_mom_vec_tot)):
+            # Loop over the total number of snapshots
+            for j in range(0, len(ang_mom_vec_tot[i])):
+                angular_momentum_3d[i][j] = ang_mom_vec_tot[i][j]
+        #
+        # Create an array that will store the total angular momentum of each subhalo across time
+        angular_momentum_norm = (-1)*np.ones((len(sub_inds), len(sub_inds[0])))
+        #
+        # Loop over the number of subhalos
+        for i in range(0, len(ang_mom_norm_tot)):
+            for j in range(0, len(ang_mom_norm_tot[i])):
+                angular_momentum_norm[i][j] = ang_mom_norm_tot[i][j]
+        #
+        d['ang.mom.vector'] = angular_momentum_3d
+        d['ang.mom.total'] = angular_momentum_norm
         return d
 
     def orbit_energy(self, tree, potential, sub_inds):
