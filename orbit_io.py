@@ -774,36 +774,59 @@ class OrbitPlot:
             - Will plot a green vertical line indicating when the subhalo
               experienced a pericenter event.
         """
+        # Set up a figure to plot to
         plt.figure(figsize=(10, 8))
+        #
+        # Select which component you want to plot
         if comp == 'r':
             ls = ell['ang.mom.vector'][subhalo_num][:,0]/1000
-            comp_str = '$_{r}$'
+            comp_str = '$_{\\rm r}$'
         elif comp == 'phi':
             ls = ell['ang.mom.vector'][subhalo_num][:,1]/1000
-            comp_str = '$_{\phi}$'
+            comp_str = '$_{\\rm \phi}$'
         elif comp == 'z':
             ls = ell['ang.mom.vector'][subhalo_num][:,2]/1000
-            comp_str = '$_{z}$'
+            comp_str = '$_{\\rm z}$'
         elif comp == 'all':
             ls = ell['ang.mom.total'][subhalo_num]/1000
-            comp_str = '$_{tot}$'
-        times = np.flip(time_array['time'], axis=0)[:len(ls)]
-        plt.plot(times, ls)
-        plt.xlim(0, 13.8)
+            comp_str = '$_{\\rm tot}$'
+        #
+        # Mask out the snapshots where the subhalo didn't exist
+        mask_nan = np.isfinite(ls) # To mask out nan's
+        mask_neg = (ls != -1)      # To mask out -1's
+        mask_tot = mask_nan & mask_neg
+        #
+        # Set up lookback time vector and select the time range to plot
+        lookback_time = np.flip(time_array['time'][-1] - time_array['time'])
+        times = lookback_time[:len(ls[mask_tot])]
+        #
+        # Plot the data and set the limits
+        plt.plot(times, ls[mask_tot])
+        plt.xlim(lookback_time[-1], lookback_time[0])
         plt.ylim(np.nanmin(ls)-5, np.nanmax(ls)+5)
+        #
+        # Check to see if there were infall, pericenter, or apocenter events
         infall = infall_array['check'][subhalo_num]
         peri = pericenter_array['pericenter.check'][subhalo_num]
         apo = apocenter_array['apocenter.check'][subhalo_num]
+        #
+        # If there were, plot when they occurred
         if infall == True:
-            infall_time = infall_array['time'][subhalo_num]
+            infall_time = infall_array['time.lb'][subhalo_num]
             plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
         if peri == True:
-            peri_times = np.asarray(pericenter_array['pericenter.time'][subhalo_num])
-            [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
+            mask = (pericenter_array['pericenter.time.lb'][subhalo_num] > 0)
+            if np.sum(mask) > 0:
+                peri_times = np.asarray(pericenter_array['pericenter.time.lb'][subhalo_num])
+                [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
         if apo == True:
-            apo_times = np.asarray(apocenter_array['apocenter.time'][subhalo_num])
-            [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
-        plt.xlabel('time [Gyr]', fontsize=28)
+            mask = (apocenter_array['apocenter.time.lb'][subhalo_num] > 0)
+            if np.sum(mask) > 0:
+                apo_times = np.asarray(apocenter_array['apocenter.time.lb'][subhalo_num])
+                [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
+        #
+        # Set the labels and save the figure
+        plt.xlabel('lookback time [Gyr]', fontsize=28)
         plt.ylabel('L'+comp_str+' [1000 km s$^{-1}$ kpc]', fontsize=28)
         plt.title('Subhalo '+str(subhalo_num), fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
