@@ -799,7 +799,7 @@ class OrbitPlot:
                 [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
         #
         # Set the labels and save the figure
-        plt.xlabel('time [Gyr]', fontsize=28)
+        plt.xlabel('lookback time [Gyr]', fontsize=28)
         plt.ylabel('E [km$^2$ s$^{-2}$]', fontsize=28)
         plt.title('Subhalo '+str(subhalo_num), fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
