@@ -937,16 +937,16 @@ class OrbitPlot:
         # See which component you want to plot
         if comp == 'r':
             ds = tree.prop('host.distance.principal.cylindrical', sub_inds[subhalo_num])[:,0]
-            comp_str = '$_{r}$'
+            comp_str = '$_{\\rm r}$'
         elif comp == 'phi':
             ds = tree.prop('host.distance.principal.cylindrical', sub_inds[subhalo_num])[:,1]
-            comp_str = '$_{\phi}$'
+            comp_str = '$_{\\rm \phi}$'
         elif comp == 'z':
             ds = tree.prop('host.distance.principal.cylindrical', sub_inds[subhalo_num])[:,2]
-            comp_str = '$_{z}$'
+            comp_str = '$_{\\rm z}$'
         elif comp == 'all':
             ds = tree.prop('host.distance.principal.cylindrical.total', sub_inds[subhalo_num])
-            comp_str = '$_{tot}$'
+            comp_str = '$_{\\rm tot}$'
         #
         # Set up lookback time vector and select the time range to plot
         lookback_time = np.flip(time_array['time'][-1] - time_array['time'])
@@ -964,17 +964,17 @@ class OrbitPlot:
         #
         # If there are, plot when they occurred
         if infall == True:
-            infall_time = infall_array['time'][subhalo_num]
+            infall_time = infall_array['time.lb'][subhalo_num]
             plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
         if peri == True:
-            mask = (pericenter_array['pericenter.time'][subhalo_num] > 0)
+            mask = (pericenter_array['pericenter.time.lb'][subhalo_num] > 0)
             if np.sum(mask) > 0:
-                peri_times = pericenter_array['pericenter.time'][subhalo_num][mask]
+                peri_times = pericenter_array['pericenter.time.lb'][subhalo_num][mask]
                 [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
         if apo == True:
-            mask = (apocenter_array['apocenter.time'][subhalo_num] > 0)
+            mask = (apocenter_array['apocenter.time.lb'][subhalo_num] > 0)
             if np.sum(mask) > 0:
-                apo_times = apocenter_array['apocenter.time'][subhalo_num][mask]
+                apo_times = apocenter_array['apocenter.time.lb'][subhalo_num][mask]
                 [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
         #
         # Set your labels and save the figure
