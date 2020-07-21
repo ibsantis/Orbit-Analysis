@@ -670,7 +670,7 @@ class OrbitAnalysis:
             d['halo.potential.norm.host'] = halo_potential_norm_host
         return d
 
-    def orbit_energy(self, tree, potential, sub_inds):
+    def orbit_energy(self, tree, potential_norm, sub_inds):
         """
         DESCRIPTION:
             Reads in the tree, a subhalo's index and progenitor indices, and an array
@@ -678,19 +678,27 @@ class OrbitAnalysis:
             for a subhalo and it's progenitor subhalos (i.e., the energy across time).
 
         VARIABLES:
-            tree      : dictionary
-            sub_inds  : 2D array
-            potential : 1D array
+            tree           : dictionary
+            potential_norm : dictionary
+            sub_inds       : 2D array
 
         NOTES:
             - Energy is defined as E = (1/2)*velocity**2 + potential
-            - Returns a 2D array:
-                - Shape: (number of subhalos) x (total number of snapshots)
-                - Each element corresponds to a different subhalo
-                - Each element starts at z = 0 and goes back in time
+            - Returns a dictionary:
+                - d['energy.norm.sub'] is a 2D array
+                  Array shape: same as sub_inds
+                               (number of subhalos) x (total number snapshots)
+                  Each row corresponds to a different subhalo
+                  Each element is the total energy of the halo at that snapshot
+                - - d['energy.norm.host'] is a 2D array
+                  Array shape: same as sub_inds
+                               (number of subhalos) x (total number snapshots)
+                  Each row corresponds to a different subhalo
+                  Each element is the total energy of the halo at that snapshot
         """
         # Set up an empty array to save to
-        energy = (-1)*np.ones((sub_inds.shape))
+        energy_norm_sub = (-1)*np.ones((sub_inds.shape))
+        energy_norm_host = (-1)*np.ones((sub_inds.shape))
         #
         # Loop through each subhalo
         for i in range(0, len(sub_inds)):
@@ -698,8 +706,14 @@ class OrbitAnalysis:
             mask = (sub_inds[i] >= 0)
             #
             # Calculate the total energy and save it to the array
-            energy[i][mask] = 0.5*tree.prop('host.velocity.total', sub_inds[i][mask])**2 + potential['halo.potentials'][sub_inds[i][mask]]
-        return energy
+            energy_norm_sub[i][mask] = 0.5*tree.prop('host.velocity.total', sub_inds[i][mask])**2 + potential_norm['halo.potential.norm.self'][i][mask]
+            energy_norm_host[i][mask] = 0.5*tree.prop('host.velocity.total', sub_inds[i][mask])**2 + potential_norm['halo.potential.norm.host'][i][mask]
+        #
+        # Save the arrays to a dictionary
+        d = dict()
+        d['energy.norm.sub'] = energy_norm_sub
+        d['energy.norm.host'] = energy_norm_host
+        return d
 
 class OrbitPlot:
 
