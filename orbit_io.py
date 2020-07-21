@@ -623,6 +623,53 @@ class OrbitAnalysis:
         d['ang.mom.total'] = angular_momentum_1d
         return d
 
+    def potential_norm(self, potential, sub_inds):
+        """
+        DESCRIPTION:
+            Read in the halo potential dictionary and normalize the potential
+            array by the subhalo's value at z = 0, and by the host's value
+            at z = 0.
+
+        VARIABLES:
+            potential : dictionary
+            sub_inds  : 2D array
+
+        NOTES:
+            - Returns a dictionary:
+                - d['halo.potential.norm.self'] is a 2D array
+                  Array shape: same as sub_inds
+                               (number of subhalos) x (total number snapshots)
+                  Each row corresponds to a different subhalo
+                  Each element is the potential of the subhalo at a snapshot,
+                    but normalized by its potential at z = 0
+            - Returns a dictionary:
+                - d['halo.potential.norm.host'] is a 2D array
+                  Array shape: same as sub_inds
+                               (number of subhalos) x (total number snapshots)
+                  Each row corresponds to a different subhalo
+                  Each element is the potential of the subhalo at a snapshot,
+                    but normalized by the host's potential at z = 0
+            - All values are the absolute value of the potential
+        """
+        # Set up arrays to save the normalized potentials to
+        halo_potential_norm_self = (-1)*np.ones((sub_inds.shape))
+        halo_potential_norm_host = (-1)*np.ones((sub_inds.shape))
+        #
+        # Loop through the number of subhalos
+        for i in range(0, len(sub_inds)):
+            # Create a mask for the snapshots the subhalo existed
+            mask = (sub_inds[i] >= 0)
+            #
+            # Save the stuff
+            halo_potential_norm_self[i][mask] = np.abs(potential['halo.potentials'][sub_inds[i][mask]]/potential['halo.potentials'][sub_inds[i][0]])
+            halo_potential_norm_host[i][mask] = np.abs(potential['halo.potentials'][sub_inds[i][mask]]/potential['halo.potentials'][sub_inds[0][0]])
+            #
+            # Put these in a dictionary
+            d = dict()
+            d['halo.potential.norm.self'] = halo_potential_norm_self
+            d['halo.potential.norm.host'] = halo_potential_norm_host
+        return d
+
     def orbit_energy(self, tree, potential, sub_inds):
         """
         DESCRIPTION:
