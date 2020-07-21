@@ -690,7 +690,7 @@ class OrbitAnalysis:
                                (number of subhalos) x (total number snapshots)
                   Each row corresponds to a different subhalo
                   Each element is the total energy of the halo at that snapshot
-                - - d['energy.norm.host'] is a 2D array
+                - d['energy.norm.host'] is a 2D array
                   Array shape: same as sub_inds
                                (number of subhalos) x (total number snapshots)
                   Each row corresponds to a different subhalo
@@ -720,8 +720,8 @@ class OrbitPlot:
     def orbit_energy_plot(
         self,
         tree,
-        etype,
-        energy_list,
+        potential_norm,
+        energy_tot,
         sub_inds,
         subhalo_num,
         infall_array,
@@ -732,17 +732,11 @@ class OrbitPlot:
     ):
         """
         DESCRIPTION:
-            Plots the orbital energy of a subhalo across time .
+            Plots the orbital energy of a subhalo across time.
 
         VARIABLES:
             tree             : dictionary
-            etype            : string
-                               The type of energy you want to plot
-                               Choose from: potential, kinetic, total
-            energy_list      : Depends on "type"
-                               Potential: array
-                               Kinetic  : array
-                               Total    : array
+            asdfasdfasdfasdf
             sub_inds         : list of arrays
             subhalo_num      : integer
                                The subhalo that you want to plot (starts at zero)
@@ -763,36 +757,50 @@ class OrbitPlot:
             - Will plot a green vertical line indicating when the subhalo
               experienced a pericenter event.
         """
+        # Set up a figure to plot to
         plt.figure(figsize=(10, 8))
-        if etype == 'potential':
-            halo_energy = energy_list[sub_inds[subhalo_num]]
-            times = np.flip(time_array['time'], axis=0)[:len(halo_energy)]
-            ystr = 'U [km$^2$ s$^{-2}$]'
-        if etype == 'kinetic':
-            halo_energy = 0.5*tree.prop('host.velocity.total', sub_inds[subhalo_num])**2
-            times = np.flip(time_array['time'], axis=0)[:len(halo_energy)]
-            ystr = 'K [km$^2$ s$^{-2}$]'
-        if etype == 'total':
-            halo_energy = energy_list[subhalo_num]
-            times = np.flip(time_array['time'], axis=0)[:len(halo_energy)]
-            ystr = 'E$_{\\rm tot}$ [km$^2$ s$^{-2}$]'
-        plt.plot(times, halo_energy)
-        plt.xlim(0, 13.8)
-        plt.ylim(np.nanmin(halo_energy)-300, np.nanmax(halo_energy)+300)
+        #
+        # Mask out snapshots where subhalo didn't exist
+        mask = (sub_inds[subhalo_num] >= 0)
+        #
+        # Set up the arrays to be plotted
+        halo_potential = potential_norm['halo.potential.norm.self'][subhalo_num][mask]
+        halo_kinetic = 0.5*tree.prop('host.velocity.total', sub_inds[subhalo_num][mask])**2
+        halo_total = energy_tot['energy.norm.sub'][subhalo_num][mask]
+        #
+        # Set up lookback time vector and select the time range to plot
+        lookback_time = np.flip(time_array['time'][-1] - time_array['time'])
+        times = lookback_time[:len(halo_potential)]
+        # Plot the data and set the limits
+        plt.plot(times, halo_potential, label='U')
+        plt.plot(times, halo_kinetic, label='K')
+        plt.plot(times, halo_total, linestyle=':', label='E$_{\\rm tot}$')
+        plt.xlim(lookback_time[-1], lookback_time[0])
+        plt.ylim(np.nanmin(halo_total)-300, np.nanmax(halo_total)+300)
+        #
+        # Check for infall, pericenter, and apocenter events
         infall = infall_array['check'][subhalo_num]
         peri = pericenter_array['pericenter.check'][subhalo_num]
         apo = apocenter_array['apocenter.check'][subhalo_num]
+        #
+        # If there were, plot when they occurred
         if infall == True:
-            infall_time = infall_array['time'][subhalo_num]
+            infall_time = infall_array['time.lb'][subhalo_num]
             plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
         if peri == True:
-            peri_times = np.asarray(pericenter_array['pericenter.time'][subhalo_num])
-            [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
+            mask = (pericenter_array['pericenter.time.lb'][subhalo_num] > 0)
+            if np.sum(mask) > 0:
+                peri_times = np.asarray(pericenter_array['pericenter.time.lb'][subhalo_num])
+                [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
         if apo == True:
-            apo_times = np.asarray(apocenter_array['apocenter.time'][subhalo_num])
-            [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
+            mask = (apocenter_array['apocenter.time.lb'][subhalo_num] > 0)
+            if np.sum(mask) > 0:
+                apo_times = np.asarray(apocenter_array['apocenter.time.lb'][subhalo_num])
+                [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
+        #
+        # Set the labels and save the figure
         plt.xlabel('time [Gyr]', fontsize=28)
-        plt.ylabel(ystr, fontsize=28)
+        plt.ylabel('E [km$^2$ s$^{-2}$]', fontsize=28)
         plt.title('Subhalo '+str(subhalo_num), fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
         plt.tight_layout()
