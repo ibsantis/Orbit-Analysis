@@ -878,7 +878,7 @@ class OrbitPlot:
         #
         # Set up lookback time vector and select the time range to plot
         lookback_time = np.flip(time_array['time'][-1] - time_array['time'])
-        times = lookback_time[:len(vs)][vs >= 0]
+        times = lookback_time[:len(vs)]
         #
         # Plot the data and set the limits
         plt.plot(times, vs)
