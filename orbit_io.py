@@ -829,7 +829,7 @@ class OrbitPlot:
 
         VARIABLES:
             tree             : dictionary
-            sub_inds         : list of lists
+            sub_inds         : 2D array
             subhalo_num      : integer
                                The subhalo you want to plot (starts at zero)
             comp             : string
@@ -850,42 +850,63 @@ class OrbitPlot:
             - Will plot a green vertical line indicating when the subhalo
               experienced a pericenter event.
         """
+        # Set up a figure to plot to
         plt.figure(figsize=(10, 8))
+        #
+        # Mask out snapshots where subhalo didn't exist
+        v_mask = (sub_inds[subhalo_num] >= 0)
+        #
+        # Select which component you want to plot
         if comp == 'r':
-            vs = tree.prop('host.velocity.cylindrical', sub_inds[subhalo_num])[:,0]
-            comp_str = '$_{r}$'
+            vs = tree.prop('host.velocity.principal.cylindrical', sub_inds[subhalo_num][v_mask])[:,0]
+            comp_str = '$_{\\rm r}$'
         elif comp == 'phi':
-            vs = tree.prop('host.velocity.cylindrical', sub_inds[subhalo_num])[:,2]
-            comp_str = '$_{\phi}$'
+            vs = tree.prop('host.velocity.principal.cylindrical', sub_inds[subhalo_num][v_mask])[:,2]
+            comp_str = '$_{\\rm \phi}$'
         elif comp == 'z':
-            vs = tree.prop('host.velocity.cylindrical', sub_inds[subhalo_num])[:,1]
-            comp_str = '$_{z}$'
+            vs = tree.prop('host.velocity.principal.cylindrical', sub_inds[subhalo_num][v_mask])[:,1]
+            comp_str = '$_{\\rm z}$'
         elif comp == 'rad':
-            vs = tree.prop('host.velocity.rad', sub_inds[subhalo_num])
-            comp_str = '$_{rad}$'
+            vs = tree.prop('host.velocity.rad', sub_inds[subhalo_num][v_mask])
+            comp_str = '$_{\\rm rad}$'
         elif comp == 'tan':
-            vs = tree.prop('host.velocity.tan', sub_inds[subhalo_num])
-            comp_str = '$_{tan}$'
+            vs = tree.prop('host.velocity.tan', sub_inds[subhalo_num][v_mask])
+            comp_str = '$_{\\rm tan}$'
         elif comp == 'all':
-            vs = tree.prop('host.velocity.cylindrical.total', sub_inds[subhalo_num])
-            comp_str = '$_{tot}$'
-        times = np.flip(time_array['time'], axis=0)[:len(vs)]
+            vs = tree.prop('host.velocity.principal.cylindrical.total', sub_inds[subhalo_num][v_mask])
+            comp_str = '$_{\\rm tot}$'
+        #
+        # Set up lookback time vector and select the time range to plot
+        lookback_time = np.flip(time_array['time'][-1] - time_array['time'])
+        times = lookback_time[:len(vs)][vs >= 0]
+        #
+        # Plot the data and set the limits
         plt.plot(times, vs)
-        plt.xlim(0, 13.8)
+        plt.xlim(lookback_time[-1], lookback_time[0])
         plt.ylim(0, np.nanmax(vs))
+        #
+        # Check to see if there were infall, pericenter, or apocenter events
         infall = infall_array['check'][subhalo_num]
         peri = pericenter_array['pericenter.check'][subhalo_num]
         apo = apocenter_array['apocenter.check'][subhalo_num]
+        #
+        # If there were, plot when they occurred
         if infall == True:
-            infall_time = infall_array['time'][subhalo_num]
+            infall_time = infall_array['time.lb'][subhalo_num]
             plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
         if peri == True:
-            peri_times = np.asarray(pericenter_array['pericenter.time'][subhalo_num])
-            [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
+            mask = (pericenter_array['pericenter.time.lb'][subhalo_num] > 0)
+            if np.sum(mask) > 0:
+                peri_times = np.asarray(pericenter_array['pericenter.time.lb'][subhalo_num])
+                [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
         if apo == True:
-            apo_times = np.asarray(apocenter_array['apocenter.time'][subhalo_num])
-            [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
-        plt.xlabel('time [Gyr]', fontsize=28)
+            mask = (apocenter_array['apocenter.time.lb'][subhalo_num] > 0)
+            if np.sum(mask) > 0:
+                apo_times = np.asarray(apocenter_array['apocenter.time.lb'][subhalo_num])
+                [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
+        #
+        # Set your labels and save the figure
+        plt.xlabel('lookback time [Gyr]', fontsize=28)
         plt.ylabel('v'+comp_str+' [km s$^{-1}$]', fontsize=28)
         plt.title('Subhalo '+str(subhalo_num), fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
@@ -934,26 +955,28 @@ class OrbitPlot:
         # Open a figure
         plt.figure(figsize=(10, 8))
         #
+        # Mask out snapshots where subhalo didn't exist
+        d_mask = (sub_inds[subhalo_num] >= 0)
         # See which component you want to plot
         if comp == 'r':
-            ds = tree.prop('host.distance.principal.cylindrical', sub_inds[subhalo_num])[:,0]
+            ds = tree.prop('host.distance.principal.cylindrical', sub_inds[subhalo_num][d_mask])[:,0]
             comp_str = '$_{\\rm r}$'
         elif comp == 'phi':
-            ds = tree.prop('host.distance.principal.cylindrical', sub_inds[subhalo_num])[:,1]
+            ds = tree.prop('host.distance.principal.cylindrical', sub_inds[subhalo_num][d_mask])[:,1]
             comp_str = '$_{\\rm \phi}$'
         elif comp == 'z':
-            ds = tree.prop('host.distance.principal.cylindrical', sub_inds[subhalo_num])[:,2]
+            ds = tree.prop('host.distance.principal.cylindrical', sub_inds[subhalo_num][d_mask])[:,2]
             comp_str = '$_{\\rm z}$'
         elif comp == 'all':
-            ds = tree.prop('host.distance.principal.cylindrical.total', sub_inds[subhalo_num])
+            ds = tree.prop('host.distance.principal.cylindrical.total', sub_inds[subhalo_num][d_mask])
             comp_str = '$_{\\rm tot}$'
         #
         # Set up lookback time vector and select the time range to plot
         lookback_time = np.flip(time_array['time'][-1] - time_array['time'])
-        times = lookback_time[:len(ds)][ds >= 0]
+        times = lookback_time[:len(ds)]
         #
         # Plot the data and set the limits
-        plt.plot(times, ds[ds >= 0])
+        plt.plot(times, ds)
         plt.xlim(lookback_time[-1], lookback_time[0])
         plt.ylim(0, np.nanmax(ds))
         #
