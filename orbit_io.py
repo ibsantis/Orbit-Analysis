@@ -737,6 +737,7 @@ class OrbitPlot:
               experienced a pericenter event.
         """
         # Set up a figure to plot to
+        plt.rcParams["font.family"] = "serif"
         plt.figure(figsize=(10, 8))
         #
         # Mask out snapshots where subhalo didn't exist
@@ -824,6 +825,7 @@ class OrbitPlot:
               experienced a pericenter event.
         """
         # Set up a figure to plot to
+        plt.rcParams["font.family"] = "serif"
         plt.figure(figsize=(10, 8))
         #
         # Select which component you want to plot
@@ -923,6 +925,7 @@ class OrbitPlot:
               experienced a pericenter event.
         """
         # Set up a figure to plot to
+        plt.rcParams["font.family"] = "serif"
         plt.figure(figsize=(10, 8))
         #
         # Mask out snapshots where subhalo didn't exist
@@ -1025,6 +1028,7 @@ class OrbitPlot:
               experienced a pericenter event.
         """
         # Open a figure
+        plt.rcParams["font.family"] = "serif"
         plt.figure(figsize=(10, 8))
         #
         # Mask out snapshots where subhalo didn't exist
