@@ -714,7 +714,8 @@ class OrbitPlot:
 
         VARIABLES:
             tree             : dictionary
-            asdfasdfasdfasdf
+            potential_norm   : 2D array
+            energy_tot       : 2D array
             sub_inds         : list of arrays
             subhalo_num      : integer
                                The subhalo that you want to plot (starts at zero)
@@ -744,7 +745,7 @@ class OrbitPlot:
         # Set up the arrays to be plotted
         halo_potential = potential_norm[subhalo_num][mask]
         halo_kinetic = 0.5*tree.prop('host.velocity.total', sub_inds[subhalo_num][mask])**2
-        halo_total = energy_tot['energy.norm.sub'][subhalo_num][mask]
+        halo_total = energy_tot[subhalo_num][mask]
         #
         # Set up lookback time vector and select the time range to plot
         lookback_time = np.flip(time_array['time'][-1] - time_array['time'])
