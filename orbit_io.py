@@ -756,7 +756,7 @@ class OrbitPlot:
         plt.plot(times, halo_kinetic, label='K')
         plt.plot(times, halo_total, linestyle=':', label='E$_{\\rm tot}$')
         plt.xlim(lookback_time[-1], lookback_time[0])
-        plt.ylim(min(np.nanmin(halo_potential), np.nanmin(halo_kinetic), npnanmin(halo_total))-300, max(np.nanmax(halo_total), np.nanmax(halo_kinetic), np.nanmax(halo_total))+300)
+        plt.ylim(min(np.nanmin(halo_potential), np.nanmin(halo_kinetic), np.nanmin(halo_total))-300, max(np.nanmax(halo_total), np.nanmax(halo_kinetic), np.nanmax(halo_total))+300)
         #
         # Check for infall, pericenter, and apocenter events
         infall = infall_array['check'][subhalo_num]
