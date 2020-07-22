@@ -743,10 +743,10 @@ class OrbitPlot:
         # Mask out snapshots where subhalo didn't exist
         mask = (sub_inds[subhalo_num] >= 0)
         #
-        # Set up the arrays to be plotted
-        halo_potential = potential_norm[subhalo_num][mask]
-        halo_kinetic = 0.5*tree.prop('host.velocity.total', sub_inds[subhalo_num][mask])**2
-        halo_total = energy_tot[subhalo_num][mask]
+        # Set up the arrays to be plotted. Divide by 1000 to make the y-axis better
+        halo_potential = (potential_norm[subhalo_num][mask])/1000
+        halo_kinetic = (0.5*tree.prop('host.velocity.total', sub_inds[subhalo_num][mask])**2)/1000
+        halo_total = (energy_tot[subhalo_num][mask])/1000
         #
         # Set up lookback time vector and select the time range to plot
         lookback_time = np.flip(time_array['time'][-1] - time_array['time'])
@@ -756,7 +756,7 @@ class OrbitPlot:
         plt.plot(times, halo_kinetic, label='K')
         plt.plot(times, halo_total, linestyle=':', label='E$_{\\rm tot}$')
         plt.xlim(lookback_time[-1], lookback_time[0])
-        plt.ylim(np.nanmin(halo_total)-300, np.nanmax(halo_total)+300)
+        plt.ylim(min(np.nanmin(halo_potential), np.nanmin(halo_kinetic), npnanmin(halo_total))-300, max(np.nanmax(halo_total), np.nanmax(halo_kinetic), np.nanmax(halo_total))+300)
         #
         # Check for infall, pericenter, and apocenter events
         infall = infall_array['check'][subhalo_num]
@@ -780,7 +780,7 @@ class OrbitPlot:
         #
         # Set the labels and save the figure
         plt.xlabel('lookback time [Gyr]', fontsize=28)
-        plt.ylabel('E [km$^2$ s$^{-2}$]', fontsize=28)
+        plt.ylabel('E [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
         plt.title('Subhalo '+str(subhalo_num), fontsize=24)
         plt.legend(prop={'size': 14})
         plt.tick_params(axis='both', which='major', labelsize=24)
@@ -950,15 +950,28 @@ class OrbitPlot:
         elif comp == 'all':
             vs = tree.prop('host.velocity.principal.cylindrical.total', sub_inds[subhalo_num][v_mask])
             comp_str = '$_{\\rm tot}$'
+        elif comp == 'three':
+            vs1 = tree.prop('host.velocity.principal.cylindrical.total', sub_inds[subhalo_num][v_mask])
+            vs2 = tree.prop('host.velocity.rad', sub_inds[subhalo_num][v_mask])
+            vs3 = tree.prop('host.velocity.tan', sub_inds[subhalo_num][v_mask])
+            comp_str = ''
         #
         # Set up lookback time vector and select the time range to plot
         lookback_time = np.flip(time_array['time'][-1] - time_array['time'])
         times = lookback_time[:len(vs)]
         #
         # Plot the data and set the limits
-        plt.plot(times, vs)
-        plt.xlim(lookback_time[-1], lookback_time[0])
-        plt.ylim(0, np.nanmax(vs))
+        if comp != 'three':
+            plt.plot(times, vs)
+            plt.xlim(lookback_time[-1], lookback_time[0])
+            plt.ylim(np.nanmin(vs), np.nanmax(vs))
+        else:
+            plt.plot(times, vs1, label='v$_{\\rm tot}$')
+            plt.plot(times, vs2, label='v$_{\\rm rad}$')
+            plt.plot(times, vs3, label='v$_{\\rm tan}$')
+            plt.xlim(lookback_time[-1], lookback_time[0])
+            plt.ylim(min(np.nanmin(vs1), np.nanmin(vs2), np.nanmin(vs3)), max(np.nanmax(vs1), np.nanmax(vs2), np.nanmax(vs3)))
+            plt.legend(prop={'size': 14})
         #
         # Check to see if there were infall, pericenter, or apocenter events
         infall = infall_array['check'][subhalo_num]
