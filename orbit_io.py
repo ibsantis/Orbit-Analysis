@@ -756,7 +756,7 @@ class OrbitPlot:
         plt.plot(times, halo_kinetic, label='K')
         plt.plot(times, halo_total, linestyle=':', label='E$_{\\rm tot}$')
         plt.xlim(lookback_time[-1], lookback_time[0])
-        plt.ylim(min(np.nanmin(halo_potential), np.nanmin(halo_kinetic), np.nanmin(halo_total))-300, max(np.nanmax(halo_total), np.nanmax(halo_kinetic), np.nanmax(halo_total))+300)
+        plt.ylim(min(np.nanmin(halo_potential), np.nanmin(halo_kinetic), np.nanmin(halo_total))-30, max(np.nanmax(halo_total), np.nanmax(halo_kinetic), np.nanmax(halo_total))+30)
         #
         # Check for infall, pericenter, and apocenter events
         infall = infall_array['check'][subhalo_num]
@@ -971,8 +971,8 @@ class OrbitPlot:
             times = lookback_time[:len(vs1)]
             #
             plt.plot(times, vs1, label='v$_{\\rm tot}$')
-            plt.plot(times, vs2, label='v$_{\\rm rad}$')
-            plt.plot(times, vs3, label='v$_{\\rm tan}$')
+            plt.plot(times, vs2, label='v$_{\\rm rad}$', alpha=0.5)
+            plt.plot(times, vs3, label='v$_{\\rm tan}$', alpha=0.5)
             plt.xlim(lookback_time[-1], lookback_time[0])
             plt.ylim(min(np.nanmin(vs1), np.nanmin(vs2), np.nanmin(vs3)), max(np.nanmax(vs1), np.nanmax(vs2), np.nanmax(vs3)))
             plt.legend(prop={'size': 14})
