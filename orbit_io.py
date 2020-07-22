@@ -781,6 +781,7 @@ class OrbitPlot:
         plt.xlabel('lookback time [Gyr]', fontsize=28)
         plt.ylabel('E [km$^2$ s$^{-2}$]', fontsize=28)
         plt.title('Subhalo '+str(subhalo_num), fontsize=24)
+        plt.legend(prop={'size': 14})
         plt.tick_params(axis='both', which='major', labelsize=24)
         plt.tight_layout()
         plt.savefig('/home/ibsantis/scripts/orbit_data/plots/'+file_name+'.pdf')
