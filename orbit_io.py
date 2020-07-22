@@ -956,16 +956,20 @@ class OrbitPlot:
             vs3 = tree.prop('host.velocity.tan', sub_inds[subhalo_num][v_mask])
             comp_str = ''
         #
-        # Set up lookback time vector and select the time range to plot
-        lookback_time = np.flip(time_array['time'][-1] - time_array['time'])
-        times = lookback_time[:len(vs)]
-        #
         # Plot the data and set the limits
         if comp != 'three':
+            # Set up lookback time
+            lookback_time = np.flip(time_array['time'][-1] - time_array['time'])
+            times = lookback_time[:len(vs)]
+            #
             plt.plot(times, vs)
             plt.xlim(lookback_time[-1], lookback_time[0])
             plt.ylim(np.nanmin(vs), np.nanmax(vs))
         else:
+            # Set up lookback time
+            lookback_time = np.flip(time_array['time'][-1] - time_array['time'])
+            times = lookback_time[:len(vs1)]
+            #
             plt.plot(times, vs1, label='v$_{\\rm tot}$')
             plt.plot(times, vs2, label='v$_{\\rm rad}$')
             plt.plot(times, vs3, label='v$_{\\rm tan}$')
