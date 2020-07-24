@@ -644,19 +644,38 @@ class OrbitAnalysis:
         # Set up arrays to save the normalized potentials to
         halo_potential_norm_z0 = (-1)*np.ones((sub_inds.shape))
         #
+        # Create a mask for the host potential
+        mask_host = (sub_inds[0] >= 0)
+        host_potential = potential['halo.potential'][sub_inds[0][mask_host]]
+        # Find the kinetic energy, and what you need to multiply the potential to be virialized (for the host; this is zero...)
+        kin_host = (0.5*tree.prop('host.velocity.total', sub_inds[0][mask_host])**2)[0]
+        multiplier = (-2)*kin_host/potential['halo.potentials'][sub_inds[0][mask_host]][0]
+        # Set the normalized potential for the host
+        halo_potential_norm_z0[0][mask_host] = multiplier*potential['halo.potentials'][sub_inds[0][mask_host]]
+        #
         # Loop through the number of subhalos
-        for i in range(0, len(sub_inds)):
+        for i in range(1, len(sub_inds)):
             # Create a mask for the snapshots the subhalo existed
             mask = (sub_inds[i] >= 0)
+            #
+            # Check to see if the host existed longer
+            if len(sub_inds[0][mask_host]) >= len(sub_inds[i][mask]):
+                # Subtract the host potential from the subhalo potential
+                temp = potential['halo.potentials'][sub_inds[i][mask]] - host_potential[:len(sub_inds[i][mask])]
+            if len(sub_inds[0][mask_host]) < len(sub_inds[i][mask]):
+                # Only get instances where subhalo and host existed
+                mask = mask & mask_host
+                # Subtract the host potential from the subhalo potential
+                temp = potential['halo.potentials'][sub_inds[i][mask]] - host_potential
             #
             # Find the kinetic energy at z = 0
             kin_z0 = (0.5*tree.prop('host.velocity.total', sub_inds[i][mask])**2)[0]
             #
             # Calculate the multiplier to normalize all of the potentials
-            multiplier = (-2)*kin_z0/potential['halo.potentials'][sub_inds[i][mask]][0]
+            multiplier = (-2)*kin_z0/temp[0]
             #
             # Apply the multiplier to the halo potentials and save to the new array
-            halo_potential_norm_z0[i][mask] = multiplier*potential['halo.potentials'][sub_inds[i][mask]]
+            halo_potential_norm_z0[i][mask] = multiplier*temp
         return halo_potential_norm_z0
 
     def orbit_energy(self, tree, potential_norm, sub_inds):
