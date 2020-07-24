@@ -646,7 +646,7 @@ class OrbitAnalysis:
         #
         # Create a mask for the host potential
         mask_host = (sub_inds[0] >= 0)
-        host_potential = potential['halo.potential'][sub_inds[0][mask_host]]
+        host_potential = potential['halo.potentials'][sub_inds[0][mask_host]]
         # Find the kinetic energy, and what you need to multiply the potential to be virialized (for the host; this is zero...)
         kin_host = (0.5*tree.prop('host.velocity.total', sub_inds[0][mask_host])**2)[0]
         multiplier = (-2)*kin_host/potential['halo.potentials'][sub_inds[0][mask_host]][0]
