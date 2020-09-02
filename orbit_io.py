@@ -39,6 +39,13 @@ from matplotlib import pyplot as plt
 
 class OrbitAnalysis:
 
+    def __init__(self, tree):
+        # Select the subhalo indices at z = 0
+        z0_inds = ut.array.get_indices(tree['snapshot'], 600)
+        # Select luminous subhalos at z = 0 and find their progenitor indices
+        z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [1, np.inf], z0_inds)
+        self.z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
+
     def get_luminous_halos(self, tree):
         """
         DESCRIPTION:

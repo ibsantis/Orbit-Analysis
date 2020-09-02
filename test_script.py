@@ -368,3 +368,433 @@ plt.tick_params(axis='both', which='major', labelsize=24)
 plt.tight_layout()
 plt.savefig(home_dir+'/orbit_data/plots/sub3m12i_energies.pdf')
 plt.close()
+
+####################
+
+# Looking into how U_sub - U_host looks
+
+
+plt.figure(1)
+plt.figure(figsize=(10, 8))
+#
+plt.plot(lookbacks[:len(energies[3][mask3])], energies[3][mask3]/1000, alpha=0.8, label='subhalo 3', color=colors[0])
+peri = peris['pericenter.check'][3]
+if peri == True:
+    mask = (peris['pericenter.time.lb'][3] > 0)
+    if np.sum(mask) > 0:
+        peri_times = np.asarray(peris['pericenter.time.lb'][3])
+        [plt.vlines(peri_times[i], -45, -35, color=colors[0], alpha=0.5, linestyles='solid') for i in range(0, len(peri_times))]
+#
+plt.plot(lookbacks[:len(energies[9][mask9])], energies[9][mask9]/1000, alpha=0.8, label='subhalo 9', color=colors[1])
+peri = peris['pericenter.check'][9]
+if peri == True:
+    mask = (peris['pericenter.time.lb'][9] > 0)
+    if np.sum(mask) > 0:
+        peri_times = np.asarray(peris['pericenter.time.lb'][9])
+        [plt.vlines(peri_times[i], -45, -35, color=colors[1], alpha=0.5, linestyles='solid') for i in range(0, len(peri_times))]
+#
+plt.plot(lookbacks[:len(energies[10][mask10])], energies[10][mask10]/1000, alpha=0.8, label='subhalo 10', color=colors[6])
+peri = peris['pericenter.check'][10]
+if peri == True:
+    mask = (peris['pericenter.time.lb'][10] > 0)
+    if np.sum(mask) > 0:
+        peri_times = np.asarray(peris['pericenter.time.lb'][10])
+        [plt.vlines(peri_times[i], -45, -35, color=colors[6], alpha=0.5, linestyles='solid') for i in range(0, len(peri_times))]
+#
+plt.plot(lookbacks[:len(energies[16][mask16])], energies[16][mask16]/1000, alpha=0.8, label='subhalo 16', color=colors[3])
+peri = peris['pericenter.check'][16]
+if peri == True:
+    mask = (peris['pericenter.time.lb'][16] > 0)
+    if np.sum(mask) > 0:
+        peri_times = np.asarray(peris['pericenter.time.lb'][16])
+        [plt.vlines(peri_times[i], -45, -35, color=colors[3], alpha=0.5, linestyles='solid') for i in range(0, len(peri_times))]
+#
+plt.plot(lookbacks[:len(energies[32][mask32])], energies[32][mask32]/1000, alpha=0.8, label='subhalo 32', color=colors[4])
+peri = peris['pericenter.check'][32]
+if peri == True:
+    mask = (peris['pericenter.time.lb'][32] > 0)
+    if np.sum(mask) > 0:
+        peri_times = np.asarray(peris['pericenter.time.lb'][32])
+        [plt.vlines(peri_times[i], -45, -35, color=colors[4], alpha=0.5, linestyles='solid') for i in range(0, len(peri_times))]
+#
+plt.xlim(lookbacks[-1], lookbacks[0])
+plt.ylim(-45, 50)
+plt.xlabel('lookback time [Gyr]', fontsize=28)
+plt.ylabel('E$_{\\rm sub}$(t) [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
+plt.title('Luminous subhalos in m12i', fontsize=24)
+plt.legend(loc='upper left', prop={'size': 18})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/energy_tot_diff.pdf')
+plt.close()
+
+###################
+
+mask3 =
+
+
+lookbacks = np.flip(snaps['time'][-1] - snaps['time'])
+delta_t = np.asarray([(lookbacks[i] + lookbacks[i+1])/2 for i in range(0, len(lookbacks)-1)])
+
+delta_e_3 = np.asarray([energies[3][mask3][i] - energies[3][mask3][i+1] for i in range(0, len(energies[3][mask3])-1)])/1000
+delta_e_9 = np.asarray([energies[9][mask3][i] - energies[9][mask3][i+1] for i in range(0, len(energies[9][mask3])-1)])/1000
+delta_e_10 = np.asarray([energies[10][mask3][i] - energies[10][mask3][i+1] for i in range(0, len(energies[10][mask3])-1)])/1000
+delta_e_16 = np.asarray([energies[16][mask3][i] - energies[16][mask3][i+1] for i in range(0, len(energies[16][mask3])-1)])/1000
+delta_e_32 = np.asarray([energies[32][mask3][i] - energies[32][mask3][i+1] for i in range(0, len(energies[32][mask3])-1)])/1000
+
+kinetic_3 = (0.5*halt.prop('host.velocity.total', subhalo_inds[3][mask3])**2)
+kinetic_9 = (0.5*halt.prop('host.velocity.total', subhalo_inds[9][mask9])**2)
+kinetic_10 = (0.5*halt.prop('host.velocity.total', subhalo_inds[10][mask10])**2)
+kinetic_16 = (0.5*halt.prop('host.velocity.total', subhalo_inds[16][mask16])**2)
+kinetic_32 = (0.5*halt.prop('host.velocity.total', subhalo_inds[32][mask32])**2)
+
+delta_k_3 = np.asarray([kinetic_3[i] - kinetic_3[i+1] for i in range(0, len(kinetic_3)-1)])/1000
+delta_k_9 = np.asarray([kinetic_9[i] - kinetic_9[i+1] for i in range(0, len(kinetic_9)-1)])/1000
+delta_k_10 = np.asarray([kinetic_10[i] - kinetic_10[i+1] for i in range(0, len(kinetic_10)-1)])/1000
+delta_k_16 = np.asarray([kinetic_16[i] - kinetic_16[i+1] for i in range(0, len(kinetic_16)-1)])/1000
+delta_k_32 = np.asarray([kinetic_32[i] - kinetic_32[i+1] for i in range(0, len(kinetic_32)-1)])/1000
+
+delta_u_3 = np.asarray([pot_norm[3][mask3][i] - pot_norm[3][mask3][i+1] for i in range(0, len(pot_norm[3][mask3])-1)])/1000
+delta_u_9 = np.asarray([pot_norm[9][mask9][i] - pot_norm[9][mask9][i+1] for i in range(0, len(pot_norm[9][mask9])-1)])/1000
+delta_u_10 = np.asarray([pot_norm[10][mask10][i] - pot_norm[10][mask10][i+1] for i in range(0, len(pot_norm[10][mask10])-1)])/1000
+delta_u_16 = np.asarray([pot_norm[16][mask16][i] - pot_norm[16][mask16][i+1] for i in range(0, len(pot_norm[16][mask16])-1)])/1000
+delta_u_32 = np.asarray([pot_norm[32][mask32][i] - pot_norm[32][mask32][i+1] for i in range(0, len(pot_norm[32][mask32])-1)])/1000
+
+#sub3
+plt.figure(1)
+plt.figure(figsize=(10, 8))
+#
+plt.plot(delta_t[:len(delta_e_3)], delta_e_3, alpha=0.8, label='$\Delta$E')
+plt.plot(delta_t[:len(delta_k_3)], delta_k_3, alpha=0.8, label='$\Delta$K')
+plt.plot(delta_t[:len(delta_u_3)], delta_u_3, alpha=0.8, label='$\Delta$U')
+peri = peris['pericenter.check'][3]
+if peri == True:
+    mask = (peris['pericenter.time.lb'][3] > 0)
+    if np.sum(mask) > 0:
+        peri_times = np.asarray(peris['pericenter.time.lb'][3])
+        [plt.vlines(peri_times[i], -1, -0.75, color=colors[0], alpha=0.5, linestyles='solid') for i in range(0, len(peri_times))]
+#
+plt.xlim(lookbacks[-1], lookbacks[0])
+plt.ylim(-1, 1)
+plt.xlabel('lookback time [Gyr]', fontsize=28)
+plt.ylabel('$\Delta$E(t) [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
+plt.title('subhalo 3, m12i', fontsize=24)
+plt.legend(loc='upper left', prop={'size': 18})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/delta_e_3.pdf')
+plt.close()
+
+plt.figure(2)
+plt.figure(figsize=(10, 8))
+#
+plt.plot(delta_t[:len(delta_e_9)], delta_e_9, alpha=0.8, label='$\Delta$E')
+plt.plot(delta_t[:len(delta_k_9)], delta_k_9, alpha=0.8, label='$\Delta$K')
+plt.plot(delta_t[:len(delta_u_9)], delta_u_9, alpha=0.8, label='$\Delta$U')
+peri = peris['pericenter.check'][9]
+if peri == True:
+    mask = (peris['pericenter.time.lb'][9] > 0)
+    if np.sum(mask) > 0:
+        peri_times = np.asarray(peris['pericenter.time.lb'][9])
+        [plt.vlines(peri_times[i], -2, -1.5, color=colors[1], alpha=0.5, linestyles='solid') for i in range(0, len(peri_times))]
+#
+plt.xlim(lookbacks[-1], lookbacks[0])
+plt.ylim(-2, 2)
+plt.xlabel('lookback time [Gyr]', fontsize=28)
+plt.ylabel('$\Delta$E(t) [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
+plt.title('subhalo 9, m12i', fontsize=24)
+plt.legend(loc='upper left', prop={'size': 18})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/delta_e_9.pdf')
+plt.close()
+
+plt.figure(3)
+plt.figure(figsize=(10, 8))
+#
+plt.plot(delta_t[:len(delta_e_10)], delta_e_10, alpha=0.8, label='$\Delta$E')
+plt.plot(delta_t[:len(delta_k_10)], delta_k_10, alpha=0.8, label='$\Delta$K')
+plt.plot(delta_t[:len(delta_u_10)], delta_u_10, alpha=0.8, label='$\Delta$U')
+peri = peris['pericenter.check'][10]
+if peri == True:
+    mask = (peris['pericenter.time.lb'][10] > 0)
+    if np.sum(mask) > 0:
+        peri_times = np.asarray(peris['pericenter.time.lb'][10])
+        [plt.vlines(peri_times[i], -2, -2.5, color=colors[6], alpha=0.5, linestyles='solid') for i in range(0, len(peri_times))]
+#
+plt.xlim(lookbacks[-1], lookbacks[0])
+plt.ylim(-2, 2)
+plt.xlabel('lookback time [Gyr]', fontsize=28)
+plt.ylabel('$\Delta$E(t) [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
+plt.title('subhalo 10, m12i', fontsize=24)
+plt.legend(loc='upper left', prop={'size': 18})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/delta_e_10.pdf')
+plt.close()
+
+plt.figure(4)
+plt.figure(figsize=(10, 8))
+#
+plt.plot(delta_t[:len(delta_e_16)], delta_e_16, alpha=0.8, label='$\Delta$E')
+plt.plot(delta_t[:len(delta_k_16)], delta_k_16, alpha=0.8, label='$\Delta$K')
+plt.plot(delta_t[:len(delta_u_16)], delta_u_16, alpha=0.8, label='$\Delta$U')
+peri = peris['pericenter.check'][16]
+if peri == True:
+    mask = (peris['pericenter.time.lb'][16] > 0)
+    if np.sum(mask) > 0:
+        peri_times = np.asarray(peris['pericenter.time.lb'][16])
+        [plt.vlines(peri_times[i], -2, -1, color=colors[3], alpha=0.5, linestyles='solid') for i in range(0, len(peri_times))]
+#
+plt.xlim(lookbacks[-1], lookbacks[0])
+plt.ylim(-2, 2)
+plt.xlabel('lookback time [Gyr]', fontsize=28)
+plt.ylabel('$\Delta$E(t) [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
+plt.title('subhalo 16, m12i', fontsize=24)
+plt.legend(loc='upper left', prop={'size': 18})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/delta_e_16.pdf')
+plt.close()
+
+plt.figure(5)
+plt.figure(figsize=(10, 8))
+#
+plt.plot(delta_t[:len(delta_e_32)], delta_e_32, alpha=0.8, label='$\Delta$E')
+plt.plot(delta_t[:len(delta_k_32)], delta_k_32, alpha=0.8, label='$\Delta$K')
+plt.plot(delta_t[:len(delta_u_32)], delta_u_32, alpha=0.8, label='$\Delta$U')
+peri = peris['pericenter.check'][32]
+if peri == True:
+    mask = (peris['pericenter.time.lb'][32] > 0)
+    if np.sum(mask) > 0:
+        peri_times = np.asarray(peris['pericenter.time.lb'][32])
+        [plt.vlines(peri_times[i], -3, -2, color=colors[4], alpha=0.5, linestyles='solid') for i in range(0, len(peri_times))]
+#
+plt.xlim(lookbacks[-1], lookbacks[0])
+plt.ylim(-3, 3)
+plt.xlabel('lookback time [Gyr]', fontsize=28)
+plt.ylabel('$\Delta$E(t) [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
+plt.title('subhalo 32, m12i', fontsize=24)
+plt.legend(loc='upper left', prop={'size': 18})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/delta_e_32.pdf')
+plt.close()
+
+##################
+# Plot the different energies vs distance
+
+
+plt.figure(1)
+plt.figure(figsize=(10, 8))
+#
+plt.plot(halt_dists[3][mask3], energies[3][mask3]/1000, alpha=0.8, label='K + U')
+plt.plot(halt_dists[3][mask3], kinetic_3/1000, alpha=0.8, label='K')
+plt.plot(halt_dists[3][mask3], pot_norm[3][mask3]/1000, alpha=0.8, label='U$_{\\rm norm}$')
+plt.plot(halt_dists[3][mask3], halo_potential['halo.potentials'][subhalo_inds[3][mask3]]/10000, alpha=0.8, label='U/10')
+#plt.xlim(lookbacks[-1], lookbacks[0])
+#plt.ylim(-1, 1)
+plt.xlabel('d$_{\\rm host}$ [kpc]', fontsize=28)
+plt.ylabel('E [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
+plt.title('subhalo 3, m12i', fontsize=24)
+plt.legend(loc='best', prop={'size': 18})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/evd_3.pdf')
+plt.close()
+
+plt.figure(2)
+plt.figure(figsize=(10, 8))
+#
+plt.plot(halt_dists[9][mask9], energies[9][mask9]/1000, alpha=0.8, label='K + U')
+plt.plot(halt_dists[9][mask9], kinetic_9/1000, alpha=0.8, label='K')
+plt.plot(halt_dists[9][mask9], pot_norm[9][mask9]/1000, alpha=0.8, label='U$_{\\rm norm}$')
+plt.plot(halt_dists[9][mask9], halo_potential['halo.potentials'][subhalo_inds[9][mask9]]/10000, alpha=0.8, label='U/10')
+#plt.xlim(lookbacks[-1], lookbacks[0])
+#plt.ylim(-1, 1)
+plt.xlabel('d$_{\\rm host}$ [kpc]', fontsize=28)
+plt.ylabel('E [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
+plt.title('subhalo 9, m12i', fontsize=24)
+plt.legend(loc='best', prop={'size': 18})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/evd_9.pdf')
+plt.close()
+
+plt.figure(3)
+plt.figure(figsize=(10, 8))
+#
+plt.plot(halt_dists[10][mask10], energies[10][mask10]/1000, alpha=0.8, label='K + U')
+plt.plot(halt_dists[10][mask10], kinetic_10/1000, alpha=0.8, label='K')
+plt.plot(halt_dists[10][mask10], pot_norm[10][mask10]/1000, alpha=0.8, label='U$_{\\rm norm}$')
+plt.plot(halt_dists[10][mask10], halo_potential['halo.potentials'][subhalo_inds[10][mask10]]/10000, alpha=0.8, label='U/10')
+#plt.xlim(lookbacks[-1], lookbacks[0])
+#plt.ylim(-1, 1)
+plt.xlabel('d$_{\\rm host}$ [kpc]', fontsize=28)
+plt.ylabel('E [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
+plt.title('subhalo 10, m12i', fontsize=24)
+plt.legend(loc='best', prop={'size': 18})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/evd_10.pdf')
+plt.close()
+
+plt.figure(4)
+plt.figure(figsize=(10, 8))
+#
+plt.plot(halt_dists[16][mask16], energies[16][mask16]/1000, alpha=0.8, label='K + U')
+plt.plot(halt_dists[16][mask16], kinetic_16/1000, alpha=0.8, label='K')
+plt.plot(halt_dists[16][mask16], pot_norm[16][mask16]/1000, alpha=0.8, label='U$_{\\rm norm}$')
+plt.plot(halt_dists[16][mask16], halo_potential['halo.potentials'][subhalo_inds[16][mask16]]/10000, alpha=0.8, label='U/10')
+#plt.xlim(lookbacks[-1], lookbacks[0])
+#plt.ylim(-1, 1)
+plt.xlabel('d$_{\\rm host}$ [kpc]', fontsize=28)
+plt.ylabel('E [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
+plt.title('subhalo 16, m12i', fontsize=24)
+plt.legend(loc='best', prop={'size': 18})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/evd_16.pdf')
+plt.close()
+
+plt.figure(5)
+plt.figure(figsize=(10, 8))
+#
+plt.plot(halt_dists[32][mask32], energies[32][mask32]/1000, alpha=0.8, label='K + U')
+plt.plot(halt_dists[32][mask32], kinetic_32/1000, alpha=0.8, label='K')
+plt.plot(halt_dists[32][mask32], pot_norm[32][mask32]/1000, alpha=0.8, label='U$_{\\rm norm}$')
+plt.plot(halt_dists[32][mask32], halo_potential['halo.potentials'][subhalo_inds[32][mask32]]/10000, alpha=0.8, label='U/10')
+#plt.xlim(lookbacks[-1], lookbacks[0])
+#plt.ylim(-1, 1)
+plt.xlabel('d$_{\\rm host}$ [kpc]', fontsize=28)
+plt.ylabel('E [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
+plt.title('subhalo 32, m12i', fontsize=24)
+plt.legend(loc='best', prop={'size': 18})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/evd_32.pdf')
+plt.close()
+
+##########
+# Check the potential energy vs the normalized potential energy differences
+
+d_u_3 = np.asarray([halo_potential['halo.potentials'][subhalo_inds[3][mask3]][i] - halo_potential['halo.potentials'][subhalo_inds[3][mask3]][i+1] for i in range(0, len(halo_potential['halo.potentials'][subhalo_inds[3][mask3]])-1)])/1000
+d_u_9 = np.asarray([halo_potential['halo.potentials'][subhalo_inds[9][mask9]][i] - halo_potential['halo.potentials'][subhalo_inds[9][mask9]][i+1] for i in range(0, len(halo_potential['halo.potentials'][subhalo_inds[9][mask9]])-1)])/1000
+d_u_10 = np.asarray([halo_potential['halo.potentials'][subhalo_inds[10][mask10]][i] - halo_potential['halo.potentials'][subhalo_inds[10][mask10]][i+1] for i in range(0, len(halo_potential['halo.potentials'][subhalo_inds[10][mask10]])-1)])/1000
+d_u_16 = np.asarray([halo_potential['halo.potentials'][subhalo_inds[16][mask16]][i] - halo_potential['halo.potentials'][subhalo_inds[16][mask16]][i+1] for i in range(0, len(halo_potential['halo.potentials'][subhalo_inds[16][mask16]])-1)])/1000
+d_u_32 = np.asarray([halo_potential['halo.potentials'][subhalo_inds[32][mask32]][i] - halo_potential['halo.potentials'][subhalo_inds[32][mask32]][i+1] for i in range(0, len(halo_potential['halo.potentials'][subhalo_inds[32][mask32]])-1)])/1000
+
+plt.figure(1)
+plt.figure(figsize=(10, 8))
+#
+plt.plot(delta_t[:len(d_u_3)], d_u_3, alpha=0.8, label='$\Delta$U')
+plt.plot(delta_t[:len(delta_u_3)], delta_u_3, alpha=0.8, label='$\Delta$U$_{\\rm norm}$')
+peri = peris['pericenter.check'][3]
+if peri == True:
+    mask = (peris['pericenter.time.lb'][3] > 0)
+    if np.sum(mask) > 0:
+        peri_times = np.asarray(peris['pericenter.time.lb'][3])
+        [plt.vlines(peri_times[i], -1, -0.75, color=colors[0], alpha=0.5, linestyles='solid') for i in range(0, len(peri_times))]
+#
+plt.xlim(lookbacks[-1], lookbacks[0])
+plt.ylim(-1, 1)
+plt.xlabel('lookback time [Gyr]', fontsize=28)
+plt.ylabel('$\Delta$E(t) [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
+plt.title('subhalo 3, m12i', fontsize=24)
+plt.legend(loc='upper left', prop={'size': 18})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/delta_u_3.pdf')
+plt.close()
+
+plt.figure(2)
+plt.figure(figsize=(10, 8))
+#
+plt.plot(delta_t[:len(d_u_9)], d_u_9, alpha=0.8, label='$\Delta$U')
+plt.plot(delta_t[:len(delta_u_9)], delta_u_9, alpha=0.8, label='$\Delta$U$_{\\rm norm}$')
+peri = peris['pericenter.check'][9]
+if peri == True:
+    mask = (peris['pericenter.time.lb'][9] > 0)
+    if np.sum(mask) > 0:
+        peri_times = np.asarray(peris['pericenter.time.lb'][9])
+        [plt.vlines(peri_times[i], -2, -1.5, color=colors[1], alpha=0.5, linestyles='solid') for i in range(0, len(peri_times))]
+#
+plt.xlim(lookbacks[-1], lookbacks[0])
+plt.ylim(-2, 2)
+plt.xlabel('lookback time [Gyr]', fontsize=28)
+plt.ylabel('$\Delta$E(t) [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
+plt.title('subhalo 9, m12i', fontsize=24)
+plt.legend(loc='upper left', prop={'size': 18})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/delta_u_9.pdf')
+plt.close()
+
+plt.figure(3)
+plt.figure(figsize=(10, 8))
+#
+plt.plot(delta_t[:len(d_u_10)], d_u_10, alpha=0.8, label='$\Delta$U')
+plt.plot(delta_t[:len(delta_u_10)], delta_u_10, alpha=0.8, label='$\Delta$U$_{\\rm norm}$')
+peri = peris['pericenter.check'][10]
+if peri == True:
+    mask = (peris['pericenter.time.lb'][10] > 0)
+    if np.sum(mask) > 0:
+        peri_times = np.asarray(peris['pericenter.time.lb'][10])
+        [plt.vlines(peri_times[i], -2, -2.5, color=colors[6], alpha=0.5, linestyles='solid') for i in range(0, len(peri_times))]
+#
+plt.xlim(lookbacks[-1], lookbacks[0])
+plt.ylim(-2, 2)
+plt.xlabel('lookback time [Gyr]', fontsize=28)
+plt.ylabel('$\Delta$E(t) [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
+plt.title('subhalo 10, m12i', fontsize=24)
+plt.legend(loc='upper left', prop={'size': 18})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/delta_u_10.pdf')
+plt.close()
+
+plt.figure(4)
+plt.figure(figsize=(10, 8))
+#
+plt.plot(delta_t[:len(d_u_16)], d_u_16, alpha=0.8, label='$\Delta$U')
+plt.plot(delta_t[:len(delta_u_16)], delta_u_16, alpha=0.8, label='$\Delta$U$_{\\rm norm}$')
+peri = peris['pericenter.check'][16]
+if peri == True:
+    mask = (peris['pericenter.time.lb'][16] > 0)
+    if np.sum(mask) > 0:
+        peri_times = np.asarray(peris['pericenter.time.lb'][16])
+        [plt.vlines(peri_times[i], -2, -1, color=colors[3], alpha=0.5, linestyles='solid') for i in range(0, len(peri_times))]
+#
+plt.xlim(lookbacks[-1], lookbacks[0])
+plt.ylim(-2, 2)
+plt.xlabel('lookback time [Gyr]', fontsize=28)
+plt.ylabel('$\Delta$E(t) [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
+plt.title('subhalo 16, m12i', fontsize=24)
+plt.legend(loc='upper left', prop={'size': 18})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/delta_u_16.pdf')
+plt.close()
+
+plt.figure(5)
+plt.figure(figsize=(10, 8))
+#
+plt.plot(delta_t[:len(d_u_32)], d_u_32, alpha=0.8, label='$\Delta$U')
+plt.plot(delta_t[:len(delta_u_32)], delta_u_32, alpha=0.8, label='$\Delta$U$_{\\rm norm}$')
+peri = peris['pericenter.check'][32]
+if peri == True:
+    mask = (peris['pericenter.time.lb'][32] > 0)
+    if np.sum(mask) > 0:
+        peri_times = np.asarray(peris['pericenter.time.lb'][32])
+        [plt.vlines(peri_times[i], -3, -2, color=colors[4], alpha=0.5, linestyles='solid') for i in range(0, len(peri_times))]
+#
+plt.xlim(lookbacks[-1], lookbacks[0])
+plt.ylim(-3, 3)
+plt.xlabel('lookback time [Gyr]', fontsize=28)
+plt.ylabel('$\Delta$E(t) [10$^3$ km$^2$ s$^{-2}$]', fontsize=28)
+plt.title('subhalo 32, m12i', fontsize=24)
+plt.legend(loc='upper left', prop={'size': 18})
+plt.tick_params(axis='both', which='major', labelsize=24)
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/delta_u_32.pdf')
+plt.close()
