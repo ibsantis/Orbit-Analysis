@@ -99,7 +99,7 @@ class OrbitAnalysis:
         #z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
         #return z0_inds_w_star_prog
 
-    def halo_distances(self, tree, sub_inds):
+    def halo_distances(self, tree):
         """
         DESCRIPTION:
             Reads in the halo tree and subhalo indices, then returns a 2D array,
@@ -120,13 +120,13 @@ class OrbitAnalysis:
             - The 2D array is ordered however the subhalo indices are ordered
         """
         # Set up null 2D array with the same shape as the subhalo index array
-        distances = (-1)*np.ones(sub_inds.shape)
+        distances = (-1)*np.ones(self.sub_inds.shape)
         # Loop over the number of subhalos
-        for i in range(0, len(sub_inds)):
+        for i in range(0, len(self.sub_inds)):
             # Mask only the subhalos that exist (non-negative elements)
-            mask = (sub_inds[i] >= 0)
+            mask = (self.sub_inds[i] >= 0)
             # Loop over the number of snapshots a subhalo exists
-            for j, val in enumerate(tree.prop('host.distance.total', sub_inds[i][mask])):
+            for j, val in enumerate(tree.prop('host.distance.total', self.sub_inds[i][mask])):
                 # Fill in the null array with 1D distances
                 distances[i][j] = val
         return distances
