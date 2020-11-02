@@ -59,7 +59,9 @@ else:
 print('Set paths')
 
 # Read in the entire tree
+#
 snaps = ut.simulation.read_snapshot_times(directory=simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
+#
 halt = halo.io.IO.read_tree(simulation_directory=simulation_dir, file_kind='hdf5', species='star')
 # Read in the halo potential file
 halo_potential = ut.io.file_hdf5(home_dir+'/orbit_data/hdf5_files/'+galaxy+'_halo_potentials.hdf5')
@@ -67,6 +69,7 @@ print('Done reading in the data.')
 
 orbits = orbit_io.OrbitAnalysis()
 orbit_plot = orbit_io.OrbitPlot()
+#
 subhalo_inds = orbits.get_luminous_halos(halt)
 halt_dists = orbits.halo_distances(halt, subhalo_inds) # Originally had the function written out here
 halt_vels = orbits.halo_velocities(halt, subhalo_inds)

@@ -40,17 +40,10 @@ from matplotlib import pyplot as plt
 class OrbitAnalysis:
 
     def __init__(self, tree):
-        # Select the subhalo indices at z = 0
-        z0_inds = ut.array.get_indices(tree['snapshot'], 600)
-        # Select luminous subhalos at z = 0 and find their progenitor indices
-        z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [1, np.inf], z0_inds)
-        self.z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
-
-    def get_luminous_halos(self, tree):
         """
         DESCRIPTION:
-            Reads in the halo tree, and returns the indices of luminous subhalos
-            along with their progenitor indices.
+            Returns the indices of luminous subhalos along with their progenitor
+            indices.
 
         VARIABLES:
             tree : dictionary
@@ -73,8 +66,37 @@ class OrbitAnalysis:
         z0_inds = ut.array.get_indices(tree['snapshot'], 600)
         # Select luminous subhalos at z = 0 and find their progenitor indices
         z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [1, np.inf], z0_inds)
-        z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
-        return z0_inds_w_star_prog
+        self.z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
+
+    #def get_luminous_halos(self, tree):
+        """
+        DESCRIPTION:
+            Reads in the halo tree, and returns the indices of luminous subhalos
+            along with their progenitor indices.
+
+        VARIABLES:
+            tree : dictionary
+
+        NOTES:
+            - Returns a 2D array:
+                - Each row corresponds to a luminous subhalo
+                - The first element in a row is the index of the luminous
+                  subhalo at z = 0
+                - Each other element in a row corresponds to the subhalo's main
+                  progenitor
+            - Elements that are negative correspond to times when it did not
+              exist
+            - For each subhalo (row), the arrays are ordered from
+              z = 0 to z = z_form (i.e., from present-day to the past)
+            - Each row has a length of 597. There are no halos that exist in
+              snapshots 0,1,2,3.
+        """
+        ## Select the subhalo indices at z = 0
+        #z0_inds = ut.array.get_indices(tree['snapshot'], 600)
+        ## Select luminous subhalos at z = 0 and find their progenitor indices
+        #z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [1, np.inf], z0_inds)
+        #z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
+        #return z0_inds_w_star_prog
 
     def halo_distances(self, tree, sub_inds):
         """
