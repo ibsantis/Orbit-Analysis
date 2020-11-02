@@ -69,36 +69,6 @@ class OrbitAnalysis:
         z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
         self.sub_inds = z0_inds_w_star_prog
 
-    #def get_luminous_halos(self, tree):
-        """
-        DESCRIPTION:
-            Reads in the halo tree, and returns the indices of luminous subhalos
-            along with their progenitor indices.
-
-        VARIABLES:
-            tree : dictionary
-
-        NOTES:
-            - Returns a 2D array:
-                - Each row corresponds to a luminous subhalo
-                - The first element in a row is the index of the luminous
-                  subhalo at z = 0
-                - Each other element in a row corresponds to the subhalo's main
-                  progenitor
-            - Elements that are negative correspond to times when it did not
-              exist
-            - For each subhalo (row), the arrays are ordered from
-              z = 0 to z = z_form (i.e., from present-day to the past)
-            - Each row has a length of 597. There are no halos that exist in
-              snapshots 0,1,2,3.
-        """
-        ## Select the subhalo indices at z = 0
-        #z0_inds = ut.array.get_indices(tree['snapshot'], 600)
-        ## Select luminous subhalos at z = 0 and find their progenitor indices
-        #z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [1, np.inf], z0_inds)
-        #z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
-        #return z0_inds_w_star_prog
-
     def halo_distances(self, tree):
         """
         DESCRIPTION:
@@ -107,7 +77,6 @@ class OrbitAnalysis:
 
         VARIABLES:
             tree     : dictionary
-            sub_inds : 2D array
 
         NOTES:
             - Returns a 2D array:
@@ -160,7 +129,7 @@ class OrbitAnalysis:
                 distances_norm[i][j] = val
         return distances_norm
 
-    def halo_velocities(self, tree, sub_inds):
+    def halo_velocities(self, tree):
         """
         DESCRIPTION:
             Reads in the halo tree and subhalo indices, then returns a 2D array,
@@ -169,7 +138,6 @@ class OrbitAnalysis:
 
         VARIABLES:
             tree     : dictionary
-            sub_inds : 2D array
 
         NOTES:
             - Returns a 2D array:
@@ -182,13 +150,13 @@ class OrbitAnalysis:
             - The 2D array is ordered however the subhalo indices are ordered
         """
         # Set up null 2D array with the same shape as the subhalo index array
-        velocities = (-1)*np.ones(sub_inds.shape)
+        velocities = (-1)*np.ones(self.sub_inds.shape)
         # Loop over the number of subhalos
-        for i in range(0, len(sub_inds)):
+        for i in range(0, len(self.sub_inds)):
             # Mask only the subhalos that exist (non-negative elements)
-            mask = (sub_inds[i] >= 0)
+            mask = (self.sub_inds[i] >= 0)
             # Loop over the number of snapshots a subhalo exists
-            for j, val in enumerate(tree.prop('host.velocity.total', sub_inds[i][mask])):
+            for j, val in enumerate(tree.prop('host.velocity.total', self.sub_inds[i][mask])):
                 # Fill in the null array with 1D distances
                 velocities[i][j] = val
         return velocities
@@ -586,7 +554,7 @@ class OrbitAnalysis:
         d['max.dist.time.lb'] = max_dist_time_lb
         return d
 
-    def angular_momentum(self, tree, sub_inds):
+    def angular_momentum(self, tree):
         """
         DESCRIPTION:
             Reads in the tree and subhalo indices and returns a dictionary that contains
@@ -594,7 +562,6 @@ class OrbitAnalysis:
 
         VARIABLES:
             tree     : dictionary
-            sub_inds : 2D array
 
         NOTES:
             - Returns a dictionary:
@@ -616,14 +583,14 @@ class OrbitAnalysis:
         ang_mom_norm_tot = []
         #
         # Loop over all of the subhalos
-        for i in range(0, len(sub_inds)):
+        for i in range(0, len(self.sub_inds)):
             # Mask out indices where the halo didn't exist (negative indices)
-            mask = (sub_inds[i] >= 0)
+            mask = (self.sub_inds[i] >= 0)
             #
             # Calculate the different components of angular momentum
-            lr = (-1)*tree.prop('host.distance.principal.cylindrical', sub_inds[i][mask])[:,2]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i][mask])[:,1]
-            lphi = (-1)*((tree.prop('host.distance.principal.cylindrical', sub_inds[i][mask])[:,0]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i][mask])[:,2]) - (tree.prop('host.distance.principal.cylindrical', sub_inds[i][mask])[:,2]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i][mask])[:,0]))
-            lz = tree.prop('host.distance.principal.cylindrical', sub_inds[i][mask])[:,0]*tree.prop('host.velocity.principal.cylindrical', sub_inds[i][mask])[:,1]
+            lr = (-1)*tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
+            lphi = (-1)*((tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,2]) - (tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,0]))
+            lz = tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
             #
             # Save the values to arrays
             ang_mom_vec_subhalo = np.asarray([(lr[j], lphi[j], lz[j]) for j in range(0, len(lr))])
@@ -632,7 +599,7 @@ class OrbitAnalysis:
             ang_mom_norm_tot.append(ang_mom_norm_subhalo)
         #
         # Create an array that will store the 3D angular momentum of each subhalo across time
-        angular_momentum_3d = (-1)*np.ones((len(sub_inds), len(sub_inds[0]), 3))
+        angular_momentum_3d = (-1)*np.ones((len(self.sub_inds), len(self.sub_inds[0]), 3))
         #
         # Loop over the number of subhalos
         for i in range(0, len(ang_mom_vec_tot)):
@@ -641,7 +608,7 @@ class OrbitAnalysis:
                 angular_momentum_3d[i][j] = ang_mom_vec_tot[i][j]
         #
         # Create an array that will store the total angular momentum of each subhalo across time
-        angular_momentum_1d = (-1)*np.ones((len(sub_inds), len(sub_inds[0])))
+        angular_momentum_1d = (-1)*np.ones((len(self.sub_inds), len(self.sub_inds[0])))
         #
         # Loop over the number of subhalos
         for i in range(0, len(ang_mom_norm_tot)):
@@ -653,7 +620,7 @@ class OrbitAnalysis:
         d['ang.mom.total'] = angular_momentum_1d
         return d
 
-    def potential_norm(self, tree, potential, sub_inds):
+    def potential_norm(self, tree, potential):
         """
         DESCRIPTION:
             Normalize the subhalo potentials so that their values at z = 0 are
@@ -662,44 +629,43 @@ class OrbitAnalysis:
         VARIABLES:
             tree      : dictionary
             potential : dictionary
-            sub_inds  : 2D array
 
         NOTES:
             - Returns a 2D array:
-                - Array shape: same as sub_inds
+                - Array shape: same as self.sub_inds
                              (number of subhalos) x (total number snapshots)
                 - Each row corresponds to a different subhalo
                 - Each element gives the subhalo potential at a different snapshot
         """
         # Set up arrays to save the normalized potentials to
-        halo_potential_norm_z0 = (-1)*np.ones((sub_inds.shape))
+        halo_potential_norm_z0 = (-1)*np.ones((self.sub_inds.shape))
         #
         # Create a mask for the host potential
-        mask_host = (sub_inds[0] >= 0)
-        host_potential = potential['halo.potentials'][sub_inds[0][mask_host]]
+        mask_host = (self.sub_inds[0] >= 0)
+        host_potential = potential['halo.potentials'][self.sub_inds[0][mask_host]]
         # Find the kinetic energy, and what you need to multiply the potential to be virialized (for the host; this is zero...)
-        kin_host = (0.5*tree.prop('host.velocity.total', sub_inds[0][mask_host])**2)[0]
-        multiplier = (-2)*kin_host/potential['halo.potentials'][sub_inds[0][mask_host]][0]
+        kin_host = (0.5*tree.prop('host.velocity.total', self.sub_inds[0][mask_host])**2)[0]
+        multiplier = (-2)*kin_host/potential['halo.potentials'][self.sub_inds[0][mask_host]][0]
         # Set the normalized potential for the host
-        halo_potential_norm_z0[0][mask_host] = multiplier*potential['halo.potentials'][sub_inds[0][mask_host]]
+        halo_potential_norm_z0[0][mask_host] = multiplier*potential['halo.potentials'][self.sub_inds[0][mask_host]]
         #
         # Loop through the number of subhalos
-        for i in range(1, len(sub_inds)):
+        for i in range(1, len(self.sub_inds)):
             # Create a mask for the snapshots the subhalo existed
-            mask = (sub_inds[i] >= 0)
+            mask = (self.sub_inds[i] >= 0)
             #
             # Check to see if the host existed longer
-            if len(sub_inds[0][mask_host]) >= len(sub_inds[i][mask]):
+            if len(self.sub_inds[0][mask_host]) >= len(self.sub_inds[i][mask]):
                 # Subtract the host potential from the subhalo potential
-                temp = potential['halo.potentials'][sub_inds[i][mask]] - host_potential[:len(sub_inds[i][mask])]
-            if len(sub_inds[0][mask_host]) < len(sub_inds[i][mask]):
+                temp = potential['halo.potentials'][self.sub_inds[i][mask]] - host_potential[:len(self.sub_inds[i][mask])]
+            if len(self.sub_inds[0][mask_host]) < len(self.sub_inds[i][mask]):
                 # Only get instances where subhalo and host existed
                 mask = mask & mask_host
                 # Subtract the host potential from the subhalo potential
-                temp = potential['halo.potentials'][sub_inds[i][mask]] - host_potential
+                temp = potential['halo.potentials'][self.sub_inds[i][mask]] - host_potential
             #
             # Find the kinetic energy at z = 0
-            kin_z0 = (0.5*tree.prop('host.velocity.total', sub_inds[i][mask])**2)[0]
+            kin_z0 = (0.5*tree.prop('host.velocity.total', self.sub_inds[i][mask])**2)[0]
             #
             # Calculate the multiplier to normalize all of the potentials
             multiplier = (-2)*kin_z0/temp[0]
@@ -708,7 +674,7 @@ class OrbitAnalysis:
             halo_potential_norm_z0[i][mask] = multiplier*temp
         return halo_potential_norm_z0
 
-    def orbit_energy(self, tree, potential_norm, sub_inds):
+    def orbit_energy(self, tree, potential_norm):
         """
         DESCRIPTION:
             Reads in the tree, an array of subhalo gravitational potentials,
@@ -719,27 +685,26 @@ class OrbitAnalysis:
         VARIABLES:
             tree           : dictionary
             potential_norm : 2D array
-            sub_inds       : 2D array
 
         NOTES:
             - Energy is defined as E = (1/2)*velocity**2 + potential
             - Returns a dictionary:
                 - d['energy.norm.sub'] is a 2D array
-                  Array shape: same as sub_inds
+                  Array shape: same as self.sub_inds
                                (number of subhalos) x (total number snapshots)
                   Each row corresponds to a different subhalo
                   Each element is the total energy of the halo at that snapshot
         """
         # Set up an empty array to save to
-        energy = (-1)*np.ones((sub_inds.shape))
+        energy = (-1)*np.ones((self.sub_inds.shape))
         #
         # Loop through each subhalo
-        for i in range(0, len(sub_inds)):
+        for i in range(0, len(self.sub_inds)):
             # Create a mask to only select subhalos that exist
-            mask = (sub_inds[i] >= 0)
+            mask = (self.sub_inds[i] >= 0)
             #
             # Calculate the total energy and save it to the array
-            energy[i][mask] = 0.5*tree.prop('host.velocity.total', sub_inds[i][mask])**2 + potential_norm[i][mask]
+            energy[i][mask] = 0.5*tree.prop('host.velocity.total', self.sub_inds[i][mask])**2 + potential_norm[i][mask]
         return energy
 
 class OrbitPlot:
