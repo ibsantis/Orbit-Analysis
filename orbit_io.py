@@ -738,7 +738,7 @@ class OrbitPlot(OrbitAnalysis):
             energy_tot       : 2D array
             subhalo_num      : integer
                                The subhalo that you want to plot (starts at zero)
-                               This is the element of "sub_inds" you want
+                               This is the element of "self.sub_inds" you want
             infall_array     : dictionary
             pericenter_array : dictionary
             apocenter_array  : dictionary
@@ -907,7 +907,6 @@ class OrbitPlot(OrbitAnalysis):
     def velocity_plot(
         self,
         tree,
-        sub_inds,
         subhalo_num,
         comp,
         infall_array,
@@ -922,7 +921,6 @@ class OrbitPlot(OrbitAnalysis):
 
         VARIABLES:
             tree             : dictionary
-            sub_inds         : 2D array
             subhalo_num      : integer
                                The subhalo you want to plot (starts at zero)
             comp             : string
@@ -948,31 +946,31 @@ class OrbitPlot(OrbitAnalysis):
         plt.figure(figsize=(10, 8))
         #
         # Mask out snapshots where subhalo didn't exist
-        v_mask = (sub_inds[subhalo_num] >= 0)
+        v_mask = (self.sub_inds[subhalo_num] >= 0)
         #
         # Select which component you want to plot
         if comp == 'r':
-            vs = tree.prop('host.velocity.principal.cylindrical', sub_inds[subhalo_num][v_mask])[:,0]
+            vs = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[subhalo_num][v_mask])[:,0]
             comp_str = '$_{\\rm r}$'
         elif comp == 'phi':
-            vs = tree.prop('host.velocity.principal.cylindrical', sub_inds[subhalo_num][v_mask])[:,2]
+            vs = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[subhalo_num][v_mask])[:,2]
             comp_str = '$_{\\rm \phi}$'
         elif comp == 'z':
-            vs = tree.prop('host.velocity.principal.cylindrical', sub_inds[subhalo_num][v_mask])[:,1]
+            vs = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[subhalo_num][v_mask])[:,1]
             comp_str = '$_{\\rm z}$'
         elif comp == 'rad':
-            vs = tree.prop('host.velocity.rad', sub_inds[subhalo_num][v_mask])
+            vs = tree.prop('host.velocity.rad', self.sub_inds[subhalo_num][v_mask])
             comp_str = '$_{\\rm rad}$'
         elif comp == 'tan':
-            vs = tree.prop('host.velocity.tan', sub_inds[subhalo_num][v_mask])
+            vs = tree.prop('host.velocity.tan', self.sub_inds[subhalo_num][v_mask])
             comp_str = '$_{\\rm tan}$'
         elif comp == 'all':
-            vs = tree.prop('host.velocity.principal.cylindrical.total', sub_inds[subhalo_num][v_mask])
+            vs = tree.prop('host.velocity.principal.cylindrical.total', self.sub_inds[subhalo_num][v_mask])
             comp_str = '$_{\\rm tot}$'
         elif comp == 'three':
-            vs1 = tree.prop('host.velocity.principal.cylindrical.total', sub_inds[subhalo_num][v_mask])
-            vs2 = tree.prop('host.velocity.rad', sub_inds[subhalo_num][v_mask])
-            vs3 = tree.prop('host.velocity.tan', sub_inds[subhalo_num][v_mask])
+            vs1 = tree.prop('host.velocity.principal.cylindrical.total', self.sub_inds[subhalo_num][v_mask])
+            vs2 = tree.prop('host.velocity.rad', self.sub_inds[subhalo_num][v_mask])
+            vs3 = tree.prop('host.velocity.tan', self.sub_inds[subhalo_num][v_mask])
             comp_str = ''
         #
         # Plot the data and set the limits
@@ -1028,7 +1026,6 @@ class OrbitPlot(OrbitAnalysis):
     def distance_plot(
         self,
         tree,
-        sub_inds,
         subhalo_num,
         comp,
         infall_array,
@@ -1043,7 +1040,6 @@ class OrbitPlot(OrbitAnalysis):
 
         VARIABLES:
             tree             : dictionary
-            sub_inds         : 2D array
             subhalo_num      : integer
                                The subhalo you want to plot (starts at zero)
             comp             : string
@@ -1068,19 +1064,19 @@ class OrbitPlot(OrbitAnalysis):
         plt.figure(figsize=(10, 8))
         #
         # Mask out snapshots where subhalo didn't exist
-        d_mask = (sub_inds[subhalo_num] >= 0)
+        d_mask = (self.sub_inds[subhalo_num] >= 0)
         # See which component you want to plot
         if comp == 'r':
-            ds = tree.prop('host.distance.principal.cylindrical', sub_inds[subhalo_num][d_mask])[:,0]
+            ds = tree.prop('host.distance.principal.cylindrical', self.sub_inds[subhalo_num][d_mask])[:,0]
             comp_str = '$_{\\rm r}$'
         elif comp == 'phi':
-            ds = tree.prop('host.distance.principal.cylindrical', sub_inds[subhalo_num][d_mask])[:,1]
+            ds = tree.prop('host.distance.principal.cylindrical', self.sub_inds[subhalo_num][d_mask])[:,1]
             comp_str = '$_{\\rm \phi}$'
         elif comp == 'z':
-            ds = tree.prop('host.distance.principal.cylindrical', sub_inds[subhalo_num][d_mask])[:,2]
+            ds = tree.prop('host.distance.principal.cylindrical', self.sub_inds[subhalo_num][d_mask])[:,2]
             comp_str = '$_{\\rm z}$'
         elif comp == 'all':
-            ds = tree.prop('host.distance.principal.cylindrical.total', sub_inds[subhalo_num][d_mask])
+            ds = tree.prop('host.distance.principal.cylindrical.total', self.sub_inds[subhalo_num][d_mask])
             comp_str = '$_{\\rm tot}$'
         #
         # Set up lookback time vector and select the time range to plot
