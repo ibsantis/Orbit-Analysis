@@ -709,9 +709,8 @@ class OrbitAnalysis:
 
 class OrbitPlot(OrbitAnalysis):
 
-    def __init__(self):
-        #OrbitAnalysis.__init__(self, tree)
-        pass
+    def __init__(self, tree):
+        OrbitAnalysis.__init__(self, tree)
 
     def orbit_energy_plot(
         self,
