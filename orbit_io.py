@@ -709,7 +709,11 @@ class OrbitAnalysis:
 
 class OrbitPlot(OrbitAnalysis):
 
-    def __init__(self):
+    def __init__(self, tree):
+        """
+        Need to do this to inherit the subhalo indices defined from __init__
+        in OrbitAnalysis
+        """
         OrbitAnalysis.__init__(self, tree)
 
     def orbit_energy_plot(
@@ -717,7 +721,6 @@ class OrbitPlot(OrbitAnalysis):
         tree,
         potential_norm,
         energy_tot,
-        #sub_inds,
         subhalo_num,
         infall_array,
         pericenter_array,
@@ -733,7 +736,6 @@ class OrbitPlot(OrbitAnalysis):
             tree             : dictionary
             potential_norm   : 2D array
             energy_tot       : 2D array
-            sub_inds         : list of arrays
             subhalo_num      : integer
                                The subhalo that you want to plot (starts at zero)
                                This is the element of "sub_inds" you want
