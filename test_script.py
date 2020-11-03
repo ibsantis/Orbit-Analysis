@@ -67,20 +67,20 @@ halt = halo.io.IO.read_tree(simulation_directory=simulation_dir, file_kind='hdf5
 halo_potential = ut.io.file_hdf5(home_dir+'/orbit_data/hdf5_files/'+galaxy+'_halo_potentials.hdf5')
 print('Done reading in the data.')
 
-orbits = orbit_io.OrbitAnalysis()
+orbits = orbit_io.OrbitAnalysis(halt)
 orbit_plot = orbit_io.OrbitPlot()
 #
-subhalo_inds = orbits.get_luminous_halos(halt)
-halt_dists = orbits.halo_distances(halt, subhalo_inds) # Originally had the function written out here
-halt_vels = orbits.halo_velocities(halt, subhalo_inds)
-host_radii = halt['radius'][subhalo_inds[0][subhalo_inds[0] >= 0]] # Want to divide the other distances by this distance
+#subhalo_inds = orbits.get_luminous_halos(halt)
+halt_dists = orbits.halo_distances(halt) # Originally had the function written out here
+halt_vels = orbits.halo_velocities(halt)
+host_radii = halt['radius'][orbits.sub_inds[0][orbits.sub_inds[0] >= 0]] # Want to divide the other distances by this distance
 halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
 infall_info = orbits.first_infall_times(halt_dists_norm, snaps)
 peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps)
 apos = orbits.apocenter_interp(distances=halt_dists, velocities=halt_vels, time_array=snaps, infall_array=infall_info)
-angs = orbits.angular_momentum(tree=halt, sub_inds=subhalo_inds)
-pot_norm = orbits.potential_norm(tree=halt, potential=halo_potential, sub_inds=subhalo_inds)
-energies = orbits.orbit_energy(tree=halt, potential_norm=pot_norm, sub_inds=subhalo_inds)
+angs = orbits.angular_momentum(tree=halt)
+pot_norm = orbits.potential_norm(tree=halt, potential=halo_potential)
+energies = orbits.orbit_energy(tree=halt, potential_norm=pot_norm)
 
 sub = 3
 orbit_plot.distance_plot(tree=halt, sub_inds=subhalo_inds, subhalo_num=sub, comp='all', infall_array=infall_info, pericenter_array=peris, apocenter_array=apos, time_array=snaps, file_name='distance_total_subhalo_'+str(sub))
