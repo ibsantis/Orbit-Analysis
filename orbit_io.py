@@ -707,14 +707,17 @@ class OrbitAnalysis:
             energy[i][mask] = 0.5*tree.prop('host.velocity.total', self.sub_inds[i][mask])**2 + potential_norm[i][mask]
         return energy
 
-class OrbitPlot:
+class OrbitPlot(OrbitAnalysis):
+
+    def __init__(self):
+        OrbitAnalysis.__init__(self, tree)
 
     def orbit_energy_plot(
         self,
         tree,
         potential_norm,
         energy_tot,
-        sub_inds,
+        #sub_inds,
         subhalo_num,
         infall_array,
         pericenter_array,
@@ -755,11 +758,11 @@ class OrbitPlot:
         plt.figure(figsize=(10, 8))
         #
         # Mask out snapshots where subhalo didn't exist
-        mask = (sub_inds[subhalo_num] >= 0)
+        mask = (self.sub_inds[subhalo_num] >= 0)
         #
         # Set up the arrays to be plotted. Divide by 1000 to make the y-axis better
         halo_potential = (potential_norm[subhalo_num][mask])/1000
-        halo_kinetic = (0.5*tree.prop('host.velocity.total', sub_inds[subhalo_num][mask])**2)/1000
+        halo_kinetic = (0.5*tree.prop('host.velocity.total', self.sub_inds[subhalo_num][mask])**2)/1000
         halo_total = (energy_tot[subhalo_num][mask])/1000
         #
         # Set up lookback time vector and select the time range to plot
