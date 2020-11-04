@@ -98,10 +98,10 @@ class OrbitAnalysis:
             for j, val in enumerate(tree.prop('host.distance.total', self.sub_inds[i][mask])):
                 # Fill in the null array with 1D distances
                 distances[i][j] = val
-            # If there are cases where the subhalo existed before the host, it will return nans
-            # Replace nans with -1s
+            # There are cases where the subhalo progenitor existed before the host
+            # Replace these nan instances with -1s
             nan_mask = np.isnan(distances[i])
-            distances[i][mask] = -1
+            distances[i][nan_mask] = -1
         return distances
 
     def halo_distances_norm(self, distances, host_halo_radii):
