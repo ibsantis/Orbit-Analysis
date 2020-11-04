@@ -273,29 +273,29 @@ class OrbitAnalysis:
         peri_vel_spl = []
         time_spl = []
         #
+        # Define how many snapshots you want to 'reach' out to find a local min
+        reach = 4
         # Loop over the number of subhalos
-        reach = 4 # how many snapshots to 'reach' out to, to find a local min
         for k in range(0, len(distances)):
             temp_halo_d = distances[k] # Now goes from z = 0 to z_form (un-normalized)
             temp_halo_v = velocities[k] # Same as above
             peri_rad_list = []
-            # Want initial element to be this because we check +- 4 neighbors on each side
-            temp_peri = temp_halo_d[4]
+            # Want initial element to be this because we check neighbors on each side
+            temp_peri = temp_halo_d[reach]
             temp_check = np.zeros(len(temp_halo_d))
             temp_peri_spl = []
             temp_peri_vel_spl = []
             temp_time_spl = []
             #
             # Loop through each subhalo
-            for i in range(4, len(temp_halo_d)-4):
+            for i in range(reach, len(temp_halo_d)-reach):
                 # Check its neighbors and if it is within virial radius
-                #if (all(temp_peri < temp_halo_d[i-reach:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
-                if (temp_peri < temp_halo_d[i+1]) and (temp_peri < temp_halo_d[i+2]) and (temp_peri < temp_halo_d[i+3])and (temp_peri < temp_halo_d[i+4]) and (temp_peri < temp_halo_d[i-1]) and (temp_peri < temp_halo_d[i-2]) and (temp_peri < temp_halo_d[i-3])and (temp_peri < temp_halo_d[i-4]) and (temp_peri/virial_radii[i] < 1):
+                if (all(temp_peri < temp_halo_d[i-reach:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
                     temp_check[i] = 1
                     peri_rad_list.append(virial_radii[i])
-                    temp_peri_spl.append(temp_halo_d[i-4:i+4])
-                    temp_peri_vel_spl.append(temp_halo_v[i-4:i+4])
-                    temp_time_spl.append(time_array['time'][600-i-4:600-i+4])
+                    temp_peri_spl.append(temp_halo_d[i-reach:i+reach])
+                    temp_peri_vel_spl.append(temp_halo_v[i-reach:i+reach])
+                    temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
                     temp_peri = temp_halo_d[i+1]
                 else:
                     temp_peri = temp_halo_d[i+1]
@@ -451,6 +451,8 @@ class OrbitAnalysis:
         max_dist_time = np.zeros(len(distances))
         max_dist_time_lb = np.zeros(len(distances))
         #
+        # Define how many snapshots you want to 'reach' out to find a local min
+        reach = 10
         # Loop through the number of subhalos
         for k in range(0, len(distances)):
             #
@@ -463,21 +465,22 @@ class OrbitAnalysis:
             max_dist_time_lb[k] = (time_array['time'][-1] - max_dist_time[k])
             #
             # Want initial element to be this because we check +- 10 neighbors on each side
-            temp_apo = temp_halo_d[10]
-            temp_apo_time = time_array['time'][600-10]
+            temp_apo = temp_halo_d[reach]
+            temp_apo_time = time_array['time'][600-reach]
             temp_check = np.zeros(len(temp_halo_d))
             temp_apo_spl = []
             temp_apo_vel_spl = []
             temp_time_spl = []
             #
             # Loop through each subhalo
-            for i in range(10, len(temp_halo_d)-10):
+            for i in range(reach, len(temp_halo_d)-reach):
                 # Check to make sure that this is the local maximum
-                if (infall_array['time'][k] != -1) and (temp_apo > temp_halo_d[i+1]) and (temp_apo > temp_halo_d[i+2]) and (temp_apo > temp_halo_d[i+3]) and (temp_apo > temp_halo_d[i+4]) and (temp_apo > temp_halo_d[i+5]) and (temp_apo > temp_halo_d[i+6]) and (temp_apo > temp_halo_d[i+7]) and (temp_apo > temp_halo_d[i+8]) and (temp_apo > temp_halo_d[i+9]) and (temp_apo > temp_halo_d[i+10]) and (temp_apo > temp_halo_d[i-1]) and (temp_apo > temp_halo_d[i-2]) and (temp_apo > temp_halo_d[i-3]) and (temp_apo > temp_halo_d[i-4]) and (temp_apo > temp_halo_d[i-5]) and (temp_apo > temp_halo_d[i-6]) and (temp_apo > temp_halo_d[i-7]) and (temp_apo > temp_halo_d[i-8]) and (temp_apo > temp_halo_d[i-9]) and (temp_apo > temp_halo_d[i-10]) and (temp_apo_time > infall_array['time'][k]):
+                if (infall_array['time'][k] != -1) and (all(temp_apo > temp_halo_d[i-reach:i])) and (all(temp_apo > temp_halo_d[i+1:i+1+reach])) and (temp_apo_time > infall_array['time'][k]):
+                #if (infall_array['time'][k] != -1) and (temp_apo > temp_halo_d[i+1]) and (temp_apo > temp_halo_d[i+2]) and (temp_apo > temp_halo_d[i+3]) and (temp_apo > temp_halo_d[i+4]) and (temp_apo > temp_halo_d[i+5]) and (temp_apo > temp_halo_d[i+6]) and (temp_apo > temp_halo_d[i+7]) and (temp_apo > temp_halo_d[i+8]) and (temp_apo > temp_halo_d[i+9]) and (temp_apo > temp_halo_d[i+10]) and (temp_apo > temp_halo_d[i-1]) and (temp_apo > temp_halo_d[i-2]) and (temp_apo > temp_halo_d[i-3]) and (temp_apo > temp_halo_d[i-4]) and (temp_apo > temp_halo_d[i-5]) and (temp_apo > temp_halo_d[i-6]) and (temp_apo > temp_halo_d[i-7]) and (temp_apo > temp_halo_d[i-8]) and (temp_apo > temp_halo_d[i-9]) and (temp_apo > temp_halo_d[i-10]) and (temp_apo_time > infall_array['time'][k]):
                     temp_check[i] = 1
-                    temp_apo_spl.append(temp_halo_d[i-10:i+10])
-                    temp_apo_vel_spl.append(temp_halo_v[i-10:i+10])
-                    temp_time_spl.append(time_array['time'][600-i-10:600-i+10])
+                    temp_apo_spl.append(temp_halo_d[i-reach:i+reach])
+                    temp_apo_vel_spl.append(temp_halo_v[i-reach:i+reach])
+                    temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
                     temp_apo = temp_halo_d[i+1]
                     temp_apo_time = time_array['time'][600-(i+1)]
                 else:
