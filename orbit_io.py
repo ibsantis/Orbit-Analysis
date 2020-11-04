@@ -199,10 +199,11 @@ class OrbitAnalysis:
         for i in range(0, len(distances_norm)):
             # Check to see if the subhalo is within the virial radius of the host
             if len(np.where(np.abs(distances_norm[i]) < 1)[0]) != 0:
-                # If it is, get the snapshot
+                # If it is, get the snapshot, time, and lookback time
                 first_infall_snap[i] = time_array['index'][-1]-np.max(np.where(np.abs(distances_norm[i]) < 1)[0])
                 first_infall_times[i] = time_array['time'][first_infall_snap[i]]
                 first_infall_times_lookback[i] = lookback[first_infall_snap[i]]
+                # Save whether or not subhalo fell into host
                 if first_infall_snap[i] >= 0:
                     infall_check[i] = True
         # Assign arrays to dictionary elements
@@ -273,26 +274,28 @@ class OrbitAnalysis:
         time_spl = []
         #
         # Loop over the number of subhalos
+        reach = 4 # how many snapshots to 'reach' out to, to find a local min
         for k in range(0, len(distances)):
             temp_halo_d = distances[k] # Now goes from z = 0 to z_form (un-normalized)
             temp_halo_v = velocities[k] # Same as above
             peri_rad_list = []
             # Want initial element to be this because we check +- 4 neighbors on each side
-            temp_peri = temp_halo_d[4]
+            temp_peri = temp_halo_d[reach]
             temp_check = np.zeros(len(temp_halo_d))
             temp_peri_spl = []
             temp_peri_vel_spl = []
             temp_time_spl = []
             #
             # Loop through each subhalo
-            for i in range(4, len(temp_halo_d)-4):
+            for i in range(reach, len(temp_halo_d)-reach):
                 # Check its neighbors and if it is within virial radius
-                if (temp_peri < temp_halo_d[i+1]) and (temp_peri < temp_halo_d[i+2]) and (temp_peri < temp_halo_d[i+3])and (temp_peri < temp_halo_d[i+4]) and (temp_peri < temp_halo_d[i-1]) and (temp_peri < temp_halo_d[i-2]) and (temp_peri < temp_halo_d[i-3])and (temp_peri < temp_halo_d[i-4]) and (temp_peri/virial_radii[i] < 1):
+                if (np.sum(temp_peri < temp_halo_d[i-reach:i]) == reach) and (np.sum(temp_peri < temp_halo_d[i+1:i+1+reach]) == reach) and (temp_peri/virial_radii[i] < 1):
+                #if (temp_peri < temp_halo_d[i+1]) and (temp_peri < temp_halo_d[i+2]) and (temp_peri < temp_halo_d[i+3])and (temp_peri < temp_halo_d[i+4]) and (temp_peri < temp_halo_d[i-1]) and (temp_peri < temp_halo_d[i-2]) and (temp_peri < temp_halo_d[i-3])and (temp_peri < temp_halo_d[i-4]) and (temp_peri/virial_radii[i] < 1):
                     temp_check[i] = 1
                     peri_rad_list.append(virial_radii[i])
-                    temp_peri_spl.append(temp_halo_d[i-4:i+4])
-                    temp_peri_vel_spl.append(temp_halo_v[i-4:i+4])
-                    temp_time_spl.append(time_array['time'][600-i-4:600-i+4])
+                    temp_peri_spl.append(temp_halo_d[i-reach:i+reach])
+                    temp_peri_vel_spl.append(temp_halo_v[i-reach:i+reach])
+                    temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
                     temp_peri = temp_halo_d[i+1]
                 else:
                     temp_peri = temp_halo_d[i+1]
