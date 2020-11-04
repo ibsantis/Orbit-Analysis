@@ -68,7 +68,7 @@ halo_potential = ut.io.file_hdf5(home_dir+'/orbit_data/hdf5_files/'+galaxy+'_hal
 print('Done reading in the data.')
 
 orbits = orbit_io.OrbitAnalysis(halt)
-orbit_plot = orbit_io.OrbitPlot()
+orbit_plot = orbit_io.OrbitPlot(halt)
 #
 #subhalo_inds = orbits.get_luminous_halos(halt)
 halt_dists = orbits.halo_distances(halt) # Originally had the function written out here
@@ -83,10 +83,10 @@ pot_norm = orbits.potential_norm(tree=halt, potential=halo_potential)
 energies = orbits.orbit_energy(tree=halt, potential_norm=pot_norm)
 
 sub = 3
-orbit_plot.distance_plot(tree=halt, sub_inds=subhalo_inds, subhalo_num=sub, comp='all', infall_array=infall_info, pericenter_array=peris, apocenter_array=apos, time_array=snaps, file_name='distance_total_subhalo_'+str(sub))
-orbit_plot.velocity_plot(tree=halt, sub_inds=subhalo_inds, subhalo_num=sub, comp='three', infall_array=infall_info, pericenter_array=peris, apocenter_array=apos, time_array=snaps, file_name='velocities_subhalo_'+str(sub))
+orbit_plot.distance_plot(tree=halt, subhalo_num=sub, comp='all', infall_array=infall_info, pericenter_array=peris, apocenter_array=apos, time_array=snaps, file_name='distance_total_subhalo_'+str(sub))
+orbit_plot.velocity_plot(tree=halt, subhalo_num=sub, comp='three', infall_array=infall_info, pericenter_array=peris, apocenter_array=apos, time_array=snaps, file_name='velocities_subhalo_'+str(sub))
 orbit_plot.angular_momentum_plot(ell=angs, subhalo_num=sub, comp='all', infall_array=infall_info, pericenter_array=peris, apocenter_array=apos, time_array=snaps, file_name='ang_total_subhalo_'+str(sub))
-orbit_plot.orbit_energy_plot(tree=halt, potential_norm=np.abs(pot_norm), energy_tot=np.abs(energies), sub_inds=subhalo_inds, subhalo_num=sub, infall_array=infall_info, pericenter_array=peris, apocenter_array=apos, time_array=snaps, file_name='energies_subhalo_'+str(sub))
+orbit_plot.orbit_energy_plot(tree=halt, potential_norm=np.abs(pot_norm), energy_tot=np.abs(energies), subhalo_num=sub, infall_array=infall_info, pericenter_array=peris, apocenter_array=apos, time_array=snaps, file_name='energies_subhalo_'+str(sub))
 
 
 #################################################################################################

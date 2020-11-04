@@ -98,6 +98,10 @@ class OrbitAnalysis:
             for j, val in enumerate(tree.prop('host.distance.total', self.sub_inds[i][mask])):
                 # Fill in the null array with 1D distances
                 distances[i][j] = val
+            # If there are cases where the subhalo existed before the host, it will return nans
+            # Replace nans with -1s
+            nan_mask = np.isnan(distances[i])
+            distances[i][mask] = -1
         return distances
 
     def halo_distances_norm(self, distances, host_halo_radii):
@@ -476,7 +480,6 @@ class OrbitAnalysis:
             for i in range(reach, len(temp_halo_d)-reach):
                 # Check to make sure that this is the local maximum
                 if (infall_array['time'][k] != -1) and (all(temp_apo > temp_halo_d[i-reach:i])) and (all(temp_apo > temp_halo_d[i+1:i+1+reach])) and (temp_apo_time > infall_array['time'][k]):
-                #if (infall_array['time'][k] != -1) and (temp_apo > temp_halo_d[i+1]) and (temp_apo > temp_halo_d[i+2]) and (temp_apo > temp_halo_d[i+3]) and (temp_apo > temp_halo_d[i+4]) and (temp_apo > temp_halo_d[i+5]) and (temp_apo > temp_halo_d[i+6]) and (temp_apo > temp_halo_d[i+7]) and (temp_apo > temp_halo_d[i+8]) and (temp_apo > temp_halo_d[i+9]) and (temp_apo > temp_halo_d[i+10]) and (temp_apo > temp_halo_d[i-1]) and (temp_apo > temp_halo_d[i-2]) and (temp_apo > temp_halo_d[i-3]) and (temp_apo > temp_halo_d[i-4]) and (temp_apo > temp_halo_d[i-5]) and (temp_apo > temp_halo_d[i-6]) and (temp_apo > temp_halo_d[i-7]) and (temp_apo > temp_halo_d[i-8]) and (temp_apo > temp_halo_d[i-9]) and (temp_apo > temp_halo_d[i-10]) and (temp_apo_time > infall_array['time'][k]):
                     temp_check[i] = 1
                     temp_apo_spl.append(temp_halo_d[i-reach:i+reach])
                     temp_apo_vel_spl.append(temp_halo_v[i-reach:i+reach])
@@ -551,6 +554,7 @@ class OrbitAnalysis:
         mask = (time_spline_array > 0)
         time_lb_spline_array[mask] = (time_array['time'][-1] - time_spline_array[mask])
         #
+        # Save everything to a dictionary
         d['apocenter.dist'] = apocenter_spline_array
         d['apocenter.vel'] = apocenter_vel_spline_array
         d['apocenter.time'] = time_spline_array
