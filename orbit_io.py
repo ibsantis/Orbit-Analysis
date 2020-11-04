@@ -280,22 +280,22 @@ class OrbitAnalysis:
             temp_halo_v = velocities[k] # Same as above
             peri_rad_list = []
             # Want initial element to be this because we check +- 4 neighbors on each side
-            temp_peri = temp_halo_d[reach]
+            temp_peri = temp_halo_d[4]
             temp_check = np.zeros(len(temp_halo_d))
             temp_peri_spl = []
             temp_peri_vel_spl = []
             temp_time_spl = []
             #
             # Loop through each subhalo
-            for i in range(reach, len(temp_halo_d)-reach):
+            for i in range(4, len(temp_halo_d)-4):
                 # Check its neighbors and if it is within virial radius
-                if (all(temp_peri < temp_halo_d[i-reach:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
-                #if (temp_peri < temp_halo_d[i+1]) and (temp_peri < temp_halo_d[i+2]) and (temp_peri < temp_halo_d[i+3])and (temp_peri < temp_halo_d[i+4]) and (temp_peri < temp_halo_d[i-1]) and (temp_peri < temp_halo_d[i-2]) and (temp_peri < temp_halo_d[i-3])and (temp_peri < temp_halo_d[i-4]) and (temp_peri/virial_radii[i] < 1):
+                #if (all(temp_peri < temp_halo_d[i-reach:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
+                if (temp_peri < temp_halo_d[i+1]) and (temp_peri < temp_halo_d[i+2]) and (temp_peri < temp_halo_d[i+3])and (temp_peri < temp_halo_d[i+4]) and (temp_peri < temp_halo_d[i-1]) and (temp_peri < temp_halo_d[i-2]) and (temp_peri < temp_halo_d[i-3])and (temp_peri < temp_halo_d[i-4]) and (temp_peri/virial_radii[i] < 1):
                     temp_check[i] = 1
                     peri_rad_list.append(virial_radii[i])
-                    temp_peri_spl.append(temp_halo_d[i-reach:i+reach])
-                    temp_peri_vel_spl.append(temp_halo_v[i-reach:i+reach])
-                    temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
+                    temp_peri_spl.append(temp_halo_d[i-4:i+4])
+                    temp_peri_vel_spl.append(temp_halo_v[i-4:i+4])
+                    temp_time_spl.append(time_array['time'][600-i-4:600-i+4])
                     temp_peri = temp_halo_d[i+1]
                 else:
                     temp_peri = temp_halo_d[i+1]
