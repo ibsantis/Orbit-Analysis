@@ -289,7 +289,7 @@ class OrbitAnalysis:
             # Loop through each subhalo
             for i in range(reach, len(temp_halo_d)-reach):
                 # Check its neighbors and if it is within virial radius
-                if (np.sum(temp_peri < temp_halo_d[i-reach:i]) == reach) and (np.sum(temp_peri < temp_halo_d[i+1:i+1+reach]) == reach) and (temp_peri/virial_radii[i] < 1):
+                if (all(temp_peri < temp_halo_d[i-reach:i])) and ((temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
                 #if (temp_peri < temp_halo_d[i+1]) and (temp_peri < temp_halo_d[i+2]) and (temp_peri < temp_halo_d[i+3])and (temp_peri < temp_halo_d[i+4]) and (temp_peri < temp_halo_d[i-1]) and (temp_peri < temp_halo_d[i-2]) and (temp_peri < temp_halo_d[i-3])and (temp_peri < temp_halo_d[i-4]) and (temp_peri/virial_radii[i] < 1):
                     temp_check[i] = 1
                     peri_rad_list.append(virial_radii[i])
