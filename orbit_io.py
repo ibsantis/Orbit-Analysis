@@ -67,7 +67,9 @@ class OrbitAnalysis:
         # Select luminous subhalos at z = 0 and find their progenitor indices
         z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [1, np.inf], z0_inds)
         z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
+        # Set attributes for subhalo indices and the shape of the array
         self.sub_inds = z0_inds_w_star_prog
+        self.shape = self.sub_inds.shape
 
     def halo_distances(self, tree):
         """
@@ -89,7 +91,7 @@ class OrbitAnalysis:
             - The 2D array is ordered however the subhalo indices are ordered
         """
         # Set up null 2D array with the same shape as the subhalo index array
-        distances = (-1)*np.ones(self.sub_inds.shape)
+        distances = (-1)*np.ones(self.shape)
         # Loop over the number of subhalos
         for i in range(0, len(self.sub_inds)):
             # Mask only the subhalos that exist (non-negative elements)
@@ -154,7 +156,7 @@ class OrbitAnalysis:
             - The 2D array is ordered however the subhalo indices are ordered
         """
         # Set up null 2D array with the same shape as the subhalo index array
-        velocities = (-1)*np.ones(self.sub_inds.shape)
+        velocities = (-1)*np.ones(self.shape)
         # Loop over the number of subhalos
         for i in range(0, len(self.sub_inds)):
             # Mask only the subhalos that exist (non-negative elements)
@@ -648,7 +650,7 @@ class OrbitAnalysis:
                 - Each element gives the subhalo potential at a different snapshot
         """
         # Set up arrays to save the normalized potentials to
-        halo_potential_norm_z0 = (-1)*np.ones((self.sub_inds.shape))
+        halo_potential_norm_z0 = (-1)*np.ones((self.shape))
         #
         # Create a mask for the host potential
         mask_host = (self.sub_inds[0] >= 0)
@@ -706,7 +708,7 @@ class OrbitAnalysis:
                   Each element is the total energy of the halo at that snapshot
         """
         # Set up an empty array to save to
-        energy = (-1)*np.ones((self.sub_inds.shape))
+        energy = (-1)*np.ones((self.shape))
         #
         # Loop through each subhalo
         for i in range(0, len(self.sub_inds)):
