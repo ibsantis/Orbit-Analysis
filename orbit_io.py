@@ -52,7 +52,7 @@ class OrbitRead:
 
         NOTES:
             - Depending on the variables you enter, sets the number of galaxies,
-              the simulation directory, and the home directory.
+              the simulation directory, the home directory, and the galaxy name.
         """
         if gal1 == 'Romeo':
             gal2 = 'Juliet'
@@ -199,7 +199,7 @@ class OrbitAnalysis:
                 distances_norm[i][j] = val
         return distances_norm
 
-    def halo_velocities(self, tree):
+    def halo_velocities(self, tree, host=1):
         """
         DESCRIPTION:
             Reads in the halo tree and subhalo indices, then returns a 2D array,
@@ -207,7 +207,8 @@ class OrbitAnalysis:
             the main host galaxy.
 
         VARIABLES:
-            tree     : dictionary
+            tree : dictionary
+            host : int
 
         NOTES:
             - Returns a 2D array:
@@ -218,6 +219,9 @@ class OrbitAnalysis:
                 - Negative elements correspond to times when the subhalo
                   did not exist
             - The 2D array is ordered however the subhalo indices are ordered
+            - The default is to create arrays of velocities from the first host
+                - If using a LG simulation, need to specify the second host to
+                  get velocities from that host
         """
         # Set up null 2D array with the same shape as the subhalo index array
         velocities = (-1)*np.ones(self.shape)
@@ -226,9 +230,17 @@ class OrbitAnalysis:
             # Mask only the subhalos that exist (non-negative elements)
             mask = (self.sub_inds[i] >= 0)
             # Loop over the number of snapshots a subhalo exists
-            for j, val in enumerate(tree.prop('host.velocity.total', self.sub_inds[i][mask])):
-                # Fill in the null array with 1D distances
-                velocities[i][j] = val
+            if host == 1:
+                for j, val in enumerate(tree.prop('host.velocity.total', self.sub_inds[i][mask])):
+                    # Fill in the null array with 1D distances
+                    velocities[i][j] = val
+            elif host == 2:
+                for j, val in enumerate(tree.prop('host2.velocity.total', self.sub_inds[i][mask])):
+                    # Fill in the null array with 1D distances
+                    velocities[i][j] = val
+            else:
+                print('Choose a valid host.')
+                break
         return velocities
 
     def first_infall_times(self, distances_norm, time_array):
@@ -630,14 +642,15 @@ class OrbitAnalysis:
         d['max.dist.time.lb'] = max_dist_time_lb
         return d
 
-    def angular_momentum(self, tree):
+    def angular_momentum(self, tree, host=1):
         """
         DESCRIPTION:
             Reads in the tree and subhalo indices and returns a dictionary that contains
             the angular momentum vectors and their magnitudes.
 
         VARIABLES:
-            tree     : dictionary
+            tree : dictionary
+            host : int
 
         NOTES:
             - Returns a dictionary:
@@ -652,6 +665,9 @@ class OrbitAnalysis:
                     - Array shape: (number of subhalos) x (total number of snapshots)
                     - d['ang.mom.vector'][i,j]: jth angular momentum value for subhalo i (at time j)
                         - j starts at z = 0 and goes back in time
+                - The default is to create arrays of values from the first host
+                    - If using a LG simulation, need to specify the second host to
+                      get values from that host
         """
         # Initialize a dictionary to save values to and some arrays
         d = dict();
@@ -664,9 +680,14 @@ class OrbitAnalysis:
             mask = (self.sub_inds[i] >= 0)
             #
             # Calculate the different components of angular momentum
-            lr = (-1)*tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
-            lphi = (-1)*((tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,2]) - (tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,0]))
-            lz = tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
+            if host == 1:
+                lr = (-1)*tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
+                lphi = (-1)*((tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,2]) - (tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,0]))
+                lz = tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
+            elif host == 1:
+                lr = (-1)*tree.prop('host2.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
+                lphi = (-1)*((tree.prop('host2.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,2]) - (tree.prop('host2.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,0]))
+                lz = tree.prop('host2.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
             #
             # Save the values to arrays
             ang_mom_vec_subhalo = np.asarray([(lr[j], lphi[j], lz[j]) for j in range(0, len(lr))])
@@ -712,6 +733,8 @@ class OrbitAnalysis:
                              (number of subhalos) x (total number snapshots)
                 - Each row corresponds to a different subhalo
                 - Each element gives the subhalo potential at a different snapshot
+            - !!! HAVE NOT CREATED FILES FOR THE LG PAIRS !!!
+                - This function will then not work on ELVIS sims yet...
         """
         # Set up arrays to save the normalized potentials to
         halo_potential_norm_z0 = (-1)*np.ones((self.shape))
@@ -770,6 +793,8 @@ class OrbitAnalysis:
                                (number of subhalos) x (total number snapshots)
                   Each row corresponds to a different subhalo
                   Each element is the total energy of the halo at that snapshot
+            - !!! HAVE NOT CREATED POTENTIAL FILES FOR LG PAIRS !!!
+                - This function will then not work for those hosts... yet.
         """
         # Set up an empty array to save to
         energy = (-1)*np.ones((self.shape))
@@ -830,6 +855,8 @@ class OrbitPlot(OrbitAnalysis):
               an apocenter event.
             - Will plot a green vertical line indicating when the subhalo
               experienced a pericenter event.
+            - !!! HAVE NOT CREATED FILES FOR THE ELVIS SIMS !!!
+                - This function will then not work on those hosts... yet.
         """
         # Set up a figure to plot to
         plt.rcParams["font.family"] = "serif"
@@ -983,6 +1010,7 @@ class OrbitPlot(OrbitAnalysis):
     def velocity_plot(
         self,
         tree,
+        host=1,
         subhalo_num,
         comp,
         infall_array,
@@ -997,6 +1025,7 @@ class OrbitPlot(OrbitAnalysis):
 
         VARIABLES:
             tree             : dictionary
+            host             : integer
             subhalo_num      : integer
                                The subhalo you want to plot (starts at zero)
             comp             : string
@@ -1016,6 +1045,8 @@ class OrbitPlot(OrbitAnalysis):
               an apocenter event.
             - Will plot a green vertical line indicating when the subhalo
               experienced a pericenter event.
+            - Need to specify which host you are calculating velocity from.
+              Default set to the first host.
         """
         # Set up a figure to plot to
         plt.rcParams["font.family"] = "serif"
@@ -1025,29 +1056,57 @@ class OrbitPlot(OrbitAnalysis):
         v_mask = (self.sub_inds[subhalo_num] >= 0)
         #
         # Select which component you want to plot
-        if comp == 'r':
-            vs = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[subhalo_num][v_mask])[:,0]
-            comp_str = '$_{\\rm r}$'
-        elif comp == 'phi':
-            vs = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[subhalo_num][v_mask])[:,2]
-            comp_str = '$_{\\rm \phi}$'
-        elif comp == 'z':
-            vs = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[subhalo_num][v_mask])[:,1]
-            comp_str = '$_{\\rm z}$'
-        elif comp == 'rad':
-            vs = tree.prop('host.velocity.rad', self.sub_inds[subhalo_num][v_mask])
-            comp_str = '$_{\\rm rad}$'
-        elif comp == 'tan':
-            vs = tree.prop('host.velocity.tan', self.sub_inds[subhalo_num][v_mask])
-            comp_str = '$_{\\rm tan}$'
-        elif comp == 'all':
-            vs = tree.prop('host.velocity.principal.cylindrical.total', self.sub_inds[subhalo_num][v_mask])
-            comp_str = '$_{\\rm tot}$'
-        elif comp == 'three':
-            vs1 = tree.prop('host.velocity.principal.cylindrical.total', self.sub_inds[subhalo_num][v_mask])
-            vs2 = tree.prop('host.velocity.rad', self.sub_inds[subhalo_num][v_mask])
-            vs3 = tree.prop('host.velocity.tan', self.sub_inds[subhalo_num][v_mask])
-            comp_str = ''
+        if host == 1:
+            if comp == 'r':
+                vs = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[subhalo_num][v_mask])[:,0]
+                comp_str = '$_{\\rm r}$'
+            elif comp == 'phi':
+                vs = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[subhalo_num][v_mask])[:,2]
+                comp_str = '$_{\\rm \phi}$'
+            elif comp == 'z':
+                vs = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[subhalo_num][v_mask])[:,1]
+                comp_str = '$_{\\rm z}$'
+            elif comp == 'rad':
+                vs = tree.prop('host.velocity.rad', self.sub_inds[subhalo_num][v_mask])
+                comp_str = '$_{\\rm rad}$'
+            elif comp == 'tan':
+                vs = tree.prop('host.velocity.tan', self.sub_inds[subhalo_num][v_mask])
+                comp_str = '$_{\\rm tan}$'
+            elif comp == 'all':
+                vs = tree.prop('host.velocity.principal.cylindrical.total', self.sub_inds[subhalo_num][v_mask])
+                comp_str = '$_{\\rm tot}$'
+            elif comp == 'three':
+                vs1 = tree.prop('host.velocity.principal.cylindrical.total', self.sub_inds[subhalo_num][v_mask])
+                vs2 = tree.prop('host.velocity.rad', self.sub_inds[subhalo_num][v_mask])
+                vs3 = tree.prop('host.velocity.tan', self.sub_inds[subhalo_num][v_mask])
+                comp_str = ''
+        elif host == 2:
+            if comp == 'r':
+                vs = tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[subhalo_num][v_mask])[:,0]
+                comp_str = '$_{\\rm r}$'
+            elif comp == 'phi':
+                vs = tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[subhalo_num][v_mask])[:,2]
+                comp_str = '$_{\\rm \phi}$'
+            elif comp == 'z':
+                vs = tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[subhalo_num][v_mask])[:,1]
+                comp_str = '$_{\\rm z}$'
+            elif comp == 'rad':
+                vs = tree.prop('host2.velocity.rad', self.sub_inds[subhalo_num][v_mask])
+                comp_str = '$_{\\rm rad}$'
+            elif comp == 'tan':
+                vs = tree.prop('host2.velocity.tan', self.sub_inds[subhalo_num][v_mask])
+                comp_str = '$_{\\rm tan}$'
+            elif comp == 'all':
+                vs = tree.prop('host2.velocity.principal.cylindrical.total', self.sub_inds[subhalo_num][v_mask])
+                comp_str = '$_{\\rm tot}$'
+            elif comp == 'three':
+                vs1 = tree.prop('host2.velocity.principal.cylindrical.total', self.sub_inds[subhalo_num][v_mask])
+                vs2 = tree.prop('host2.velocity.rad', self.sub_inds[subhalo_num][v_mask])
+                vs3 = tree.prop('host2.velocity.tan', self.sub_inds[subhalo_num][v_mask])
+                comp_str = ''
+        else:
+            print('Choose a valid host.')
+            break
         #
         # Plot the data and set the limits
         if comp != 'three':
@@ -1102,6 +1161,7 @@ class OrbitPlot(OrbitAnalysis):
     def distance_plot(
         self,
         tree,
+        host=1,
         subhalo_num,
         comp,
         infall_array,
@@ -1116,6 +1176,7 @@ class OrbitPlot(OrbitAnalysis):
 
         VARIABLES:
             tree             : dictionary
+            host             : integer
             subhalo_num      : integer
                                The subhalo you want to plot (starts at zero)
             comp             : string
@@ -1134,6 +1195,8 @@ class OrbitPlot(OrbitAnalysis):
               an apocenter event.
             - Will plot a green vertical line indicating when the subhalo
               experienced a pericenter event.
+            - Need to specify which host you are calculating distances from.
+                - Default is set to the first host.
         """
         # Open a figure
         plt.rcParams["font.family"] = "serif"
@@ -1142,18 +1205,35 @@ class OrbitPlot(OrbitAnalysis):
         # Mask out snapshots where subhalo didn't exist
         d_mask = (self.sub_inds[subhalo_num] >= 0)
         # See which component you want to plot
-        if comp == 'r':
-            ds = tree.prop('host.distance.principal.cylindrical', self.sub_inds[subhalo_num][d_mask])[:,0]
-            comp_str = '$_{\\rm r}$'
-        elif comp == 'phi':
-            ds = tree.prop('host.distance.principal.cylindrical', self.sub_inds[subhalo_num][d_mask])[:,1]
-            comp_str = '$_{\\rm \phi}$'
-        elif comp == 'z':
-            ds = tree.prop('host.distance.principal.cylindrical', self.sub_inds[subhalo_num][d_mask])[:,2]
-            comp_str = '$_{\\rm z}$'
-        elif comp == 'all':
-            ds = tree.prop('host.distance.principal.cylindrical.total', self.sub_inds[subhalo_num][d_mask])
-            comp_str = '$_{\\rm tot}$'
+        if host == 1:
+            if comp == 'r':
+                ds = tree.prop('host.distance.principal.cylindrical', self.sub_inds[subhalo_num][d_mask])[:,0]
+                comp_str = '$_{\\rm r}$'
+            elif comp == 'phi':
+                ds = tree.prop('host.distance.principal.cylindrical', self.sub_inds[subhalo_num][d_mask])[:,1]
+                comp_str = '$_{\\rm \phi}$'
+            elif comp == 'z':
+                ds = tree.prop('host.distance.principal.cylindrical', self.sub_inds[subhalo_num][d_mask])[:,2]
+                comp_str = '$_{\\rm z}$'
+            elif comp == 'all':
+                ds = tree.prop('host.distance.principal.cylindrical.total', self.sub_inds[subhalo_num][d_mask])
+                comp_str = '$_{\\rm tot}$'
+        elif host == 2:
+            if comp == 'r':
+                ds = tree.prop('host2.distance.principal.cylindrical', self.sub_inds[subhalo_num][d_mask])[:,0]
+                comp_str = '$_{\\rm r}$'
+            elif comp == 'phi':
+                ds = tree.prop('host2.distance.principal.cylindrical', self.sub_inds[subhalo_num][d_mask])[:,1]
+                comp_str = '$_{\\rm \phi}$'
+            elif comp == 'z':
+                ds = tree.prop('host2.distance.principal.cylindrical', self.sub_inds[subhalo_num][d_mask])[:,2]
+                comp_str = '$_{\\rm z}$'
+            elif comp == 'all':
+                ds = tree.prop('host2.distance.principal.cylindrical.total', self.sub_inds[subhalo_num][d_mask])
+                comp_str = '$_{\\rm tot}$'
+        else:
+            print('Choose a valid host.')
+            break
         #
         # Set up lookback time vector and select the time range to plot
         lookback_time = np.flip(time_array['time'][-1] - time_array['time'])
