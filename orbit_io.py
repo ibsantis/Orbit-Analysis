@@ -785,7 +785,7 @@ class OrbitAnalysis:
 
 class OrbitPlot(OrbitAnalysis):
 
-    def __init__(self, tree):
+    def __init__(self, tree, gal1, location):
         """
         Need to do this to inherit the subhalo indices defined from __init__
         in OrbitAnalysis
