@@ -72,12 +72,12 @@ class OrbitRead:
             resolution = '_res7100'
             self.num_gal = 1
 
-        if loc == 'mac':
+        if location == 'mac':
             self.home_dir = '/Users/isaiahsantistevan/simulation'
-        elif loc == 'peloton' and num_gal == 1:
+        elif location == 'peloton' and num_gal == 1:
             self.home_dir = '/home/ibsantis/scripts'
             self.simulation_dir = '/home/awetzel/scratch/'+galaxy+'/'+galaxy+resolution
-        elif loc == 'peloton' and num_gal == 2:
+        elif location == 'peloton' and num_gal == 2:
             self.home_dir = '/home/ibsantis/scripts'
             self.simulation_dir = '/home/awetzel/scratch/m12_elvis/'+galaxy+resolution
         else:
