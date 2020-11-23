@@ -37,6 +37,53 @@ import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
 
+# Adding a class to read in the halo tree and set some variables
+class OrbitRead:
+
+    def __init__(self, gal1, location):
+        """
+        Set the home directory, simulation directory, and number of galaxies
+
+        VARIABLES:
+            - gal1     : string
+            - location : string
+
+        NOTES:
+            - Depending on the variables you enter, sets the number of galaxies,
+              the simulation directory, and the home directory.
+        """
+        if gal1 == 'Romeo':
+            gal2 = 'Juliet'
+            galaxy = 'm12_elvis_'+gal1+gal2
+            resolution = '_res3500'
+            self.num_gal = 2
+        elif gal1 == 'Thelma':
+            gal2 = 'Louise'
+            galaxy = 'm12_elvis_'+gal1+gal2
+            resolution = '_res4000'
+            self.num_gal = 2
+        elif gal1 == 'Romulus':
+            gal2 = 'Remus'
+            galaxy = 'm12_elvis_'+gal1+gal2
+            resolution = '_res4000'
+            self.num_gal = 2
+        else:
+            galaxy = gal1
+            resolution = '_res7100'
+            self.num_gal = 1
+
+        if loc == 'mac':
+            self.home_dir = '/Users/isaiahsantistevan/simulation'
+        elif loc == 'peloton' and num_gal == 1:
+            self.home_dir = '/home/ibsantis/scripts'
+            self.simulation_dir = '/home/awetzel/scratch/'+galaxy+'/'+galaxy+resolution
+        elif loc == 'peloton' and num_gal == 2:
+            self.home_dir = '/home/ibsantis/scripts'
+            self.simulation_dir = '/home/awetzel/scratch/m12_elvis/'+galaxy+resolution
+        else:
+            self.home_dir = '/home1/05400/ibsantis/scripts'
+            self.simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+galaxy+resolution
+
 class OrbitAnalysis:
 
     def __init__(self, tree):
