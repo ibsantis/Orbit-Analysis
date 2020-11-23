@@ -54,21 +54,21 @@ class OrbitRead:
         """
         if gal1 == 'Romeo':
             gal2 = 'Juliet'
-            galaxy = 'm12_elvis_'+gal1+gal2
+            self.galaxy = 'm12_elvis_'+gal1+gal2
             resolution = '_res3500'
             self.num_gal = 2
         elif gal1 == 'Thelma':
             gal2 = 'Louise'
-            galaxy = 'm12_elvis_'+gal1+gal2
+            self.galaxy = 'm12_elvis_'+gal1+gal2
             resolution = '_res4000'
             self.num_gal = 2
         elif gal1 == 'Romulus':
             gal2 = 'Remus'
-            galaxy = 'm12_elvis_'+gal1+gal2
+            self.galaxy = 'm12_elvis_'+gal1+gal2
             resolution = '_res4000'
             self.num_gal = 2
         else:
-            galaxy = gal1
+            self.galaxy = gal1
             resolution = '_res7100'
             self.num_gal = 1
 
@@ -76,17 +76,17 @@ class OrbitRead:
             self.home_dir = '/Users/isaiahsantistevan/simulation'
         elif location == 'peloton' and self.num_gal == 1:
             self.home_dir = '/home/ibsantis/scripts'
-            self.simulation_dir = '/home/awetzel/scratch/'+galaxy+'/'+galaxy+resolution
+            self.simulation_dir = '/home/awetzel/scratch/'+self.galaxy+'/'+self.galaxy+resolution
         elif location == 'peloton' and self.num_gal == 2:
             self.home_dir = '/home/ibsantis/scripts'
-            self.simulation_dir = '/home/awetzel/scratch/m12_elvis/'+galaxy+resolution
+            self.simulation_dir = '/home/awetzel/scratch/m12_elvis/'+self.galaxy+resolution
         else:
             self.home_dir = '/home1/05400/ibsantis/scripts'
-            self.simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+galaxy+resolution
+            self.simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+self.galaxy+resolution
 
 class OrbitAnalysis:
 
-    def __init__(self, tree):
+    def __init__(self, tree, gal1, location):
         """
         DESCRIPTION:
             Returns the indices of luminous subhalos along with their progenitor
@@ -117,6 +117,9 @@ class OrbitAnalysis:
         # Set attributes for subhalo indices and the shape of the array
         self.sub_inds = z0_inds_w_star_prog
         self.shape = self.sub_inds.shape
+        #
+        # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
+        OrbitRead.__init__(self, gal1, location)
 
     def halo_distances(self, tree):
         """
