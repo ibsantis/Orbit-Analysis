@@ -5,6 +5,8 @@ Intended for use with the FIRE-2 simulations
 
 @author: Isaiah Santistevan <ibsantistevan@ucdavis.edu>
 
+[Talk about the new OrbitRead class...]
+
 This package is written to help compute the following subhalo orbital parameters
 with the OrbitAnalysis class:
     - Infall times of subhalos around a host halo
@@ -121,14 +123,15 @@ class OrbitAnalysis:
         # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
         OrbitRead.__init__(self, gal1, location)
 
-    def halo_distances(self, tree):
+    def halo_distances(self, tree, host=1):
         """
         DESCRIPTION:
             Reads in the halo tree and subhalo indices, then returns a 2D array,
             where each row contains subhalo distances from the main host galaxy.
 
         VARIABLES:
-            tree     : dictionary
+            tree : dictionary
+            host : int
 
         NOTES:
             - Returns a 2D array:
@@ -139,6 +142,9 @@ class OrbitAnalysis:
                 - Negative elements correspond to times when the subhalo
                   did not exist
             - The 2D array is ordered however the subhalo indices are ordered
+            - The default is to create arrays of distances from the first host
+                - If using a LG simulation, need to specify the second host to
+                  get distances from that host
         """
         # Set up null 2D array with the same shape as the subhalo index array
         distances = (-1)*np.ones(self.shape)
@@ -147,9 +153,17 @@ class OrbitAnalysis:
             # Mask only the subhalos that exist (non-negative elements)
             mask = (self.sub_inds[i] >= 0)
             # Loop over the number of snapshots a subhalo exists
-            for j, val in enumerate(tree.prop('host.distance.total', self.sub_inds[i][mask])):
-                # Fill in the null array with 1D distances
-                distances[i][j] = val
+            if host == 1:
+                for j, val in enumerate(tree.prop('host.distance.total', self.sub_inds[i][mask])):
+                    # Fill in the null array with 1D distances
+                    distances[i][j] = val
+            elif host == 2:
+                for j, val in enumerate(tree.prop('host2.distance.total', self.sub_inds[i][mask])):
+                    # Fill in the null array with 1D distances
+                    distances[i][j] = val
+            else:
+                print('Choose a valid host.')
+                break
             # There are cases where the subhalo progenitor existed before the host
             # Replace these nan instances with -1s
             nan_mask = np.isnan(distances[i])
