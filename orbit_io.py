@@ -39,6 +39,7 @@ import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
 from galpy.orbit import Orbit
+import sys
 
 # Adding a class to read in the halo tree and set some variables
 class OrbitRead:
@@ -164,7 +165,7 @@ class OrbitAnalysis:
                     distances[i][j] = val
             else:
                 print('Choose a valid host.')
-                break
+                sys.exit()
             # There are cases where the subhalo progenitor existed before the host
             # Replace these nan instances with -1s
             nan_mask = np.isnan(distances[i])
@@ -241,7 +242,7 @@ class OrbitAnalysis:
                     velocities[i][j] = val
             else:
                 print('Choose a valid host.')
-                break
+                sys.exit()
         return velocities
 
     def first_infall_times(self, distances_norm, time_array):
@@ -1121,7 +1122,7 @@ class OrbitPlot(OrbitAnalysis):
                 comp_str = ''
         else:
             print('Choose a valid host.')
-            break
+            sys.exit()
         #
         # Plot the data and set the limits
         if comp != 'three':
@@ -1248,7 +1249,7 @@ class OrbitPlot(OrbitAnalysis):
                 comp_str = '$_{\\rm tot}$'
         else:
             print('Choose a valid host.')
-            break
+            sys.exit()
         #
         # Set up lookback time vector and select the time range to plot
         lookback_time = np.flip(time_array['time'][-1] - time_array['time'])
