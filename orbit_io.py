@@ -38,6 +38,7 @@ from scipy.interpolate import interp1d
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
+from galpy.orbit import Orbit
 
 # Adding a class to read in the halo tree and set some variables
 class OrbitRead:
@@ -807,6 +808,20 @@ class OrbitAnalysis:
             # Calculate the total energy and save it to the array
             energy[i][mask] = 0.5*tree.prop('host.velocity.total', self.sub_inds[i][mask])**2 + potential_norm[i][mask]
         return energy
+
+    def galpy_orbit_init(self, tree):
+        sub_orbits = []
+        for i in range(0, len(self.sub_inds)):
+            R = tree.prop('host.distance.principal.cylindrical', sub_inds[i][0])[0]
+            vR = tree.prop('host.velocity.principal.cylindrical', sub_inds[i][0])[0]
+            vT = tree.prop('host.velocity.tan', sub_inds[i][0])
+            z = tree.prop('host.distance.principal.cylindrical', sub_inds[i][0])[2]
+            vz = tree.prop('host.velocity.principal.cylindrical', sub_inds[i][0])[2]
+            phi = np.rad2deg(np.arctan(tree.prop('host.distance.principal', sub_inds[i][0])[1]/tree.prop('host.distance.principal', sub_inds[i][0])[0]))
+            #
+            sub_orbits.append(Orbit([R, vR, vT, z, vz, phi]))
+        #
+        return Orbit(sub_orbits)
 
 class OrbitPlot(OrbitAnalysis):
 
