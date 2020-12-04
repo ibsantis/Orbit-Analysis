@@ -813,12 +813,12 @@ class OrbitAnalysis:
     def galpy_orbit_init(self, tree):
         sub_orbits = []
         for i in range(0, len(self.sub_inds)):
-            R = tree.prop('host.distance.principal.cylindrical', sub_inds[i][0])[0]
-            vR = tree.prop('host.velocity.principal.cylindrical', sub_inds[i][0])[0]
-            vT = tree.prop('host.velocity.tan', sub_inds[i][0])
-            z = tree.prop('host.distance.principal.cylindrical', sub_inds[i][0])[2]
-            vz = tree.prop('host.velocity.principal.cylindrical', sub_inds[i][0])[2]
-            phi = np.rad2deg(np.arctan(tree.prop('host.distance.principal', sub_inds[i][0])[1]/tree.prop('host.distance.principal', sub_inds[i][0])[0]))
+            R = tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][0])[0]
+            vR = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][0])[0]
+            vT = tree.prop('host.velocity.tan', self.sub_inds[i][0])
+            z = tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][0])[2]
+            vz = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][0])[2]
+            phi = np.rad2deg(np.arctan(tree.prop('host.distance.principal', self.sub_inds[i][0])[1]/tree.prop('host.distance.principal', self.sub_inds[i][0])[0]))
             #
             sub_orbits.append(Orbit([R, vR, vT, z, vz, phi]))
         #
