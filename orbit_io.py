@@ -1025,14 +1025,14 @@ class OrbitPlot(OrbitAnalysis):
     def velocity_plot(
         self,
         tree,
-        host=1,
         subhalo_num,
         comp,
         infall_array,
         pericenter_array,
         apocenter_array,
         time_array,
-        file_name
+        file_name,
+        host=1
     ):
         """
         DESCRIPTION:
@@ -1176,14 +1176,14 @@ class OrbitPlot(OrbitAnalysis):
     def distance_plot(
         self,
         tree,
-        host=1,
         subhalo_num,
         comp,
         infall_array,
         pericenter_array,
         apocenter_array,
         time_array,
-        file_name
+        file_name,
+        host=1
     ):
         """
         DESCRIPTION:
