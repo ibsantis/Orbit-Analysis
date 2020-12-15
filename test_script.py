@@ -25,27 +25,28 @@ print('Read in the tools')
 sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
 print('Set paths')
 
-# Read in the entire tree
-#
-snaps = ut.simulation.read_snapshot_times(directory=simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
-#
-halt = halo.io.IO.read_tree(simulation_directory=simulation_dir, file_kind='hdf5', species='star', host_number=num_gal)
+# Read in the snapshot dictionary and the entire tree
+snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
+halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal)
+
 # Read in the halo potential file
-halo_potential = ut.io.file_hdf5(home_dir+'/orbit_data/hdf5_files/'+galaxy+'_halo_potentials.hdf5')
+halo_potential = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/'+sim_data.galaxy+'_halo_potentials.hdf5')
 print('Done reading in the data.')
 
-orbits = orbit_io.OrbitAnalysis(halt)
-orbit_plot = orbit_io.OrbitPlot(halt)
+orbits = orbit_io.OrbitAnalysis(tree=halt, gal1='m12i', location='peloton')
+orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1='m12i', location='peloton')
 #
 #subhalo_inds = orbits.get_luminous_halos(halt)
-halt_dists = orbits.halo_distances(halt) # Originally had the function written out here
+halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
 halt_vels = orbits.halo_velocities(halt)
+# host_radii[0] will give the first LG host, host_radii[1] will give the second??? Need to check this
 host_radii = halt['radius'][orbits.sub_inds[0][orbits.sub_inds[0] >= 0]] # Want to divide the other distances by this distance
 halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
 infall_info = orbits.first_infall_times(halt_dists_norm, snaps)
 peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps)
 apos = orbits.apocenter_interp(distances=halt_dists, velocities=halt_vels, time_array=snaps, infall_array=infall_info)
 angs = orbits.angular_momentum(tree=halt)
+orbs = orbits.galpy_orbit_init(tree=halt)
 pot_norm = orbits.potential_norm(tree=halt, potential=halo_potential)
 energies = orbits.orbit_energy(tree=halt, potential_norm=pot_norm)
 
