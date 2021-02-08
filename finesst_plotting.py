@@ -217,7 +217,7 @@ plt.xlim(times[-1], times[0])
 plt.ylim(0, np.nanmax(ds))
 plt.xlabel('lookback time [Gyr]', fontsize=32)
 plt.ylabel('r [kpc]', fontsize=32)
-plt.title('Satellite 1', fontsize=30)
+plt.title('Good Agreement', fontsize=30)
 plt.legend(prop={'size': 24})
 plt.tick_params(axis='both', which='major', labelsize=26)
 plt.tight_layout()
@@ -318,362 +318,86 @@ plt.close()
 
 
 
-
-
-
-
-
-## HALO 33
-#
-# Initialize the orbit and integrate it
 ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
-orb_32.integrate(ts, potential_total, method='odeint')
-d_model = orb_32._parse_plot_quantity(quant='r')
+orb_9.integrate(ts, potential_total, method='odeint')
+d_model = orb_9._parse_plot_quantity(quant='r')
 #
-# Print out the pericenter distance
-print('Pericenter distance for halo 32 in potential_total: {0}'.format(orb_32.rperi()))
-print('Apocenter distance for halo 32 in potential_total: {0}'.format(orb_32.rap()))
-
-d_mask = (halt_dists[32] >= 0)
-ds = halt_dists[32][d_mask]
+d_mask = (halt_dists[9] >= 0)
+ds = halt_dists[9][d_mask]
 # Plot the data from the simulation and model
 plt.rcParams["font.family"] = "serif"
 plt.figure(figsize=(10, 8))
+ax1 = plt.subplot(211)
+ax2 = plt.subplot(212, sharex=ax1)
 lookback_time = np.flip(snaps['time'][-1] - snaps['time'])
 times = lookback_time[:len(ds)]
 # Plot the data and set the limits
-plt.plot(times, ds, label='simulation')
-plt.plot(-1*ts, d_model, label='galpy')
-#plt.xlim(lookback_time[-1], lookback_time[0])
-#plt.ylim(0, np.nanmax(ds))
-# Check to see if there were infall, pericenter, or apocenter events
-infall = infall_info['check'][32]
-peri = peris['pericenter.check'][32]
-apo = apos['apocenter.check'][32]
-# If there are, plot when they occurred
-if infall == True:
-    infall_time = infall_info['time.lb'][32]
-    plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
-if peri == True:
-    mask = (peris['pericenter.time.lb'][32] > 0)
-    if np.sum(mask) > 0:
-        peri_times = peris['pericenter.time.lb'][32][mask]
-        [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
-if apo == True:
-    mask = (apos['apocenter.time.lb'][32] > 0)
-    if np.sum(mask) > 0:
-        apo_times = apos['apocenter.time.lb'][32][mask]
-        [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
+ax1.plot(times, ds, label='simulation')
+ax1.plot(-1*ts, d_model, label='galpy')
+ax1.set_xlim(times[-1], times[0])
+ax1.set_ylim(0, np.nanmax(ds))
+ax1.get_yaxis().set_label_coords(-0.08, 0.5)
+ax1.label_outer()
+ax1.set_ylabel('r [kpc]', fontsize=32)
+ax1.legend(prop={'size': 24})
+ax1.text(5.5, 450, 'Good Agreement', fontsize=22, bbox={'facecolor':'black', 'alpha': 0.3, 'pad': 6})
+ax1.text(5.5, 450, 'Good Agreement', fontsize=22, bbox={'facecolor':'none', 'edgecolor':'black', 'alpha': 0.7, 'pad': 6})
 #
-plt.xlim(times[-1], times[0])
-plt.ylim(0, np.nanmax(ds))
-plt.xlabel('lookback time [Gyr]', fontsize=28)
-plt.ylabel('r [kpc]', fontsize=28)
-plt.title('Subhalo 32', fontsize=24)
-plt.legend(prop={'size': 18})
-plt.tick_params(axis='both', which='major', labelsize=24)
+v_model = orb_9._parse_plot_quantity(quant='vR')
+v_mask = (halt_vels[9] >= 0)
+vs = halt.prop('host.velocity.principal.spherical', orbits.sub_inds[9][orbits.sub_inds[9]>=0])[:,0]
+ax2.plot(times, vs, label='simulation')
+ax2.plot(-1*ts, v_model, label='galpy')
+ax2.set_xlim(times[-1], times[0])
+ax2.set_ylim(np.nanmin(v_model), np.nanmax(vs))
+ax2.set_xlabel('lookback time [Gyr]', fontsize=32)
+ax2.set_ylabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=32)
+ax2.tick_params(axis='both', which='major', labelsize=26)
 plt.tight_layout()
-plt.savefig('/home/ibsantis/scripts/orbit_data/plots/sub_32_sim_n_data.pdf')
+plt.savefig('/home/ibsantis/scripts/orbit_data/plots/sub_9_finesst.pdf')
 plt.close()
 
 
 
-# Subhalo 5
-print(halt.prop('host.distance.principal', orbits.sub_inds[5][0]))
-print(halt.prop('host.distance.principal.cylidnrical', orbits.sub_inds[5][0]))
-print(halt.prop('host.velocity.principal.cylindrical', orbits.sub_inds[5][0]))
-print(halt.prop('host.velocity.tan', orbits.sub_inds[5][0]))
-
-orb_5 = Orbit([267.57*u.kpc, -70.60*u.km/u.s, 121.62*u.km/u.s, -102.80*u.kpc, 81.65*u.km/u.s, 86.11*u.deg])
-ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
-orb_5.integrate(ts, potential_total, method='odeint')
-d_model = orb_5._parse_plot_quantity(quant='r')
+orb_22 = Orbit([92.24*u.kpc, 62.08*u.km/u.s, 127.85*u.km/u.s, 106.65*u.kpc, -105.09*u.km/u.s, -82.18*u.deg])
 #
-# Print out the pericenter distance
-print('Pericenter distance for halo 5 in potential_total: {0}'.format(orb_5.rperi()))
-print('Apocenter distance for halo 5 in potential_total: {0}'.format(orb_5.rap()))
-
-d_mask = (halt_dists[5] >= 0)
-ds = halt_dists[5][d_mask]
+ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
+orb_22.integrate(ts, potential_total, method='odeint')
+d_model = orb_22._parse_plot_quantity(quant='r')
+#
+d_mask = (halt_dists[22] >= 0)
+ds = halt_dists[22][d_mask]
 # Plot the data from the simulation and model
 plt.rcParams["font.family"] = "serif"
 plt.figure(figsize=(10, 8))
+ax1 = plt.subplot(211)
+ax2 = plt.subplot(212, sharex=ax1)
 lookback_time = np.flip(snaps['time'][-1] - snaps['time'])
 times = lookback_time[:len(ds)]
 # Plot the data and set the limits
-plt.plot(times, ds, label='simulation')
-plt.plot(-1*ts, d_model, label='galpy')
-#plt.xlim(lookback_time[-1], lookback_time[0])
-#plt.ylim(0, np.nanmax(ds))
-# Check to see if there were infall, pericenter, or apocenter events
-infall = infall_info['check'][5]
-peri = peris['pericenter.check'][5]
-apo = apos['apocenter.check'][5]
-# If there are, plot when they occurred
-if infall == True:
-    infall_time = infall_info['time.lb'][5]
-    plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
-if peri == True:
-    mask = (peris['pericenter.time.lb'][5] > 0)
-    if np.sum(mask) > 0:
-        peri_times = peris['pericenter.time.lb'][5][mask]
-        [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
-if apo == True:
-    mask = (apos['apocenter.time.lb'][5] > 0)
-    if np.sum(mask) > 0:
-        apo_times = apos['apocenter.time.lb'][5][mask]
-        [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
+ax1.plot(times, ds, label='simulation')
+ax1.plot(-1*ts, d_model, label='galpy')
+ax1.set_xlim(times[-1], times[0])
+ax1.set_ylim(0, np.nanmax(d_model)+5)
+ax1.get_yaxis().set_label_coords(-0.08, 0.5)
+ax1.label_outer()
+ax1.set_ylabel('r [kpc]', fontsize=32)
+#ax1.legend(prop={'size': 24})
+ax1.text(5.5, 35, 'Bad Agreement', fontsize=22, bbox={'facecolor':'black', 'alpha': 0.3, 'pad': 6})
+ax1.text(5.5, 35, 'Bad Agreement', fontsize=22, bbox={'facecolor':'none', 'edgecolor':'black', 'alpha': 0.7, 'pad': 6})
 #
-plt.xlim(times[-1], times[0])
-plt.ylim(0, np.nanmax(ds))
-plt.xlabel('lookback time [Gyr]', fontsize=28)
-plt.ylabel('r [kpc]', fontsize=28)
-plt.title('Subhalo 5', fontsize=24)
-plt.legend(prop={'size': 18})
-plt.tick_params(axis='both', which='major', labelsize=24)
+v_model = orb_22._parse_plot_quantity(quant='vR')
+v_mask = (halt_vels[22] >= 0)
+vs = halt.prop('host.velocity.principal.spherical', orbits.sub_inds[22][orbits.sub_inds[22]>=0])[:,0]
+ax2.plot(times, vs, label='simulation')
+ax2.plot(-1*ts, v_model, label='galpy')
+ax2.set_xlim(times[-1], times[0])
+ax2.set_ylim(np.nanmin(vs)-5, np.nanmax(vs)+5)
+ax2.set_xlabel('lookback time [Gyr]', fontsize=32)
+ax2.set_ylabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=32)
+ax2.tick_params(axis='both', which='major', labelsize=26)
 plt.tight_layout()
-plt.savefig('/home/ibsantis/scripts/orbit_data/plots/sub_5_sim_n_data.pdf')
-plt.close()
-
-
-
-
-# Subhalo 8
-print(halt.prop('host.distance.principal', orbits.sub_inds[8][0]))
-print(halt.prop('host.distance.principal.cylidnrical', orbits.sub_inds[8][0]))
-print(halt.prop('host.velocity.principal.cylindrical', orbits.sub_inds[8][0]))
-print(halt.prop('host.velocity.tan', orbits.sub_inds[8][0]))
-
-orb_8 = Orbit([324.23*u.kpc, 113.92*u.km/u.s, 98.79*u.km/u.s, -78.20*u.kpc, 66.47*u.km/u.s, -83.71*u.deg])
-ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
-orb_8.integrate(ts, potential_total, method='odeint')
-d_model = orb_8._parse_plot_quantity(quant='r')
-#
-# Print out the pericenter distance
-print('Pericenter distance for halo 8 in potential_total: {0}'.format(orb_8.rperi()))
-print('Apocenter distance for halo 8 in potential_total: {0}'.format(orb_8.rap()))
-
-d_mask = (halt_dists[8] >= 0)
-ds = halt_dists[8][d_mask]
-# Plot the data from the simulation and model
-plt.rcParams["font.family"] = "serif"
-plt.figure(figsize=(10, 8))
-lookback_time = np.flip(snaps['time'][-1] - snaps['time'])
-times = lookback_time[:len(ds)]
-# Plot the data and set the limits
-plt.plot(times, ds, label='simulation')
-plt.plot(-1*ts, d_model, label='galpy')
-#plt.xlim(lookback_time[-1], lookback_time[0])
-#plt.ylim(0, np.nanmax(ds))
-# Check to see if there were infall, pericenter, or apocenter events
-infall = infall_info['check'][8]
-peri = peris['pericenter.check'][8]
-apo = apos['apocenter.check'][8]
-# If there are, plot when they occurred
-if infall == True:
-    infall_time = infall_info['time.lb'][8]
-    plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
-if peri == True:
-    mask = (peris['pericenter.time.lb'][8] > 0)
-    if np.sum(mask) > 0:
-        peri_times = peris['pericenter.time.lb'][8][mask]
-        [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
-if apo == True:
-    mask = (apos['apocenter.time.lb'][8] > 0)
-    if np.sum(mask) > 0:
-        apo_times = apos['apocenter.time.lb'][8][mask]
-        [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
-#
-plt.xlim(times[-1], times[0])
-plt.ylim(0, 1000)
-plt.xlabel('lookback time [Gyr]', fontsize=28)
-plt.ylabel('r [kpc]', fontsize=28)
-plt.title('Subhalo 8', fontsize=24)
-plt.legend(prop={'size': 18})
-plt.tick_params(axis='both', which='major', labelsize=24)
-plt.tight_layout()
-plt.savefig('/home/ibsantis/scripts/orbit_data/plots/sub_8_sim_n_data.pdf')
-plt.close()
-
-
-
-
-# Subhalo 10
-print(halt.prop('host.distance.principal', orbits.sub_inds[10][0]))
-print(halt.prop('host.distance.principal.cylidnrical', orbits.sub_inds[10][0]))
-print(halt.prop('host.velocity.principal.cylindrical', orbits.sub_inds[10][0]))
-print(halt.prop('host.velocity.tan', orbits.sub_inds[10][0]))
-
-orb_10 = Orbit([135.74*u.kpc, -106.50*u.km/u.s, 98.79*u.km/u.s, -85.83*u.kpc, 32.45*u.km/u.s, -69.70*u.deg])
-ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
-orb_10.integrate(ts, potential_total, method='odeint')
-d_model = orb_10._parse_plot_quantity(quant='r')
-#
-# Print out the pericenter distance
-print('Pericenter distance for halo 10 in potential_total: {0}'.format(orb_10.rperi()))
-print('Apocenter distance for halo 10 in potential_total: {0}'.format(orb_10.rap()))
-
-d_mask = (halt_dists[10] >= 0)
-ds = halt_dists[10][d_mask]
-# Plot the data from the simulation and model
-plt.rcParams["font.family"] = "serif"
-plt.figure(figsize=(10, 8))
-lookback_time = np.flip(snaps['time'][-1] - snaps['time'])
-times = lookback_time[:len(ds)]
-# Plot the data and set the limits
-plt.plot(times, ds, label='simulation')
-plt.plot(-1*ts, d_model, label='galpy')
-#plt.xlim(lookback_time[-1], lookback_time[0])
-#plt.ylim(0, np.nanmax(ds))
-# Check to see if there were infall, pericenter, or apocenter events
-infall = infall_info['check'][10]
-peri = peris['pericenter.check'][10]
-apo = apos['apocenter.check'][10]
-# If there are, plot when they occurred
-if infall == True:
-    infall_time = infall_info['time.lb'][10]
-    plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
-if peri == True:
-    mask = (peris['pericenter.time.lb'][10] > 0)
-    if np.sum(mask) > 0:
-        peri_times = peris['pericenter.time.lb'][10][mask]
-        [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
-if apo == True:
-    mask = (apos['apocenter.time.lb'][10] > 0)
-    if np.sum(mask) > 0:
-        apo_times = apos['apocenter.time.lb'][10][mask]
-        [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
-#
-plt.xlim(times[-1], times[0])
-plt.ylim(0, np.nanmax(ds))
-plt.xlabel('lookback time [Gyr]', fontsize=28)
-plt.ylabel('r [kpc]', fontsize=28)
-plt.title('Subhalo 10', fontsize=24)
-plt.legend(prop={'size': 18})
-plt.tick_params(axis='both', which='major', labelsize=24)
-plt.tight_layout()
-plt.savefig('/home/ibsantis/scripts/orbit_data/plots/sub_10_sim_n_data.pdf')
-plt.close()
-
-
-
-
-
-# Subhalo 11
-print(halt.prop('host.distance.principal', orbits.sub_inds[11][0]))
-print(halt.prop('host.distance.principal.cylidnrical', orbits.sub_inds[11][0]))
-print(halt.prop('host.velocity.principal.cylindrical', orbits.sub_inds[11][0]))
-print(halt.prop('host.velocity.tan', orbits.sub_inds[11][0]))
-
-orb_11 = Orbit([18.36*u.kpc, 102.84*u.km/u.s, 134.58*u.km/u.s, -163.88*u.kpc, 115.71*u.km/u.s, -52.31*u.deg])
-ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
-orb_11.integrate(ts, potential_total, method='odeint')
-d_model = orb_11._parse_plot_quantity(quant='r')
-#
-# Print out the pericenter distance
-print('Pericenter distance for halo 11 in potential_total: {0}'.format(orb_11.rperi()))
-print('Apocenter distance for halo 11 in potential_total: {0}'.format(orb_11.rap()))
-
-d_mask = (halt_dists[11] >= 0)
-ds = halt_dists[11][d_mask]
-# Plot the data from the simulation and model
-plt.rcParams["font.family"] = "serif"
-plt.figure(figsize=(10, 8))
-lookback_time = np.flip(snaps['time'][-1] - snaps['time'])
-times = lookback_time[:len(ds)]
-# Plot the data and set the limits
-plt.plot(times, ds, label='simulation')
-plt.plot(-1*ts, d_model, label='galpy')
-#plt.xlim(lookback_time[-1], lookback_time[0])
-#plt.ylim(0, np.nanmax(ds))
-# Check to see if there were infall, pericenter, or apocenter events
-infall = infall_info['check'][11]
-peri = peris['pericenter.check'][11]
-apo = apos['apocenter.check'][11]
-# If there are, plot when they occurred
-if infall == True:
-    infall_time = infall_info['time.lb'][11]
-    plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
-if peri == True:
-    mask = (peris['pericenter.time.lb'][11] > 0)
-    if np.sum(mask) > 0:
-        peri_times = peris['pericenter.time.lb'][11][mask]
-        [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
-if apo == True:
-    mask = (apos['apocenter.time.lb'][11] > 0)
-    if np.sum(mask) > 0:
-        apo_times = apos['apocenter.time.lb'][11][mask]
-        [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
-#
-plt.xlim(times[-1], times[0])
-plt.ylim(0, np.nanmax(ds))
-plt.xlabel('lookback time [Gyr]', fontsize=28)
-plt.ylabel('r [kpc]', fontsize=28)
-plt.title('Subhalo 11', fontsize=24)
-plt.legend(prop={'size': 18})
-plt.tick_params(axis='both', which='major', labelsize=24)
-plt.tight_layout()
-plt.savefig('/home/ibsantis/scripts/orbit_data/plots/sub_11_sim_n_data.pdf')
-plt.close()
-
-
-
-
-# Subhalo 30
-print(halt.prop('host.distance.principal', orbits.sub_inds[30][0]))
-print(halt.prop('host.distance.principal.cylidnrical', orbits.sub_inds[30][0]))
-print(halt.prop('host.velocity.principal.cylindrical', orbits.sub_inds[30][0]))
-print(halt.prop('host.velocity.tan', orbits.sub_inds[30][0]))
-
-orb_30 = Orbit([32.50*u.kpc, -81.20*u.km/u.s, 79.74*u.km/u.s, -160.75*u.kpc, 30.26*u.km/u.s, -85.70*u.deg])
-ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
-orb_30.integrate(ts, potential_total, method='odeint')
-d_model = orb_30._parse_plot_quantity(quant='r')
-#
-# Print out the pericenter distance
-print('Pericenter distance for halo 30 in potential_total: {0}'.format(orb_30.rperi()))
-print('Apocenter distance for halo 30 in potential_total: {0}'.format(orb_30.rap()))
-
-d_mask = (halt_dists[30] >= 0)
-ds = halt_dists[30][d_mask]
-# Plot the data from the simulation and model
-plt.rcParams["font.family"] = "serif"
-plt.figure(figsize=(10, 8))
-lookback_time = np.flip(snaps['time'][-1] - snaps['time'])
-times = lookback_time[:len(ds)]
-# Plot the data and set the limits
-plt.plot(times, ds, label='simulation')
-plt.plot(-1*ts, d_model, label='galpy')
-#plt.xlim(lookback_time[-1], lookback_time[0])
-#plt.ylim(0, np.nanmax(ds))
-# Check to see if there were infall, pericenter, or apocenter events
-infall = infall_info['check'][30]
-peri = peris['pericenter.check'][30]
-apo = apos['apocenter.check'][30]
-# If there are, plot when they occurred
-if infall == True:
-    infall_time = infall_info['time.lb'][30]
-    plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
-if peri == True:
-    mask = (peris['pericenter.time.lb'][30] > 0)
-    if np.sum(mask) > 0:
-        peri_times = peris['pericenter.time.lb'][30][mask]
-        [plt.vlines(peri_times[i], -1000000, 1000000, color='#228833', alpha=0.5, linestyles='dotted') for i in range(0, len(peri_times))]
-if apo == True:
-    mask = (apos['apocenter.time.lb'][30] > 0)
-    if np.sum(mask) > 0:
-        apo_times = apos['apocenter.time.lb'][30][mask]
-        [plt.vlines(apo_times[i], -1000000, 1000000, color='r', alpha=0.8, linestyles='dotted') for i in range(0, len(apo_times))]
-#
-plt.xlim(times[-1], times[0])
-plt.ylim(0, np.nanmax(ds))
-plt.xlabel('lookback time [Gyr]', fontsize=28)
-plt.ylabel('r [kpc]', fontsize=28)
-plt.title('Subhalo 30', fontsize=24)
-plt.legend(prop={'size': 18})
-plt.tick_params(axis='both', which='major', labelsize=24)
-plt.tight_layout()
-plt.savefig('/home/ibsantis/scripts/orbit_data/plots/sub_30_sim_n_data.pdf')
+plt.savefig('/home/ibsantis/scripts/orbit_data/plots/sub_22_finesst.pdf')
 plt.close()
 
 
@@ -682,11 +406,6 @@ plt.close()
 
 
 # Subhalo 22
-print(halt.prop('host.distance.principal', orbits.sub_inds[22][0]))
-print(halt.prop('host.distance.principal.cylidnrical', orbits.sub_inds[22][0]))
-print(halt.prop('host.velocity.principal.cylindrical', orbits.sub_inds[22][0]))
-print(halt.prop('host.velocity.tan', orbits.sub_inds[22][0]))
-
 orb_22 = Orbit([92.24*u.kpc, 62.08*u.km/u.s, 127.85*u.km/u.s, 106.65*u.kpc, -105.09*u.km/u.s, -82.18*u.deg])
 ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
 orb_22.integrate(ts, potential_total, method='odeint')
@@ -731,8 +450,8 @@ plt.xlim(10, times[0])
 plt.ylim(0, 200)
 plt.xlabel('lookback time [Gyr]', fontsize=32)
 plt.ylabel('r [kpc]', fontsize=32)
-plt.title('Satellite 2', fontsize=30)
-plt.legend(prop={'size': 24})
+plt.title('Bad Agreement', fontsize=30)
+#plt.legend(prop={'size': 24})
 plt.tick_params(axis='both', which='major', labelsize=26)
 plt.tight_layout()
 plt.savefig('/home/ibsantis/scripts/orbit_data/plots/sub_22_sim_n_data.pdf')
