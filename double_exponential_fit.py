@@ -19,11 +19,12 @@ from matplotlib import pyplot as plt
 from astropy import units as u
 from astropy.modeling.models import custom_model
 from astropy.modeling.fitting import LevMarLSQFitter
+from astropy.constants import G
 from scipy import special
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'm12m'
+gal1 = 'm12b'
 loc = 'mac'
 
 if gal1 == 'Romeo':
@@ -74,10 +75,6 @@ mass_outer = data_vert['mass.outer']
 mass_total = data_vert['mass.total']
 zs = data_vert['zs']
 #
-data_whole = ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting_data/disk/'+gal1+'_disk_whole_profile_fitting')
-density_whole = data_whole['density']
-mass_whole = data_whole['mass']
-
 ##############################################################################
 """
     - Define the double exponential density model
@@ -90,54 +87,17 @@ def double_exponential_density(r, amp1=1e10, r1=1, amp2=1e9, r2=1):
     return amp1*np.exp(-r/r1) + amp2*np.exp(-r/r2)
 #
 # Fit the model to the data for various cutoff radii
-model_init = double_exponential_density(bounds={'amp1':(1e5, 5e11), 'r1':(1e-2, 10), 'amp2':(1e5, 5e12), 'r2':(1e-2, 10)})
+model_init = double_exponential_density(bounds={'amp1':(1e7, 5e11), 'r1':(1e-1, 10), 'amp2':(1e8, 5e12), 'r2':(1e-2, 10)})
 fit = LevMarLSQFitter()
 model_de = fit(model_init, rs[1:], density_rad, maxiter=100000)
 print(model_de)
-
-#################################
-
-# Two exponential models
-@custom_model
-def double_exponential_density1(r, amp1=1e10, r1=1):
-    return amp1*np.exp(-r/r1)
-#
-@custom_model
-def double_exponential_density2(r, amp2=1e10, r2=1):
-    return amp2*np.exp(-r/r2)
-#
-model_init1 = double_exponential_density1(bounds={'amp1':(1e7, 5e11), 'r1':(1e-2, 5)})
-model_init2 = double_exponential_density2(bounds={'amp2':(1e7, 5e11), 'r2':(1e-2, 10)})
-fit = LevMarLSQFitter()
-model1 = fit(model_init1, rs[1:9], density_rad[0:8], maxiter=100000)
-model2 = fit(model_init2, rs[8:], density_rad[7:], maxiter=100000)
-#
-full_model = model1+model2
-print(full_model)
-
-#################################
-
-# M-N density model
-@custom_model
-def mn_surface_density(r, M=1e10, a=2):
-    return ((a*M)/(2*np.pi))*(1/((r**2 + a**2)**1.5))
-#
-# Fit the model to the data for various cutoff radii
-model_init = mn_surface_density(bounds={'M':(1e7, 5e11), 'a':(1e-1, 30)})
-fit = LevMarLSQFitter()
-model_mn = fit(model_init, rs[8:], density_rad[7:], maxiter=100000)
-full_model2 = model1+model_mn
-print(full_model2)
-
 
 """
     Make a plot of the profiles
 """
 plt.figure(figsize=(10,8))
-plt.plot(rs[1:], density_rad, 'k.', label='data')
-plt.plot(rs, model_de(rs), '-', label='Double Exponential')
-plt.plot(rs, full_model(rs), '-', label='Two Exponentials')
-plt.plot(rs, full_model2(rs), '-', label='Exponential + M-N')
+plt.plot(rs[1:], density_rad, 'k.', label='Data')
+plt.plot(rs, model_de(rs), '-', label='Two Exponentials')
 plt.yscale('log')
 plt.xlim(xmin=0,xmax=15.1)
 plt.ylim(ymin=1e7, ymax=1e10)
@@ -150,16 +110,13 @@ plt.savefig(home_dir+'/orbit_data/plots/fitting/double_exponential/'+gal1+'/'+ga
 plt.close()
 #
 plt.figure(figsize=(10,8))
-plt.plot(rs[1:], density_rad/model_de(rs[1:]), '-', label='Double Exponential')
-plt.plot(rs[1:], density_rad/full_model(rs[1:]), '-', label='Two Exponentials')
-plt.plot(rs[1:], density_rad/full_model2(rs[1:]), '-', label='Exponential + M-N')
+plt.plot(rs[1:], density_rad/model_de(rs[1:]), '-')
 plt.xlim(xmin=0,xmax=15.1)
 plt.hlines(y=1,xmin=1,xmax=15.1,linestyles='dotted')
 plt.ylim(ymin=0.5, ymax=2)
 plt.xlabel('R [kpc]', fontsize=28)
 plt.ylabel('$\\rho_{\\rm data}(R)/\\rho_{\\rm model}(R)$', fontsize=28)
 plt.title(gal1+', |Z| < 3 kpc', fontsize=28)
-plt.legend(prop={'size': 18})
 plt.tight_layout()
 plt.savefig(home_dir+'/orbit_data/plots/fitting/double_exponential/'+gal1+'/'+gal1+'_disk_radial_profile_ratio.pdf')
 plt.close()
@@ -172,20 +129,19 @@ m_encl = np.cumsum(mass_rad)[-1]
 print('The enclosed mass is: {0:.3g}'.format(m_encl))
 #
 mass_de = np.zeros(len(rs)-1)
-mass_full = np.zeros(len(rs)-1)
-mass_full2 = np.zeros(len(rs)-1)
+mass_de_25 = np.zeros(len(rs_25)-1)
 #
 for i in range(0, len(rs)-1):
     area = np.pi*(rs[i+1]**2 - rs[i]**2)
     mass_de[i] = model_de(rs[i+1])*area
-    mass_full[i] = full_model(rs[i+1])*area
-    mass_full2[i] = full_model2(rs[i+1])*area
+#
+for i in range(0, len(rs_25)-1):
+    area = np.pi*(rs_25[i+1]**2 - rs_25[i]**2)
+    mass_de_25[i] = model_de(rs_25[i+1])*area
 #
 plt.figure(figsize=(10,8))
-plt.plot(rs[1:], np.cumsum(mass_rad), 'k.', label='data')
-plt.plot(rs[1:], np.cumsum(mass_de), '-', label='Double Exponential')
-plt.plot(rs[1:], np.cumsum(mass_full), '-', label='Two Exponentials')
-plt.plot(rs[1:], np.cumsum(mass_full2), '-', label='Exponential + M-N')
+plt.plot(rs[1:], np.cumsum(mass_rad), 'k.', label='Data')
+plt.plot(rs[1:], np.cumsum(mass_de), '-', label='Two Exponentials')
 plt.yscale('log')
 plt.xlim(xmin=0, xmax=20.1)
 plt.ylim(ymin=3e9, ymax=2e11)
@@ -198,16 +154,12 @@ plt.savefig(home_dir+'/orbit_data/plots/fitting/double_exponential/'+gal1+'/'+ga
 plt.close()
 #
 plt.figure(figsize=(10,8))
-plt.plot(rs[1:], np.cumsum(mass_rad)/np.cumsum(mass_de), '-', label='Double Exponential')
-plt.plot(rs[1:], np.cumsum(mass_rad)/np.cumsum(mass_full), '-', label='Two Exponentials')
-plt.plot(rs[1:], np.cumsum(mass_rad)/np.cumsum(mass_full2), '-', label='Exponential + M-N')
+plt.plot(rs[1:], np.cumsum(mass_rad)/np.cumsum(mass_de), '-')
 plt.hlines(y=1,xmin=0,xmax=20.1,linestyles='dotted')
 plt.xlim(xmin=0, xmax=20.1)
-#plt.ylim(ymin=0, ymax=1.5e11)
 plt.xlabel('R [kpc]', fontsize=28)
 plt.ylabel('$M_{\\rm data}(<R)/M_{\\rm model}(R)$', fontsize=28)
 plt.title(gal1+', |Z| < 3 kpc', fontsize=28)
-plt.legend(prop={'size': 18})
 plt.tight_layout()
 plt.savefig(home_dir+'/orbit_data/plots/fitting/double_exponential/'+gal1+'/'+gal1+'_enclosed_disk_mass_ratio.pdf')
 plt.close()
@@ -249,148 +201,12 @@ plt.savefig(home_dir+'/orbit_data/plots/fitting/double_exponential/'+gal1+'/'+ga
 plt.close()
 #
 plt.figure(figsize=(10,8))
-plt.plot(zs[1:-1], density_total[:-1]/model_dev(zs[1:-1]), '-', label='Exponential')
+plt.plot(zs[1:-1], density_total[:-1]/model_dev(zs[1:-1]), '-')
 plt.xlim(xmin=0,xmax=3.1)
 plt.hlines(y=1,xmin=0,xmax=3.1,linestyles='dotted')
-#plt.ylim(ymin=0.5, ymax=2)
 plt.xlabel('|Z| [kpc]', fontsize=28)
 plt.ylabel('$\\rho_{\\rm data}(Z)/\\rho_{\\rm model}(Z)$', fontsize=28)
 plt.title(gal1, fontsize=28)
-plt.legend(prop={'size': 18})
 plt.tight_layout()
 plt.savefig(home_dir+'/orbit_data/plots/fitting/double_exponential/'+gal1+'/'+gal1+'_disk_vertical_profile_ratio.pdf')
-plt.close()
-
-"""
-    Make a plot of the enclosed mass
-
-m_encl = np.cumsum(mass_total)[-1]
-print('The enclosed mass is: {0:.3g}'.format(m_encl))
-#
-mass_dev = np.zeros(len(zs)-1)
-#mass_fullv = np.zeros(len(zs)-1)
-#
-volume = np.pi*2*0.1*20**2
-for i in range(0, len(zs)-1):
-    #volume = np.pi*2*(zs[i+1] - zs[i])*(20**2 - 0**2)
-    mass_dev[i] = model_dev(zs[i+1])*volume
-#    mass_fullv[i] = total_model(zs[i+1])*volume
-#
-plt.figure(figsize=(10,8))
-plt.plot(zs[1:], np.cumsum(mass_total), 'k.', label='data')
-plt.plot(zs[1:], np.cumsum(mass_dev), '-', label='Double Exponential')
-#plt.plot(zs[1:], np.cumsum(mass_fullv), '-', label='Two Exponentials')
-plt.yscale('log')
-plt.xlim(xmin=0, xmax=3.1)
-#plt.ylim(ymin=3e9, ymax=1.5e11)
-plt.xlabel('|Z| [kpc]', fontsize=28)
-plt.ylabel('M(<Z) [$M_{\\odot}$]', fontsize=28)
-plt.title(gal1+', R < 20 kpc', fontsize=28)
-plt.legend(prop={'size': 18})
-plt.tight_layout()
-plt.savefig(home_dir+'/orbit_data/plots/fitting/double_exponential/'+gal1+'/'+gal1+'_enclosed_disk_mass_vertical.pdf')
-plt.close()
-#
-plt.figure(figsize=(10,8))
-plt.plot(zs[1:-1], np.cumsum(mass_total[:-1])/np.cumsum(mass_dev[:-1]), '-', label='Double Exponential')
-#plt.plot(zs[1:], np.cumsum(mass_total)/np.cumsum(mass_fullv), '-', label='Two Exponentials')
-plt.hlines(y=1,xmin=0,xmax=3.1,linestyles='dotted')
-plt.xlim(xmin=0, xmax=3.1)
-#plt.ylim(ymin=0, ymax=1.5e11)
-plt.xlabel('|Z| [kpc]', fontsize=28)
-plt.ylabel('$M_{\\rm data}(<|Z|)/M_{\\rm model}(|Z|)$', fontsize=28)
-plt.title(gal1+', R < 20 kpc', fontsize=28)
-plt.legend(prop={'size': 18})
-plt.tight_layout()
-plt.savefig(home_dir+'/orbit_data/plots/fitting/double_exponential/'+gal1+'/'+gal1+'_enclosed_disk_mass_vertical_ratio.pdf')
-plt.close()
-"""
-
-
-
-
-
-
-
-
-
-############################################################################################
-"""
-    - Define the exponential density model
-
-        - Fit the model to the both profiles
-"""
-# Double exponential model
-@custom_model
-def double_exponential_full(r, z, amp1=1e9, r1=0.1, r2=1, amp2=1e8, z1=0.1, z2=0.1):
-#def double_exponential_full(r, z, amp1=1e9, r1=1, amp2=1e9, z1=0.1):
-    #return amp1*np.exp(-r/r1 - r/r2) + amp2*np.exp(-np.abs(z)/z1 - np.abs(z)/z2)
-    #return amp1*np.exp(-r/r1) + amp2*np.exp(-np.abs(z)/z1)
-    return amp1*np.exp(-r/r1 - np.abs(z)/z1) + amp2*np.exp(-r/r2 - np.abs(z)/z2)
-#
-rs, zs = np.mgrid[0:20.5:0.5, 0:3.5:0.5]
-#
-# Fit the model to the data for various cutoff radii
-model_init = double_exponential_full(bounds={'amp1':(1e5, 5e11), 'r1':(-1, 10), 'r2':(-1, 10), 'amp2':(1e5, 5e11), 'z1':(-1, 3), 'z2':(-1, 3)})
-fit = LevMarLSQFitter()
-model_all = fit(model_init, rs[1:][:, 1:], zs[1:][:, 1:], density_whole, maxiter=1000000000)
-print(model_all)
-
-
-density_whole_rad = np.cumsum(density_whole,axis=1)[:,-1]
-model_density_whole_rad = np.cumsum(model_all(rs,zs), axis=1)[:,-1]
-#
-plt.figure(figsize=(10,8))
-plt.plot(rs[:, -1][1:], density_rad, 'k.', label='data rad')
-plt.plot(rs[:, -1][1:], density_whole_rad, 'b.', label='data full rad')
-plt.plot(rs[:, -1], model_density_whole_rad, '-', label='model rad')
-plt.yscale('log')
-plt.xlim(xmin=0,xmax=20.1)
-plt.xlabel('R [kpc]', fontsize=28)
-plt.ylabel('$\\rho(R)$ [$M_{\\odot} \ kpc^{-3}$]', fontsize=28)
-plt.title(gal1+', |Z|<3 kpc', fontsize=28)
-plt.legend(prop={'size': 18})
-plt.tight_layout()
-plt.savefig(home_dir+'/orbit_data/plots/fitting/double_exponential/'+gal1+'/'+gal1+'_disk_full_profile_rad.pdf')
-plt.close()
-#
-plt.figure(figsize=(10,8))
-plt.plot(rs[:, -1][1:], density_whole_rad/model_density_whole_rad[1:], '-', label='model rad')
-plt.xlim(xmin=0,xmax=20.1)
-#plt.ylim(ymin=1e6, ymax=1e8)
-plt.xlabel('R [kpc]', fontsize=28)
-plt.ylabel('$\\rho_{\\rm data}(R)/\\rho_{\\rm model}(R)$', fontsize=28)
-plt.title(gal1+', |Z|<3 kpc', fontsize=28)
-plt.legend(prop={'size': 18})
-plt.tight_layout()
-plt.savefig(home_dir+'/orbit_data/plots/fitting/double_exponential/'+gal1+'/'+gal1+'_disk_full_profile_rad_ratio.pdf')
-plt.close()
-
-
-density_whole_vert = np.cumsum(density_whole, axis=0)[-1]
-model_density_whole_vert = np.cumsum(model_all(rs,zs), axis=0)[-1]
-#
-plt.figure(figsize=(10,8))
-plt.plot(data_vert['zs'][1:], density_total, 'k.', label='data vert')
-plt.plot(zs[0][1:], density_whole_vert, 'b.', label='data full vert')
-plt.plot(zs[0], model_density_whole_vert, '-', label='model vert')
-plt.yscale('log')
-plt.xlim(xmin=0,xmax=3.1)
-plt.xlabel('|Z| [kpc]', fontsize=28)
-plt.ylabel('$\\rho(Z)$ [$M_{\\odot} \ kpc^{-3}$]', fontsize=28)
-plt.title(gal1+', R < 20 kpc', fontsize=28)
-plt.legend(prop={'size': 18})
-plt.tight_layout()
-plt.savefig(home_dir+'/orbit_data/plots/fitting/double_exponential/'+gal1+'/'+gal1+'_disk_full_profile_vert.pdf')
-plt.close()
-#
-plt.figure(figsize=(10,8))
-plt.plot(zs[0][1:], density_whole_vert/model_density_whole_vert[1:], '-', label='model vert')
-plt.xlim(xmin=0,xmax=3.1)
-plt.xlabel('|Z| [kpc]', fontsize=28)
-plt.ylabel('$\\rho_{\\rm data}(Z)/\\rho_{\\rm model}(Z)$', fontsize=28)
-plt.title(gal1+', R < 20 kpc', fontsize=28)
-plt.legend(prop={'size': 18})
-plt.tight_layout()
-plt.savefig(home_dir+'/orbit_data/plots/fitting/double_exponential/'+gal1+'/'+gal1+'_disk_full_profile_vert_ratio.pdf')
 plt.close()
