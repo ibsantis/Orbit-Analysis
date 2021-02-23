@@ -24,7 +24,7 @@ from scipy import special
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'm12b'
+gal1 = 'Romulus'
 loc = 'mac'
 
 if gal1 == 'Romeo':
@@ -67,11 +67,7 @@ mass_rad = data_rad['mass']
 rs = data_rad['rs']
 #
 data_vert = ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting_data/disk/'+gal1+'_disk_vertical_profile_fitting')
-density_inner = data_vert['density.inner']
-density_outer = data_vert['density.outer']
 density_total = data_vert['density.total']
-mass_inner = data_vert['mass.inner']
-mass_outer = data_vert['mass.outer']
 mass_total = data_vert['mass.total']
 zs = data_vert['zs']
 #
@@ -83,13 +79,38 @@ zs = data_vert['zs']
 """
 # Double exponential model
 @custom_model
-def double_exponential_density(r, amp1=1e10, r1=1, amp2=1e9, r2=1):
+def double_exponential_density(r, amp1=1e9, r1=1, amp2=1e9, r2=1):
     return amp1*np.exp(-r/r1) + amp2*np.exp(-r/r2)
 #
 # Fit the model to the data for various cutoff radii
 model_init = double_exponential_density(bounds={'amp1':(1e7, 5e11), 'r1':(1e-1, 10), 'amp2':(1e8, 5e12), 'r2':(1e-2, 10)})
 fit = LevMarLSQFitter()
 model_de = fit(model_init, rs[1:], density_rad, maxiter=100000)
+print(model_de)
+
+# Inner region
+@custom_model
+def double_exponential_density1(r, amp1=1e9, r1=1):
+    return amp1*np.exp(-r/r1)
+#
+# Fit the model to the data for various cutoff radii
+model_init = double_exponential_density1(bounds={'amp1':(1e7, 5e11), 'r1':(1e-1, 10)})
+fit = LevMarLSQFitter()
+model_de1 = fit(model_init, rs[1:17], density_rad[:16], maxiter=100000)
+print(model_de1)
+#
+# Outer region
+@custom_model
+def double_exponential_density2(r, amp2=1e9, r2=1):
+    return amp2*np.exp(-r/r2)
+#
+# Fit the model to the data for various cutoff radii
+model_init = double_exponential_density2(bounds={'amp2':(-1e8, 5e12), 'r2':(-1e-2, 10)})
+fit = LevMarLSQFitter()
+model_de2 = fit(model_init, rs[17:], density_rad[16:], maxiter=100000)
+print(model_de2)
+#
+model_de = model_de1+model_de2
 print(model_de)
 
 """
@@ -99,8 +120,8 @@ plt.figure(figsize=(10,8))
 plt.plot(rs[1:], density_rad, 'k.', label='Data')
 plt.plot(rs, model_de(rs), '-', label='Two Exponentials')
 plt.yscale('log')
-plt.xlim(xmin=0,xmax=15.1)
-plt.ylim(ymin=1e7, ymax=1e10)
+plt.xlim(xmin=0,xmax=20.1)
+plt.ylim(ymin=1e6, ymax=1e10)
 plt.xlabel('R [kpc]', fontsize=28)
 plt.ylabel('$\\rho(R)$ [$M_{\\odot} \ kpc^{-3}$]', fontsize=28)
 plt.title(gal1+', |Z| < 3 kpc', fontsize=28)
@@ -111,8 +132,8 @@ plt.close()
 #
 plt.figure(figsize=(10,8))
 plt.plot(rs[1:], density_rad/model_de(rs[1:]), '-')
-plt.xlim(xmin=0,xmax=15.1)
-plt.hlines(y=1,xmin=1,xmax=15.1,linestyles='dotted')
+plt.xlim(xmin=0,xmax=20.1)
+plt.hlines(y=1,xmin=1,xmax=20.1,linestyles='dotted')
 plt.ylim(ymin=0.5, ymax=2)
 plt.xlabel('R [kpc]', fontsize=28)
 plt.ylabel('$\\rho_{\\rm data}(R)/\\rho_{\\rm model}(R)$', fontsize=28)
@@ -129,15 +150,10 @@ m_encl = np.cumsum(mass_rad)[-1]
 print('The enclosed mass is: {0:.3g}'.format(m_encl))
 #
 mass_de = np.zeros(len(rs)-1)
-mass_de_25 = np.zeros(len(rs_25)-1)
 #
 for i in range(0, len(rs)-1):
     area = np.pi*(rs[i+1]**2 - rs[i]**2)
     mass_de[i] = model_de(rs[i+1])*area
-#
-for i in range(0, len(rs_25)-1):
-    area = np.pi*(rs_25[i+1]**2 - rs_25[i]**2)
-    mass_de_25[i] = model_de(rs_25[i+1])*area
 #
 plt.figure(figsize=(10,8))
 plt.plot(rs[1:], np.cumsum(mass_rad), 'k.', label='Data')

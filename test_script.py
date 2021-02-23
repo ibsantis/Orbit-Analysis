@@ -769,3 +769,29 @@ plt.tick_params(axis='both', which='major', labelsize=24)
 plt.tight_layout()
 plt.savefig(home_dir+'/orbit_data/plots/delta_u_32.pdf')
 plt.close()
+
+
+
+
+####################################################################################
+
+
+start = time.time()
+# Testing which halos a particular sub was a satellite of
+test_halo = orbits.sub_inds[3] # Goes back to snapshot 4
+#
+# The positions of the test_halo at all snapshots
+positions = np.linalg.norm(halt['position'][test_halo], axis=1)
+#
+# Loop through all snapshots and see if it's position is within r_vir of other halos
+check_full = []
+for i in range(0, len(test_halo)):
+    check_ind = []
+    snapshott = halt['snapshot'][test_halo[i]]
+    halos = ut.array.get_indices(halt['snapshot'], halt['snapshot'][snapshott])
+    for j in range(0, len(halos)):
+        if ((positions[i] - np.linalg.norm(halt['position'][halos[j]], axis=0))*snaps['scalefactor'][600-snapshott] < halt['radius'][halos[j]]):
+            check_ind.append(halos[j])
+    check_full.append(check_ind)
+end = time.time()
+print(end-start,'seconds')

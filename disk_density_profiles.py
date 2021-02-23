@@ -28,7 +28,7 @@ from scipy import special
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'm12b'
+gal1 = 'Romulus'
 loc = 'peloton'
 
 if gal1 == 'Romeo':
@@ -88,6 +88,7 @@ mass = np.zeros(len(rs)-1)
 density = np.zeros(len(rs)-1)
 #
 gas_temp_inds = ut.array.get_indices(part['gas']['temperature'], [0, 1e5])
+#gas_temp_inds = ut.array.get_indices(part['gas']['temperature'], [0, np.inf])
 gas_z_inds = ut.array.get_indices(np.abs(part['gas'].prop('host.distance.principal.cylindrical')[:,2]), [0, 3], gas_temp_inds)
 star_z_inds = ut.array.get_indices(np.abs(part['star'].prop('host.distance.principal.cylindrical')[:,2]), [0, 3])
 #
@@ -104,69 +105,105 @@ d_r['density'] = density
 d_r['mass'] = mass
 d_r['rs'] = rs
 #
-ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting/disk/'+gal1+'_disk_radial_profile_fitting', dict_or_array_to_write=d_r, verbose=True)
+ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting/disk/'+gal1+'_disk_radial_profile_fitting_all_gas', dict_or_array_to_write=d_r, verbose=True)
 
 
 # Model the vertical profile
 # This profile is going to be cumulative already, no need to cumulatively sum the mass or density at all...
-r_in = 0.77
-r_out = 4.15
 zs = np.linspace(0, 3, 31)
-#
-mass_in = np.zeros(len(zs)-1)
-density_in = np.zeros(len(zs)-1)
-#
-mass_out = np.zeros(len(zs)-1)
-density_out = np.zeros(len(zs)-1)
 #
 mass_tot = np.zeros(len(zs)-1)
 density_tot = np.zeros(len(zs)-1)
 #
 gas_temp_inds = ut.array.get_indices(part['gas']['temperature'], [0, 1e5])
-#
-gas_r_in_inds = ut.array.get_indices(part['gas'].prop('host.distance.principal.cylindrical')[:,0], [0, r_in], gas_temp_inds)
-star_r_in_inds = ut.array.get_indices(part['star'].prop('host.distance.principal.cylindrical')[:,0], [0, r_in])
-#
-gas_r_out_inds = ut.array.get_indices(part['gas'].prop('host.distance.principal.cylindrical')[:,0], [r_in, r_out], gas_temp_inds)
-star_r_out_inds = ut.array.get_indices(part['star'].prop('host.distance.principal.cylindrical')[:,0], [r_in, r_out])
+#gas_temp_inds = ut.array.get_indices(part['gas']['temperature'], [0, np.inf])
 #
 gas_r_tot_inds = ut.array.get_indices(part['gas'].prop('host.distance.principal.cylindrical')[:,0], [0, 10], gas_temp_inds)
 star_r_tot_inds = ut.array.get_indices(part['star'].prop('host.distance.principal.cylindrical')[:,0], [0, 10])
 #
 for i in range(0, len(zs)-1):
-    gas_in_inds = ut.array.get_indices(np.abs(part['gas'].prop('host.distance.principal.cylindrical')[:,2]), [zs[i], zs[i+1]], gas_r_in_inds)
-    star_in_inds = ut.array.get_indices(np.abs(part['star'].prop('host.distance.principal.cylindrical')[:,2]), [zs[i], zs[i+1]], star_r_in_inds)
-    #
-    mass_in[i] = np.sum(part['gas']['mass'][gas_in_inds]) + np.sum(part['star']['mass'][star_in_inds])
-    density_in[i] = mass_in[i]/(np.pi*2*(zs[i+1]-zs[i])*(r_in**2-0**2))
-    #
-    gas_out_inds = ut.array.get_indices(np.abs(part['gas'].prop('host.distance.principal.cylindrical')[:,2]), [zs[i], zs[i+1]], gas_r_out_inds)
-    star_out_inds = ut.array.get_indices(np.abs(part['star'].prop('host.distance.principal.cylindrical')[:,2]), [zs[i], zs[i+1]], star_r_out_inds)
-    #
-    mass_out[i] = np.sum(part['gas']['mass'][gas_out_inds]) + np.sum(part['star']['mass'][star_out_inds])
-    density_out[i] = mass_out[i]/(np.pi*2*(zs[i+1]-zs[i])*(r_out**2 - r_in**2))
-    #
     gas_tot_inds = ut.array.get_indices(np.abs(part['gas'].prop('host.distance.principal.cylindrical')[:,2]), [zs[i], zs[i+1]], gas_r_tot_inds)
     star_tot_inds = ut.array.get_indices(np.abs(part['star'].prop('host.distance.principal.cylindrical')[:,2]), [zs[i], zs[i+1]], star_r_tot_inds)
     #
     mass_tot[i] = np.sum(part['gas']['mass'][gas_tot_inds]) + np.sum(part['star']['mass'][star_tot_inds])
-    density_tot[i] = mass_out[i]/(np.pi*2*(zs[i+1]-zs[i])*(10**2 - 0**2))
+    density_tot[i] = mass_tot[i]/(np.pi*2*(zs[i+1]-zs[i])*(10**2 - 0**2))
     #
     print('Done with step', i)
 #
 # Save the data to a dictionary
 d_z = dict()
-d_z['density.inner'] = density_in
-d_z['mass.inner'] = mass_in
-d_z['density.outer'] = density_out
-d_z['mass.outer'] = mass_out
 d_z['density.total'] = density_tot
 d_z['mass.total'] = mass_tot
 d_z['zs'] = zs
-d_z['r1'] = np.array([r_in])
-d_z['r2'] = np.array([r_out])
 #
-ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting/disk/'+gal1+'_disk_vertical_profile_fitting', dict_or_array_to_write=d_z, verbose=True)
+ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting/disk/'+gal1+'_disk_vertical_profile_fitting_all_gas', dict_or_array_to_write=d_z, verbose=True)
+
+
+if num_gal == 2:
+    """
+     Generate data for the model
+        - Want cold gas (T < 1e5 K) and stars
+        - Getting the surface density here:
+            Need to divide by the area of an annulus
+                A = pi * (R**2 - r**2)
+                R: Outer radius
+                r: Inner radius
+    """
+    # Model the radial profile
+    rs = np.linspace(0, 20, 41)
+    mass = np.zeros(len(rs)-1)
+    density = np.zeros(len(rs)-1)
+    #
+    gas_temp_inds = ut.array.get_indices(part['gas']['temperature'], [0, 1e5])
+    #gas_temp_inds = ut.array.get_indices(part['gas']['temperature'], [0, np.inf])
+    gas_z_inds = ut.array.get_indices(np.abs(part['gas'].prop('host2.distance.principal.cylindrical')[:,2]), [0, 3], gas_temp_inds)
+    star_z_inds = ut.array.get_indices(np.abs(part['star'].prop('host2.distance.principal.cylindrical')[:,2]), [0, 3])
+    #
+    for i in range(0, len(rs)-1):
+        gas_inds = ut.array.get_indices(part['gas'].prop('host2.distance.principal.cylindrical')[:,0], [rs[i], rs[i+1]], gas_z_inds)
+        star_inds = ut.array.get_indices(part['star'].prop('host2.distance.principal.cylindrical')[:,0], [rs[i], rs[i+1]], star_z_inds)
+        mass[i] = np.sum(part['gas']['mass'][gas_inds]) + np.sum(part['star']['mass'][star_inds])
+        density[i] = mass[i]/(np.pi*(rs[i+1]**2 - rs[i]**2))
+        print('Done with step', i)
+    #
+    # Save the data to a dictionary
+    d_r = dict()
+    d_r['density'] = density
+    d_r['mass'] = mass
+    d_r['rs'] = rs
+    #
+    ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting/disk/'+gal2+'_disk_radial_profile_fitting_all_gas', dict_or_array_to_write=d_r, verbose=True)
+
+
+    # Model the vertical profile
+    # This profile is going to be cumulative already, no need to cumulatively sum the mass or density at all...
+    zs = np.linspace(0, 3, 31)
+    #
+    mass_tot = np.zeros(len(zs)-1)
+    density_tot = np.zeros(len(zs)-1)
+    #
+    gas_temp_inds = ut.array.get_indices(part['gas']['temperature'], [0, 1e5])
+    #gas_temp_inds = ut.array.get_indices(part['gas']['temperature'], [0, np.inf])
+    #
+    gas_r_tot_inds = ut.array.get_indices(part['gas'].prop('host2.distance.principal.cylindrical')[:,0], [0, 10], gas_temp_inds)
+    star_r_tot_inds = ut.array.get_indices(part['star'].prop('host2.distance.principal.cylindrical')[:,0], [0, 10])
+    #
+    for i in range(0, len(zs)-1):
+        gas_tot_inds = ut.array.get_indices(np.abs(part['gas'].prop('host2.distance.principal.cylindrical')[:,2]), [zs[i], zs[i+1]], gas_r_tot_inds)
+        star_tot_inds = ut.array.get_indices(np.abs(part['star'].prop('host2.distance.principal.cylindrical')[:,2]), [zs[i], zs[i+1]], star_r_tot_inds)
+        #
+        mass_tot[i] = np.sum(part['gas']['mass'][gas_tot_inds]) + np.sum(part['star']['mass'][star_tot_inds])
+        density_tot[i] = mass_tot[i]/(np.pi*2*(zs[i+1]-zs[i])*(10**2 - 0**2))
+        #
+        print('Done with step', i)
+    #
+    # Save the data to a dictionary
+    d_z = dict()
+    d_z['density.total'] = density_tot
+    d_z['mass.total'] = mass_tot
+    d_z['zs'] = zs
+    #
+    ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting/disk/'+gal2+'_disk_vertical_profile_fitting_all_gas', dict_or_array_to_write=d_z, verbose=True)
 
 
 
