@@ -28,7 +28,7 @@ from scipy import special
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'Romulus'
+gal1 = 'm12z'
 loc = 'peloton'
 
 if gal1 == 'Romeo':
