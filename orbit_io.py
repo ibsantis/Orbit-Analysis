@@ -822,7 +822,7 @@ class OrbitAnalysis:
             #
             sub_orbits.append([R, vR, vT, z, vz, phi])
         #
-        return Orbit(sub_orbits)
+        return sub_orbits
 
 class OrbitPlot(OrbitAnalysis):
 
