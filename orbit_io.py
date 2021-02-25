@@ -39,6 +39,7 @@ import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
 from galpy.orbit import Orbit
+from astropy import units as u
 import sys
 
 # Adding a class to read in the halo tree and set some variables
@@ -820,9 +821,9 @@ class OrbitAnalysis:
             vz = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][0])[2]
             phi = np.rad2deg(np.arctan(tree.prop('host.distance.principal', self.sub_inds[i][0])[1]/tree.prop('host.distance.principal', self.sub_inds[i][0])[0]))
             #
-            sub_orbits.append([R, vR, vT, z, vz, phi])
+            sub_orbits.append(Orbit([R*u.kpc, vR*u.km/u.s, vT*u.km/u.s, z*u.kpc, vz*u.km/u.s, phi*u.deg]))
         #
-        return sub_orbits
+        return Orbit(sub_orbits)
 
 class OrbitPlot(OrbitAnalysis):
 
