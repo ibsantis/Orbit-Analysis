@@ -29,43 +29,6 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'm12i'
-loc = 'peloton'
-#
-if gal1 == 'Romeo':
-    gal2 = 'Juliet'
-    galaxy = 'm12_elvis_'+gal1+gal2
-    resolution = '_res3500'
-    num_gal = 2
-elif gal1 == 'Thelma':
-    gal2 = 'Louise'
-    galaxy = 'm12_elvis_'+gal1+gal2
-    resolution = '_res4000'
-    num_gal = 2
-elif gal1 == 'Romulus':
-    gal2 = 'Remus'
-    galaxy = 'm12_elvis_'+gal1+gal2
-    resolution = '_res4000'
-    num_gal = 2
-else:
-    galaxy = gal1
-    resolution = '_res7100'
-    num_gal = 1
-#
-if loc == 'mac':
-    home_dir = '/Users/isaiahsantistevan/simulation'
-elif loc == 'peloton' and num_gal == 1:
-    home_dir = '/home/ibsantis/scripts'
-    simulation_dir = '/home/awetzel/scratch/'+galaxy+'/'+galaxy+resolution
-elif loc == 'peloton' and num_gal == 2:
-    home_dir = '/home/ibsantis/scripts'
-    simulation_dir = '/home/awetzel/scratch/m12_elvis/'+galaxy+resolution
-else:
-    home_dir = '/home1/05400/ibsantis/scripts'
-    simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+galaxy+resolution
-print('Set paths')
-
-### Set path and initial parameters
 sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
 print('Set paths')
 
@@ -73,6 +36,7 @@ print('Set paths')
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
 halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal)
 
+# This initializes the classes and makes sure they inherit from the OrbitRead class
 orbits = orbit_io.OrbitAnalysis(tree=halt, gal1='m12i', location='peloton')
 orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1='m12i', location='peloton')
 #
@@ -84,87 +48,99 @@ infall_info = orbits.first_infall_times(halt_dists_norm, snaps)
 peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps)
 apos = orbits.apocenter_interp(distances=halt_dists, velocities=halt_vels, time_array=snaps, infall_array=infall_info)
 angs = orbits.angular_momentum(tree=halt)
+galpy_orbits_best = orbits.galpy_orbit_init(tree=halt)
+galpy_orbits_nfw = orbits.galpy_orbit_init(tree=halt)
 
 # Read in the fitting parameters
-fitting_data = pd.read_csv(home_dir+'/orbit_data/fitting_params.csv', index_col=0)
+fitting_data = pd.read_csv(sim_data.home_dir+'/orbit_data/fitting_params.csv', index_col=0)
 
 # Import the potentials and create custom ones
 from galpy.potential import DoubleExponentialDiskPotential # For disks
 from galpy.potential import TwoPowerSphericalPotential # For DM halos
 from galpy.potential import NFWPotential
 #
-disk_outer = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_out'][gal1]*u.solMass/u.kpc**3, hr=fitting_data['r_out'][gal1]*u.kpc, hz=fitting_data['h_z'][gal1]*u.kpc)
-disk_inner = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_in'][gal1]*u.solMass/u.kpc**3, hr=fitting_data['r_in'][gal1]*u.kpc, hz=fitting_data['h_z'][gal1]*u.kpc)
-halo = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][gal1]*u.solMass, a=fitting_data['a_halo'][gal1]*u.kpc, alpha=fitting_data['alpha'][gal1], beta=fitting_data['beta'][gal1])
+disk_outer = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_out'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=fitting_data['r_out'][sim_data.galaxy]*u.kpc, hz=fitting_data['h_z'][sim_data.galaxy]*u.kpc)
+disk_inner = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_in'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=fitting_data['r_in'][sim_data.galaxy]*u.kpc, hz=fitting_data['h_z'][sim_data.galaxy]*u.kpc)
+halo = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data['alpha'][sim_data.galaxy], beta=fitting_data['beta'][sim_data.galaxy])
 potential_total_best = disk_inner+disk_outer+halo
 
-disk_outer = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_out'][gal1]*u.solMass/u.kpc**3, hr=fitting_data['r_out'][gal1]*u.kpc, hz=fitting_data['h_z'][gal1]*u.kpc)
-disk_inner = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_in'][gal1]*u.solMass/u.kpc**3, hr=fitting_data['r_in'][gal1]*u.kpc, hz=fitting_data['h_z'][gal1]*u.kpc)
+disk_outer = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_out'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=fitting_data['r_out'][sim_data.galaxy]*u.kpc, hz=fitting_data['h_z'][sim_data.galaxy]*u.kpc)
+disk_inner = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_in'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=fitting_data['r_in'][sim_data.galaxy]*u.kpc, hz=fitting_data['h_z'][sim_data.galaxy]*u.kpc)
 nfw = NFWPotential(amp=5.41e11*u.solMass, a=18.73*u.kpc)
-potential_total_nfw_good_disk = disk_inner+disk_outer+nfw
+potential_total_nfw = disk_inner+disk_outer+nfw
 
-disk_outer = DoubleExponentialDiskPotential(amp=1.17e9*2.24*u.solMass/u.kpc**3, hr=2.76*u.kpc, hz=0.41*u.kpc)
-disk_inner = DoubleExponentialDiskPotential(amp=1.59e10*2.24*u.solMass/u.kpc**3, hr=0.61*u.kpc, hz=0.41*u.kpc)
-nfw = NFWPotential(amp=5.41e11*u.solMass, a=18.73*u.kpc)
-potential_total_nfw_old_disk = disk_inner+disk_outer+nfw
-
-# Get halos that fell into the host; these are IDs at z = 0
-halo_1 = 3257469
-halo_2 = 3502033
-halo_3 = 6719222
-
-# Get the halo properties necessary for orbit initialization
-print(halt.prop('host.distance.principal', halo_1))
-print(halt.prop('host.distance.principal.cylidnrical', halo_1))
-print(halt.prop('host.velocity.principal.cylindrical', halo_1))
-print(halt.prop('host.velocity.tan', halo_1))
-#
-print(halt.prop('host.distance.principal', halo_2))
-print(halt.prop('host.distance.principal.cylidnrical', halo_2))
-print(halt.prop('host.velocity.principal.cylindrical', halo_2))
-print(halt.prop('host.velocity.tan', halo_2))
-#
-print(halt.prop('host.distance.principal', halo_3))
-print(halt.prop('host.distance.principal.cylidnrical', halo_3))
-print(halt.prop('host.velocity.principal.cylindrical', halo_3))
-print(halt.prop('host.velocity.tan', halo_3))
-
-# Initialize the orbits (R, vR, vT, z, vz, phi)
-# Set up time array (negative because integrating backward)
-orb_3 = Orbit([231.64*u.kpc, 12.99*u.km/u.s, 86.77*u.km/u.s, 19.84*u.kpc, -39.72*u.km/u.s, 37.89*u.deg])
+# Integrate all of the orbits in both potentials
 ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
-orb_3.integrate(ts, potential_total_best, method='odeint')
-d_model = orb_3._parse_plot_quantity(quant='r')
-#
-d_mask = (halt_dists[3] >= 0)
-ds = halt_dists[3][d_mask]
-# Plot the data from the simulation and model
-plt.rcParams["font.family"] = "serif"
-plt.figure(figsize=(10, 8))
-ax1 = plt.subplot(211)
-ax2 = plt.subplot(212, sharex=ax1)
-lookback_time = np.flip(snaps['time'][-1] - snaps['time'])
-times = lookback_time[:len(ds)]
-# Plot the data and set the limits
-ax1.plot(times, ds, label='simulation')
-ax1.plot(-1*ts, d_model, label='galpy')
-ax1.set_xlim(times[-1], times[0])
-ax1.set_ylim(0, np.nanmax(ds))
-ax1.get_yaxis().set_label_coords(-0.08, 0.5)
-ax1.label_outer()
-ax1.set_ylabel('r [kpc]', fontsize=32)
-ax1.legend(prop={'size': 24})
-#
-v_model = orb_3._parse_plot_quantity(quant='vR')
-v_mask = (halt_vels[3] >= 0)
-vs = halt.prop('host.velocity.principal.spherical', orbits.sub_inds[3][orbits.sub_inds[3]>=0])[:,0]
-ax2.plot(times, vs[:len(times)], label='simulation')
-ax2.plot(-1*ts, v_model, label='galpy')
-ax2.set_xlim(times[-1], times[0])
-ax2.set_ylim(np.nanmin(v_model), np.nanmax(vs))
-ax2.set_xlabel('lookback time [Gyr]', fontsize=32)
-ax2.set_ylabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=32)
-ax2.tick_params(axis='both', which='major', labelsize=26)
+galpy_orbits_best.integrate(ts, potential_total_best, method='odeint')
+galpy_orbits_nfw.integrate(ts, potential_total_nfw, method='odeint')
+
+for i in range(1, orbits.shape[0]):
+    # Integrate the subhalo orbit in each potential
+    d_model_best = galpy_orbits_best[i]._parse_plot_quantity(quant='r')
+    v_model_best = galpy_orbits_best[i]._parse_plot_quantity(quant='vR')
+    #
+    d_model_nfw = galpy_orbits_nfw[i]._parse_plot_quantity(quant='r')
+    v_model_nfw = galpy_orbits_nfw[i]._parse_plot_quantity(quant='vR')
+    #
+    # Set up the distances and times to plot
+    d_mask = (halt_dists[i] >= 0)
+    d_data = halt_dists[i][d_mask]
+    lookback_time = np.flip(snaps['time'][-1] - snaps['time'])
+    times = lookback_time[:len(d_data)]
+    #
+    # Set up the figure
+    plt.rcParams["font.family"] = "serif"
+    plt.figure(figsize=(10, 8))
+    ax1 = plt.subplot(211)
+    ax2 = plt.subplot(212, sharex=ax1)
+    #ax3 = plt.subplot(313, sharex=ax1)
+    #
+    # Plot the distances
+    ax1.plot(times, d_data, label='simulation')
+    ax1.plot(-1*ts, d_model_best, label='galpy (two-power halo)', alpha=0.8)
+    ax1.plot(-1*ts, d_model_nfw, label='galpy (nfw halo)', alpha=0.8)
+    ax1.set_xlim(times[-1], times[0])
+    #ax1.set_ylim(0, np.nanmax(d_data))
+    ax1.get_yaxis().set_label_coords(-0.08, 0.5)
+    ax1.label_outer()
+    ax1.set_ylabel('r [kpc]', fontsize=32)
+    ax1.legend(prop={'size': 24})
+    #
+    # Set up velocity data
+    #v_mask = (halt_vels[i] >= 0)
+    v_data = halt.prop('host.velocity.principal.spherical', orbits.sub_inds[i][orbits.sub_inds[i]>=0])[:,0][:len(times)]
+    #
+    # Plot the velocity data
+    ax2.plot(times, v_data)
+    ax2.plot(-1*ts, v_model_best)
+    ax2.plot(-1*ts, v_model_nfw)
+    ax2.set_xlim(times[-1], times[0])
+    #ax2.set_ylim(np.nanmin(v_model_best), np.nanmax(v_data))
+    #ax2.set_xlabel('lookback time [Gyr]', fontsize=32)
+    ax2.set_ylabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=32)
+    ax2.tick_params(axis='both', which='major', labelsize=26)
+    #
+    # ADD THE L PLOTS HERE
+    #
+    ax2.set_xlabel('lookback time [Gyr]', fontsize=32)
+    plt.tight_layout()
+    plt.savefig(orbits.home_dir+'/orbit_data/plots/galpy_plot_checks/sub_'+str(i)+'_data.pdf')
+    plt.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 plt.tight_layout()
 plt.savefig('/home/ibsantis/scripts/orbit_data/plots/sub_3_finesst.pdf')
 plt.close()
