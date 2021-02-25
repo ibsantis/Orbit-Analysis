@@ -820,7 +820,7 @@ class OrbitAnalysis:
             vz = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][0])[2]
             phi = np.rad2deg(np.arctan(tree.prop('host.distance.principal', self.sub_inds[i][0])[1]/tree.prop('host.distance.principal', self.sub_inds[i][0])[0]))
             #
-            sub_orbits.append(Orbit([R, vR, vT, z, vz, phi]))
+            sub_orbits.append([R, vR, vT, z, vz, phi])
         #
         return Orbit(sub_orbits)
 
