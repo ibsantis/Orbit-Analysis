@@ -12,7 +12,7 @@
 
 """
     Code for saving the data to a file.
-        - This is run on stampede.
+        - This is run on Peloton.
 """
 import halo_analysis as halo
 import gizmo_analysis as gizmo
@@ -28,7 +28,7 @@ from scipy import special
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'm12z'
+gal1 = 'm12m'
 loc = 'peloton'
 
 if gal1 == 'Romeo':
@@ -75,9 +75,42 @@ print('Particles at z = 0 read in')
 
 """
  Generate data for the model
+    - Want ALL particles
+"""
+# Need to calculate density on my own, the particles won't help
+rs = np.logspace(np.log10(0.1), np.log10(500), 100)
+mass = np.zeros(len(rs)-1)
+density = np.zeros(len(rs)-1)
+gas_temp_inds = ut.array.get_indices(part['gas']['temperature'], [1e5, np.inf])
+for i in range(0, len(rs)-1):
+    if rs[i] < 10:
+        gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [rs[i], rs[i+1]], gas_temp_inds)
+        dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [rs[i], rs[i+1]])
+        mass[i] = np.sum(part['gas']['mass'][gas_inds]) + np.sum(part['dark']['mass'][dark_inds])
+        density[i] = mass[i]/(4/3*np.pi*(rs[i+1]**3-rs[i]**3))
+        print('done with step', i)
+    if rs[i] > 10:
+        gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [rs[i], rs[i+1]])
+        star_inds = ut.array.get_indices(part['star'].prop('host.distance.total'), [rs[i], rs[i+1]])
+        dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [rs[i], rs[i+1]])
+        mass[i] = np.sum(part['gas']['mass'][gas_inds]) + np.sum(part['star']['mass'][star_inds]) + np.sum(part['dark']['mass'][dark_inds])
+        density[i] = mass[i]/(4/3*np.pi*(rs[i+1]**3-rs[i]**3))
+        print('done with step', i)
+
+d1 = dict()
+d1['density'] = density
+d1['mass'] = mass
+d1['rs'] = rs
+
+ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting/halo/'+gal1+'_halo_fitting', dict_or_array_to_write=d1, verbose=True)
+
+
+
+"""
+ Generate data for the model
     - Want hot gas (T > 1e5 K) and dark matter within the virial radius
         - For now, I'm just testing out to 300 kpc
-"""
+
 # Need to calculate density on my own, the particles won't help
 rs = np.logspace(-1, 2.699, 81)
 mass = np.zeros(len(rs)-1)
@@ -96,6 +129,7 @@ d1['mass'] = mass
 d1['rs'] = rs
 
 ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/plots/fitting/'+gal1+'_profile_fitting', dict_or_array_to_write=d1, verbose=True)
+"""
 
 ###############################################################################
 
@@ -117,7 +151,7 @@ from scipy import special
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'm12c'
+gal1 = 'm12m'
 loc = 'mac'
 
 if gal1 == 'Romeo':
@@ -154,10 +188,11 @@ else:
 print('Set paths')
 
 # Read in the data
-data = ut.io.file_hdf5(file_name_base=home_dir+'/orbit_plots/fitting/fitting_data/'+gal1+'_profile_fitting')
+#data = ut.io.file_hdf5(file_name_base=home_dir+'/orbit_plots/fitting/fitting_data/'+gal1+'_profile_fitting')
+data = ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting_data/halo/new/'+gal1+'_halo_fitting')
 density = data['density']
-rs = data['rs']
 mass = data['mass']
+rs = data['rs']
 
 ##############################################################################
 """
@@ -172,119 +207,107 @@ mass = data['mass']
 """
 # alpha/beta vary
 @custom_model
-def two_power_beta_fixed(r, amp=1e12, a=10, alpha=0.5, beta=3):
+def two_power_beta_fixed(r, amp=1e12, a=5, alpha=0.5, beta=2.5):
     #return (4*np.pi*amp*a**3)*(((r/a)**(3.-alpha))/(3.-alpha)*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-r/a))
     return ((amp/a**3)*(r**(3-alpha))*(a+r)**(alpha-beta)*(r/a+1)**(beta-1)*a**beta/(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-r/a)
 
 # Fit the model to the data for various cutoff radii
-model_init = two_power_beta_fixed(bounds={'amp':(3e11, 2.25e12), 'a':(5, 30), 'alpha':(0, 1.5), 'beta':(2, 5)})
+model_init = two_power_beta_fixed(bounds={'amp':(3e9, 2.25e12), 'a':(0.5, 30), 'alpha':(0, 1.5), 'beta':(2, 5)})
 fit = LevMarLSQFitter()
-model_0 = fit(model_init, rs[1:], np.cumsum(mass), maxiter=10000000)
-model_1 = fit(model_init, rs[22:], np.cumsum(mass)[21:], maxiter=10000000)
-model_2 = fit(model_init, rs[28:], np.cumsum(mass)[27:], maxiter=10000000)
-model_3 = fit(model_init, rs[32:], np.cumsum(mass)[31:], maxiter=10000000)
-model_5 = fit(model_init, rs[37:], np.cumsum(mass)[36:], maxiter=10000000)
-model_10 = fit(model_init, rs[44:], np.cumsum(mass)[43:], maxiter=10000000)
-print(model_0)
-print(model_1)
-print(model_2)
-print(model_3)
-print(model_5)
-print(model_10)
+model_10_300 = fit(model_init, rs[54:93], np.cumsum(mass)[53:92], maxiter=10000000)
+model_10_350 = fit(model_init, rs[54:95], np.cumsum(mass)[53:94], maxiter=10000000)
+model_10_400 = fit(model_init, rs[54:96], np.cumsum(mass)[53:95], maxiter=10000000)
+model_10_500 = fit(model_init, rs[54:], np.cumsum(mass)[53:], maxiter=10000000)
+print(model_10_300)
+print(model_10_350)
+print(model_10_400)
+print(model_10_500)
 
 # Plot all of the profiles
 plt.figure(figsize=(10,8))
 plt.plot(rs[1:], np.cumsum(mass), 'k.', label='data')
-plt.plot(rs, model_1(rs), '-', label='1 kpc fit')
-plt.plot(rs, model_2(rs), '-', label='2 kpc fit')
-plt.plot(rs, model_3(rs), '-', label='3 kpc fit')
-plt.plot(rs, model_5(rs), '-', label='5 kpc fit')
-plt.plot(rs, model_10(rs), '-', label='10 kpc fit')
+plt.plot(rs, model_10_300(rs), '-', label='Rmax = 300 kpc')
+plt.plot(rs, model_10_350(rs), '-', label='Rmax = 350 kpc')
+plt.plot(rs, model_10_400(rs), '-', label='Rmax = 400 kpc')
+plt.plot(rs, model_10_500(rs), '-', label='Rmax = 500 kpc')
 plt.xscale('log')
 plt.yscale('log')
-plt.xlim(xmin=1)
+plt.xlim(1,600)
 plt.ylim(ymin=1e8)
 plt.xlabel('r [kpc]', fontsize=28)
 plt.ylabel('M(<r) [M$_{\\odot}$]', fontsize=28)
-plt.title('$\\beta$, $\\alpha$ float', fontsize=28)
 plt.legend(prop={'size': 18})
 plt.tight_layout()
-plt.savefig(home_dir+'/orbit_plots/fitting/two_power_model/'+gal1+'/'+gal1+'_2P_mass_profiles_float.pdf')
+plt.savefig(home_dir+'/orbit_data/plots/fitting/two_power_model_v2/'+gal1+'_2P_mass_profile.pdf')
 plt.close()
 #
 plt.figure(figsize=(10,8))
-plt.plot(rs[1:], np.cumsum(mass)/model_1(rs[1:]), '-', label='1 kpc fit')
-plt.plot(rs[1:], np.cumsum(mass)/model_2(rs[1:]), '-', label='2 kpc fit')
-plt.plot(rs[1:], np.cumsum(mass)/model_3(rs[1:]), '-', label='3 kpc fit')
-plt.plot(rs[1:], np.cumsum(mass)/model_5(rs[1:]), '-', label='5 kpc fit')
-plt.plot(rs[1:], np.cumsum(mass)/model_10(rs[1:]), '-', label='10 kpc fit')
+plt.plot(rs[1:], model_10_300(rs[1:])/np.cumsum(mass), '-', label='Rmax = 300 kpc')
+plt.plot(rs[1:], model_10_350(rs[1:])/np.cumsum(mass), '-', label='Rmax = 350 kpc')
+plt.plot(rs[1:], model_10_400(rs[1:])/np.cumsum(mass), '-', label='Rmax = 400 kpc')
+plt.plot(rs[1:], model_10_500(rs[1:])/np.cumsum(mass), '-', label='Rmax = 500 kpc')
 plt.xscale('log')
-plt.xlim(xmin=1)
-#plt.ylim(ymax=3)
+plt.xlim(5,600)
+plt.ylim(ymin=0.9,ymax=1.2)
 plt.hlines(y=1, xmin=1, xmax=500, colors='k', linestyles='dotted')
 plt.xlabel('r [kpc]', fontsize=28)
-plt.ylabel('$M(<r)_{\\rm data}/M(<r)_{\\rm model}$', fontsize=28)
-plt.title('$\\beta$, $\\alpha$ float', fontsize=28)
+plt.ylabel('$M(<r)_{\\rm model}/M(<r)_{\\rm data}$', fontsize=28)
 plt.legend(prop={'size': 18})
 plt.tight_layout()
-plt.savefig(home_dir+'/orbit_plots/fitting/two_power_model/'+gal1+'/'+gal1+'_2P_mass_profiles_float_ratio.pdf')
+plt.savefig(home_dir+'/orbit_data/plots/fitting/two_power_model_v2/'+gal1+'_2P_mass_profile_ratio.pdf')
 plt.close()
 
-# Average the mass ratio from 10 - 500 kpc
-print('Standard deviation offset for 1 kpc cutoff is {0:.4g}'.format(np.std(np.abs(np.cumsum(mass)[43:]/model_1(rs[44:]) - 1))))
-print('Standard deviation offset for 2 kpc cutoff is {0:.4g}'.format(np.std(np.abs(np.cumsum(mass)[43:]/model_2(rs[44:]) - 1))))
-print('Standard deviation offset for 3 kpc cutoff is {0:.4g}'.format(np.std(np.abs(np.cumsum(mass)[43:]/model_3(rs[44:]) - 1))))
-print('Standard deviation offset for 5 kpc cutoff is {0:.4g}'.format(np.std(np.abs(np.cumsum(mass)[43:]/model_5(rs[44:]) - 1))))
-print('Standard deviation offset for 10 kpc cutoff is {0:.4g}'.format(np.std(np.abs(np.cumsum(mass)[43:]/model_10(rs[44:]) - 1))))
+## Average the mass ratio from 10 - 500 kpc
+#print('Standard deviation offset for 1 kpc cutoff is {0:.4g}'.format(np.std(np.abs(np.cumsum(mass)[43:]/model_1(rs[44:]) - 1))))
+#print('Standard deviation offset for 2 kpc cutoff is {0:.4g}'.format(np.std(np.abs(np.cumsum(mass)[43:]/model_2(rs[44:]) - 1))))
+#print('Standard deviation offset for 3 kpc cutoff is {0:.4g}'.format(np.std(np.abs(np.cumsum(mass)[43:]/model_3(rs[44:]) - 1))))
+#print('Standard deviation offset for 5 kpc cutoff is {0:.4g}'.format(np.std(np.abs(np.cumsum(mass)[43:]/model_5(rs[44:]) - 1))))
+#print('Standard deviation offset for 10 kpc cutoff is {0:.4g}'.format(np.std(np.abs(np.cumsum(mass)[43:]/model_10(rs[44:]) - 1))))
 
 # Use the mass model parameters to plot the density profiles
-dens_1 = np.zeros(len(rs)-1)
-dens_2 = np.zeros(len(rs)-1)
-dens_3 = np.zeros(len(rs)-1)
-dens_5 = np.zeros(len(rs)-1)
-dens_10 = np.zeros(len(rs)-1)
+dens_10_300 = np.zeros(len(rs)-1)
+dens_10_350 = np.zeros(len(rs)-1)
+dens_10_400 = np.zeros(len(rs)-1)
+dens_10_500 = np.zeros(len(rs)-1)
 for i in range(0, len(rs)-1):
     volume = 4/3*np.pi*(rs[i+1]**3-rs[i]**3)
-    dens_1[i] = (model_1(rs[i+1]) - model_1(rs[i]))/volume
-    dens_2[i] = (model_2(rs[i+1]) - model_2(rs[i]))/volume
-    dens_3[i] = (model_3(rs[i+1]) - model_3(rs[i]))/volume
-    dens_5[i] = (model_5(rs[i+1]) - model_5(rs[i]))/volume
-    dens_10[i] = (model_10(rs[i+1]) - model_10(rs[i]))/volume
+    dens_10_300[i] = (model_10_300(rs[i+1]) - model_10_300(rs[i]))/volume
+    dens_10_350[i] = (model_10_350(rs[i+1]) - model_10_350(rs[i]))/volume
+    dens_10_400[i] = (model_10_400(rs[i+1]) - model_10_400(rs[i]))/volume
+    dens_10_500[i] = (model_10_500(rs[i+1]) - model_10_500(rs[i]))/volume
 
 # Plot the derived density profiles on top of the actual density
 plt.figure(figsize=(10,8))
 plt.plot(rs[1:], density, 'k.', label='data')
-plt.plot(rs[1:], dens_1, '-', label='1 kpc fit')
-plt.plot(rs[1:], dens_2, '-', label='2 kpc fit')
-plt.plot(rs[1:], dens_3, '-', label='3 kpc fit')
-plt.plot(rs[1:], dens_5, '-', label='5 kpc fit')
-plt.plot(rs[1:], dens_10, '-', label='10 kpc fit')
+plt.plot(rs[1:], dens_10_300, '-', label='Rmax = 300 kpc')
+plt.plot(rs[1:], dens_10_350, '-', label='Rmax = 350 kpc')
+plt.plot(rs[1:], dens_10_400, '-', label='Rmax = 400 kpc')
+plt.plot(rs[1:], dens_10_500, '-', label='Rmax = 500 kpc')
 plt.xscale('log')
 plt.yscale('log')
-plt.xlim(xmin=1)
+plt.xlim(1,600)
+plt.ylim(ymax=1e9)
 plt.xlabel('r [kpc]', fontsize=28)
 plt.ylabel('$\\rho$ [M$_{\\odot}$ kpc$^{-3}$]', fontsize=28)
-plt.title('$\\beta$, $\\alpha$ float', fontsize=28)
 plt.legend(prop={'size': 18})
 plt.tight_layout()
-plt.savefig(home_dir+'/orbit_plots/fitting/two_power_model/'+gal1+'/'+gal1+'_2P_mass_profiles_density_float.pdf')
+plt.savefig(home_dir+'/orbit_data/plots/fitting/two_power_model_v2/'+gal1+'_2P_mass_profiles_density.pdf')
 plt.close()
 #
 plt.figure(figsize=(10,8))
-plt.plot(rs[1:], density/dens_1, '-', label='1 kpc fit')
-plt.plot(rs[1:], density/dens_2, '-', label='2 kpc fit')
-plt.plot(rs[1:], density/dens_3, '-', label='3 kpc fit')
-plt.plot(rs[1:], density/dens_5, '-', label='5 kpc fit')
-plt.plot(rs[1:], density/dens_10, '-', label='10 kpc fit')
+plt.plot(rs[1:], dens_10_300/density, '-', label='Rmax = 300 kpc')
+plt.plot(rs[1:], dens_10_350/density, '-', label='Rmax = 350 kpc')
+plt.plot(rs[1:], dens_10_400/density, '-', label='Rmax = 400 kpc')
+plt.plot(rs[1:], dens_10_500/density, '-', label='Rmax = 500 kpc')
 plt.xscale('log')
-plt.xlim(xmin=1)
-#plt.ylim(ymax=3)
+plt.hlines(y=1, xmin=1, xmax=500, colors='k', linestyles='dotted')
+plt.xlim(1,600)
+plt.ylim(0.5, 2)
 plt.xlabel('r [kpc]', fontsize=28)
-plt.ylabel('$\\rho_{\\rm data}/\\rho_{\\rm model}$', fontsize=28)
-plt.title('$\\beta$, $\\alpha$ float', fontsize=28)
+plt.ylabel('$\\rho_{\\rm model}/\\rho_{\\rm data}$', fontsize=28)
 plt.legend(prop={'size': 18})
 plt.tight_layout()
-plt.savefig(home_dir+'/orbit_plots/fitting/two_power_model/'+gal1+'/'+gal1+'_2P_mass_profiles_density_float_ratio.pdf')
+plt.savefig(home_dir+'/orbit_data/plots/fitting/two_power_model_v2/'+gal1+'_2P_mass_profiles_density_ratio.pdf')
 plt.close()
 
 

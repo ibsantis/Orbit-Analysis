@@ -136,7 +136,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'Romeo'
+gal1 = 'm12z'
 loc = 'mac'
 
 if gal1 == 'Romeo':
@@ -191,9 +191,9 @@ fitting_data = pd.read_csv(home_dir+'/orbit_data/fitting_params.csv', index_col=
 
 # Create the mass model for the disk and halo
 def disk_density(r, gal):
-    A_disk_in = fitting_data['A_disk_in'][gal]
+    A_disk_in = fitting_data['A_disk_in'][gal]*1.2
     r_in = fitting_data['r_in'][gal]
-    A_disk_out = fitting_data['A_disk_out'][gal]
+    A_disk_out = fitting_data['A_disk_out'][gal]*1.2
     r_out = fitting_data['r_out'][gal]
     h_z = fitting_data['h_z'][gal]
     #
@@ -205,10 +205,10 @@ def disk_density(r, gal):
 
 
 rs = np.logspace(np.log10(0.1), np.log10(500), 81)
-disk_mass = np.zeros(len(rs)-1)
+disk_mass_20 = np.zeros(len(rs)-1)
 for i in range(0, len(rs)-1):
     area = np.pi*(rs[i+1]**2-rs[i]**2)
-    disk_mass[i] = disk_density(rs[i+1], gal=gal1)*area
+    disk_mass_20[i] = disk_density(rs[i+1], gal=gal1)*area
 
 def halo_mass(r, gal):
     A_halo = fitting_data['A_halo'][gal]
@@ -218,21 +218,27 @@ def halo_mass(r, gal):
     #
     return ((A_halo/a_halo**3)*(r**(3-alpha))*(a_halo+r)**(alpha-beta)*(r/a_halo+1)**(beta-1)*a_halo**beta/(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-r/a_halo)
 
-
-total_mass = halo_mass(rs[1:], gal=gal1)+np.cumsum(disk_mass)
+total_mass_0 = halo_mass(rs[1:], gal=gal1)+np.cumsum(disk_mass_0)
+total_mass_10 = halo_mass(rs[1:], gal=gal1)+np.cumsum(disk_mass_10)
+total_mass_15 = halo_mass(rs[1:], gal=gal1)+np.cumsum(disk_mass_15)
+total_mass_20 = halo_mass(rs[1:], gal=gal1)+np.cumsum(disk_mass_20)
 
 # Plot the ratio of the data to the model
 plt.figure(figsize=(10,8))
-plt.plot(rs[1:], total_mass/masses['mass.enclosed'], '-')
+plt.plot(rs[1:], total_mass_0/masses['mass.enclosed'], '-', label='No Amplitude increase')
+plt.plot(rs[1:], total_mass_10/masses['mass.enclosed'], '-', label='10% Amplitude increase')
+plt.plot(rs[1:], total_mass_15/masses['mass.enclosed'], '-', label='15% Amplitude increase')
+plt.plot(rs[1:], total_mass_20/masses['mass.enclosed'], '-', label='20% Amplitude increase')
 plt.xscale('log')
 plt.xlim(xmin=5,xmax=500)
 plt.hlines(y=1,xmin=5,xmax=500,linestyles='dotted')
 plt.ylim(ymin=0.8, ymax=1.1)
 plt.xlabel('R [kpc]', fontsize=28)
 plt.ylabel('$M_{\\rm model}(R)/M_{\\rm sim}(R)$', fontsize=28)
-plt.title(gal1+', halo mass model', fontsize=28)
+plt.title(gal1+', Full model, New Halo Params', fontsize=28)
+plt.legend(prop={'size': 18})
 plt.tight_layout()
-plt.savefig(home_dir+'/orbit_data/plots/fitting/full_model_check/'+gal1+'_full_model_check.pdf')
+plt.savefig(home_dir+'/orbit_data/plots/fitting/full_model_check_v2/'+gal1+'_full_model_check_v2_amps.pdf')
 plt.close()
 
 
@@ -279,4 +285,53 @@ plt.ylabel('$M_{\\rm mass}(R)/M_{\\rm density}(R)$', fontsize=28)
 plt.title(gal1+', halo model ratios', fontsize=28)
 plt.tight_layout()
 plt.savefig(home_dir+'/orbit_data/plots/fitting/full_model_check/'+gal1+'_halo_density_to_halo_mass_models.pdf')
+plt.close()
+
+
+##############################################################################################################################
+"""
+    Compare the regular and 2-power NFW mass profiles
+"""
+
+rs = np.logspace(np.log10(0.1), np.log10(500), 81)
+#
+def halo_mass_1(r, gal):
+    A_halo = fitting_data['A_halo'][gal]
+    a_halo = fitting_data['a_halo'][gal]
+    alpha = fitting_data['alpha'][gal]
+    beta = fitting_data['beta'][gal]
+    #
+    return ((A_halo/a_halo**3)*(r**(3-alpha))*(a_halo+r)**(alpha-beta)*(r/a_halo+1)**(beta-1)*a_halo**beta/(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-r/a_halo)
+
+def halo_mass_2(r, gal):
+    A_halo = 2.501349e11
+    a_halo = 21.03378
+    alpha = 1.340087
+    beta = 3.250613
+    #
+    return ((A_halo/a_halo**3)*(r**(3-alpha))*(a_halo+r)**(alpha-beta)*(r/a_halo+1)**(beta-1)*a_halo**beta/(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-r/a_halo)
+
+def nfw_halo_mass(r, gal):
+    A_halo = 5.4149488e11
+    a_halo = 18.726256
+    return (A_halo)*(np.log((a_halo+r)/a_halo) + (a_halo/(a_halo+r)) - 1)
+
+two_power_mass_1 = halo_mass_1(rs,gal1)
+two_power_mass_2 = halo_mass_2(rs,gal1)
+nfw_mass = nfw_halo_mass(rs,gal1)
+
+# Plot the ratio of the data to the model
+plt.figure(figsize=(10,8))
+plt.plot(rs, two_power_mass_1/nfw_mass, '-', label='Old 2P Parameters')
+plt.plot(rs, two_power_mass_2/nfw_mass, '-', label='New 2P Paramters')
+plt.xscale('log')
+plt.xlim(xmin=5,xmax=500)
+plt.hlines(y=1,xmin=5,xmax=500,linestyles='dotted')
+plt.ylim(ymin=0.8, ymax=2)
+plt.xlabel('R [kpc]', fontsize=28)
+plt.ylabel('$M_{\\rm 2P}(<R)/M_{\\rm NFW}(<R)$', fontsize=28)
+plt.title(gal1, fontsize=28)
+plt.legend(prop={'size': 18})
+plt.tight_layout()
+plt.savefig(home_dir+'/orbit_data/plots/fitting/two_power_vs_nfw/'+gal1+'_model_compare.pdf')
 plt.close()

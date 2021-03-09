@@ -15,6 +15,8 @@ with the OrbitAnalysis class:
     - Orbit angular momentum
     - Orbit energy
 
+[Talk about the OrbitGalpy class...]
+
 There is also a class named OrbitPlot which can generate the following kinds of
 figures:
     - Distance of subhalo vs time
@@ -85,6 +87,8 @@ class OrbitRead:
         elif location == 'peloton' and self.num_gal == 2:
             self.home_dir = '/home/ibsantis/scripts'
             self.simulation_dir = '/home/awetzel/scratch/m12_elvis/'+self.galaxy+resolution
+            self.gal_1 = gal1
+            self.gal_2 = gal2
         else:
             self.home_dir = '/home1/05400/ibsantis/scripts'
             self.simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+self.galaxy+resolution
@@ -327,12 +331,12 @@ class OrbitAnalysis:
                   Each row of the array corresponds to a different subhalo
                   Each element in a row gives the virial radius of the host
                     when the subhalo reached pericenter
-                - d['pericenter'] is a 2D array
+                - d['pericenter.dist'] is a 2D array
                   Array shape: (number of subhalos) x (max number of pericenters
                                                        any halo experienced)
                   Each row of the array corresponds to a different subhalo
                   Each element in a row gives the pericenter distance (in kpc physical)
-                - d['pericenter.velocity'] is a 2D array
+                - d['pericenter.vel'] is a 2D array
                   Array shape: (number of subhalos) x (max number of pericenters
                                                        any halo experienced)
                   Each row of the array corresponds to a different subhalo
@@ -811,6 +815,15 @@ class OrbitAnalysis:
             energy[i][mask] = 0.5*tree.prop('host.velocity.total', self.sub_inds[i][mask])**2 + potential_norm[i][mask]
         return energy
 
+class OrbitGalpy(OrbitAnalysis):
+
+    def __init__(self, tree, gal1, location):
+        """
+        Need to do this to inherit the subhalo indices defined from __init__
+        in OrbitAnalysis
+        """
+        OrbitAnalysis.__init__(self, tree, gal1, location)
+
     def galpy_orbit_init(self, tree):
         sub_orbits = []
         for i in range(0, len(self.sub_inds)):
@@ -824,6 +837,315 @@ class OrbitAnalysis:
             sub_orbits.append(Orbit([R*u.kpc, vR*u.km/u.s, vT*u.km/u.s, z*u.kpc, vz*u.km/u.s, phi*u.deg]))
         #
         return Orbit(sub_orbits)
+
+    def galpy_potential(self):
+        """
+        Have some function that defines the potential?
+        """
+        pass
+
+    def galpy_pericenter_interp(self, distances, velocities, time_array):
+        """
+        DESCRIPTION:
+            Reads in integrated subhalo distances and velocites across time,
+            and snapshot information and returns a dictionary of pericenter
+            distances, velocities, and times.
+
+        VARIABLES:
+            distances    : 2D array (given in kpc physical)
+            velocites    : 2D array (km / s)
+            time_array   : dictionary
+
+        NOTES:
+            - Same as OrbitAnalysis.pericenter_interp() except this does not
+              check to see if the subhalo is within the virial radius since the
+              subhalos are integrated in a static potential (the virial radius
+              does not change).
+            - Returns a dictionary
+                - d['pericenter.check'] is a 1D array of booleans
+                  Each element tells you if the subhalo has experienced a pericenter
+                - d['pericenter.dist'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row of the array corresponds to a different subhalo
+                  Each element in a row gives the pericenter distance (in kpc physical)
+                - d['pericenter.vel'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row of the array corresponds to a different subhalo
+                  Each element in a row gives the pericenter velocity (in kpc physical)
+                - d['pericenter.time'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row of the array corresponds to a different subhalo
+                  Each element in a row gives the age of the Universe when the
+                    subhalo experienced a pericenter
+                - d['pericenter.time.lb'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row of the array corresponds to a different subhalo
+                  Each element in a row gives the lookback time when the
+                    subhalo experienced a pericenter
+        """
+        # Set up a dictionary and lists to save values to
+        d = dict();
+        check = []
+        peri_spl = []
+        peri_vel_spl = []
+        time_spl = []
+        #
+        # Define how many snapshots you want to 'reach' out to find a local min
+        reach = 4
+        # Loop over the number of subhalos
+        for k in range(0, len(distances)):
+            temp_halo_d = distances[k] # Now goes from z = 0 to z_form (un-normalized)
+            temp_halo_v = velocities[k] # Same as above
+            # Want initial element to be this because we check neighbors on each side
+            temp_peri = temp_halo_d[reach]
+            temp_check = np.zeros(len(temp_halo_d))
+            temp_peri_spl = []
+            temp_peri_vel_spl = []
+            temp_time_spl = []
+            #
+            # Loop through each subhalo
+            for i in range(reach, len(temp_halo_d)-reach):
+                # Check its neighbors and if it is within virial radius
+                if (all(temp_peri < temp_halo_d[i-reach:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])):
+                    temp_check[i] = 1
+                    temp_peri_spl.append(temp_halo_d[i-reach:i+reach])
+                    temp_peri_vel_spl.append(temp_halo_v[i-reach:i+reach])
+                    temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
+                    temp_peri = temp_halo_d[i+1]
+                else:
+                    temp_peri = temp_halo_d[i+1]
+            check.append(temp_check)
+            peri_spl.append(temp_peri_spl)
+            peri_vel_spl.append(temp_peri_vel_spl)
+            time_spl.append(temp_time_spl)
+        #
+        # Create a mask that tells you whether or not halo experienced pericenter
+        peri_bool = np.zeros(len(check), bool)
+        for i in range(0, len(check)):
+            if (np.sum(check[i]) > 0):
+                peri_bool[i] = True
+        d['pericenter.check'] = peri_bool
+        #
+        # Find maximum number of pericenter events
+        N = np.max([len(host_peri_rad[i]) for i in range(0, len(host_peri_rad))])
+        #
+        # Set up empty lists for spline fitting
+        pericenter_spline = []
+        pericenter_vel_spline = []
+        time_spline = []
+        # Loop over all of the subhalos
+        for i in range(0, len(peri_spl)):
+            # Check if subhalo experienced pericenter. If so, continue.
+            if (len(peri_spl[i]) != 0):
+                temp_peri_new_spl = []
+                temp_peri_vel_new_spl = []
+                temp_time_new_spl = []
+                # Loop over the number of pericenter events
+                for j in range(0, len(peri_spl[i])):
+                    temp_dist = peri_spl[i][j]
+                    temp_vel = peri_vel_spl[i][j]
+                    temp_time = time_spl[i][j]
+                    # Work on distance
+                    f = interp1d(temp_time, temp_dist, kind='cubic')
+                    f2 = interp1d(temp_time, temp_vel, kind='cubic')
+                    x_new = np.linspace(temp_time[0], temp_time[-1], 100)
+                    temp_peri_new_spl.append(np.min(f(x_new)))
+                    temp_time_new_spl.append(x_new[np.where(f(x_new) == np.min(f(x_new)))[0][0]])
+                    temp_peri_vel_new_spl.append(f2(x_new)[np.where(f(x_new) == np.min(f(x_new)))[0][0]])
+                pericenter_spline.append(temp_peri_new_spl)
+                pericenter_vel_spline.append(temp_peri_vel_new_spl)
+                time_spline.append(temp_time_new_spl)
+            else:
+                temp_peri_new_spl = []
+                temp_peri_vel_new_spl = []
+                temp_time_new_spl = []
+                pericenter_spline.append(temp_peri_new_spl)
+                pericenter_vel_spline.append(temp_peri_vel_new_spl)
+                time_spline.append(temp_time_new_spl)
+        #
+        # Initialize arrays with size (number subhalos) x (number of pericenter events)
+        pericenter_spline_array = (-1)*np.ones((len(distances), N))
+        pericenter_vel_spline_array = (-1)*np.ones((len(distances), N))
+        time_spline_array = (-1)*np.ones((len(distances), N))
+        #
+        # Store the data in 2D arrays
+        for i in range(0, len(pericenter_spline)):
+            if len(pericenter_spline[i]) != 0:
+                for j in range(0, len(pericenter_spline[i])):
+                    pericenter_spline_array[i,j] = pericenter_spline[i][j]
+                    pericenter_vel_spline_array[i,j] = pericenter_vel_spline[i][j]
+                    time_spline_array[i,j] = time_spline[i][j]
+        #
+        # Save 2D arrays to dictionary
+        d['pericenter.dist'] = pericenter_spline_array
+        d['pericenter.vel'] = pericenter_vel_spline_array
+        d['pericenter.time'] = time_spline_array
+        #
+        # Find lookback time and save to 2D array
+        time_lb_spline_array = (-1)*np.ones((len(distances), N))
+        mask = (time_spline_array > 0)
+        time_lb_spline_array[mask] = (time_array['time'][-1] - time_spline_array[mask])
+        #
+        d['pericenter.time.lb'] = time_lb_spline_array
+        #
+        return d
+
+    def galpy_apocenter_interp(self, distances, velocities, time_array):
+        """
+        DESCRIPTION:
+            Reads in a list of integrated subhalo distances and velocities, and
+            snapshot information, and returns a dictionary of apocenter distances,
+            velocities, and times, as well as maximum distances a subhalo
+            experiences, and the times this happens.
+
+        VARIABLES:
+            distances    : 2D array (given in kpc physical)
+            velocites    : 2D array (km / s)
+            time_array   : dictionary
+
+        NOTES:
+            - Similar to OrbitAnalysis.apocenter_interp() except this does not
+              check if the subhalo has fallen into the host since the subhalos
+              were integrated in a static potential. For the same reason, this
+              does not return maximum distances, times, and velocities.
+            - Returns a dictionary
+                - d['apocenter.check'] is a 1D array of booleans
+                  These will tell you if there was an apocenter event for
+                  a specific halo.
+                - d['apocenter.dist'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row corresponds to a different subhalo
+                  Each element gives the apocenter distance (in kpc physical)
+                - d['apocenter.velocity'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row corresponds to a different subhalo
+                  Each element gives the apocenter velocity (in km/s)
+                - d['apocenter.time'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row corresponds to a different subhalo
+                  Each element gives the age of the Universe at apocenter
+                - d['apocenter.time.lb'] is a 2D array
+                  Array shape: (number of subhalos) x (max number of pericenters
+                                                       any halo experienced)
+                  Each row corresponds to a different subhalo
+                  Each element gives the lookback time at apocenter
+            - If a subhalo never reaches apocenter, then distances, velocities,
+              and times are set to -1
+        """
+        # Set up some initial variables
+        d = dict();
+        check = []
+        apo_spl = []
+        apo_vel_spl = []
+        time_spl = []
+        #
+        # Define how many snapshots you want to 'reach' out to find a local min
+        reach = 10
+        # Loop through the number of subhalos
+        for k in range(0, len(distances)):
+            #
+            temp_halo_d = distances[k] # Now goes from z = 0 to z_form (un-normalized)
+            temp_halo_v = velocities[k] # Same as above
+            #
+            # Want initial element to be this because we check +- 10 neighbors on each side
+            temp_apo = temp_halo_d[reach]
+            temp_apo_time = time_array['time'][600-reach]
+            temp_check = np.zeros(len(temp_halo_d))
+            temp_apo_spl = []
+            temp_apo_vel_spl = []
+            temp_time_spl = []
+            #
+            # Loop through each subhalo
+            for i in range(reach, len(temp_halo_d)-reach):
+                # Check to make sure that this is the local maximum
+                if (all(temp_apo > temp_halo_d[i-reach:i])) and (all(temp_apo > temp_halo_d[i+1:i+1+reach])):
+                    temp_check[i] = 1
+                    temp_apo_spl.append(temp_halo_d[i-reach:i+reach])
+                    temp_apo_vel_spl.append(temp_halo_v[i-reach:i+reach])
+                    temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
+                    temp_apo = temp_halo_d[i+1]
+                    temp_apo_time = time_array['time'][600-(i+1)]
+                else:
+                    temp_apo = temp_halo_d[i+1]
+                    temp_apo_time = time_array['time'][600-(i+1)]
+            check.append(temp_check)
+            apo_spl.append(temp_apo_spl)
+            apo_vel_spl.append(temp_apo_vel_spl)
+            time_spl.append(temp_time_spl)
+            #
+        # Create a mask that tells you whether or not halo experienced apocenter
+        apo_bool = np.zeros(len(check), bool)
+        for i in range(0, len(check)):
+            if (np.sum(check[i]) > 0):
+                apo_bool[i] = True
+        d['apocenter.check'] = apo_bool
+        #
+        # Do the spline fitting
+        apocenter_spline = []
+        apocenter_vel_spline = []
+        time_spline = []
+        # Loop over all of the subhalos
+        for i in range(0, len(apo_spl)):
+            # Check if subhalo experienced apocenter. If so, continue.
+            if (len(apo_spl[i]) != 0):
+                temp_apo_new_spl = []
+                temp_apo_vel_new_spl = []
+                temp_time_new_spl = []
+                # Loop over the number of apocenter events
+                for j in range(0, len(apo_spl[i])):
+                    temp_dist = apo_spl[i][j]
+                    temp_vel = apo_vel_spl[i][j]
+                    temp_time = time_spl[i][j]
+                    # Work on distance
+                    f = interp1d(temp_time, temp_dist, kind='cubic')
+                    f2 = interp1d(temp_time, temp_vel, kind='cubic')
+                    x_new = np.linspace(temp_time[0], temp_time[-1], 100)
+                    temp_apo_new_spl.append(np.max(f(x_new)))
+                    temp_time_new_spl.append(x_new[np.where(f(x_new) == np.max(f(x_new)))[0][0]])
+                    temp_apo_vel_new_spl.append(f2(x_new)[np.where(f(x_new) == np.max(f(x_new)))[0][0]])
+                apocenter_spline.append(temp_apo_new_spl)
+                apocenter_vel_spline.append(temp_apo_vel_new_spl)
+                time_spline.append(temp_time_new_spl)
+            else:
+                temp_apo_new_spl = []
+                temp_apo_vel_new_spl = []
+                temp_time_new_spl = []
+                apocenter_spline.append(temp_apo_new_spl)
+                apocenter_vel_spline.append(temp_apo_vel_new_spl)
+                time_spline.append(temp_time_new_spl)
+        #
+        # Create null arrays that are of size (number of subhalos) x (max number of apocenter events any halo experiences)
+        N = np.max([len(apocenter_spline[i]) for i in range(0, len(apocenter_spline))])
+        apocenter_spline_array = (-1)*np.ones((len(distances), N))
+        apocenter_vel_spline_array = (-1)*np.ones((len(distances), N))
+        time_spline_array = (-1)*np.ones((len(distances), N))
+        #
+        # Fill in the 2D arrays with the spline data
+        for i in range(0, len(apocenter_spline)):
+            if len(apocenter_spline[i]) != 0:
+                for j in range(0, len(apocenter_spline[i])):
+                    apocenter_spline_array[i,j] = apocenter_spline[i][j]
+                    apocenter_vel_spline_array[i,j] = apocenter_vel_spline[i][j]
+                    time_spline_array[i,j] = time_spline[i][j]
+        #
+        # Find lookback time and save to 2D array
+        time_lb_spline_array = (-1)*np.ones((len(distances), N))
+        mask = (time_spline_array > 0)
+        time_lb_spline_array[mask] = (time_array['time'][-1] - time_spline_array[mask])
+        #
+        # Save everything to a dictionary
+        d['apocenter.dist'] = apocenter_spline_array
+        d['apocenter.vel'] = apocenter_vel_spline_array
+        d['apocenter.time'] = time_spline_array
+        d['apocenter.time.lb'] = time_lb_spline_array
+        return d
 
 class OrbitPlot(OrbitAnalysis):
 
