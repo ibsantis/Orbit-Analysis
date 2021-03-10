@@ -6,6 +6,8 @@
   = Spherical mass ratio check =
   ==============================
 
+  Written by Isaiah Santistevan (ibsantistevan@ucdavis.edu) during Winter Quarter, 2021
+
   Calculate what the enclosed mass is for ALL particles
   within bins of spherical r, out to 500 kpc
 
@@ -133,43 +135,13 @@ from astropy.modeling.models import custom_model
 from astropy.modeling.fitting import LevMarLSQFitter
 from scipy import special
 import pandas as pd
+from orbit_analysis import orbit_io
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'm12z'
-loc = 'mac'
-
-if gal1 == 'Romeo':
-    gal2 = 'Juliet'
-    galaxy = 'm12_elvis_'+gal1+gal2
-    resolution = '_res3500'
-    num_gal = 2
-elif gal1 == 'Thelma':
-    gal2 = 'Louise'
-    galaxy = 'm12_elvis_'+gal1+gal2
-    resolution = '_res4000'
-    num_gal = 2
-elif gal1 == 'Romulus':
-    gal2 = 'Remus'
-    galaxy = 'm12_elvis_'+gal1+gal2
-    resolution = '_res4000'
-    num_gal = 2
-else:
-    galaxy = gal1
-    resolution = '_res7100'
-    num_gal = 1
-
-if loc == 'mac':
-    home_dir = '/Users/isaiahsantistevan/simulation'
-elif loc == 'peloton' and num_gal == 1:
-    home_dir = '/home/ibsantis/scripts'
-    simulation_dir = '/home/awetzel/scratch/'+galaxy+'/'+galaxy+resolution
-elif loc == 'peloton' and num_gal == 2:
-    home_dir = '/home/ibsantis/scripts'
-    simulation_dir = '/home/awetzel/scratch/m12_elvis/'+galaxy+resolution
-else:
-    home_dir = '/home1/05400/ibsantis/scripts'
-    simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+galaxy+resolution
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='mac')
+sim_data.gal_1 = 'Romulus'
+sim_data.gal_2 = 'Remus'
 print('Set paths')
 
 
@@ -178,10 +150,11 @@ print('Set paths')
 """
 
 # Read in the data
-masses = ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting_data/'+gal1+'_spherical_mass')
+#masses = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting_data/full_profile/'+sim_data.galaxy+'_spherical_mass')
+masses = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting_data/full_profile/'+sim_data.gal_2+'_spherical_mass')
 #
 # Read in the fitting parameters
-fitting_data = pd.read_csv(home_dir+'/orbit_data/fitting_params.csv', index_col=0)
+fitting_data = pd.read_csv(sim_data.home_dir+'/orbit_data/fitting_params.csv', index_col=0)
 
 ##########################################################################################
 
@@ -191,9 +164,9 @@ fitting_data = pd.read_csv(home_dir+'/orbit_data/fitting_params.csv', index_col=
 
 # Create the mass model for the disk and halo
 def disk_density(r, gal):
-    A_disk_in = fitting_data['A_disk_in'][gal]*1.2
+    A_disk_in = fitting_data['A_disk_in'][gal]
     r_in = fitting_data['r_in'][gal]
-    A_disk_out = fitting_data['A_disk_out'][gal]*1.2
+    A_disk_out = fitting_data['A_disk_out'][gal]
     r_out = fitting_data['r_out'][gal]
     h_z = fitting_data['h_z'][gal]
     #
@@ -205,12 +178,13 @@ def disk_density(r, gal):
 
 
 rs = np.logspace(np.log10(0.1), np.log10(500), 81)
-disk_mass_20 = np.zeros(len(rs)-1)
+disk_mass= np.zeros(len(rs)-1)
 for i in range(0, len(rs)-1):
     area = np.pi*(rs[i+1]**2-rs[i]**2)
-    disk_mass_20[i] = disk_density(rs[i+1], gal=gal1)*area
+    #disk_mass[i] = disk_density(rs[i+1], gal=sim_data.galaxy)*area
+    disk_mass[i] = disk_density(rs[i+1], gal=sim_data.gal_2)*area
 
-def halo_mass(r, gal):
+def halo_mass_1(r, gal):
     A_halo = fitting_data['A_halo'][gal]
     a_halo = fitting_data['a_halo'][gal]
     alpha = fitting_data['alpha'][gal]
@@ -218,27 +192,53 @@ def halo_mass(r, gal):
     #
     return ((A_halo/a_halo**3)*(r**(3-alpha))*(a_halo+r)**(alpha-beta)*(r/a_halo+1)**(beta-1)*a_halo**beta/(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-r/a_halo)
 
-total_mass_0 = halo_mass(rs[1:], gal=gal1)+np.cumsum(disk_mass_0)
-total_mass_10 = halo_mass(rs[1:], gal=gal1)+np.cumsum(disk_mass_10)
-total_mass_15 = halo_mass(rs[1:], gal=gal1)+np.cumsum(disk_mass_15)
-total_mass_20 = halo_mass(rs[1:], gal=gal1)+np.cumsum(disk_mass_20)
+def halo_mass_2(r, gal):
+    A_halo = 5.11440993446542E+11
+    a_halo = 14.2806708994752
+    alpha = 1.05396225625856
+    beta = 3.08756684053642
+    #
+    return ((A_halo/a_halo**3)*(r**(3-alpha))*(a_halo+r)**(alpha-beta)*(r/a_halo+1)**(beta-1)*a_halo**beta/(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-r/a_halo)
+
+
+#total_mass_1 = halo_mass_1(rs[1:], gal=sim_data.galaxy)+np.cumsum(disk_mass)
+#total_mass_2 = halo_mass_2(rs[1:], gal=sim_data.galaxy)+np.cumsum(disk_mass)
+total_mass_1 = halo_mass_1(rs[1:], gal=sim_data.gal_2)+np.cumsum(disk_mass)
+total_mass_2 = halo_mass_2(rs[1:], gal=sim_data.gal_2)+np.cumsum(disk_mass)
+
+
 
 # Plot the ratio of the data to the model
 plt.figure(figsize=(10,8))
-plt.plot(rs[1:], total_mass_0/masses['mass.enclosed'], '-', label='No Amplitude increase')
-plt.plot(rs[1:], total_mass_10/masses['mass.enclosed'], '-', label='10% Amplitude increase')
-plt.plot(rs[1:], total_mass_15/masses['mass.enclosed'], '-', label='15% Amplitude increase')
-plt.plot(rs[1:], total_mass_20/masses['mass.enclosed'], '-', label='20% Amplitude increase')
+plt.plot(rs[1:], total_mass_1/masses['mass.enclosed'], '-', label='Old 2P Parameters')
+plt.plot(rs[1:], total_mass_2/masses['mass.enclosed'], '-', label='New 2P Parameters')
 plt.xscale('log')
 plt.xlim(xmin=5,xmax=500)
 plt.hlines(y=1,xmin=5,xmax=500,linestyles='dotted')
 plt.ylim(ymin=0.8, ymax=1.1)
 plt.xlabel('R [kpc]', fontsize=28)
 plt.ylabel('$M_{\\rm model}(R)/M_{\\rm sim}(R)$', fontsize=28)
-plt.title(gal1+', Full model, New Halo Params', fontsize=28)
+#plt.title(sim_data.galaxy+', Full model', fontsize=28)
+plt.title(sim_data.gal_2+', Full model', fontsize=28)
 plt.legend(prop={'size': 18})
 plt.tight_layout()
-plt.savefig(home_dir+'/orbit_data/plots/fitting/full_model_check_v2/'+gal1+'_full_model_check_v2_amps.pdf')
+#plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/full_model_check/'+sim_data.galaxy+'_full_model_checks.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/full_model_check/'+sim_data.gal_2+'_full_model_checks.pdf')
+plt.close()
+#
+plt.figure(figsize=(10,8))
+plt.plot(rs[1:], total_mass_2/masses['mass.enclosed'], '-', label='New 2P Parameters')
+plt.xscale('log')
+plt.xlim(xmin=5,xmax=500)
+plt.hlines(y=1,xmin=5,xmax=500,linestyles='dotted')
+plt.ylim(ymin=0.8, ymax=1.1)
+plt.xlabel('R [kpc]', fontsize=28)
+plt.ylabel('$M_{\\rm model}(R)/M_{\\rm sim}(R)$', fontsize=28)
+#plt.title(sim_data.galaxy+', Full model', fontsize=28)
+plt.title(sim_data.gal_2+', Full model', fontsize=28)
+plt.tight_layout()
+#plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/full_model_check/'+sim_data.galaxy+'_full_model.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/full_model_check/'+sim_data.gal_2+'_full_model.pdf')
 plt.close()
 
 
