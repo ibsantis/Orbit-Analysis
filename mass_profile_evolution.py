@@ -22,7 +22,7 @@ import h5py
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'm12f'
+gal1 = 'm12i'
 loc = 'peloton'
 
 if gal1 == 'Romeo':
