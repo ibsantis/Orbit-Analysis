@@ -27,7 +27,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='m12r', location='mac')
 print('Set paths')
 
 # Read in the data
