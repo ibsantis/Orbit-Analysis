@@ -27,7 +27,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12c', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
 print('Set paths')
 
 # Read in the data
@@ -46,7 +46,7 @@ plt.figure(figsize=(10, 12))
 for i in range(0, len(mass_data['mass.profile'])):
     plt.plot(rs[1:], np.cumsum(mass_data['mass.profile'][i])[:-1]/mass_prof_avg[:-1], color=colors[i], label=str(mass_data['time'][i])+' Gyr')
 plt.xlim(5, 500)
-#plt.ylim(0.96, 1.04)
+plt.ylim(0.96, 1.04)
 plt.hlines(1, 0.1, 500, color='k', alpha=0.8, linestyles='dotted', zorder=100)
 plt.xscale('log')
 plt.xlabel('r [kpc]', fontsize=32)
