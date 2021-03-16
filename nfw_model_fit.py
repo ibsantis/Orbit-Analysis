@@ -99,51 +99,23 @@ from astropy import units as u
 from astropy.modeling.models import custom_model
 from astropy.modeling.fitting import LevMarLSQFitter
 from scipy import special
+from orbit_analysis import orbit_io
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'Remus'
-loc = 'mac'
-
-if gal1 == 'Romeo':
-    gal2 = 'Juliet'
-    galaxy = 'm12_elvis_'+gal1+gal2
-    resolution = '_res3500'
-    num_gal = 2
-elif gal1 == 'Thelma':
-    gal2 = 'Louise'
-    galaxy = 'm12_elvis_'+gal1+gal2
-    resolution = '_res4000'
-    num_gal = 2
-elif gal1 == 'Romulus':
-    gal2 = 'Remus'
-    galaxy = 'm12_elvis_'+gal1+gal2
-    resolution = '_res4000'
-    num_gal = 2
-else:
-    galaxy = gal1
-    resolution = '_res7100'
-    num_gal = 1
-
-if loc == 'mac':
-    home_dir = '/Users/isaiahsantistevan/simulation'
-elif loc == 'peloton' and num_gal == 1:
-    home_dir = '/home/ibsantis/scripts'
-    simulation_dir = '/home/awetzel/scratch/'+galaxy+'/'+galaxy+resolution
-elif loc == 'peloton' and num_gal == 2:
-    home_dir = '/home/ibsantis/scripts'
-    simulation_dir = '/home/awetzel/scratch/m12_elvis/'+galaxy+resolution
-else:
-    home_dir = '/home1/05400/ibsantis/scripts'
-    simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+galaxy+resolution
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='mac')
 print('Set paths')
+sim_data.galaxy = 'Remus'
 
-# Read in the data
-data = ut.io.file_hdf5(file_name_base=home_dir+'/orbit_plots/fitting/fitting_data/'+gal1+'_profile_fitting')
+## Read in the data
+#data = ut.io.file_hdf5(file_name_base=home_dir+'/orbit_plots/fitting/fitting_data/'+gal1+'_profile_fitting')
+#density = data['density']
+#rs = data['rs']
+#mass = data['mass']
+data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting_data/halo/complete/'+sim_data.galaxy+'_halo_fitting')
 density = data['density']
-rs = data['rs']
 mass = data['mass']
-
+rs = data['rs']
 
 """
     - Define the NFW mass model
@@ -157,13 +129,11 @@ def nfw_mass_model(r, amp=1e12, a=10):
 # Fit the model to the data for various cutoff radii
 model_init = nfw_mass_model(bounds={'amp':(3e10, 2.25e12), 'a':(5, 30)})
 fit = LevMarLSQFitter()
-model_0 = fit(model_init, rs[1:], np.cumsum(mass), maxiter=1000000000)
-model_1 = fit(model_init, rs[22:], np.cumsum(mass)[21:], maxiter=1000000000)
-model_2 = fit(model_init, rs[28:], np.cumsum(mass)[27:], maxiter=1000000000)
-model_3 = fit(model_init, rs[32:], np.cumsum(mass)[31:], maxiter=1000000000)
-model_5 = fit(model_init, rs[37:], np.cumsum(mass)[36:], maxiter=1000000000)
-model_10 = fit(model_init, rs[44:], np.cumsum(mass)[43:], maxiter=1000000000)
-print(model_0)
+model_1 = fit(model_init, rs[27:], np.cumsum(mass)[26:], maxiter=1000000000)
+model_2 = fit(model_init, rs[35:], np.cumsum(mass)[34:], maxiter=1000000000)
+model_3 = fit(model_init, rs[40:], np.cumsum(mass)[39:], maxiter=1000000000)
+model_5 = fit(model_init, rs[45:], np.cumsum(mass)[44:], maxiter=1000000000)
+model_10 = fit(model_init, rs[54:], np.cumsum(mass)[53:], maxiter=1000000000)
 print(model_1)
 print(model_2)
 print(model_3)
@@ -184,10 +154,10 @@ plt.xlim(xmin=1)
 plt.ylim(ymin=1e8)
 plt.xlabel('r [kpc]', fontsize=28)
 plt.ylabel('M(<r) [M$_{\\odot}$]', fontsize=28)
-plt.title(gal1, fontsize=28)
+plt.title(sim_data.galaxy, fontsize=28)
 plt.legend(prop={'size': 18})
 plt.tight_layout()
-plt.savefig(home_dir+'/orbit_plots/fitting/nfw_model/'+gal1+'/'+gal1+'_nfw_mass_profiles_float.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/nfw_model_v2/'+sim_data.galaxy+'/'+sim_data.galaxy+'_nfw_mass_profiles_float.pdf')
 plt.close()
 #
 plt.figure(figsize=(10,8))
@@ -201,10 +171,10 @@ plt.xlim(xmin=1)
 plt.hlines(y=1, xmin=1, xmax=500, colors='k', linestyles='dotted')
 plt.xlabel('r [kpc]', fontsize=28)
 plt.ylabel('$M(<r)_{\\rm data}/M(<r)_{\\rm model}$', fontsize=28)
-plt.title(gal1, fontsize=28)
+plt.title(sim_data.galaxy, fontsize=28)
 plt.legend(prop={'size': 18})
 plt.tight_layout()
-plt.savefig(home_dir+'/orbit_plots/fitting/nfw_model/'+gal1+'/'+gal1+'_nfw_mass_profiles_float_ratio.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/nfw_model_v2/'+sim_data.galaxy+'/'+sim_data.galaxy+'_nfw_mass_profiles_float_ratio.pdf')
 plt.close()
 
 # Average the mass ratio from 10 - 500 kpc
@@ -241,10 +211,10 @@ plt.yscale('log')
 plt.xlim(xmin=1)
 plt.xlabel('r [kpc]', fontsize=28)
 plt.ylabel('$\\rho$ [M$_{\\odot}$ kpc$^{-3}$]', fontsize=28)
-plt.title(gal1, fontsize=28)
+plt.title(sim_data.galaxy, fontsize=28)
 plt.legend(prop={'size': 18})
 plt.tight_layout()
-plt.savefig(home_dir+'/orbit_plots/fitting/nfw_model/'+gal1+'/'+gal1+'_nfw_mass_profiles_density_float.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/nfw_model_v2/'+sim_data.galaxy+'/'+sim_data.galaxy+'_nfw_mass_profiles_density_float.pdf')
 plt.close()
 #
 plt.figure(figsize=(10,8))
@@ -257,8 +227,8 @@ plt.xscale('log')
 plt.xlim(xmin=1)
 plt.xlabel('r [kpc]', fontsize=28)
 plt.ylabel('$\\rho_{\\rm data}/\\rho_{\\rm model}$', fontsize=28)
-plt.title(gal1, fontsize=28)
+plt.title(sim_data.galaxy, fontsize=28)
 plt.legend(prop={'size': 18})
 plt.tight_layout()
-plt.savefig(home_dir+'/orbit_plots/fitting/nfw_model/'+gal1+'/'+gal1+'_nfw_mass_profiles_density_float_ratio.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/nfw_model_v2/'+sim_data.galaxy+'/'+sim_data.galaxy+'_nfw_mass_profiles_density_float_ratio.pdf')
 plt.close()

@@ -27,7 +27,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12r', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='m12z', location='mac')
 print('Set paths')
 
 # Read in the data
@@ -38,15 +38,21 @@ mass_prof_avg = np.average(np.cumsum(mass_data['mass.profile'], axis=1), axis=0)
 
 # Plot each snapshot mass profile to the average mass profile
 rs = np.logspace(np.log10(0.1), np.log10(500), 100)
-colors = ['#800000', '#9A6324', '#808000', '#469990', '#000075', '#e6194B', '#f58231', '#3cb44b', '#42d4f4', '#911eb4', '#f032e6']
+#colors = ['#800000', '#9A6324', '#808000', '#469990', '#000075', '#e6194B', '#f58231', '#3cb44b', '#42d4f4', '#911eb4', '#f032e6']
+
+def color_cycle(cycle_length=len(mass_data['time']), cmap_name='plasma', low=0, high=1):
+    cmap=plt.get_cmap(cmap_name)
+    colors = cmap(np.linspace(low, high, cycle_length))
+    return colors
+colorss = color_cycle(len(mass_data['time']), cmap_name='plasma', low=0, high=1)
 #
 plt.rcParams["font.family"] = "serif"
 plt.figure(figsize=(10, 12))
 #
 for i in range(0, len(mass_data['mass.profile'])):
-    plt.plot(rs[1:], np.cumsum(mass_data['mass.profile'][i])[:-1]/mass_prof_avg[:-1], color=colors[i], label=str(mass_data['time'][i])+' Gyr')
+    plt.plot(rs[1:], np.cumsum(mass_data['mass.profile'][i])[:-1]/mass_prof_avg[:-1], color=colorss[i], label=str(mass_data['time'][i])+' Gyr')
 plt.xlim(5, 500)
-plt.ylim(0.96, 1.04)
+plt.ylim(0.84, 1.16)
 plt.hlines(1, 0.1, 500, color='k', alpha=0.8, linestyles='dotted', zorder=100)
 plt.xscale('log')
 plt.xlabel('r [kpc]', fontsize=32)
