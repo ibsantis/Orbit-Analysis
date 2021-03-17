@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 #SBATCH --job-name=mass_profile_TL
-#SBATCH --partition=high2    # peloton node: 32 cores, 7.8 GB per core, 250 GB total
-##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
-#SBATCH --mem=250G
+##SBATCH --partition=high2    # peloton node: 32 cores, 7.8 GB per core, 250 GB total
+#SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
+#SBATCH --mem=240G
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=32    # MPI tasks per node
 #SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
