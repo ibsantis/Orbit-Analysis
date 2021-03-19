@@ -29,6 +29,7 @@ print('Set paths')
 # Set up snapshot array to loop through
 snaps = np.array([600, 587, 582, 578, 573, 569, 564, 560, 556, 551, 547])
 times = np.array([13.8, 13.7, 13.6, 13.5, 13.4, 13.3, 13.2, 13.1, 13.0, 12.9, 12.8])
+rs = np.logspace(np.log10(0.1), np.log10(500), 100)
 
 if sim_data.num_gal == 1:
     # Set up dictionary to save the data
