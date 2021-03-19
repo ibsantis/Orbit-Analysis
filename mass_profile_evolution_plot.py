@@ -27,7 +27,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12z', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='m12w', location='mac')
 print('Set paths')
 
 # Read in the data
@@ -52,7 +52,7 @@ plt.figure(figsize=(10, 12))
 for i in range(0, len(mass_data['mass.profile'])):
     plt.plot(rs[1:], np.cumsum(mass_data['mass.profile'][i])[:-1]/mass_prof_avg[:-1], color=colorss[i], label=str(mass_data['time'][i])+' Gyr')
 plt.xlim(5, 500)
-plt.ylim(0.84, 1.16)
+plt.ylim(0.93, 1.05)
 plt.hlines(1, 0.1, 500, color='k', alpha=0.8, linestyles='dotted', zorder=100)
 plt.xscale('log')
 plt.xlabel('r [kpc]', fontsize=32)
@@ -61,3 +61,19 @@ plt.title(sim_data.galaxy, fontsize=32)
 plt.legend(prop={'size': 16}, ncol=2)
 plt.tight_layout()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/mass_profiles/'+sim_data.galaxy+'_mass_profile_evolution.pdf')
+
+
+plt.rcParams["font.family"] = "serif"
+plt.figure(figsize=(10, 12))
+#
+for i in range(0, len(mass_data['mass.profile'])):
+    plt.plot(rs[1:], np.cumsum(mass_data['mass.profile'][i])[:-1]/np.cumsum(mass_data['mass.profile'][0])[:-1], color=colorss[i], label=str(mass_data['time'][i])+' Gyr')
+plt.xlim(5, 500)
+plt.ylim(0.9, 1.03)
+plt.xscale('log')
+plt.xlabel('r [kpc]', fontsize=32)
+plt.ylabel('$M$(<r) / $M_{\\rm z = 0}$(<r)', fontsize=32)
+plt.title(sim_data.galaxy, fontsize=32)
+plt.legend(prop={'size': 16}, ncol=2)
+plt.tight_layout()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/mass_profiles/'+sim_data.galaxy+'_mass_profile_evolution_z0.pdf')
