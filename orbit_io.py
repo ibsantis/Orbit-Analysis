@@ -83,10 +83,10 @@ class OrbitRead:
             self.home_dir = '/Users/isaiahsantistevan/simulation'
         elif location == 'peloton' and self.num_gal == 1:
             self.home_dir = '/home/ibsantis/scripts'
-            self.simulation_dir = '/home/awetzel/scratch/'+self.galaxy+'/'+self.galaxy+resolution
+            self.simulation_dir = '/share/wetzellab/'+self.galaxy+'/'+self.galaxy+resolution
         elif location == 'peloton' and self.num_gal == 2:
             self.home_dir = '/home/ibsantis/scripts'
-            self.simulation_dir = '/home/awetzel/scratch/m12_elvis/'+self.galaxy+resolution
+            self.simulation_dir = '/share/wetzellab/m12_elvis/'+self.galaxy+resolution
             self.gal_1 = gal1
             self.gal_2 = gal2
         else:
