@@ -74,13 +74,21 @@ class OrbitRead:
             self.galaxy = 'm12_elvis_'+gal1+gal2
             resolution = '_res4000'
             self.num_gal = 2
+        elif gal1 == 'm12z':
+            self.galaxy = gal1
+            resolution = '_res4200'
+            self.num_gal = 1
         else:
             self.galaxy = gal1
             resolution = '_res7100'
             self.num_gal = 1
 
-        if location == 'mac':
+        if location == 'mac' and self.num_gal == 1:
             self.home_dir = '/Users/isaiahsantistevan/simulation'
+        elif location == 'mac' and self.num_gal == 2:
+            self.home_dir = '/Users/isaiahsantistevan/simulation'
+            self.gal_1 = gal1
+            self.gal_2 = gal2
         elif location == 'peloton' and self.num_gal == 1:
             self.home_dir = '/home/ibsantis/scripts'
             self.simulation_dir = '/share/wetzellab/'+self.galaxy+'/'+self.galaxy+resolution
