@@ -30,7 +30,7 @@ print('Set paths')
 snaps = np.array([600, 587, 582, 578, 573, 569, 564, 560, 556, 551, 547])
 times = np.array([13.8, 13.7, 13.6, 13.5, 13.4, 13.3, 13.2, 13.1, 13.0, 12.9, 12.8])
 
-if num_gal == 1:
+if sim_data.num_gal == 1:
     # Set up dictionary to save the data
     mass_dict = dict()
     mass_dict['snapshot'] = snaps
@@ -55,7 +55,7 @@ if num_gal == 1:
     # Save this data to a file
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.galaxy+'_mass_profile_evolution', dict_or_array_to_write=mass_dict, verbose=True)
 
-if num_gal == 2:
+if sim_data.num_gal == 2:
     # Set up dictionary to save the data
     mass_dict_1 = dict()
     mass_dict_1['snapshot'] = snaps
