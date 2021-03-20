@@ -28,11 +28,12 @@ from scipy.interpolate import interp1d
 from astropy import units as u
 import pandas as pd
 from scipy import special
+import time
 
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12f', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -71,39 +72,45 @@ from galpy.potential import NFWPotential
 
 
 # Find what the circular velocity should be for a given radius in 2P NFW
-vc = vcirc(150.0, halo_mass(150.0, sim_data.galaxy))
+
+vc = vcirc(50.0, halo_mass(50.0, sim_data.galaxy))
 #
 # Find out what is the best fix to the amplitude to ensure most circular orbit
-fixes = np.linspace(0.8, 2.0, 241)
+fixes = np.linspace(1.0, 2.0, 201)
 vars = np.zeros(len(fixes))
 for i in range(0, len(fixes)):
+    start = time.time()
     potential_two_power = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*fixes[i]*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
-    orb = Orbit([150.0*(u.kpc), 0.0*(u.km/u.s), (vc)*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
-    orb.integrate(ts, potential_two_power, method='odeint')
+    orb = Orbit([50.0*(u.kpc), 0.0*(u.km/u.s), (vc)*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
+    orb.integrate(ts, potential_two_power, method='leapfrog')
     vars[i] = np.var(orb.r(ts))
+    print('Done with step {0}'.format(i))
+    end = time.time()
+    print(end-start)
 print(np.where(np.min(vars) == vars)[0], np.min(vars), fixes[np.where(np.min(vars) == vars)[0]])
+
 
 # Plot the orbit with different corrections
 plt.rcParams["font.family"] = "serif"
 plt.figure(figsize=(10, 12))
 #
 potential_two_power = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*0.9*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
-orb = Orbit([150.0*(u.kpc), 0.0*(u.km/u.s), vc*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
+orb = Orbit([50.0*(u.kpc), 0.0*(u.km/u.s), vc*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
 orb.integrate(ts, potential_two_power, method='odeint')
 plt.plot(-1*ts, orb.r(ts), label='0.9*amp')
 #
 potential_two_power = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*1.5*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
-orb = Orbit([150.0*(u.kpc), 0.0*(u.km/u.s), vc*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
+orb = Orbit([50.0*(u.kpc), 0.0*(u.km/u.s), vc*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
 orb.integrate(ts, potential_two_power, method='odeint')
 plt.plot(-1*ts, orb.r(ts), label='1.5*amp')
 #
 potential_two_power = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*1.615*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
-orb = Orbit([150.0*(u.kpc), 0.0*(u.km/u.s), vc*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
+orb = Orbit([50.0*(u.kpc), 0.0*(u.km/u.s), vc*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
 orb.integrate(ts, potential_two_power, method='odeint')
 plt.plot(-1*ts, orb.r(ts), label='1.615*amp')
 #
 potential_two_power = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*1.4*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
-orb = Orbit([150.0*(u.kpc), 0.0*(u.km/u.s), vc*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
+orb = Orbit([50.0*(u.kpc), 0.0*(u.km/u.s), vc*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
 orb.integrate(ts, potential_two_power, method='odeint')
 plt.plot(-1*ts, orb.r(ts), label='1.7*amp')
 #
