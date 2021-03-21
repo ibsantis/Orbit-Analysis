@@ -33,7 +33,7 @@ from scipy import special
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12f', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12m', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
