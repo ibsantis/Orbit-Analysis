@@ -27,8 +27,10 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12w', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='mac')
 print('Set paths')
+
+sim_data.galaxy = 'Remus' # this is only necessary for LG pairs
 
 # Read in the data
 mass_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.galaxy+'_mass_profile_evolution')
@@ -52,7 +54,7 @@ plt.figure(figsize=(10, 12))
 for i in range(0, len(mass_data['mass.profile'])):
     plt.plot(rs[1:], np.cumsum(mass_data['mass.profile'][i])[:-1]/mass_prof_avg[:-1], color=colorss[i], label=str(mass_data['time'][i])+' Gyr')
 plt.xlim(5, 500)
-plt.ylim(0.93, 1.05)
+plt.ylim(0.97, 1.04)
 plt.hlines(1, 0.1, 500, color='k', alpha=0.8, linestyles='dotted', zorder=100)
 plt.xscale('log')
 plt.xlabel('r [kpc]', fontsize=32)
@@ -69,7 +71,7 @@ plt.figure(figsize=(10, 12))
 for i in range(0, len(mass_data['mass.profile'])):
     plt.plot(rs[1:], np.cumsum(mass_data['mass.profile'][i])[:-1]/np.cumsum(mass_data['mass.profile'][0])[:-1], color=colorss[i], label=str(mass_data['time'][i])+' Gyr')
 plt.xlim(5, 500)
-plt.ylim(0.9, 1.03)
+plt.ylim(0.95, 1.02)
 plt.xscale('log')
 plt.xlabel('r [kpc]', fontsize=32)
 plt.ylabel('$M$(<r) / $M_{\\rm z = 0}$(<r)', fontsize=32)
