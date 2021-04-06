@@ -85,8 +85,10 @@ class OrbitRead:
 
         if location == 'mac' and self.num_gal == 1:
             self.home_dir = '/Users/isaiahsantistevan/simulation'
+            self.simulation_dir = self.home_dir+'/galaxies/'+self.galaxy+resolution # maybe this is a good place for a try-except statement?
         elif location == 'mac' and self.num_gal == 2:
             self.home_dir = '/Users/isaiahsantistevan/simulation'
+            #self.simulation_dir = '/Users/isaiahsantistevan/simulation/galaxies/'+self.galaxy+resolution
             self.gal_1 = gal1
             self.gal_2 = gal2
         elif location == 'peloton' and self.num_gal == 1:

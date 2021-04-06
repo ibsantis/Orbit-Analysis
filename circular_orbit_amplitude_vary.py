@@ -33,7 +33,7 @@ import time
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='m12f', location='mac')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -46,7 +46,7 @@ fitting_data_nfw_v2 = pd.read_csv(sim_data.home_dir+'/orbit_data/fitting_params_
 #
 # Read in the subhalo initial conditions
 sub_ics = pd.read_csv(sim_data.home_dir+'/orbit_data/'+sim_data.galaxy+'_subhalo_ics.csv', index_col=0)
-ts = snaps['time']*(-1)*u.Gyr
+ts = np.linspace(0.0, -13.78, 1379)*u.Gyr
 
 # Define the 2P halo enclosed mass profile
 def halo_mass(r, gal):
@@ -73,7 +73,7 @@ from galpy.potential import NFWPotential
 
 # Find what the circular velocity should be for a given radius in 2P NFW
 
-vc = vcirc(50.0, halo_mass(50.0, sim_data.galaxy))
+vc = vcirc(15.0, halo_mass(15.0, sim_data.galaxy))
 #
 # Find out what is the best fix to the amplitude to ensure most circular orbit
 fixes = np.linspace(1.0, 2.0, 201)
@@ -81,12 +81,11 @@ vars = np.zeros(len(fixes))
 for i in range(0, len(fixes)):
     start = time.time()
     potential_two_power = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*fixes[i]*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
-    orb = Orbit([50.0*(u.kpc), 0.0*(u.km/u.s), (vc)*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
-    orb.integrate(ts, potential_two_power, method='leapfrog')
+    orb = Orbit([15.0*(u.kpc), 0.0*(u.km/u.s), (vc)*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
+    orb.integrate(ts, potential_two_power, method='odeint')
     vars[i] = np.var(orb.r(ts))
-    print('Done with step {0}'.format(i))
     end = time.time()
-    print(end-start)
+    print('Done with step {0} in {1} seconds'.format(i, end-start))
 print(np.where(np.min(vars) == vars)[0], np.min(vars), fixes[np.where(np.min(vars) == vars)[0]])
 
 
@@ -95,22 +94,22 @@ plt.rcParams["font.family"] = "serif"
 plt.figure(figsize=(10, 12))
 #
 potential_two_power = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*0.9*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
-orb = Orbit([50.0*(u.kpc), 0.0*(u.km/u.s), vc*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
+orb = Orbit([15.0*(u.kpc), 0.0*(u.km/u.s), vc*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
 orb.integrate(ts, potential_two_power, method='odeint')
 plt.plot(-1*ts, orb.r(ts), label='0.9*amp')
 #
-potential_two_power = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*1.5*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
-orb = Orbit([50.0*(u.kpc), 0.0*(u.km/u.s), vc*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
+potential_two_power = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*1.*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
+orb = Orbit([15.0*(u.kpc), 0.0*(u.km/u.s), vc*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
 orb.integrate(ts, potential_two_power, method='odeint')
 plt.plot(-1*ts, orb.r(ts), label='1.5*amp')
 #
-potential_two_power = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*1.615*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
-orb = Orbit([50.0*(u.kpc), 0.0*(u.km/u.s), vc*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
+potential_two_power = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*1.05*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
+orb = Orbit([15.0*(u.kpc), 0.0*(u.km/u.s), vc*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
 orb.integrate(ts, potential_two_power, method='odeint')
 plt.plot(-1*ts, orb.r(ts), label='1.615*amp')
 #
-potential_two_power = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*1.4*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
-orb = Orbit([50.0*(u.kpc), 0.0*(u.km/u.s), vc*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
+potential_two_power = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*1.1*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
+orb = Orbit([15.0*(u.kpc), 0.0*(u.km/u.s), vc*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
 orb.integrate(ts, potential_two_power, method='odeint')
 plt.plot(-1*ts, orb.r(ts), label='1.7*amp')
 #
@@ -128,14 +127,14 @@ plt.tight_layout()
     Plot the corrected potential and other potentials to see the comparisons
 """
 # Find what the circular velocity should be for a given radius in 2P NFW
-vc = vcirc(sub_ics['R'][32], halo_mass(sub_ics['R'][32], sim_data.galaxy))
+vc = vcirc(sub_ics['R'][20], halo_mass(sub_ics['R'][20], sim_data.galaxy))
 #
 # Find out what is the best fix to the amplitude to ensure most circular orbit
 fixes = np.linspace(0.8, 3.0, 441)
 vars = np.zeros(len(fixes))
 for i in range(0, len(fixes)):
     potential_two_power = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*fixes[i]*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
-    orb = Orbit([sub_ics['R'][32]*(u.kpc), 0.0*(u.km/u.s), (vc)*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
+    orb = Orbit([sub_ics['R'][20]*(u.kpc), 0.0*(u.km/u.s), (vc)*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
     orb.integrate(ts, potential_two_power, method='odeint')
     vars[i] = np.var(orb.r(ts))
 print(np.where(np.min(vars) == vars)[0], np.min(vars), fixes[np.where(np.min(vars) == vars)[0]])
@@ -144,7 +143,7 @@ print(np.where(np.min(vars) == vars)[0], np.min(vars), fixes[np.where(np.min(var
 disk_outer = DoubleExponentialDiskPotential(amp=fitting_data_2p['A_disk_out'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=fitting_data_2p['r_out'][sim_data.galaxy]*u.kpc, hz=fitting_data_2p['h_z'][sim_data.galaxy]*u.kpc)
 disk_inner = DoubleExponentialDiskPotential(amp=fitting_data_2p['A_disk_in'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=fitting_data_2p['r_in'][sim_data.galaxy]*u.kpc, hz=fitting_data_2p['h_z'][sim_data.galaxy]*u.kpc)
 halo_two_power_1 = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
-halo_two_power_2 = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*1.43*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
+halo_two_power_2 = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*1.47*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
 halo_nfw_1 = NFWPotential(amp=fitting_data_nfw['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data_nfw['a_halo'][sim_data.galaxy]*u.kpc)
 halo_nfw_2 = NFWPotential(amp=fitting_data_nfw_v2['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data_nfw_v2['a_halo'][sim_data.galaxy]*u.kpc)
 #
@@ -162,19 +161,19 @@ potential_nfw_2 = disk_inner+disk_outer+halo_nfw_2
 plt.rcParams["font.family"] = "serif"
 plt.figure(figsize=(10, 12))
 #
-orb = Orbit([sub_ics['R'][32]*(u.kpc), sub_ics['vR'][32]*(u.km/u.s), sub_ics['vT'][32]*(u.km/u.s), sub_ics['z'][32]*(u.kpc), sub_ics['vz'][32]*(u.km/u.s), sub_ics['phi'][32]*(u.deg)])
+orb = Orbit([sub_ics['R'][20]*(u.kpc), sub_ics['vR'][20]*(u.km/u.s), sub_ics['vT'][20]*(u.km/u.s), sub_ics['z'][20]*(u.kpc), sub_ics['vz'][20]*(u.km/u.s), sub_ics['phi'][20]*(u.deg)])
 orb.integrate(ts, potential_two_power_1, method='odeint')
 plt.plot(-1*ts, orb.r(ts), label='2P Original')
 #
-orb = Orbit([sub_ics['R'][32]*(u.kpc), sub_ics['vR'][32]*(u.km/u.s), sub_ics['vT'][32]*(u.km/u.s), sub_ics['z'][32]*(u.kpc), sub_ics['vz'][32]*(u.km/u.s), sub_ics['phi'][32]*(u.deg)])
+orb = Orbit([sub_ics['R'][20]*(u.kpc), sub_ics['vR'][20]*(u.km/u.s), sub_ics['vT'][20]*(u.km/u.s), sub_ics['z'][20]*(u.kpc), sub_ics['vz'][20]*(u.km/u.s), sub_ics['phi'][20]*(u.deg)])
 orb.integrate(ts, potential_two_power_2, method='odeint')
 plt.plot(-1*ts, orb.r(ts), label='2P Corrected')
 #
-orb = Orbit([sub_ics['R'][32]*(u.kpc), sub_ics['vR'][32]*(u.km/u.s), sub_ics['vT'][32]*(u.km/u.s), sub_ics['z'][32]*(u.kpc), sub_ics['vz'][32]*(u.km/u.s), sub_ics['phi'][32]*(u.deg)])
+orb = Orbit([sub_ics['R'][20]*(u.kpc), sub_ics['vR'][20]*(u.km/u.s), sub_ics['vT'][20]*(u.km/u.s), sub_ics['z'][20]*(u.kpc), sub_ics['vz'][20]*(u.km/u.s), sub_ics['phi'][20]*(u.deg)])
 orb.integrate(ts, potential_nfw_1, method='odeint')
 plt.plot(-1*ts, orb.r(ts), label='NFW')
 #
-orb = Orbit([sub_ics['R'][32]*(u.kpc), sub_ics['vR'][32]*(u.km/u.s), sub_ics['vT'][32]*(u.km/u.s), sub_ics['z'][32]*(u.kpc), sub_ics['vz'][32]*(u.km/u.s), sub_ics['phi'][32]*(u.deg)])
+orb = Orbit([sub_ics['R'][20]*(u.kpc), sub_ics['vR'][20]*(u.km/u.s), sub_ics['vT'][20]*(u.km/u.s), sub_ics['z'][20]*(u.kpc), sub_ics['vz'][20]*(u.km/u.s), sub_ics['phi'][20]*(u.deg)])
 orb.integrate(ts, potential_nfw_2, method='odeint')
 plt.plot(-1*ts, orb.r(ts), label='NFW v2')
 #
@@ -182,5 +181,5 @@ plt.xlabel('Lookback time [Gyr]', fontsize=32)
 plt.ylabel('r [kpc]', fontsize=32)
 plt.xlim(13.8, 0)
 plt.legend(prop={'size': 16})
-plt.title('Subhalo 32, '+sim_data.galaxy+', w/disk', fontsize=32)
+plt.title('Subhalo 20, '+sim_data.galaxy+', w/disk', fontsize=32)
 plt.tight_layout()

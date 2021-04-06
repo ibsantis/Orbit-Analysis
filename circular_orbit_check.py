@@ -53,9 +53,8 @@ sub_ics = pd.read_csv(sim_data.home_dir+'/orbit_data/m12i_subhalo_ics.csv', inde
     First test the effects of just the halo potential
 """
 
-# Calculate the enclosed mass profiles
-rs = np.logspace(np.log10(0.1), np.log10(500), 81)
-ts = snaps['time']*(-1)*u.Gyr
+# Define the enclosed mass profiles
+ts = np.linspace(0.0, -13.78, 1379)*u.Gyr
 #
 def halo_mass(r, gal):
     A_halo = fitting_data_2p['A_halo'][gal]
@@ -70,19 +69,13 @@ def nfw_halo_mass(r, gal):
     a_halo = fitting_data_nfw['a_halo'][gal]
     return (A_halo)*(np.log((a_halo+r)/a_halo) + (a_halo/(a_halo+r)) - 1)
 #
-two_power_mass = halo_mass(rs, sim_data.galaxy)
-nfw_mass = nfw_halo_mass(rs, sim_data.galaxy)
 
-
-# Calculate what the circular velocity should be at all radii
+# Define circular velocity function
 def vcirc(r,m):
     G = 6.67*10**(-11)*1000**(-3) # km^3 kg^(-1) s^(-2)
     mass = m*2*10**(30) # kg
     distance = r*10**3*3.086*10**(13) # km
     return np.sqrt(np.array(G*mass/distance, dtype=np.float64))
-#
-v_two_power = vcirc(rs, two_power_mass)
-v_nfw = vcirc(rs, nfw_mass)
 
 
 # Import the potentials
@@ -327,6 +320,66 @@ disk_inner = DoubleExponentialDiskPotential(amp=fitting_data_2p['A_disk_in'][sim
 halo_nfw = NFWPotential(amp=fitting_data_nfw['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data_nfw['a_halo'][sim_data.galaxy]*u.kpc)
 #
 potential_nfw = disk_inner+disk_outer+halo_nfw
+
+v_c_nfw = vcirc(sub_ics['R'][9], nfw_halo_mass(sub_ics['R'][9], gal=sim_data.galaxy))
+
+# Set up orbit for a subhalo and integrate using odeint
+orb_nfw_odeint = Orbit([sub_ics['R'][9]*(u.kpc), 0.0*(u.km/u.s), v_c_nfw*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
+orb_nfw_odeint.integrate(ts, potential_nfw, method='odeint')
+orb_nfw_leapfrog = Orbit([sub_ics['R'][9]*(u.kpc), 0.0*(u.km/u.s), v_c_nfw*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
+orb_nfw_leapfrog.integrate(ts, potential_nfw, method='leapfrog')
+orb_nfw_leapfrogc = Orbit([sub_ics['R'][9]*(u.kpc), 0.0*(u.km/u.s), v_c_nfw*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
+orb_nfw_leapfrogc.integrate(ts, potential_nfw, method='leapfrog_c')
+orb_nfw_symplec4c = Orbit([sub_ics['R'][9]*(u.kpc), 0.0*(u.km/u.s), v_c_nfw*(u.km/u.s), 0.0*(u.kpc), 0.0*(u.km/u.s), 0.0*(u.deg)])
+orb_nfw_symplec4c.integrate(ts, potential_nfw, method='symplec4_c')
+
+
+# Plot in a 2x2 figure
+plt.rcParams["font.family"] = "serif"
+plt.figure(figsize=(10, 12))
+ax1 = plt.subplot(411)
+ax2 = plt.subplot(412, sharey=ax1)
+ax3 = plt.subplot(413, sharex=ax2)
+ax4 = plt.subplot(414, sharex=ax3)
+#
+ax1.plot(-1*ts, orb_nfw_odeint.r(ts), 'b', alpha=0.5)
+ax1.set_xlim(13.8, 0)
+ax1.label_outer()
+ax1.set_ylabel('r [kpc]', fontsize=22)
+#ax1.text(8, 100, 'odeint')
+#
+ax2.plot(-1*ts, orb_nfw_leapfrog.r(ts), 'b', alpha=0.5)
+ax2.set_xlim(13.8, 0)
+ax2.label_outer()
+ax2.set_ylabel('r [kpc]', fontsize=22)
+#ax2.text(8, 100, 'leapfrog')
+#
+ax3.plot(-1*ts, orb_nfw_leapfrogc.r(ts), 'b', alpha=0.5)
+ax3.set_xlim(13.8, 0)
+ax3.label_outer()
+ax3.set_ylabel('r [kpc]', fontsize=22)
+#ax3.text(8, 100, 'leapfrog_c')
+#
+ax4.plot(-1*ts, orb_nfw_symplec4c.r(ts), 'b', alpha=0.5)
+ax4.set_xlim(13.8, 0)
+ax4.label_outer()
+ax4.set_xlabel('Lookback time [Gyr]', fontsize=22)
+ax4.set_ylabel('r [kpc]', fontsize=22)
+#ax4.text(8, 100, 'symplec4_c')
+#
+plt.tight_layout()
+plt.subplots_adjust(wspace=0, hspace=0)
+
+
+"""
+    Now test several C methods in the NFW potential for circular orbit
+"""
+# Import the potentials
+from galpy.potential import NFWPotential
+#
+halo_nfw = NFWPotential(amp=fitting_data_nfw['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data_nfw['a_halo'][sim_data.galaxy]*u.kpc)
+#
+potential_nfw = halo_nfw
 
 v_c_nfw = vcirc(sub_ics['R'][9], nfw_halo_mass(sub_ics['R'][9], gal=sim_data.galaxy))
 

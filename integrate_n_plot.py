@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -80,8 +80,8 @@ potential_nfw_v2 = disk_inner+disk_outer+nfw_v2
 
 
 # Integrate all of the orbits in both potentials
-#ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
-ts = snaps['time']*(-1)*u.Gyr
+ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
+#ts = snaps['time']*(-1)*u.Gyr
 galpy_orbits_best.integrate(ts, potential_two_power, method='leapfrog')
 print('Done integrating 2P model')
 galpy_orbits_nfw.integrate(ts, potential_nfw, method='leapfrog')
