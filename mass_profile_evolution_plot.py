@@ -28,9 +28,8 @@ print('Read in the tools')
 
 ### Set path and initial parameters
 sim_data = orbit_io.OrbitRead(gal1='Romulus', location='mac')
-print('Set paths')
-
 sim_data.galaxy = 'Remus' # this is only necessary for LG pairs
+print('Set paths')
 
 # Read in the data
 mass_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.galaxy+'_mass_profile_evolution')
