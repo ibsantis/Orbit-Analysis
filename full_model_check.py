@@ -140,8 +140,6 @@ print('Read in the tools')
 
 ### Set path and initial parameters
 sim_data = orbit_io.OrbitRead(gal1='Romulus', location='mac')
-sim_data.gal_1 = 'Romulus'
-sim_data.gal_2 = 'Remus'
 print('Set paths')
 
 
@@ -154,7 +152,10 @@ print('Set paths')
 masses = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting_data/full_profile/'+sim_data.gal_2+'_spherical_mass')
 #
 # Read in the fitting parameters
-fitting_data = pd.read_csv(sim_data.home_dir+'/orbit_data/fitting_params.csv', index_col=0)
+fitting_data_1 = pd.read_csv(sim_data.home_dir+'/orbit_data/param_2p_all.csv', index_col=0)
+fitting_data_2 = pd.read_csv(sim_data.home_dir+'/orbit_data/param_2p_gasdm.csv', index_col=0)
+fitting_data_nfw_1 = pd.read_csv(sim_data.home_dir+'/orbit_data/param_nfw_all.csv', index_col=0)
+fitting_data_nfw_2 = pd.read_csv(sim_data.home_dir+'/orbit_data/param_nfw_gasdm.csv', index_col=0)
 
 ##########################################################################################
 
@@ -164,11 +165,11 @@ fitting_data = pd.read_csv(sim_data.home_dir+'/orbit_data/fitting_params.csv', i
 
 # Create the mass model for the disk and halo
 def disk_density(r, gal):
-    A_disk_in = fitting_data['A_disk_in'][gal]
-    r_in = fitting_data['r_in'][gal]
-    A_disk_out = fitting_data['A_disk_out'][gal]
-    r_out = fitting_data['r_out'][gal]
-    h_z = fitting_data['h_z'][gal]
+    A_disk_in = fitting_data_1['A_disk_in'][gal]
+    r_in = fitting_data_1['r_in'][gal]
+    A_disk_out = fitting_data_1['A_disk_out'][gal]
+    r_out = fitting_data_1['r_out'][gal]
+    h_z = fitting_data_1['h_z'][gal]
     #
     # Integrate the z comp out which results in just a factor of hz
     #
@@ -185,33 +186,50 @@ for i in range(0, len(rs)-1):
     disk_mass[i] = disk_density(rs[i+1], gal=sim_data.gal_2)*area
 
 def halo_mass_1(r, gal):
-    A_halo = fitting_data['A_halo'][gal]
-    a_halo = fitting_data['a_halo'][gal]
-    alpha = fitting_data['alpha'][gal]
-    beta = fitting_data['beta'][gal]
+    A_halo = fitting_data_1['A_halo'][gal]
+    a_halo = fitting_data_1['a_halo'][gal]
+    alpha = fitting_data_1['alpha'][gal]
+    beta = fitting_data_1['beta'][gal]
     #
-    return ((A_halo/a_halo**3)*(r**(3-alpha))*(a_halo+r)**(alpha-beta)*(r/a_halo+1)**(beta-1)*a_halo**beta/(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-r/a_halo)
+    return (A_halo/(3-alpha))*((r/a_halo)**(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-r/a_halo)
 
 def halo_mass_2(r, gal):
-    A_halo = 5.11440993446542E+11
-    a_halo = 14.2806708994752
-    alpha = 1.05396225625856
-    beta = 3.08756684053642
+    A_halo = fitting_data_2['A_halo'][gal]
+    a_halo = fitting_data_2['a_halo'][gal]
+    alpha = fitting_data_2['alpha'][gal]
+    beta = fitting_data_2['beta'][gal]
     #
-    return ((A_halo/a_halo**3)*(r**(3-alpha))*(a_halo+r)**(alpha-beta)*(r/a_halo+1)**(beta-1)*a_halo**beta/(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-r/a_halo)
+    return (A_halo/(3-alpha))*((r/a_halo)**(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-r/a_halo)
+
+def halo_mass_nfw_1(r, gal):
+    A_halo = fitting_data_nfw_1['A_halo'][gal]
+    a_halo = fitting_data_nfw_1['a_halo'][gal]
+    #
+    return A_halo*(np.log((a_halo+r)/a_halo)+a_halo/(a_halo+r)-1)
+
+def halo_mass_nfw_2(r, gal):
+    A_halo = fitting_data_nfw_2['A_halo'][gal]
+    a_halo = fitting_data_nfw_2['a_halo'][gal]
+    #
+    return A_halo*(np.log((a_halo+r)/a_halo)+a_halo/(a_halo+r)-1)
 
 
 #total_mass_1 = halo_mass_1(rs[1:], gal=sim_data.galaxy)+np.cumsum(disk_mass)
 #total_mass_2 = halo_mass_2(rs[1:], gal=sim_data.galaxy)+np.cumsum(disk_mass)
+#total_mass_nfw_1 = halo_mass_nfw_1(rs[1:], gal=sim_data.galaxy)+np.cumsum(disk_mass)
+#total_mass_nfw_2 = halo_mass_nfw_2(rs[1:], gal=sim_data.galaxy)+np.cumsum(disk_mass)
 total_mass_1 = halo_mass_1(rs[1:], gal=sim_data.gal_2)+np.cumsum(disk_mass)
 total_mass_2 = halo_mass_2(rs[1:], gal=sim_data.gal_2)+np.cumsum(disk_mass)
-
+total_mass_nfw_1 = halo_mass_nfw_1(rs[1:], gal=sim_data.gal_2)+np.cumsum(disk_mass)
+total_mass_nfw_2 = halo_mass_nfw_2(rs[1:], gal=sim_data.gal_2)+np.cumsum(disk_mass)
 
 
 # Plot the ratio of the data to the model
 plt.figure(figsize=(10,8))
-plt.plot(rs[1:], total_mass_1/masses['mass.enclosed'], '-', label='Old 2P Parameters')
-plt.plot(rs[1:], total_mass_2/masses['mass.enclosed'], '-', label='New 2P Parameters')
+plt.plot(rs[1:], total_mass_1/masses['mass.enclosed'], '-', label='2P: All r > 10 kpc')
+plt.plot(rs[1:], total_mass_2/masses['mass.enclosed'], '-', label='2P: Gas + DM only')
+plt.plot(rs[1:], total_mass_nfw_1/masses['mass.enclosed'], '-', label='NFW: All r > 10 kpc')
+plt.plot(rs[1:], total_mass_nfw_2/masses['mass.enclosed'], '-', label='NFW: Gas + DM only')
 plt.xscale('log')
 plt.xlim(xmin=5,xmax=500)
 plt.hlines(y=1,xmin=5,xmax=500,linestyles='dotted')
@@ -222,23 +240,8 @@ plt.ylabel('$M_{\\rm model}(R)/M_{\\rm sim}(R)$', fontsize=28)
 plt.title(sim_data.gal_2+', Full model', fontsize=28)
 plt.legend(prop={'size': 18})
 plt.tight_layout()
-#plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/full_model_check/'+sim_data.galaxy+'_full_model_checks.pdf')
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/full_model_check/'+sim_data.gal_2+'_full_model_checks.pdf')
-plt.close()
-#
-plt.figure(figsize=(10,8))
-plt.plot(rs[1:], total_mass_2/masses['mass.enclosed'], '-', label='New 2P Parameters')
-plt.xscale('log')
-plt.xlim(xmin=5,xmax=500)
-plt.hlines(y=1,xmin=5,xmax=500,linestyles='dotted')
-plt.ylim(ymin=0.8, ymax=1.1)
-plt.xlabel('R [kpc]', fontsize=28)
-plt.ylabel('$M_{\\rm model}(R)/M_{\\rm sim}(R)$', fontsize=28)
-#plt.title(sim_data.galaxy+', Full model', fontsize=28)
-plt.title(sim_data.gal_2+', Full model', fontsize=28)
-plt.tight_layout()
-#plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/full_model_check/'+sim_data.galaxy+'_full_model.pdf')
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/full_model_check/'+sim_data.gal_2+'_full_model.pdf')
+#plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/full_model_check_2p/'+sim_data.galaxy+'_full_model.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/full_model_check_2p/'+sim_data.gal_2+'_full_model.pdf')
 plt.close()
 
 
