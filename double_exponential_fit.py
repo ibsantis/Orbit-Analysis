@@ -21,52 +21,21 @@ from astropy.modeling.models import custom_model
 from astropy.modeling.fitting import LevMarLSQFitter
 from astropy.constants import G
 from scipy import special
+import orbit_io
+import model_io
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'Romulus'
-loc = 'mac'
-
-if gal1 == 'Romeo':
-    gal2 = 'Juliet'
-    galaxy = 'm12_elvis_'+gal1+gal2
-    resolution = '_res3500'
-    num_gal = 2
-elif gal1 == 'Thelma':
-    gal2 = 'Louise'
-    galaxy = 'm12_elvis_'+gal1+gal2
-    resolution = '_res4000'
-    num_gal = 2
-elif gal1 == 'Romulus':
-    gal2 = 'Remus'
-    galaxy = 'm12_elvis_'+gal1+gal2
-    resolution = '_res4000'
-    num_gal = 2
-else:
-    galaxy = gal1
-    resolution = '_res7100'
-    num_gal = 1
-
-if loc == 'mac':
-    home_dir = '/Users/isaiahsantistevan/simulation'
-elif loc == 'peloton' and num_gal == 1:
-    home_dir = '/home/ibsantis/scripts'
-    simulation_dir = '/home/awetzel/scratch/'+galaxy+'/'+galaxy+resolution
-elif loc == 'peloton' and num_gal == 2:
-    home_dir = '/home/ibsantis/scripts'
-    simulation_dir = '/home/awetzel/scratch/m12_elvis/'+galaxy+resolution
-else:
-    home_dir = '/home1/05400/ibsantis/scripts'
-    simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+galaxy+resolution
+sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
 print('Set paths')
 
 # Read in the data
-data_rad = ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting_data/disk/'+gal1+'_disk_radial_profile_fitting')
+data_rad = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting_data/disk/'+sim_data.galaxy+'_disk_radial_profile_fitting')
 density_rad = data_rad['density']
 mass_rad = data_rad['mass']
 rs = data_rad['rs']
 #
-data_vert = ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting_data/disk/'+gal1+'_disk_vertical_profile_fitting')
+data_vert = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting_data/disk/'+sim_data.galaxy+'_disk_vertical_profile_fitting')
 density_total = data_vert['density.total']
 mass_total = data_vert['mass.total']
 zs = data_vert['zs']
@@ -79,7 +48,7 @@ zs = data_vert['zs']
 """
 # Double exponential model
 @custom_model
-def double_exponential_density(r, amp1=1e9, r1=1, amp2=1e9, r2=1):
+def double_exponential_density(r, amp1=1e10, r1=1, amp2=1e10, r2=1):
     return amp1*np.exp(-r/r1) + amp2*np.exp(-r/r2)
 #
 # Fit the model to the data for various cutoff radii
@@ -225,4 +194,83 @@ plt.ylabel('$\\rho_{\\rm data}(Z)/\\rho_{\\rm model}(Z)$', fontsize=28)
 plt.title(gal1, fontsize=28)
 plt.tight_layout()
 plt.savefig(home_dir+'/orbit_data/plots/fitting/double_exponential/'+gal1+'/'+gal1+'_disk_vertical_profile_ratio.pdf')
+plt.close()
+
+
+############################################################################################
+############################################################################################
+############################################################################################
+
+import halo_analysis as halo
+import gizmo_analysis as gizmo
+import utilities as ut
+import numpy as np
+import h5py
+import matplotlib
+from matplotlib import pyplot as plt
+from astropy import units as u
+from astropy.modeling.models import custom_model
+from astropy.modeling.fitting import LevMarLSQFitter
+from astropy.constants import G
+from scipy import special
+from orbit_analysis import orbit_io
+import model_io
+print('Read in the tools')
+
+### Set path and initial parameters
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='mac')
+print('Set paths')
+
+# Read in the data
+#data_rad = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting_data/disk/'+sim_data.galaxy+'_disk_radial_profile_fitting')
+data_rad = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting_data/disk/'+sim_data.gal_2+'_disk_radial_profile_fitting')
+density_rad = data_rad['density']
+mass_rad = data_rad['mass']
+rs = data_rad['rs']
+#
+#data_vert = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting_data/disk/'+sim_data.galaxy+'_disk_vertical_profile_fitting')
+data_vert = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting_data/disk/'+sim_data.gal_2+'_disk_vertical_profile_fitting')
+density_total = data_vert['density.total']
+mass_total = data_vert['mass.total']
+zs = data_vert['zs']
+#
+
+# Initialize the class (not sure if this is how to explain this?)
+disk_models = model_io.MassModelFit()
+
+# Get a fit for hz to the vertical mass profile
+disk_v = disk_models.disk_vert_mass_model(distances=zs, masses=mass_total, Amp=1e7, hz=1, Amp_bounds=(1e5, 5e11), hz_bounds=(1e-2, 1000))
+
+# Get a fit for the other disk parameters from the radial mass profile
+disk_r = disk_models.disk_rad_mass_model(distances=rs, masses=mass_rad, A_in=1e10, r_in=1, A_out=1e8, r_out=10, hz=disk_v.z1.value, A_in_bounds=(1e7,5e11), r_in_bounds=(1e-1,10), A_out_bounds=(1e6,5e10), r_out_bounds=(1e-2,20))
+
+# Plot the radial mass profile
+plt.figure(figsize=(10,8))
+plt.plot(rs[1:], np.cumsum(mass_rad), 'k.', label='Data')
+plt.plot(rs, disk_r(rs), '-', label='Two Exponentials')
+plt.yscale('log')
+plt.xlim(xmin=0, xmax=20.1)
+plt.ylim(ymin=3e9, ymax=2e11)
+plt.xlabel('R [kpc]', fontsize=28)
+plt.ylabel('M(<R) [$M_{\\odot}$]', fontsize=28)
+#plt.title(sim_data.galaxy+', |Z| < 3 kpc', fontsize=28)
+plt.title(sim_data.gal_2+', |Z| < 3 kpc', fontsize=28)
+plt.legend(prop={'size': 18})
+plt.tight_layout()
+#plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/double_exponential_mass_model/'+sim_data.galaxy+'/'+sim_data.galaxy+'_enclosed_disk_mass.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/double_exponential_mass_model/'+sim_data.gal_2+'/'+sim_data.gal_2+'_enclosed_disk_mass.pdf')
+plt.close()
+#
+plt.figure(figsize=(10,8))
+plt.plot(rs[1:], disk_r(rs[1:])/np.cumsum(mass_rad), '-')
+plt.hlines(y=1,xmin=0,xmax=20.1,linestyles='dotted')
+plt.xlim(xmin=0, xmax=20.1)
+plt.ylim(ymin=0.95, ymax=1.05)
+plt.xlabel('R [kpc]', fontsize=28)
+plt.ylabel('$M_{\\rm model}(<R)/M_{\\rm sim}(<R)$', fontsize=28)
+#plt.title(sim_data.galaxy+', |Z| < 3 kpc', fontsize=28)
+plt.title(sim_data.gal_2+', |Z| < 3 kpc', fontsize=28)
+plt.tight_layout()
+#plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/double_exponential_mass_model/'+sim_data.galaxy+'/'+sim_data.galaxy+'_enclosed_disk_mass_ratio.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/double_exponential_mass_model/'+sim_data.gal_2+'/'+sim_data.gal_2+'_enclosed_disk_mass_ratio.pdf')
 plt.close()
