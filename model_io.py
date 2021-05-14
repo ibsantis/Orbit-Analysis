@@ -130,7 +130,7 @@ class MassModelFit:
             return model_halo
 
 
-    def halo_2p_mass_model(self):
+    def halo_2p_mass_model(self, distances, masses, A_halo, a_halo, slope_in, slope_out, A_halo_bounds, a_halo_bounds, slope_in_bounds, slope_out_bounds, r_min=10, r_max=None, iters=100000):
         """
         DESCRIPTION:
             Blah blah blah
@@ -141,8 +141,34 @@ class MassModelFit:
         NOTES:
             Yes.
         """
-        pass
-
+        r_cut_min = np.where(distances > 10)[0][0]
+        #
+        if r_max == None:
+            @custom_model
+            def two_power_beta_fixed(r, amp=A_halo, a=a_halo, alpha=slope_in, beta=slope_out):
+                return (amp/(3-alpha))*((r/a)**(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-r/a)
+            #
+            # Fit the model to the data for various cutoff radii
+            model_init = two_power_beta_fixed(bounds={'amp':A_halo_bounds, 'a':a_halo_bounds, 'alpha':slope_in_bounds, 'beta':slope_out_bounds})
+            fit = LevMarLSQFitter()
+            model_halo = fit(model_init, distances[r_cut_min:], np.cumsum(masses)[r_cut_min-1:], maxiter=iters)
+            print(model_halo)
+            #
+            return model_halo
+        else:
+            r_cut_max = np.where(distances > r_max)[0][0]
+            #
+            @custom_model
+            def two_power_beta_fixed(r, amp=A_halo, a=a_halo, alpha=slope_in, beta=slope_out):
+                return (amp/(3-alpha))*((r/a)**(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-r/a)
+            #
+            # Fit the model to the data for various cutoff radii
+            model_init = two_power_beta_fixed(bounds={'amp':A_halo_bounds, 'a':a_halo_bounds, 'alpha':slope_in_bounds, 'beta':slope_out_bounds})
+            fit = LevMarLSQFitter()
+            model_halo = fit(model_init, distances[r_cut_min:r_cut_max], np.cumsum(masses)[r_cut_min-1:r_cut_max-1], maxiter=iters)
+            print(model_halo)
+            #
+            return model_halo
 
 
 class DensityModelFit:
