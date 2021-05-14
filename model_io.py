@@ -25,6 +25,7 @@ from matplotlib import pyplot as plt
 from astropy.modeling.models import custom_model
 from astropy.modeling.fitting import LevMarLSQFitter
 from scipy import special
+import pandas as pd
 import sys
 
 
@@ -271,3 +272,127 @@ class DensityModelFit:
             Yes.
         """
         pass
+
+
+
+class Profiles:
+
+    def __init__(self, directory):
+        """
+        Don't really have anything to put in here yet...
+        Leaving blank for now.
+        """
+        self.fitting_data_1 = pd.read_csv(directory+'/orbit_data/param_2p_all.csv', index_col=0)
+        self.fitting_data_2 = pd.read_csv(directory+'/orbit_data/param_2p_gasdm.csv', index_col=0)
+        self.fitting_data_nfw_1 = pd.read_csv(directory+'/orbit_data/param_nfw_all.csv', index_col=0)
+        self.fitting_data_nfw_2 = pd.read_csv(directory+'/orbit_data/param_nfw_gasdm.csv', index_col=0)
+        pass
+
+    def disk_density(self, distances, fitting_csv, gal):
+        """
+        DESCRIPTION:
+            Blah blah blah
+
+        VARIABLES:
+            HMMM
+
+        NOTES:
+            Yes.
+        """
+        A_disk_in = fitting_csv['A_disk_in'][gal]
+        r_in = fitting_csv['r_in'][gal]
+        A_disk_out = fitting_csv['A_disk_out'][gal]
+        r_out = fitting_csv['r_out'][gal]
+        h_z = fitting_csv['h_z'][gal]
+        #
+        # Integrate the z comp out which results in just a factor of hz
+        #
+        density_inner = A_disk_in*h_z*np.exp(-distances/r_in)
+        density_outer = A_disk_out*h_z*np.exp(-distances/r_out)
+        #
+        return density_inner + density_outer
+
+
+    def disk_mass(self, distances, fitting_csv, gal):
+        """
+        DESCRIPTION:
+            Blah blah blah
+
+        VARIABLES:
+            HMMM
+
+        NOTES:
+            Yes.
+        """
+        A_disk_in = fitting_csv['A_disk_in'][gal]
+        r_in = fitting_csv['r_in'][gal]
+        A_disk_out = fitting_csv['A_disk_out'][gal]
+        r_out = fitting_csv['r_out'][gal]
+        h_z = fitting_csv['h_z'][gal]
+        #
+        mass_inner = (4*np.pi*A_disk_in*h_z*r_in)*(r_in-np.exp(-distances/r_in)*(r_in+distances))
+        mass_outer = (4*np.pi*A_disk_out*h_z*r_out)*(r_out-np.exp(-distances/r_out)*(r_out+distances))
+        #
+        return mass_inner + mass_outer
+
+
+    def halo_nfw_density(self):
+        """
+        DESCRIPTION:
+            Blah blah blah
+
+        VARIABLES:
+            HMMM
+
+        NOTES:
+            Yes.
+        """
+        pass
+
+    def halo_nfw_mass(self, distances, fitting_csv, gal):
+        """
+        DESCRIPTION:
+            Blah blah blah
+
+        VARIABLES:
+            HMMM
+
+        NOTES:
+            Yes.
+        """
+        A_halo = fitting_csv['A_halo'][gal]
+        a_halo = fitting_csv['a_halo'][gal]
+        #
+        return A_halo*(np.log((a_halo+distances)/a_halo)+a_halo/(a_halo+distances)-1)
+
+
+    def halo_2p_nfw_density(self):
+        """
+        DESCRIPTION:
+            Blah blah blah
+
+        VARIABLES:
+            HMMM
+
+        NOTES:
+            Yes.
+        """
+        pass
+
+    def halo_2p_nfw_mass(self, distances, fitting_csv, gal):
+        """
+        DESCRIPTION:
+            Blah blah blah
+
+        VARIABLES:
+            HMMM
+
+        NOTES:
+            Yes.
+        """
+        A_halo = fitting_csv['A_halo'][gal]
+        a_halo = fitting_csv['a_halo'][gal]
+        alpha = fitting_csv['alpha'][gal]
+        beta = fitting_csv['beta'][gal]
+        #
+        return (A_halo/(3-alpha))*((distances/a_halo)**(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-distances/a_halo)
