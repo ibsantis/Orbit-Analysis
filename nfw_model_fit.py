@@ -4,7 +4,7 @@
   = NFW Density Profile Fit =
   ===========================
 
-  Find fits to an NFW Potential for m12i, m12f, m12m
+  Collect data to then model with an NFW mass/density profile
 
 """
 
@@ -83,6 +83,8 @@ for i in range(0, len(rs)-1):
 
 
 ###############################################################################
+###############################################################################
+###############################################################################
 
 """
     Code for fitting the models
@@ -99,80 +101,44 @@ from astropy import units as u
 from astropy.modeling.models import custom_model
 from astropy.modeling.fitting import LevMarLSQFitter
 from scipy import special
-from orbit_analysis import orbit_io
+import orbit_io
+import model_io
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
 print('Set paths')
 
 ## Read in the data
 #data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting_data/halo/complete/'+sim_data.galaxy+'_halo_fitting')
 #data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting_data/halo/complete/'+sim_data.gal_1+'_halo_fitting')
-#data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting_data/halo/gas_dm_only/'+sim_data.galaxy+'_halo_profile_fitting')
-data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting_data/halo/gas_dm_only/'+sim_data.gal_2+'_halo_profile_fitting')
+data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting_data/halo/gas_dm_only/'+sim_data.galaxy+'_halo_profile_fitting')
+#data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting_data/halo/gas_dm_only/'+sim_data.gal_2+'_halo_profile_fitting')
 density = data['density']
 mass = data['mass']
 rs = data['rs']
 
-"""
-    - Define the NFW mass model
-    - Want to exclude the inner [1, 2, 3, 5, 10] kpc
-"""
-# alpha/beta vary
-@custom_model
-def nfw_mass_model(r, amp=1e12, a=10):
-    return amp*(np.log((a+r)/a)+a/(a+r)-1)
+halo_models = model_io.MassModelFit()
 
-# Fit the model to the data for various cutoff radii
-model_init = nfw_mass_model(bounds={'amp':(3e10, 2.25e12), 'a':(5, 30)})
-fit = LevMarLSQFitter()
-#model_1 = fit(model_init, rs[27:], np.cumsum(mass)[26:], maxiter=1000000000)
-#model_2 = fit(model_init, rs[35:], np.cumsum(mass)[34:], maxiter=1000000000)
-#model_3 = fit(model_init, rs[40:], np.cumsum(mass)[39:], maxiter=1000000000)
-#model_5 = fit(model_init, rs[45:], np.cumsum(mass)[44:], maxiter=1000000000)
-#model_10 = fit(model_init, rs[54:], np.cumsum(mass)[53:], maxiter=1000000000)
-#print(model_1)
-#print(model_2)
-#print(model_3)
-#print(model_5)
-#print(model_10)
-#
-## Average the mass ratio from X - 500 kpc
-#print('Standard deviation offset for 1 kpc cutoff is {0:.4g}'.format(np.std(np.abs(np.cumsum(mass)[43:]/model_1(rs[44:]) - 1))))
-#print('Standard deviation offset for 2 kpc cutoff is {0:.4g}'.format(np.std(np.abs(np.cumsum(mass)[43:]/model_2(rs[44:]) - 1))))
-#print('Standard deviation offset for 3 kpc cutoff is {0:.4g}'.format(np.std(np.abs(np.cumsum(mass)[43:]/model_3(rs[44:]) - 1))))
-#print('Standard deviation offset for 5 kpc cutoff is {0:.4g}'.format(np.std(np.abs(np.cumsum(mass)[43:]/model_5(rs[44:]) - 1))))
-#print('Standard deviation offset for 10 kpc cutoff is {0:.4g}'.format(np.std(np.abs(np.cumsum(mass)[43:]/model_10(rs[44:]) - 1))))
-#
-model_10_300 = fit(model_init, rs[54:94], np.cumsum(mass)[53:93], maxiter=10000000)
-model_10_350 = fit(model_init, rs[54:96], np.cumsum(mass)[53:95], maxiter=10000000)
-model_10_400 = fit(model_init, rs[54:97], np.cumsum(mass)[53:96], maxiter=10000000)
-model_10_500 = fit(model_init, rs[54:], np.cumsum(mass)[53:], maxiter=10000000)
-print(model_10_300)
-print(model_10_350)
-print(model_10_400)
-print(model_10_500)
+halo_300 = halo_models.halo_nfw_mass_model(distances=rs, masses=mass, A_halo=1e12, a_halo=10, A_halo_bounds=(3e10,2.25e12), a_halo_bounds=(5,30), r_max=300)
+halo_350 = halo_models.halo_nfw_mass_model(distances=rs, masses=mass, A_halo=1e12, a_halo=10, A_halo_bounds=(3e10,2.25e12), a_halo_bounds=(5,30), r_max=350)
+halo_400 = halo_models.halo_nfw_mass_model(distances=rs, masses=mass, A_halo=1e12, a_halo=10, A_halo_bounds=(3e10,2.25e12), a_halo_bounds=(5,30), r_max=400)
+halo_500 = halo_models.halo_nfw_mass_model(distances=rs, masses=mass, A_halo=1e12, a_halo=10, A_halo_bounds=(3e10,2.25e12), a_halo_bounds=(5,30))
+
 # Average the mass ratio from 10 - X kpc
-print('Standard deviation offset for 300 kpc cutoff is {0:.4g}'.format(np.std(np.abs(model_10_300(rs[54:94])/np.cumsum(mass)[53:93] - 1))))
-print('Standard deviation offset for 350 kpc cutoff is {0:.4g}'.format(np.std(np.abs(model_10_350(rs[54:96])/np.cumsum(mass)[53:95] - 1))))
-print('Standard deviation offset for 400 kpc cutoff is {0:.4g}'.format(np.std(np.abs(model_10_400(rs[54:97])/np.cumsum(mass)[53:96] - 1))))
-print('Standard deviation offset for 500 kpc cutoff is {0:.4g}'.format(np.std(np.abs(model_10_500(rs[54:])/np.cumsum(mass)[53:] - 1))))
+print('Standard deviation offset for 300 kpc cutoff is {0:.4g}'.format(np.std(np.abs(halo_300(rs[54:94])/np.cumsum(mass)[53:93] - 1))))
+print('Standard deviation offset for 350 kpc cutoff is {0:.4g}'.format(np.std(np.abs(halo_350(rs[54:96])/np.cumsum(mass)[53:95] - 1))))
+print('Standard deviation offset for 400 kpc cutoff is {0:.4g}'.format(np.std(np.abs(halo_400(rs[54:97])/np.cumsum(mass)[53:96] - 1))))
+print('Standard deviation offset for 500 kpc cutoff is {0:.4g}'.format(np.std(np.abs(halo_500(rs[54:])/np.cumsum(mass)[53:] - 1))))
 
 
 # Plot all of the profiles
 plt.figure(figsize=(10,8))
 plt.plot(rs[1:], np.cumsum(mass), 'k.', label='data')
-#plt.plot(rs, model_1(rs), '-', label='1 kpc fit')
-#plt.plot(rs, model_2(rs), '-', label='2 kpc fit')
-#plt.plot(rs, model_3(rs), '-', label='3 kpc fit')
-#plt.plot(rs, model_5(rs), '-', label='5 kpc fit')
-#plt.plot(rs, model_10(rs), '-', label='10 kpc fit')
-#
-plt.plot(rs, model_10_300(rs), '-', label='300 kpc fit')
-plt.plot(rs, model_10_350(rs), '-', label='350 kpc fit')
-plt.plot(rs, model_10_400(rs), '-', label='400 kpc fit')
-plt.plot(rs, model_10_500(rs), '-', label='500 kpc fit')
+plt.plot(rs, halo_300(rs), '-', label='300 kpc fit')
+plt.plot(rs, halo_350(rs), '-', label='350 kpc fit')
+plt.plot(rs, halo_400(rs), '-', label='400 kpc fit')
+plt.plot(rs, halo_500(rs), '-', label='500 kpc fit')
 plt.xscale('log')
 plt.yscale('log')
 plt.xlim(xmin=1)
@@ -189,16 +155,10 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/nfw_model_v3_gas_dm/'+s
 plt.close()
 #
 plt.figure(figsize=(10,8))
-#plt.plot(rs[1:], np.cumsum(mass)/model_1(rs[1:]), '-', label='1 kpc fit')
-#plt.plot(rs[1:], np.cumsum(mass)/model_2(rs[1:]), '-', label='2 kpc fit')
-#plt.plot(rs[1:], np.cumsum(mass)/model_3(rs[1:]), '-', label='3 kpc fit')
-#plt.plot(rs[1:], np.cumsum(mass)/model_5(rs[1:]), '-', label='5 kpc fit')
-#plt.plot(rs[1:], np.cumsum(mass)/model_10(rs[1:]), '-', label='10 kpc fit')
-#
-plt.plot(rs[1:], model_10_300(rs[1:])/np.cumsum(mass), '-', label='300 kpc fit')
-plt.plot(rs[1:], model_10_350(rs[1:])/np.cumsum(mass), '-', label='350 kpc fit')
-plt.plot(rs[1:], model_10_400(rs[1:])/np.cumsum(mass), '-', label='400 kpc fit')
-plt.plot(rs[1:], model_10_500(rs[1:])/np.cumsum(mass), '-', label='500 kpc fit')
+plt.plot(rs[1:], halo_300(rs[1:])/np.cumsum(mass), '-', label='300 kpc fit')
+plt.plot(rs[1:], halo_350(rs[1:])/np.cumsum(mass), '-', label='350 kpc fit')
+plt.plot(rs[1:], halo_400(rs[1:])/np.cumsum(mass), '-', label='400 kpc fit')
+plt.plot(rs[1:], halo_500(rs[1:])/np.cumsum(mass), '-', label='500 kpc fit')
 plt.xscale('log')
 plt.xlim(xmin=5)
 plt.ylim(ymin=0.5, ymax=1.2)
@@ -215,36 +175,20 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/nfw_model_v3_gas_dm/'+s
 plt.close()
 
 # Use the mass model parameters to plot the density profiles
-#dens_1 = np.zeros(len(rs)-1)
-#dens_2 = np.zeros(len(rs)-1)
-#dens_3 = np.zeros(len(rs)-1)
-#dens_5 = np.zeros(len(rs)-1)
-#dens_10 = np.zeros(len(rs)-1)
 dens_10_300 = np.zeros(len(rs)-1)
 dens_10_350 = np.zeros(len(rs)-1)
 dens_10_400 = np.zeros(len(rs)-1)
 dens_10_500 = np.zeros(len(rs)-1)
 for i in range(0, len(rs)-1):
     volume = 4/3*np.pi*(rs[i+1]**3-rs[i]**3)
-    #dens_1[i] = (model_1(rs[i+1]) - model_1(rs[i]))/volume
-    #dens_2[i] = (model_2(rs[i+1]) - model_2(rs[i]))/volume
-    #dens_3[i] = (model_3(rs[i+1]) - model_3(rs[i]))/volume
-    #dens_5[i] = (model_5(rs[i+1]) - model_5(rs[i]))/volume
-    #dens_10[i] = (model_10(rs[i+1]) - model_10(rs[i]))/volume
-    dens_10_300[i] = (model_10_300(rs[i+1]) - model_10_300(rs[i]))/volume
-    dens_10_350[i] = (model_10_350(rs[i+1]) - model_10_350(rs[i]))/volume
-    dens_10_400[i] = (model_10_400(rs[i+1]) - model_10_400(rs[i]))/volume
-    dens_10_500[i] = (model_10_500(rs[i+1]) - model_10_500(rs[i]))/volume
+    dens_10_300[i] = (halo_300(rs[i+1]) - halo_300(rs[i]))/volume
+    dens_10_350[i] = (halo_350(rs[i+1]) - halo_350(rs[i]))/volume
+    dens_10_400[i] = (halo_400(rs[i+1]) - halo_400(rs[i]))/volume
+    dens_10_500[i] = (halo_500(rs[i+1]) - halo_500(rs[i]))/volume
 
 # Plot the derived density profiles on top of the actual density
 plt.figure(figsize=(10,8))
 plt.plot(rs[1:], density, 'k.', label='data')
-#plt.plot(rs[1:], dens_1, '-', label='1 kpc fit')
-#plt.plot(rs[1:], dens_2, '-', label='2 kpc fit')
-#plt.plot(rs[1:], dens_3, '-', label='3 kpc fit')
-#plt.plot(rs[1:], dens_5, '-', label='5 kpc fit')
-#plt.plot(rs[1:], dens_10, '-', label='10 kpc fit')
-#
 plt.plot(rs[1:], dens_10_300, '-', label='300 kpc fit')
 plt.plot(rs[1:], dens_10_350, '-', label='350 kpc fit')
 plt.plot(rs[1:], dens_10_400, '-', label='400 kpc fit')
@@ -264,11 +208,6 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/nfw_model_v3_gas_dm/'+s
 plt.close()
 #
 plt.figure(figsize=(10,8))
-#plt.plot(rs[1:], density/dens_1, '-', label='1 kpc fit')
-#plt.plot(rs[1:], density/dens_2, '-', label='2 kpc fit')
-#plt.plot(rs[1:], density/dens_3, '-', label='3 kpc fit')
-#plt.plot(rs[1:], density/dens_5, '-', label='5 kpc fit')
-#plt.plot(rs[1:], density/dens_10, '-', label='10 kpc fit')
 plt.plot(rs[1:], dens_10_300/density, '-', label='300 kpc fit')
 plt.plot(rs[1:], dens_10_350/density, '-', label='350 kpc fit')
 plt.plot(rs[1:], dens_10_400/density, '-', label='400 kpc fit')

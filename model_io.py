@@ -38,6 +38,7 @@ class MassModelFit:
         """
         pass
 
+
     def disk_vert_mass_model(self, distances, masses, Amp, hz, Amp_bounds, hz_bounds, iters=100000):
         """
         DESCRIPTION:
@@ -61,6 +62,7 @@ class MassModelFit:
         print(model_disk_vert)
         #
         return model_disk_vert
+
 
     def disk_rad_mass_model(self, distances, masses, A_in, r_in, A_out, r_out, hz, A_in_bounds, r_in_bounds, A_out_bounds, r_out_bounds, iters=100000):
         """
@@ -86,7 +88,8 @@ class MassModelFit:
         #
         return model_disk_rad
 
-    def halo_nfw_mass_model(self):
+
+    def halo_nfw_mass_model(self, distances, masses, A_halo, a_halo, A_halo_bounds, a_halo_bounds, r_min=10, r_max=None, iters=100000):
         """
         DESCRIPTION:
             Blah blah blah
@@ -97,7 +100,35 @@ class MassModelFit:
         NOTES:
             Yes.
         """
-        pass
+        r_cut_min = np.where(distances > 10)[0][0]
+        #
+        if r_max == None:
+            @custom_model
+            def nfw_mass_model(r, amp=A_halo, a=a_halo):
+                return amp*(np.log((a+r)/a)+a/(a+r)-1)
+
+            # Fit the model to the data for various cutoff radii
+            model_init = nfw_mass_model(bounds={'amp':A_halo_bounds, 'a':a_halo_bounds})
+            fit = LevMarLSQFitter()
+            model_halo = fit(model_init, distances[r_cut_min:], np.cumsum(masses)[r_cut_min-1:], maxiter=iters)
+            print(model_halo)
+            #
+            return model_halo
+        else:
+            r_cut_max = np.where(distances > r_max)[0][0]
+            #
+            @custom_model
+            def nfw_mass_model(r, amp=A_halo, a=a_halo):
+                return amp*(np.log((a+r)/a)+a/(a+r)-1)
+
+            # Fit the model to the data for various cutoff radii
+            model_init = nfw_mass_model(bounds={'amp':A_halo_bounds, 'a':a_halo_bounds})
+            fit = LevMarLSQFitter()
+            model_halo = fit(model_init, distances[r_cut_min:r_cut_max], np.cumsum(masses)[r_cut_min-1:r_cut_max-1], maxiter=iters)
+            print(model_halo)
+            #
+            return model_halo
+
 
     def halo_2p_mass_model(self):
         """
@@ -113,6 +144,7 @@ class MassModelFit:
         pass
 
 
+
 class DensityModelFit:
 
     def __init__(self):
@@ -121,6 +153,30 @@ class DensityModelFit:
         Leaving blank for now.
         """
         pass
+
+    def disk_vert_dens_model(self, distances, densities, Amp, hz, Amp_bounds, hz_bounds, iters=100000):
+        """
+        DESCRIPTION:
+            Blah blah blah
+
+        VARIABLES:
+            HMMM
+
+        NOTES:
+            Yes.
+        """
+        @custom_model
+        def exponential_vert_density(z, amp1=Amp, z1=hz):
+            return amp1*np.exp(-np.abs(z)/z1)
+        #
+        # Fit the model to the data for various cutoff radii
+        model_init = exponential_vert_density(bounds={'amp1':Amp_bounds, 'z1':hz_bounds})
+        fit = LevMarLSQFitter()
+        model_disk_vert = fit(model_init, distances[1:], densities, maxiter=iters)
+        print(model_disk_vert)
+        #
+        return model_disk_vert
+
 
     def disk_rad_dens_model(self, distances, densities, A_in, r_in, A_out, r_out, A_in_bounds, r_in_bounds, A_out_bounds, r_out_bounds, r_cut=None, iters=100000):
         """
@@ -133,7 +189,6 @@ class DensityModelFit:
         NOTES:
             Yes.
         """
-        ############### TEST THISSSSS
         if r_cut == None:
             @custom_model
             def double_exponential_density(r, amp1=A_in, r1=r_in, amp2=A_out, r2=r_out):
@@ -163,29 +218,6 @@ class DensityModelFit:
             #
             return model_disk_rad
 
-    def disk_vert_dens_model(self, distances, densities, Amp, hz, Amp_bounds, hz_bounds, iters=100000):
-        """
-        DESCRIPTION:
-            Blah blah blah
-
-        VARIABLES:
-            HMMM
-
-        NOTES:
-            Yes.
-        """
-        @custom_model
-        def exponential_vert_density(z, amp1=Amp, z1=hz):
-            return amp1*np.exp(-np.abs(z)/z1)
-        #
-        # Fit the model to the data for various cutoff radii
-        model_init = exponential_vert_density(bounds={'amp1':Amp_bounds, 'z1':hz_bounds})
-        fit = LevMarLSQFitter()
-        model_disk_vert = fit(model_init, distances[1:], densities, maxiter=iters)
-        print(model_disk_vert)
-        #
-        return model_disk_vert
-
 
     def halo_nfw_dens_model(self):
         """
@@ -199,6 +231,7 @@ class DensityModelFit:
             Yes.
         """
         pass
+
 
     def halo_2p_dens_model(self):
         """
