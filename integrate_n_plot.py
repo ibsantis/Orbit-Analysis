@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='m12m', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -49,59 +49,67 @@ infall_info = orbits.first_infall_times(halt_dists_norm, snaps)
 peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps)
 apos = orbits.apocenter_interp(distances=halt_dists, velocities=halt_vels, time_array=snaps, infall_array=infall_info)
 angs = orbits.angular_momentum(tree=halt)
-galpy_orbits_best = orbit_gal.galpy_orbit_init(tree=halt)
-galpy_orbits_nfw = orbit_gal.galpy_orbit_init(tree=halt)
-galpy_orbits_nfw_v2 = orbit_gal.galpy_orbit_init(tree=halt)
+#
+galpy_orbits_2p_all = orbit_gal.galpy_orbit_init(tree=halt)
+galpy_orbits_2p_gasdm = orbit_gal.galpy_orbit_init(tree=halt)
+galpy_orbits_nfw_all = orbit_gal.galpy_orbit_init(tree=halt)
+galpy_orbits_nfw_gasdm = orbit_gal.galpy_orbit_init(tree=halt)
 
 # Read in the fitting parameters
-fitting_data_2p = pd.read_csv(sim_data.home_dir+'/orbit_data/fitting_params.csv', index_col=0)
-fitting_data_nfw = pd.read_csv(sim_data.home_dir+'/orbit_data/fitting_params_nfw.csv', index_col=0)
-fitting_data_nfw_v2 = pd.read_csv(sim_data.home_dir+'/orbit_data/fitting_params_nfw_v2.csv', index_col=0)
+fitting_data_2p_all = pd.read_csv(sim_data.home_dir+'/orbit_data/param_2p_all.csv', index_col=0)
+fitting_data_2p_gasdm = pd.read_csv(sim_data.home_dir+'/orbit_data/param_2p_gasdm.csv', index_col=0)
+fitting_data_nfw_all = pd.read_csv(sim_data.home_dir+'/orbit_data/param_nfw_all.csv', index_col=0)
+fitting_data_nfw_gasdm = pd.read_csv(sim_data.home_dir+'/orbit_data/param_nfw_gasdm.csv', index_col=0)
 
 # Import the potentials and create custom ones
 from galpy.potential import DoubleExponentialDiskPotential # For disks
 from galpy.potential import TwoPowerSphericalPotential # For DM halos
 from galpy.potential import NFWPotential
 #
-disk_outer = DoubleExponentialDiskPotential(amp=fitting_data_2p['A_disk_out'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=fitting_data_2p['r_out'][sim_data.galaxy]*u.kpc, hz=fitting_data_2p['h_z'][sim_data.galaxy]*u.kpc)
-disk_inner = DoubleExponentialDiskPotential(amp=fitting_data_2p['A_disk_in'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=fitting_data_2p['r_in'][sim_data.galaxy]*u.kpc, hz=fitting_data_2p['h_z'][sim_data.galaxy]*u.kpc)
-halo = TwoPowerSphericalPotential(amp=fitting_data_2p['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data_2p['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p['alpha'][sim_data.galaxy], beta=fitting_data_2p['beta'][sim_data.galaxy])
-potential_two_power = disk_inner+disk_outer+halo
-
-disk_outer = DoubleExponentialDiskPotential(amp=fitting_data_2p['A_disk_out'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=fitting_data_2p['r_out'][sim_data.galaxy]*u.kpc, hz=fitting_data_2p['h_z'][sim_data.galaxy]*u.kpc)
-disk_inner = DoubleExponentialDiskPotential(amp=fitting_data_2p['A_disk_in'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=fitting_data_2p['r_in'][sim_data.galaxy]*u.kpc, hz=fitting_data_2p['h_z'][sim_data.galaxy]*u.kpc)
-nfw = NFWPotential(amp=fitting_data_nfw['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data_nfw['a_halo'][sim_data.galaxy]*u.kpc)
-potential_nfw = disk_inner+disk_outer+nfw
-
-disk_outer = DoubleExponentialDiskPotential(amp=fitting_data_2p['A_disk_out'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=fitting_data_2p['r_out'][sim_data.galaxy]*u.kpc, hz=fitting_data_2p['h_z'][sim_data.galaxy]*u.kpc)
-disk_inner = DoubleExponentialDiskPotential(amp=fitting_data_2p['A_disk_in'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=fitting_data_2p['r_in'][sim_data.galaxy]*u.kpc, hz=fitting_data_2p['h_z'][sim_data.galaxy]*u.kpc)
-nfw_v2 = NFWPotential(amp=fitting_data_nfw_v2['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data_nfw_v2['a_halo'][sim_data.galaxy]*u.kpc)
-potential_nfw_v2 = disk_inner+disk_outer+nfw_v2
+disk_outer = DoubleExponentialDiskPotential(amp=fitting_data_2p_all['A_disk_out'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=fitting_data_2p_all['r_out'][sim_data.galaxy]*u.kpc, hz=fitting_data_2p_all['h_z'][sim_data.galaxy]*u.kpc)
+disk_inner = DoubleExponentialDiskPotential(amp=fitting_data_2p_all['A_disk_in'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=fitting_data_2p_all['r_in'][sim_data.galaxy]*u.kpc, hz=fitting_data_2p_all['h_z'][sim_data.galaxy]*u.kpc)
+#
+halo_2p_all = TwoPowerSphericalPotential(amp=fitting_data_2p_all['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data_2p_all['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p_all['alpha'][sim_data.galaxy], beta=fitting_data_2p_all['beta'][sim_data.galaxy])
+potential_two_power_all = disk_inner+disk_outer+halo_2p_all
+#
+halo_2p_gasdm = TwoPowerSphericalPotential(amp=fitting_data_2p_gasdm['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data_2p_gasdm['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data_2p_gasdm['alpha'][sim_data.galaxy], beta=fitting_data_2p_gasdm['beta'][sim_data.galaxy])
+potential_two_power_gasdm = disk_inner+disk_outer+halo_2p_gasdm
+#
+nfw_all = NFWPotential(amp=fitting_data_nfw_all['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data_nfw_all['a_halo'][sim_data.galaxy]*u.kpc)
+potential_nfw_all = disk_inner+disk_outer+nfw_all
+#
+nfw_gasdm = NFWPotential(amp=fitting_data_nfw_gasdm['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data_nfw_gasdm['a_halo'][sim_data.galaxy]*u.kpc)
+potential_nfw_gasdm = disk_inner+disk_outer+nfw_gasdm
 
 
 # Integrate all of the orbits in both potentials
 ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
-#ts = snaps['time']*(-1)*u.Gyr
-galpy_orbits_best.integrate(ts, potential_two_power, method='leapfrog')
+galpy_orbits_2p_all.integrate(ts, potential_two_power_all, method='odeint')
 print('Done integrating 2P model')
-galpy_orbits_nfw.integrate(ts, potential_nfw, method='leapfrog')
+galpy_orbits_2p_gasdm.integrate(ts, potential_two_power_gasdm, method='odeint')
+print('Done integrating 2P model (gas+dm only)')
+galpy_orbits_nfw_all.integrate(ts, potential_nfw_all, method='odeint')
 print('Done integrating NFW model')
-galpy_orbits_nfw_v2.integrate(ts, potential_nfw_v2, method='leapfrog')
-print('Done integrating NFW v2 model')
+galpy_orbits_nfw_gasdm.integrate(ts, potential_nfw_gasdm, method='odeint')
+print('Done integrating NFW (gas+dm only)')
 
 for i in range(1, orbits.shape[0]):
     # Integrate the subhalo orbit in each potential
-    d_model_best = galpy_orbits_best[i]._parse_plot_quantity(quant='r')
-    v_model_best = galpy_orbits_best[i]._parse_plot_quantity(quant='vR')
-    Lz_model_best = galpy_orbits_best[i]._parse_plot_quantity(quant='Lz')
+    d_model_2p_all = galpy_orbits_2p_all[i]._parse_plot_quantity(quant='r')
+    v_model_2p_all = galpy_orbits_2p_all[i]._parse_plot_quantity(quant='vR')
+    Lz_model_2p_all = galpy_orbits_2p_all[i]._parse_plot_quantity(quant='Lz')
     #
-    d_model_nfw = galpy_orbits_nfw[i]._parse_plot_quantity(quant='r')
-    v_model_nfw = galpy_orbits_nfw[i]._parse_plot_quantity(quant='vR')
-    Lz_model_nfw = galpy_orbits_nfw[i]._parse_plot_quantity(quant='Lz')
+    d_model_2p_gasdm = galpy_orbits_2p_gasdm[i]._parse_plot_quantity(quant='r')
+    v_model_2p_gasdm = galpy_orbits_2p_gasdm[i]._parse_plot_quantity(quant='vR')
+    Lz_model_2p_gasdm = galpy_orbits_2p_gasdm[i]._parse_plot_quantity(quant='Lz')
     #
-    d_model_nfw_v2 = galpy_orbits_nfw_v2[i]._parse_plot_quantity(quant='r')
-    v_model_nfw_v2 = galpy_orbits_nfw_v2[i]._parse_plot_quantity(quant='vR')
-    Lz_model_nfw_v2 = galpy_orbits_nfw_v2[i]._parse_plot_quantity(quant='Lz')
+    d_model_nfw_all = galpy_orbits_nfw_all[i]._parse_plot_quantity(quant='r')
+    v_model_nfw_all = galpy_orbits_nfw_all[i]._parse_plot_quantity(quant='vR')
+    Lz_model_nfw_all = galpy_orbits_nfw_all[i]._parse_plot_quantity(quant='Lz')
+    #
+    d_model_nfw_gasdm = galpy_orbits_nfw_gasdm[i]._parse_plot_quantity(quant='r')
+    v_model_nfw_gasdm = galpy_orbits_nfw_gasdm[i]._parse_plot_quantity(quant='vR')
+    Lz_model_nfw_gasdm = galpy_orbits_nfw_gasdm[i]._parse_plot_quantity(quant='Lz')
     #
     # Set up the distances and times to plot
     d_mask = (halt_dists[i] >= 0)
@@ -120,9 +128,10 @@ for i in range(1, orbits.shape[0]):
     #
     # Plot the distances
     ax1.plot(times, d_data, 'k', label='simulation')
-    ax1.plot(-1*ts, d_model_best, label='2-Power', alpha=0.5)
-    ax1.plot(-1*ts, d_model_nfw, label='NFW (old)', alpha=0.5)
-    ax1.plot(-1*ts, d_model_nfw_v2, label='NFW (new)', alpha=0.5)
+    ax1.plot(-1*ts, d_model_2p_all, label='2-Power (all)', alpha=0.5)
+    ax1.plot(-1*ts, d_model_2p_gasdm, label='2-Power (G+DM)', alpha=0.5)
+    ax1.plot(-1*ts, d_model_nfw_all, label='NFW (all)', alpha=0.5)
+    ax1.plot(-1*ts, d_model_nfw_gasdm, label='NFW (G+DM)', alpha=0.5)
     ax1.set_xlim(times[-1], times[0])
     #
     # Check to see if there were infall, pericenter, or apocenter events
@@ -141,9 +150,10 @@ for i in range(1, orbits.shape[0]):
     #
     # Plot the velocity data
     ax2.plot(times, v_data, 'k')
-    ax2.plot(-1*ts, v_model_best, alpha=0.5)
-    ax2.plot(-1*ts, v_model_nfw, alpha=0.5)
-    ax2.plot(-1*ts, v_model_nfw_v2, alpha=0.5)
+    ax2.plot(-1*ts, v_model_2p_all, alpha=0.5)
+    ax2.plot(-1*ts, v_model_2p_gasdm, alpha=0.5)
+    ax2.plot(-1*ts, v_model_nfw_all, alpha=0.5)
+    ax2.plot(-1*ts, v_model_nfw_gasdm, alpha=0.5)
     ax2.set_xlim(times[-1], times[0])
     ax2.label_outer()
     if infall == True:
@@ -154,9 +164,10 @@ for i in range(1, orbits.shape[0]):
     #
     # Plot the velocity data
     ax3.plot(times, Lz_data/1000, 'k')
-    ax3.plot(-1*ts, Lz_model_best/1000, alpha=0.5)
-    ax3.plot(-1*ts, Lz_model_nfw/1000, alpha=0.5)
-    ax3.plot(-1*ts, Lz_model_nfw_v2/1000, alpha=0.5)
+    ax3.plot(-1*ts, Lz_model_2p_all/1000, alpha=0.5)
+    ax3.plot(-1*ts, Lz_model_2p_gasdm/1000, alpha=0.5)
+    ax3.plot(-1*ts, Lz_model_nfw_all/1000, alpha=0.5)
+    ax3.plot(-1*ts, Lz_model_nfw_gasdm/1000, alpha=0.5)
     ax3.set_xlim(times[-1], times[0])
     ax3.set_ylabel('$L_{\\rm z}$ [$10^3$ kpc km s$^{-1}$]', fontsize=20)
     if infall == True:
@@ -166,5 +177,5 @@ for i in range(1, orbits.shape[0]):
     ax3.set_xlabel('lookback time [Gyr]', fontsize=32)
     plt.tight_layout()
     plt.subplots_adjust(wspace=0, hspace=0)
-    plt.savefig(orbits.home_dir+'/orbit_data/plots/galpy_plot_checks/'+sim_data.galaxy+'/leapfrog/sub_'+str(i)+'_data_leapfrog.pdf')
+    plt.savefig(orbits.home_dir+'/orbit_data/plots/subhalo_integration/'+sim_data.galaxy+'/'+sim_data.galaxy+'_sub_'+str(i)+'.pdf')
     plt.close()
