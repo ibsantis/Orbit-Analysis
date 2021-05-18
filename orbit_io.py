@@ -87,35 +87,23 @@ class OrbitRead:
         if location == 'mac' and self.num_gal == 1:
             self.home_dir = '/Users/isaiahsantistevan/simulation'
             self.simulation_dir = self.home_dir+'/galaxies/'+self.galaxy+resolution # maybe this is a good place for a try-except statement?
-            self.fitting_data_1 = pd.read_csv(self.home_dir+'/orbit_data/param_2p_all.csv', index_col=0)
-            self.fitting_data_2 = pd.read_csv(self.home_dir+'/orbit_data/param_2p_gasdm.csv', index_col=0)
-            self.fitting_data_nfw_1 = pd.read_csv(self.home_dir+'/orbit_data/param_nfw_all.csv', index_col=0)
-            self.fitting_data_nfw_2 = pd.read_csv(self.home_dir+'/orbit_data/param_nfw_gasdm.csv', index_col=0)
+            self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
         elif location == 'mac' and self.num_gal == 2:
             self.home_dir = '/Users/isaiahsantistevan/simulation'
             #self.simulation_dir = '/Users/isaiahsantistevan/simulation/galaxies/'+self.galaxy+resolution
             self.gal_1 = gal1
             self.gal_2 = gal2
-            self.fitting_data_1 = pd.read_csv(self.home_dir+'/orbit_data/param_2p_all.csv', index_col=0)
-            self.fitting_data_2 = pd.read_csv(self.home_dir+'/orbit_data/param_2p_gasdm.csv', index_col=0)
-            self.fitting_data_nfw_1 = pd.read_csv(self.home_dir+'/orbit_data/param_nfw_all.csv', index_col=0)
-            self.fitting_data_nfw_2 = pd.read_csv(self.home_dir+'/orbit_data/param_nfw_gasdm.csv', index_col=0)
+            self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
         elif location == 'peloton' and self.num_gal == 1:
             self.home_dir = '/home/ibsantis/scripts'
             self.simulation_dir = '/share/wetzellab/'+self.galaxy+'/'+self.galaxy+resolution
-            self.fitting_data_1 = pd.read_csv(self.home_dir+'/orbit_data/param_2p_all.csv', index_col=0)
-            self.fitting_data_2 = pd.read_csv(self.home_dir+'/orbit_data/param_2p_gasdm.csv', index_col=0)
-            self.fitting_data_nfw_1 = pd.read_csv(self.home_dir+'/orbit_data/param_nfw_all.csv', index_col=0)
-            self.fitting_data_nfw_2 = pd.read_csv(self.home_dir+'/orbit_data/param_nfw_gasdm.csv', index_col=0)
+            self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
         elif location == 'peloton' and self.num_gal == 2:
             self.home_dir = '/home/ibsantis/scripts'
             self.simulation_dir = '/share/wetzellab/m12_elvis/'+self.galaxy+resolution
             self.gal_1 = gal1
             self.gal_2 = gal2
-            self.fitting_data_1 = pd.read_csv(self.home_dir+'/orbit_data/param_2p_all.csv', index_col=0)
-            self.fitting_data_2 = pd.read_csv(self.home_dir+'/orbit_data/param_2p_gasdm.csv', index_col=0)
-            self.fitting_data_nfw_1 = pd.read_csv(self.home_dir+'/orbit_data/param_nfw_all.csv', index_col=0)
-            self.fitting_data_nfw_2 = pd.read_csv(self.home_dir+'/orbit_data/param_nfw_gasdm.csv', index_col=0)
+            self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
         else:
             self.home_dir = '/home1/05400/ibsantis/scripts'
             self.simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+self.galaxy+resolution
