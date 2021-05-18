@@ -946,7 +946,7 @@ class OrbitGalpy(OrbitAnalysis):
         d['pericenter.check'] = peri_bool
         #
         # Find maximum number of pericenter events
-        N = np.max([len(host_peri_rad[i]) for i in range(0, len(host_peri_rad))])
+        N = np.max([len(peri_spl[i]) for i in range(0, len(peri_spl))])
         #
         # Set up empty lists for spline fitting
         pericenter_spline = []
