@@ -1174,6 +1174,17 @@ class OrbitGalpy(OrbitAnalysis):
         d['apocenter.time.lb'] = time_lb_spline_array
         return d
 
+    def galpy_pole_check(self, orbits_int, times):
+        """
+            asdfasdfasdf
+        """
+        check = np.zeros(len(orbits_int), bool)
+        for i in range(1, len(orbits_int)):
+            angle = np.rad2deg(np.arccos(orbits_int[i].z(times)/np.sqrt(orbits_int[i].R(times)**2+orbits_int[i].z(times)**2)))
+            if np.sum(angle < 1) or np.sum(angle > 179):
+                check[i] = True
+        return check
+
 class OrbitPlot(OrbitAnalysis):
 
     def __init__(self, tree, gal1, location):

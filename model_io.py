@@ -43,22 +43,37 @@ class MassModelFit:
     def disk_vert_mass_model(self, distances, masses, Amp, hz, Amp_bounds, hz_bounds, iters=100000):
         """
         DESCRIPTION:
-            Blah blah blah
+            Model a single exponential profile for the vertical component of the
+            disk. Got this profile by integrating the corresponding density
+            profile.
 
         VARIABLES:
-            HMMM
+            distances  : 1D array
+            masses     : 1D array
+            Amp        : float
+            hz         : float
+            Amp_bounds : tuple
+            hz_bounds  : tuple
+            iters      : int
 
         NOTES:
-            Yes.
+            - Makes use of astropy's modeling functions
+            - Need to provide good estimates for the amplitude and scale height
+            - Also, need to provide reasonable bounds for these parameters
+            - Returns a mass model of the vertical component of the disk
+                - Returns an amplitude and scale height
         """
+        # Define the mass profile
         @custom_model
         def exponential_vert_mass(z, amp1=Amp, z1=hz):
             mass = amp1*(2*z1)*(1-np.exp(-z/z1))
             return mass
         #
-        # Fit the model to the data for various cutoff radii
+        # Initialize the model
         model_init = exponential_vert_mass(bounds={'amp1':Amp_bounds, 'z1':hz_bounds})
         fit = LevMarLSQFitter()
+        #
+        # Fit the model to the data and print it out
         model_disk_vert = fit(model_init, distances[1:], np.cumsum(masses), maxiter=iters)
         print(model_disk_vert)
         #
@@ -101,7 +116,7 @@ class MassModelFit:
         NOTES:
             Yes.
         """
-        r_cut_min = np.where(distances > 10)[0][0]
+        r_cut_min = np.where(distances > r_min)[0][0]
         #
         if r_max == None:
             @custom_model
@@ -142,7 +157,7 @@ class MassModelFit:
         NOTES:
             Yes.
         """
-        r_cut_min = np.where(distances > 10)[0][0]
+        r_cut_min = np.where(distances > r_min)[0][0]
         #
         if r_max == None:
             @custom_model
