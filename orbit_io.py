@@ -966,7 +966,7 @@ class OrbitGalpy(OrbitAnalysis):
                     temp_time = time_spl[i][j]
                     # Work on distance
                     f = interp1d(temp_time, temp_dist, kind='cubic')
-                    f2 = interp1d(temp_time, temp_vel, kind='cubic')
+                    #f2 = interp1d(temp_time, temp_vel, kind='cubic')
                     x_new = np.linspace(temp_time[0], temp_time[-1], 100)
                     temp_peri_new_spl.append(np.min(f(x_new)))
                     temp_time_new_spl.append(x_new[np.where(f(x_new) == np.min(f(x_new)))[0][0]])
