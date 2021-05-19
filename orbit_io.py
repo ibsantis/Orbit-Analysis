@@ -925,12 +925,12 @@ class OrbitGalpy(OrbitAnalysis):
         # Loop over the number of subhalos
         for k in range(0, len(distances)):
             temp_halo_d = distances[k] # Now goes from z = 0 to z_form (un-normalized)
-            #temp_halo_v = velocities[k] # Same as above
+            temp_halo_v = velocities[k] # Same as above
             # Want initial element to be this because we check neighbors on each side
             temp_peri = temp_halo_d[reach]
             temp_check = np.zeros(len(temp_halo_d))
             temp_peri_spl = []
-            #temp_peri_vel_spl = []
+            temp_peri_vel_spl = []
             temp_time_spl = []
             #
             # Loop through each subhalo
@@ -939,14 +939,14 @@ class OrbitGalpy(OrbitAnalysis):
                 if (all(temp_peri < temp_halo_d[i-reach:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])):
                     temp_check[i] = 1
                     temp_peri_spl.append(temp_halo_d[i-reach:i+reach])
-                    #temp_peri_vel_spl.append(temp_halo_v[i-reach:i+reach])
+                    temp_peri_vel_spl.append(temp_halo_v[i-reach:i+reach])
                     temp_time_spl.append(time_array[len(time_array)-1-i-reach:len(time_array)-1-i+reach])
                     temp_peri = temp_halo_d[i+1]
                 else:
                     temp_peri = temp_halo_d[i+1]
             check.append(temp_check)
             peri_spl.append(temp_peri_spl)
-            #peri_vel_spl.append(temp_peri_vel_spl)
+            peri_vel_spl.append(temp_peri_vel_spl)
             time_spl.append(temp_time_spl)
         #
         # Create a mask that tells you whether or not halo experienced pericenter
@@ -961,41 +961,41 @@ class OrbitGalpy(OrbitAnalysis):
         #
         # Set up empty lists for spline fitting
         pericenter_spline = []
-        #pericenter_vel_spline = []
+        pericenter_vel_spline = []
         time_spline = []
         # Loop over all of the subhalos
         for i in range(0, len(peri_spl)):
             # Check if subhalo experienced pericenter. If so, continue.
             if (len(peri_spl[i]) != 0):
                 temp_peri_new_spl = []
-                #temp_peri_vel_new_spl = []
+                temp_peri_vel_new_spl = []
                 temp_time_new_spl = []
                 # Loop over the number of pericenter events
                 for j in range(0, len(peri_spl[i])):
                     temp_dist = peri_spl[i][j]
-                    #temp_vel = peri_vel_spl[i][j]
+                    temp_vel = peri_vel_spl[i][j]
                     temp_time = time_spl[i][j]
                     # Work on distance
                     f = interp1d(temp_time, temp_dist, kind='cubic')
-                    #f2 = interp1d(temp_time, temp_vel, kind='cubic')
+                    f2 = interp1d(temp_time, temp_vel, kind='cubic')
                     x_new = np.linspace(temp_time[0], temp_time[-1], 100)
                     temp_peri_new_spl.append(np.min(f(x_new)))
                     temp_time_new_spl.append(x_new[np.where(f(x_new) == np.min(f(x_new)))[0][0]])
-                    #temp_peri_vel_new_spl.append(f2(x_new)[np.where(f(x_new) == np.min(f(x_new)))[0][0]])
+                    temp_peri_vel_new_spl.append(f2(x_new)[np.where(f(x_new) == np.min(f(x_new)))[0][0]])
                 pericenter_spline.append(temp_peri_new_spl)
-                #pericenter_vel_spline.append(temp_peri_vel_new_spl)
+                pericenter_vel_spline.append(temp_peri_vel_new_spl)
                 time_spline.append(temp_time_new_spl)
             else:
                 temp_peri_new_spl = []
-                #temp_peri_vel_new_spl = []
+                temp_peri_vel_new_spl = []
                 temp_time_new_spl = []
                 pericenter_spline.append(temp_peri_new_spl)
-                #pericenter_vel_spline.append(temp_peri_vel_new_spl)
+                pericenter_vel_spline.append(temp_peri_vel_new_spl)
                 time_spline.append(temp_time_new_spl)
         #
         # Initialize arrays with size (number subhalos) x (number of pericenter events)
         pericenter_spline_array = (-1)*np.ones((len(distances), N))
-        #pericenter_vel_spline_array = (-1)*np.ones((len(distances), N))
+        pericenter_vel_spline_array = (-1)*np.ones((len(distances), N))
         time_spline_array = (-1)*np.ones((len(distances), N))
         #
         # Store the data in 2D arrays
@@ -1003,12 +1003,12 @@ class OrbitGalpy(OrbitAnalysis):
             if len(pericenter_spline[i]) != 0:
                 for j in range(0, len(pericenter_spline[i])):
                     pericenter_spline_array[i,j] = pericenter_spline[i][j]
-                    #pericenter_vel_spline_array[i,j] = pericenter_vel_spline[i][j]
+                    pericenter_vel_spline_array[i,j] = pericenter_vel_spline[i][j]
                     time_spline_array[i,j] = time_spline[i][j]
         #
         # Save 2D arrays to dictionary
         d['pericenter.dist'] = pericenter_spline_array
-        #d['pericenter.vel'] = pericenter_vel_spline_array
+        d['pericenter.vel'] = pericenter_vel_spline_array
         d['pericenter.time'] = time_spline_array
         #
         # Save the number of pericenters a subhalo experiences
