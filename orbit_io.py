@@ -482,6 +482,11 @@ class OrbitAnalysis:
         d['pericenter.vel'] = pericenter_vel_spline_array
         d['pericenter.time'] = time_spline_array
         #
+        # Save the number of pericenters a subhalo experiences
+        d['pericenter.num'] = np.zeros(len(distances),int)
+        for i in range(0, len(distances)):
+            d['pericenter.num'][i] = np.sum(d['pericenter.dist'][i] > -1)
+        #
         # Find lookback time and save to 2D array
         time_lb_spline_array = (-1)*np.ones((len(distances), N))
         mask = (time_spline_array > 0)
@@ -859,6 +864,12 @@ class OrbitGalpy(OrbitAnalysis):
         """
         pass
 
+    def galpy_velocities(self, vrad, vtan):
+        """
+        asf
+        """
+        return np.sqrt(vrad**2 + vtan**2)
+
     def galpy_pericenter_interp(self, distances, velocities, time_array):
         """
         DESCRIPTION:
@@ -999,6 +1010,11 @@ class OrbitGalpy(OrbitAnalysis):
         d['pericenter.dist'] = pericenter_spline_array
         #d['pericenter.vel'] = pericenter_vel_spline_array
         d['pericenter.time'] = time_spline_array
+        #
+        # Save the number of pericenters a subhalo experiences
+        d['pericenter.num'] = np.zeros(len(distances),int)
+        for i in range(0, len(distances)):
+            d['pericenter.num'][i] = np.sum(d['pericenter.dist'][i] > -1)
         #
         # Find lookback time and save to 2D array
         time_lb_spline_array = (-1)*np.ones((len(distances), N))
