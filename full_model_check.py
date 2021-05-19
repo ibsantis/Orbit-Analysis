@@ -164,31 +164,32 @@ rs = np.logspace(np.log10(0.1), np.log10(500), 81)
 #    area = np.pi*(rs[i+1]**2-rs[i]**2)
 #    disk_density_mass[i] = disk_density[i+1]*area
 
-#disk_mass = models.disk_mass(distances=rs[1:], fitting_csv=models.fitting_data_1, gal=sim_data.galaxy)
-disk_mass = models.disk_mass(distances=rs[1:], fitting_csv=models.fitting_data_1, gal=sim_data.gal_2)
+#disk_mass = models.disk_radial_mass(distances=rs[1:], gal=sim_data.galaxy)
+disk_mass = models.disk_radial_mass(distances=rs[1:], gal=sim_data.gal_2)
 
-#halo_mass_nfw_1 = models.halo_nfw_mass(distances=rs[1:], fitting_csv=models.fitting_data_nfw_1, gal=sim_data.galaxy)
-#halo_mass_nfw_2 = models.halo_nfw_mass(distances=rs[1:], fitting_csv=models.fitting_data_nfw_2, gal=sim_data.galaxy)
-#halo_mass_2p_nfw_1 = models.halo_2p_nfw_mass(distances=rs[1:], fitting_csv=models.fitting_data_1, gal=sim_data.galaxy)
-#halo_mass_2p_nfw_2 = models.halo_2p_nfw_mass(distances=rs[1:], fitting_csv=models.fitting_data_2, gal=sim_data.galaxy)
+#halo_mass_2p = models.halo_2p_nfw_mass(distances=rs[1:], gal=sim_data.galaxy)
+halo_mass_2p = models.halo_2p_nfw_mass(distances=rs[1:], gal=sim_data.gal_2)
 
-halo_mass_nfw_1 = models.halo_nfw_mass(distances=rs[1:], fitting_csv=models.fitting_data_nfw_1, gal=sim_data.gal_2)
-halo_mass_nfw_2 = models.halo_nfw_mass(distances=rs[1:], fitting_csv=models.fitting_data_nfw_2, gal=sim_data.gal_2)
-halo_mass_2p_nfw_1 = models.halo_2p_nfw_mass(distances=rs[1:], fitting_csv=models.fitting_data_1, gal=sim_data.gal_2)
-halo_mass_2p_nfw_2 = models.halo_2p_nfw_mass(distances=rs[1:], fitting_csv=models.fitting_data_2, gal=sim_data.gal_2)
+# THESE WERE WHEN I WAS TESTING ALL MODELS
+#halo_mass_nfw_1 = models.halo_nfw_mass(distances=rs[1:], fitting_csv=models.fitting_data_nfw_1, gal=sim_data.gal_2)
+#halo_mass_nfw_2 = models.halo_nfw_mass(distances=rs[1:], fitting_csv=models.fitting_data_nfw_2, gal=sim_data.gal_2)
+#halo_mass_2p_nfw_1 = models.halo_2p_nfw_mass(distances=rs[1:], fitting_csv=models.fitting_data_1, gal=sim_data.gal_2)
+#halo_mass_2p_nfw_2 = models.halo_2p_nfw_mass(distances=rs[1:], fitting_csv=models.fitting_data_2, gal=sim_data.gal_2)
 
-total_mass_nfw_1 = halo_mass_nfw_1+disk_mass
-total_mass_nfw_2 = halo_mass_nfw_2+disk_mass
-total_mass_2p_nfw_1 = halo_mass_2p_nfw_1+disk_mass
-total_mass_2p_nfw_2 = halo_mass_2p_nfw_2+disk_mass
+#total_mass_nfw_1 = halo_mass_nfw_1+disk_mass
+#total_mass_nfw_2 = halo_mass_nfw_2+disk_mass
+#total_mass_2p_nfw_1 = halo_mass_2p_nfw_1+disk_mass
+#total_mass_2p_nfw_2 = halo_mass_2p_nfw_2+disk_mass
+
+total_mass = halo_mass_2p + disk_mass
 
 
 # Plot the ratio of the data to the model
 plt.figure(figsize=(10,8))
-plt.plot(rs[1:], total_mass_2p_nfw_1/masses['mass.enclosed'], '-', label='2P: All r > 10 kpc')
-plt.plot(rs[1:], total_mass_2p_nfw_2/masses['mass.enclosed'], '-', label='2P: Gas + DM only')
-plt.plot(rs[1:], total_mass_nfw_1/masses['mass.enclosed'], '-', label='NFW: All r > 10 kpc')
-plt.plot(rs[1:], total_mass_nfw_2/masses['mass.enclosed'], '-', label='NFW: Gas + DM only')
+plt.plot(rs[1:], total_mass/masses['mass.enclosed'], '-')
+#plt.plot(rs[1:], total_mass_2p_nfw_2/masses['mass.enclosed'], '-', label='2P: Gas + DM only')
+#plt.plot(rs[1:], total_mass_nfw_1/masses['mass.enclosed'], '-', label='NFW: All r > 10 kpc')
+#plt.plot(rs[1:], total_mass_nfw_2/masses['mass.enclosed'], '-', label='NFW: Gas + DM only')
 plt.xscale('log')
 plt.xlim(xmin=5,xmax=500)
 plt.hlines(y=1,xmin=5,xmax=500,linestyles='dotted')
@@ -197,10 +198,10 @@ plt.xlabel('R [kpc]', fontsize=28)
 plt.ylabel('$M_{\\rm model}(<R)/M_{\\rm sim}(<R)$', fontsize=28)
 #plt.title(sim_data.galaxy+', Full model', fontsize=28)
 plt.title(sim_data.gal_2+', Full model', fontsize=28)
-plt.legend(prop={'size': 18})
+#plt.legend(prop={'size': 18})
 plt.tight_layout()
-#plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/full_model_check/'+sim_data.galaxy+'_full_model.pdf')
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/full_model_check/'+sim_data.gal_2+'_full_model.pdf')
+#plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/full_model_ratios/'+sim_data.galaxy+'_full_model.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/fitting/full_model_ratios/'+sim_data.gal_2+'_full_model.pdf')
 plt.close()
 
 
@@ -219,7 +220,7 @@ plt.xlabel('R [kpc]', fontsize=28)
 plt.ylabel('$M_{\\rm mass}(R)/M_{\\rm density}(R)$', fontsize=28)
 plt.title(gal1+', halo model ratios', fontsize=28)
 plt.tight_layout()
-plt.savefig(home_dir+'/orbit_data/plots/fitting/full_model_check/'+gal1+'_halo_density_to_halo_mass_models.pdf')
+plt.savefig(home_dir+'/orbit_data/plots/fitting/full_model_ratios/'+gal1+'_halo_density_to_halo_mass_models.pdf')
 plt.close()
 """
 
