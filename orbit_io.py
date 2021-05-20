@@ -1129,7 +1129,7 @@ class OrbitGalpy(OrbitAnalysis):
             #
             # Want initial element to be this because we check +- 10 neighbors on each side
             temp_apo = temp_halo_d[reach]
-            temp_apo_time = time_array['time'][len(time_array)-reach]
+            temp_apo_time = time_array[len(time_array)-reach]
             temp_check = np.zeros(len(temp_halo_d))
             temp_apo_spl = []
             temp_apo_vel_spl = []
@@ -1142,12 +1142,12 @@ class OrbitGalpy(OrbitAnalysis):
                     temp_check[i] = 1
                     temp_apo_spl.append(temp_halo_d[i-reach:i+reach])
                     temp_apo_vel_spl.append(temp_halo_v[i-reach:i+reach])
-                    temp_time_spl.append(time_array['time'][len(time_array)-i-reach:len(time_array)-i+reach])
+                    temp_time_spl.append(time_array[len(time_array)-i-reach:len(time_array)-i+reach])
                     temp_apo = temp_halo_d[i+1]
-                    temp_apo_time = time_array['time'][len(time_array)-(i+1)]
+                    temp_apo_time = time_array[len(time_array)-(i+1)]
                 else:
                     temp_apo = temp_halo_d[i+1]
-                    temp_apo_time = time_array['time'][len(time_array)-(i+1)]
+                    temp_apo_time = time_array[len(time_array)-(i+1)]
             check.append(temp_check)
             apo_spl.append(temp_apo_spl)
             apo_vel_spl.append(temp_apo_vel_spl)
@@ -1211,7 +1211,7 @@ class OrbitGalpy(OrbitAnalysis):
         # Find lookback time and save to 2D array
         time_lb_spline_array = (-1)*np.ones((len(distances), N))
         mask = (time_spline_array > 0)
-        time_lb_spline_array[mask] = (time_array['time'][-1] - time_spline_array[mask])
+        time_lb_spline_array[mask] = (time_array[-1] - time_spline_array[mask])
         #
         # Save everything to a dictionary
         d['apocenter.dist'] = apocenter_spline_array
