@@ -327,9 +327,9 @@ class OrbitAnalysis:
         first_infall_times_lookback = (-1)*np.ones(len(distances_norm))
         infall_check = np.zeros(len(distances_norm), bool)
         #
-        all_infall_snaps = []
-        all_infall_times = []
-        all_infall_times_lookback = []
+        infall_snaps = []
+        infall_times = []
+        infall_times_lookback = []
         #
         # Set up lookback time array
         lookback = time_array['time'][-1] - time_array['time']
@@ -344,9 +344,9 @@ class OrbitAnalysis:
                         temp.append(inds[j])
                 temp.append(np.max(inds))
                 # If it is, get the snapshot, time, and lookback time
-                all_infall_snaps.append(time_array['index'][-1] - temp)
-                all_infall_times.append(time_array['time'][all_infall_snaps[i]])
-                all_infall_times_lookback.append(lookback[all_infall_snaps[i]])
+                infall_snaps.append(time_array['index'][-1] - temp)
+                infall_times.append(time_array['time'][infall_snaps[i]])
+                infall_times_lookback.append(lookback[infall_snaps[i]])
                 #
                 first_infall_snap[i] = time_array['index'][-1]-np.max(np.where(np.abs(distances_norm[i]) < 1)[0])
                 first_infall_times[i] = time_array['time'][first_infall_snap[i]]
@@ -355,9 +355,19 @@ class OrbitAnalysis:
                 if first_infall_snap[i] >= 0:
                     infall_check[i] = True
             else:
-                all_infall_snaps.append(np.array([-1]))
-                all_infall_times.append(np.array([-1]))
-                all_infall_times_lookback.append(np.array([-1]))
+                infall_snaps.append(np.array([-1]))
+                infall_times.append(np.array([-1]))
+                infall_times_lookback.append(np.array([-1]))
+        #
+        N = np.max([len(infall_snaps[i]) for i in range(0, infall_snaps)])
+        all_infall_snaps = (-1)*np.ones((len(distances_norm), N))
+        all_infall_times = (-1)*np.ones((len(distances_norm), N))
+        all_infall_times_lookback = (-1)*np.ones((len(distances_norm), N))
+        for i in range(0, len(distances_norm)):
+            for j in range(0, len(infall_snaps[i])):
+                all_infall_snaps[i,j] = infall_snaps[i][j]
+                all_infall_times[i,j] = infall_times[i][j]
+                all_infall_times_lookback[i,j] = infall_times_lookback[i][j]
         # Assign arrays to dictionary elements
         d['check'] = infall_check
         d['first.infall.snap'] = first_infall_snap
