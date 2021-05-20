@@ -626,7 +626,7 @@ class OrbitAnalysis:
             # Loop through each subhalo
             for i in range(reach, len(temp_halo_d)-reach):
                 # Check to make sure that this is the local maximum
-                if (infall_array['time'][k] != -1) and (all(temp_apo > temp_halo_d[i-reach:i])) and (all(temp_apo > temp_halo_d[i+1:i+1+reach])) and (temp_apo_time > infall_array['first.infall.time'][k]):
+                if (infall_array['first.infall.time'][k] != -1) and (all(temp_apo > temp_halo_d[i-reach:i])) and (all(temp_apo > temp_halo_d[i+1:i+1+reach])) and (temp_apo_time > infall_array['first.infall.time'][k]):
                     temp_check[i] = 1
                     temp_apo_spl.append(temp_halo_d[i-reach:i+reach])
                     temp_apo_vel_spl.append(temp_halo_v[i-reach:i+reach])
