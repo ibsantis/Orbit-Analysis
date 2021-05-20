@@ -317,6 +317,58 @@ class OrbitAnalysis:
         d['time.lb'] = first_infall_times_lookback
         return d
 
+    def infall_temp(self, distances_norm, time_array):
+        # Set up a dictionary to store the information you want
+        d = dict();
+        #
+        # Initialize some arrays for the dictionary
+        first_infall_snap = (-1)*np.ones(len(distances_norm), int)
+        first_infall_times = (-1)*np.ones(len(distances_norm))
+        first_infall_times_lookback = (-1)*np.ones(len(distances_norm))
+        infall_check = np.zeros(len(distances_norm), bool)
+        #
+        all_infall_snaps = []
+        all_infall_times = []
+        all_infall_times_lookback = []
+        #
+        # Set up lookback time array
+        lookback = time_array['time'][-1] - time_array['time']
+        # Loop over subhalos (normalized distance arrays)
+        for i in range(0, len(distances_norm)):
+            temp = []
+            inds = np.where(np.abs(distances_norm[i]) < 1)[0]
+            # Check to see if the subhalo is within the virial radius of the host
+            if len(inds) != 0:
+                for j in range(0, len(inds)-1):
+                    if (inds[j+1] > inds[j]+1):
+                        temp.append(inds[j])
+                temp.append(np.max(inds))
+                # If it is, get the snapshot, time, and lookback time
+                all_infall_snaps.append(time_array['index'][-1] - temp)
+                all_infall_times.append(time_array['time'][all_infall_snaps[i]])
+                all_infall_times_lookback.append(lookback[all_infall_snaps[i]])
+                #
+                first_infall_snap[i] = time_array['index'][-1]-np.max(np.where(np.abs(distances_norm[i]) < 1)[0])
+                first_infall_times[i] = time_array['time'][first_infall_snap[i]]
+                first_infall_times_lookback[i] = lookback[first_infall_snap[i]]
+                # Save whether or not subhalo fell into host
+                if first_infall_snap[i] >= 0:
+                    infall_check[i] = True
+            else:
+                all_infall_snaps.append(np.array([-1]))
+                all_infall_times.append(np.array([-1]))
+                all_infall_times_lookback.append(np.array([-1]))
+        # Assign arrays to dictionary elements
+        d['check'] = infall_check
+        d['first.infall.snap'] = first_infall_snap
+        d['first.infall.time'] = first_infall_times
+        d['first.infall.time.lb'] = first_infall_times_lookback
+        #
+        d['all.infall.snap'] = all_infall_snaps
+        d['all.infall.time'] = all_infall_times
+        d['all.infall.time.lb'] = all_infall_times_lookback
+        return d
+
     def pericenter_interp(self, distances, velocities, virial_radii, time_array):
         """
         DESCRIPTION:
