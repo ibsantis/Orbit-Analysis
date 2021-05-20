@@ -359,7 +359,7 @@ class OrbitAnalysis:
                 infall_times.append(np.array([-1]))
                 infall_times_lookback.append(np.array([-1]))
         #
-        N = np.max([len(infall_snaps[i]) for i in range(0, infall_snaps)])
+        N = np.max([len(infall_snaps[i]) for i in range(0, len(infall_snaps))])
         all_infall_snaps = (-1)*np.ones((len(distances_norm), N))
         all_infall_times = (-1)*np.ones((len(distances_norm), N))
         all_infall_times_lookback = (-1)*np.ones((len(distances_norm), N))
