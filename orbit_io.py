@@ -265,7 +265,7 @@ class OrbitAnalysis:
                 sys.exit()
         return velocities
 
-    def first_infall_times(self, distances_norm, time_array):
+    def infall_times(self, distances_norm, time_array):
         """
         DESCRIPTION:
             Reads in normalized subhalo distances and snapshot information and returns
@@ -279,45 +279,22 @@ class OrbitAnalysis:
             - Returns a dictionary
                 - d['check'] is a boolean array that tells you if the halo has
                   fallen into the host
-                - d['snapshot'] is a 1D array that gives the snapshot at infall
-                - d['time'] is a 1D array that gives the age of the Universe when
+                - d['first.infall.snap'] is a 1D array that gives the snapshot at infall
+                - d['first.infall.time'] is a 1D array that gives the age of the Universe when
                   a subhalo first fell into the host galaxy
-                - d['time.lb'] is a 1D array that gives the lookback time when
+                - d['first.infall.time.lb'] is a 1D array that gives the lookback time when
                   a subhalo first fell into the host galaxy
-            - Times given correspond to the age of the Universe (Gyr)
+                - d['all.infall.snap'] is a 2D array that gives the snapshots at infall
+                    - The size of these arrays is (number of subhalos) x (max number of infalls)
+                - d['all.infall.time'] is a 2D array that gives the ages of the Universe when
+                  a subhalo fell into the host galaxy
+                    - The size of these arrays is (number of subhalos) x (max number of infalls)
+                - d['all.infall.time.lb'] is a 2D array that gives the lookback times when
+                  a subhalo fell into the host galaxy
+                    - The size of these arrays is (number of subhalos) x (max number of infalls)
             - Negative elements correspond to subhalos that have not fallen into
               the host galaxy
         """
-        # Set up a dictionary to store the information you want
-        d = dict();
-        #
-        # Initialize some arrays for the dictionary
-        first_infall_snap = (-1)*np.ones(len(distances_norm), int)
-        first_infall_times = (-1)*np.ones(len(distances_norm))
-        first_infall_times_lookback = (-1)*np.ones(len(distances_norm))
-        infall_check = np.zeros(len(distances_norm), bool)
-        #
-        # Set up lookback time array
-        lookback = time_array['time'][-1] - time_array['time']
-        # Loop over subhalos (normalized distance arrays)
-        for i in range(0, len(distances_norm)):
-            # Check to see if the subhalo is within the virial radius of the host
-            if len(np.where(np.abs(distances_norm[i]) < 1)[0]) != 0:
-                # If it is, get the snapshot, time, and lookback time
-                first_infall_snap[i] = time_array['index'][-1]-np.max(np.where(np.abs(distances_norm[i]) < 1)[0])
-                first_infall_times[i] = time_array['time'][first_infall_snap[i]]
-                first_infall_times_lookback[i] = lookback[first_infall_snap[i]]
-                # Save whether or not subhalo fell into host
-                if first_infall_snap[i] >= 0:
-                    infall_check[i] = True
-        # Assign arrays to dictionary elements
-        d['check'] = infall_check
-        d['snapshot'] = first_infall_snap
-        d['time'] = first_infall_times
-        d['time.lb'] = first_infall_times_lookback
-        return d
-
-    def infall_temp(self, distances_norm, time_array):
         # Set up a dictionary to store the information you want
         d = dict();
         #
@@ -339,11 +316,13 @@ class OrbitAnalysis:
             inds = np.where(np.abs(distances_norm[i]) < 1)[0]
             # Check to see if the subhalo is within the virial radius of the host
             if len(inds) != 0:
+                # If it is, save all indices of when it fell into the host
                 for j in range(0, len(inds)-1):
                     if (inds[j+1] > inds[j]+1):
                         temp.append(inds[j])
                 temp.append(np.max(inds))
-                # If it is, get the snapshot, time, and lookback time
+                #
+                # Save the infall snapshots and times
                 infall_snaps.append(time_array['index'][-1] - temp)
                 infall_times.append(time_array['time'][infall_snaps[i]])
                 infall_times_lookback.append(lookback[infall_snaps[i]])
@@ -359,6 +338,7 @@ class OrbitAnalysis:
                 infall_times.append(np.array([-1]))
                 infall_times_lookback.append(np.array([-1]))
         #
+        # Find the maximum number of infalls any of the satellites experienced
         N = np.max([len(infall_snaps[i]) for i in range(0, len(infall_snaps))])
         all_infall_snaps = (-1)*np.ones((len(distances_norm), N))
         all_infall_times = (-1)*np.ones((len(distances_norm), N))
@@ -646,7 +626,7 @@ class OrbitAnalysis:
             # Loop through each subhalo
             for i in range(reach, len(temp_halo_d)-reach):
                 # Check to make sure that this is the local maximum
-                if (infall_array['time'][k] != -1) and (all(temp_apo > temp_halo_d[i-reach:i])) and (all(temp_apo > temp_halo_d[i+1:i+1+reach])) and (temp_apo_time > infall_array['time'][k]):
+                if (infall_array['time'][k] != -1) and (all(temp_apo > temp_halo_d[i-reach:i])) and (all(temp_apo > temp_halo_d[i+1:i+1+reach])) and (temp_apo_time > infall_array['first.infall.time'][k]):
                     temp_check[i] = 1
                     temp_apo_spl.append(temp_halo_d[i-reach:i+reach])
                     temp_apo_vel_spl.append(temp_halo_v[i-reach:i+reach])
@@ -1330,7 +1310,7 @@ class OrbitPlot(OrbitAnalysis):
         #
         # If there were, plot when they occurred
         if infall == True:
-            infall_time = infall_array['time.lb'][subhalo_num]
+            infall_time = infall_array['first.infall.time.lb'][subhalo_num]
             plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
         if peri == True:
             mask = (pericenter_array['pericenter.time.lb'][subhalo_num] > 0)
@@ -1428,7 +1408,7 @@ class OrbitPlot(OrbitAnalysis):
         #
         # If there were, plot when they occurred
         if infall == True:
-            infall_time = infall_array['time.lb'][subhalo_num]
+            infall_time = infall_array['first.infall.time.lb'][subhalo_num]
             plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
         if peri == True:
             mask = (pericenter_array['pericenter.time.lb'][subhalo_num] > 0)
@@ -1579,7 +1559,7 @@ class OrbitPlot(OrbitAnalysis):
         #
         # If there were, plot when they occurred
         if infall == True:
-            infall_time = infall_array['time.lb'][subhalo_num]
+            infall_time = infall_array['first.infall.time.lb'][subhalo_num]
             plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
         if peri == True:
             mask = (pericenter_array['pericenter.time.lb'][subhalo_num] > 0)
@@ -1694,7 +1674,7 @@ class OrbitPlot(OrbitAnalysis):
         #
         # If there are, plot when they occurred
         if infall == True:
-            infall_time = infall_array['time.lb'][subhalo_num]
+            infall_time = infall_array['first.infall.time.lb'][subhalo_num]
             plt.vlines(infall_time,-1000000,1000000,color='k',linestyles='dotted')
         if peri == True:
             mask = (pericenter_array['pericenter.time.lb'][subhalo_num] > 0)
