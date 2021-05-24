@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12m', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -46,7 +46,7 @@ halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, h
 halt_vels = orbits.halo_velocities(halt)
 host_radii = halt['radius'][orbits.sub_inds[0][orbits.sub_inds[0] >= 0]] # Want to divide the other distances by this distance
 halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
-infall_info = orbits.first_infall_times(halt_dists_norm, snaps)
+infall_info = orbits.infall_times(halt_dists_norm, snaps)
 peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps)
 apos = orbits.apocenter_interp(distances=halt_dists, velocities=halt_vels, time_array=snaps, infall_array=infall_info)
 angs = orbits.angular_momentum(tree=halt)
@@ -76,68 +76,83 @@ poles = orbit_gal.galpy_pole_check(galpy_orbits, ts)
 print(poles)
 print(np.sum(poles))
 
-for i in range(1, orbits.shape[0]):
-    # Integrate the subhalo orbit in each potential
-    d_model = galpy_orbits[i]._parse_plot_quantity(quant='r')
-    v_model = galpy_orbits[i]._parse_plot_quantity(quant='vR')
-    Lz_model = galpy_orbits[i]._parse_plot_quantity(quant='Lz')
-    #
-    # Set up the distances and times to plot
-    d_mask = (halt_dists[i] >= 0)
-    d_data = halt_dists[i][d_mask]
-    lookback_time = np.flip(snaps['time'][-1] - snaps['time'])
-    times = lookback_time[:len(d_data)]
-    v_data = halt.prop('host.velocity.principal.spherical', orbits.sub_inds[i][orbits.sub_inds[i]>=0])[:,0][:len(times)]
-    Lz_data = angs['ang.mom.vector'][i][:,2][:len(times)]
-    #
-    # Set up the figure
-    plt.rcParams["font.family"] = "serif"
-    plt.figure(figsize=(10, 12))
-    ax1 = plt.subplot(311)
-    ax2 = plt.subplot(312, sharex=ax1)
-    ax3 = plt.subplot(313, sharex=ax2)
-    #
-    # Plot the distances
-    ax1.plot(times, d_data, 'k', label='Simulation')
-    ax1.plot(-1*ts, d_model, label='Model', alpha=0.5)
-    ax1.set_xlim(times[-1], times[0])
-    #
-    # Check to see if there were infall, pericenter, or apocenter events
-    infall = infall_info['check'][i]
-    #
-    # If there were, plot when they occurred
-    if infall == True:
-        infall_time = infall_info['time.lb'][i]
-        ax1.axvline(x=infall_time, ymin=0, ymax=1, color='k', linestyle=':')
-    #
-    # Set the labels and save the figure
-    ax1.set_ylim(top=np.nanmax(d_data)+100)
-    ax1.label_outer()
-    ax1.set_ylabel('r [kpc]', fontsize=32)
-    ax1.legend(prop={'size': 16})
-    #
-    # Plot the velocity data
-    ax2.plot(times, v_data, 'k')
-    ax2.plot(-1*ts, v_model, alpha=0.5)
-    ax2.set_xlim(times[-1], times[0])
-    ax2.label_outer()
-    if infall == True:
-        infall_time = infall_info['time.lb'][i]
-        ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
-    #
-    ax2.set_ylabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=32)
-    #
-    # Plot the velocity data
-    ax3.plot(times, Lz_data/1000, 'k')
-    ax3.plot(-1*ts, Lz_model/1000, alpha=0.5)
-    ax3.set_xlim(times[-1], times[0])
-    ax3.set_ylabel('$L_{\\rm z}$ [$10^3$ kpc km s$^{-1}$]', fontsize=20)
-    if infall == True:
-        infall_time = infall_info['time.lb'][i]
-        ax3.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
-    #
-    ax3.set_xlabel('lookback time [Gyr]', fontsize=32)
-    plt.tight_layout()
-    plt.subplots_adjust(wspace=0, hspace=0)
-    plt.savefig(orbits.home_dir+'/orbit_data/plots/subhalo_integration/'+sim_data.galaxy+'/'+sim_data.galaxy+'_sub_'+str(i)+'.pdf')
-    plt.close()
+galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vR(ts), galpy_orbits.vT(ts))
+tts = (-1)*np.linspace(0.0, -13.78, 1378)
+peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, tts)
+apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, tts)
+
+# Save the data to a dictionary
+data_dict = dict()
+#
+# z = 0 indices
+data_dict['indices.z0'] = orbits.sub_inds
+#
+# Stellar mass of the subhalos at z = 0
+data_dict['Mstar.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
+#
+# Infall information
+data_dict['infall.check'] = infall_info['check']
+data_dict['first.infall.snap'] = infall_info['first.infall.snap']
+data_dict['first.infall.time'] = infall_info['first.infall.time']
+data_dict['first.infall.time.lb'] = infall_info['first.infall.time.lb']
+data_dict['all.infall.snap'] = infall_info['all.infall.snap']
+data_dict['all.infall.time'] = infall_info['all.infall.time']
+data_dict['all.infall.time.lb'] = infall_info['all.infall.time.lb']
+#
+# Pericenter checks and numbers
+data_dict['pericenter.check.sim'] = peris['pericenter.num']
+data_dict['N.peri.sim'] = peris['pericenter.num']
+data_dict['pericenter.check.galpy'] = peris_galpy['pericenter.num']
+data_dict['N.peri.galpy'] = peris_galpy['pericenter.num']
+#
+# Pericenter distances
+data_dict['pericenter.dist.sim'] = peris['pericenter.dist']
+data_dict['pericenter.dist.galpy'] = peris_galpy['pericenter.dist']
+#
+# Pericenter velocities
+data_dict['pericenter.vel.sim'] = peris['pericenter.vel']
+data_dict['pericenter.vel.galpy'] = peris_galpy['pericenter.vel']
+#
+# Pericenter times
+data_dict['pericenter.time.sim'] = peris['pericenter.time']
+data_dict['pericenter.time.galpy'] = peris_galpy['pericenter.time']
+data_dict['pericenter.time.lb.sim'] = peris['pericenter.time.lb']
+data_dict['pericenter.time.lb.galpy'] = peris_galpy['pericenter.time.lb']
+#
+# Apocenter checks
+data_dict['apocenter.check.sim'] = apos['apocenter.check']
+data_dict['apocenter.check.galpy'] = apos_galpy['apocenter.check']
+#
+# Apocenter distances
+data_dict['apocenter.dist.sim'] = apos['apocenter.dist']
+data_dict['apocenter.dist.galpy'] = apos_galpy['apocenter.dist']
+#
+# Apocenter velocities
+data_dict['apocenter.vel.sim'] = apos['apocenter.vel']
+data_dict['apocenter.vel.galpy'] = apos_galpy['apocenter.vel']
+#
+# Apocenter times
+data_dict['apocenter.time.sim'] = apos['apocenter.time']
+data_dict['apocenter.time.galpy'] = apos_galpy['apocenter.time']
+data_dict['apocenter.time.lb.sim'] = apos['apocenter.time.lb']
+data_dict['apocenter.time.lb.galpy'] = apos_galpy['apocenter.time.lb']
+#
+# Maximum distances and times
+data_dict['max.dist.sim'] = apos['max.dist']
+data_dict['max.dist.time.sim'] = apos['max.dist.time']
+data_dict['max.dist.time.lb.sim'] = apos['max.dist.time.lb']
+#
+# distance, velocity, Lz vs time
+data_dict['dtot.sim'] = halt_dists
+data_dict['vtot.sim'] = halt_vels
+#data_dict['Ltot.sim'] = angs['ang.mom.total']
+data_dict['Lz.sim'] = angs['ang.mom.vector'][:,:,2]
+###### NEED TANGENTIAL VELOCITIES
+data_dict['time.sim'] = snaps['time']
+#
+data_dict['dtot.galpy'] = galpy_orbits.r(ts)
+data_dict['vtot.galpy'] = galpy_vels
+data_dict['Lz.galpy'] = galpy_orbits.Lz(ts)
+data_dict['time.galpy'] = ts
+
+ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
