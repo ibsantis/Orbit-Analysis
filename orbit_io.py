@@ -104,9 +104,15 @@ class OrbitRead:
             self.gal_1 = gal1
             self.gal_2 = gal2
             self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
-        else:
+        elif location == 'stampede' and self.num_gal == 1:
             self.home_dir = '/home1/05400/ibsantis/scripts'
             self.simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+self.galaxy+resolution
+        elif location == 'stampede' and self.num_gal == 2:
+            self.home_dir = '/home1/05400/ibsantis/scripts'
+            self.simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+self.galaxy+resolution
+            self.gal_1 = gal1
+            self.gal_2 = gal2
+
 
 class OrbitAnalysis:
 
