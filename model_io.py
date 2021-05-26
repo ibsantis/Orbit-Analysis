@@ -431,13 +431,12 @@ class Profiles:
         #
         return density_inner + density_outer
 
-
     def disk_radial_mass(self, distances, gal):
         """
         DESCRIPTION:
             Model the disk as the sum of two exponentials, one for the inner
             region, and one for the outer. Here, the vertical component is
-            integrated out already, resulting in a factor of h_z (the scale
+            integrated out already, resulting in a factor of 2*h_z (the scale
             height) out front.
 
         VARIABLES:
@@ -461,7 +460,6 @@ class Profiles:
         mass_outer = (4*np.pi*A_disk_out*h_z*r_out)*(r_out-np.exp(-distances/r_out)*(r_out+distances))
         #
         return mass_inner + mass_outer
-
 
     def halo_nfw_density(self):
         """
