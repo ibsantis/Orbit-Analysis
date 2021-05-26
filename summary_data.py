@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12m', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -90,6 +90,9 @@ data_dict['indices.z0'] = orbits.sub_inds
 # Stellar mass of the subhalos at z = 0
 data_dict['Mstar.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
 #
+# Check for poles
+data_dict['pole.check'] = poles
+#
 # Infall information
 data_dict['infall.check'] = infall_info['check']
 data_dict['first.infall.snap'] = infall_info['first.infall.snap']
@@ -100,9 +103,9 @@ data_dict['all.infall.time'] = infall_info['all.infall.time']
 data_dict['all.infall.time.lb'] = infall_info['all.infall.time.lb']
 #
 # Pericenter checks and numbers
-data_dict['pericenter.check.sim'] = peris['pericenter.num']
+data_dict['pericenter.check.sim'] = peris['pericenter.check']
 data_dict['N.peri.sim'] = peris['pericenter.num']
-data_dict['pericenter.check.galpy'] = peris_galpy['pericenter.num']
+data_dict['pericenter.check.galpy'] = peris_galpy['pericenter.check']
 data_dict['N.peri.galpy'] = peris_galpy['pericenter.num']
 #
 # Pericenter distances
@@ -155,4 +158,4 @@ data_dict['vtot.galpy'] = galpy_vels
 data_dict['Lz.galpy'] = galpy_orbits.Lz(ts)
 data_dict['time.galpy'] = ts
 
-ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
+ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
