@@ -759,7 +759,7 @@ class OrbitAnalysis:
                 lr = (-1)*tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
                 lphi = (-1)*((tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,2]) - (tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,0]))
                 lz = tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
-            elif host == 1:
+            elif host == 2:
                 lr = (-1)*tree.prop('host2.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
                 lphi = (-1)*((tree.prop('host2.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,2]) - (tree.prop('host2.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,0]))
                 lz = tree.prop('host2.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
