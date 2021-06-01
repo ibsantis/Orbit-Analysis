@@ -180,7 +180,7 @@ if sim_data.num_gal == 2:
     angs = orbits.angular_momentum(tree=halt)
     #
     # Initialize the orbits in Galpy
-    galpy_orbits = orbit_gal.galpy_orbit_init(tree=halt)
+    galpy_orbits = orbit_gal.galpy_orbit_init(tree=halt, host=1)
 
     # Read in the fitting parameters
     fitting_data = pd.read_csv(sim_data.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
@@ -306,7 +306,7 @@ if sim_data.num_gal == 2:
     angs = orbits.angular_momentum(tree=halt, host=2)
     #
     # Initialize the orbits in Galpy
-    galpy_orbits = orbit_gal.galpy_orbit_init(tree=halt)
+    galpy_orbits = orbit_gal.galpy_orbit_init(tree=halt, host=2)
 
     # Read in the fitting parameters
     fitting_data = pd.read_csv(sim_data.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
