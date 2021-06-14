@@ -88,8 +88,9 @@ if sim_data.num_gal == 1:
     # z = 0 indices
     data_dict['indices.z0'] = orbits.sub_inds
     #
-    # Stellar mass of the subhalos at z = 0
+    # Stellar mass of the subhalos at z = 0 and peak stellar mass
     data_dict['Mstar.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
+    data_dict['Mstar.peak'] = halt.prop('star.mass.peak', orbits.sub_inds[:,0])
     #
     # Check for poles
     data_dict['pole.check'] = poles
@@ -158,6 +159,9 @@ if sim_data.num_gal == 1:
     data_dict['vtot.galpy'] = galpy_vels
     data_dict['Lz.galpy'] = galpy_orbits.Lz(ts)
     data_dict['time.galpy'] = ts
+    #
+    # Save the host radius
+    data_dict['host.radius'] = host_radii
 
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
 
@@ -215,8 +219,9 @@ if sim_data.num_gal == 2:
     # z = 0 indices
     data_dict['indices.z0'] = orbits.sub_inds
     #
-    # Stellar mass of the subhalos at z = 0
+    # Stellar mass of the subhalos at z = 0 and peak stellar mass
     data_dict['Mstar.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
+    data_dict['Mstar.peak'] = halt.prop('star.mass.peak', orbits.sub_inds[:,0])
     #
     # Check for poles
     data_dict['pole.check'] = poles
@@ -285,6 +290,9 @@ if sim_data.num_gal == 2:
     data_dict['vtot.galpy'] = galpy_vels
     data_dict['Lz.galpy'] = galpy_orbits.Lz(ts)
     data_dict['time.galpy'] = ts
+    #
+    # Save the host radius
+    data_dict['host.radius'] = host_radii
     #
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1, dict_or_array_to_write=data_dict, verbose=True)
     #
@@ -341,8 +349,9 @@ if sim_data.num_gal == 2:
     # z = 0 indices
     data_dict['indices.z0'] = orbits.sub_inds
     #
-    # Stellar mass of the subhalos at z = 0
+    # Stellar mass of the subhalos at z = 0 and peak stellar mass
     data_dict['Mstar.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
+    data_dict['Mstar.peak'] = halt.prop('star.mass.peak', orbits.sub_inds[:,0])
     #
     # Check for poles
     data_dict['pole.check'] = poles
@@ -411,5 +420,8 @@ if sim_data.num_gal == 2:
     data_dict['vtot.galpy'] = galpy_vels
     data_dict['Lz.galpy'] = galpy_orbits.Lz(ts)
     data_dict['time.galpy'] = ts
+    #
+    # Save the host radius
+    data_dict['host.radius'] = host_radii
 
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2, dict_or_array_to_write=data_dict, verbose=True)
