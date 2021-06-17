@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 ​
-# Stampede2 SKX node: 48 cores, 4 (3.5 useable) GB per core, 192 GB total
-#SBATCH --partition=skx-normal
 #SBATCH --job-name=m12b_mass_profile_parallel
-##SBATCH --mem=192G
+#SBATCH --partition=skx-normal
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
+#SBATCH --cpus-per-task=1    # processes per task
 #SBATCH --time=08:00:00
 #SBATCH --output=/home1/05400/ibsantis/scripts/jobs/m12b_mass_profile_parallel_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
 #SBATCH --mail-type=begin
+#SBATCH --account=TG-AST140064
 
 """
 
