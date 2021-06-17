@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 ​
 # Stampede2 SKX node: 48 cores, 4 (3.5 useable) GB per core, 192 GB total
-#SBATCH --job-name=m12b_mass_profile_parallel
 #SBATCH --partition=skx-normal
+#SBATCH --job-name=m12b_mass_profile_parallel
 #SBATCH --mem=192G
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
