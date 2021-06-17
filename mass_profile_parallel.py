@@ -3,7 +3,7 @@
 #SBATCH --job-name=m12b_mass_profile_parallel
 #SBATCH --partition=skx-normal
 #SBATCH --nodes=1
-#SBATCH --ntasks=4    # processes total
+#SBATCH --ntasks-per-node=4    # processes total
 #SBATCH --cpus-per-task=1    # processes per task
 #SBATCH --time=08:00:00
 #SBATCH --output=/home1/05400/ibsantis/scripts/jobs/m12b_mass_profile_parallel_%j.txt
