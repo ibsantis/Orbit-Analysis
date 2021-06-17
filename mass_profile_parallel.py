@@ -3,11 +3,9 @@
 # Stampede2 SKX node: 48 cores, 4 (3.5 useable) GB per core, 192 GB total
 #SBATCH --partition=skx-normal
 #SBATCH --job-name=m12b_mass_profile_parallel
-#SBATCH --mem=192G
+##SBATCH --mem=192G
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
-##SBATCH --ntasks-per-node=1    # processes per node
-##SBATCH --cpus-per-task=4    # processes per task
 #SBATCH --time=08:00:00
 #SBATCH --output=/home1/05400/ibsantis/scripts/jobs/m12b_mass_profile_parallel_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
