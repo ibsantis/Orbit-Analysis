@@ -27,10 +27,6 @@ Submit a job to the SLURM queue.
 '''
 
 import os
-
-from utilities.basic import io as ut_io
-
-import os
 from utilities.basic import io as ut_io    # if you want to use my print diagnostics
 
 # print run-time and CPU information
