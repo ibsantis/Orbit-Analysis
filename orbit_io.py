@@ -116,7 +116,7 @@ class OrbitRead:
 
 class OrbitAnalysis:
 
-    def __init__(self, tree, gal1, location, host=1):
+    def __init__(self, tree, gal1, location, host):
         """
         DESCRIPTION:
             Returns the indices of luminous subhalos along with their progenitor
@@ -914,7 +914,7 @@ class OrbitAnalysis:
 
 class OrbitGalpy(OrbitAnalysis):
 
-    def __init__(self, tree, gal1, location, host=1):
+    def __init__(self, tree, gal1, location, hos):
         """
         Need to do this to inherit the subhalo indices defined from __init__
         in OrbitAnalysis
@@ -1280,12 +1280,12 @@ class OrbitGalpy(OrbitAnalysis):
 
 class OrbitPlot(OrbitAnalysis):
 
-    def __init__(self, tree, gal1, location, host=1):
+    def __init__(self, tree, gal1, location, host):
         """
         Need to do this to inherit the subhalo indices defined from __init__
         in OrbitAnalysis
         """
-        OrbitAnalysis.__init__(self, tree, gal1, location, host=1)
+        OrbitAnalysis.__init__(self, tree, gal1, location, host)
 
     def orbit_energy_plot(
         self,
