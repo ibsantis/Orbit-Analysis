@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12m', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -38,9 +38,9 @@ halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_k
 
 if sim_data.num_gal == 1:
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton')
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location='peloton')
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location='peloton')
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
@@ -91,6 +91,8 @@ if sim_data.num_gal == 1:
     # Stellar mass of the subhalos at z = 0 and peak stellar mass
     data_dict['Mstar.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
     data_dict['Mstar.peak'] = halt.prop('star.mass.peak', orbits.sub_inds[:,0])
+    data_dict['Mhalo.z0'] = halt['mass'][orbits.sub_inds[:,0]]
+    data_dict['Mhalo.peak'] = halt.prop('mass.peak', orbits.sub_inds[:,0])
     #
     # Check for poles
     data_dict['pole.check'] = poles
@@ -169,9 +171,9 @@ if sim_data.num_gal == 2:
     #
     ### GALAXY 1
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton')
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton')
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton')
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
@@ -222,6 +224,8 @@ if sim_data.num_gal == 2:
     # Stellar mass of the subhalos at z = 0 and peak stellar mass
     data_dict['Mstar.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
     data_dict['Mstar.peak'] = halt.prop('star.mass.peak', orbits.sub_inds[:,0])
+    data_dict['Mhalo.z0'] = halt['mass'][orbits.sub_inds[:,0]]
+    data_dict['Mhalo.peak'] = halt.prop('mass.peak', orbits.sub_inds[:,0])
     #
     # Check for poles
     data_dict['pole.check'] = poles
@@ -299,9 +303,9 @@ if sim_data.num_gal == 2:
     #
     ### GALAXY 2
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton')
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton')
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton')
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt, host=2) # set host=1 for the first host, host=2 for the other
@@ -352,6 +356,8 @@ if sim_data.num_gal == 2:
     # Stellar mass of the subhalos at z = 0 and peak stellar mass
     data_dict['Mstar.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
     data_dict['Mstar.peak'] = halt.prop('star.mass.peak', orbits.sub_inds[:,0])
+    data_dict['Mhalo.z0'] = halt['mass'][orbits.sub_inds[:,0]]
+    data_dict['Mhalo.peak'] = halt.prop('mass.peak', orbits.sub_inds[:,0])
     #
     # Check for poles
     data_dict['pole.check'] = poles
