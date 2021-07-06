@@ -116,7 +116,7 @@ class OrbitRead:
 
 class OrbitAnalysis:
 
-    def __init__(self, tree, gal1, location):
+    def __init__(self, tree, gal1, location, host=1):
         """
         DESCRIPTION:
             Returns the indices of luminous subhalos along with their progenitor
@@ -139,17 +139,46 @@ class OrbitAnalysis:
             - Each row has a length of 597. There are no halos that exist in
               snapshots 0,1,2,3.
         """
-        # Select the subhalo indices at z = 0
-        z0_inds = ut.array.get_indices(tree['snapshot'], 600)
-        # Select luminous subhalos at z = 0 and find their progenitor indices
-        z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [3e4, np.inf], z0_inds)
-        z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
-        # Set attributes for subhalo indices and the shape of the array
-        self.sub_inds = z0_inds_w_star_prog
-        self.shape = self.sub_inds.shape
-        #
-        # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
-        OrbitRead.__init__(self, gal1, location)
+        if self.num_gal == 1:
+            # Select the subhalo indices at z = 0
+            z0_inds = ut.array.get_indices(tree['snapshot'], 600)
+            z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
+            # Select luminous subhalos at z = 0 and find their progenitor indices
+            z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [3e4, np.inf], z0_inds)
+            z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
+            # Set attributes for subhalo indices and the shape of the array
+            self.sub_inds = z0_inds_w_star_prog
+            self.shape = self.sub_inds.shape
+            #
+            # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
+            OrbitRead.__init__(self, gal1, location)
+        elif self.num_gal == 2:
+            if host == 1:
+                # Select the subhalo indices at z = 0
+                z0_inds = ut.array.get_indices(tree['snapshot'], 600)
+                z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
+                # Select luminous subhalos at z = 0 and find their progenitor indices
+                z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [3e4, np.inf], z0_inds)
+                z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
+                # Set attributes for subhalo indices and the shape of the array
+                self.sub_inds = z0_inds_w_star_prog
+                self.shape = self.sub_inds.shape
+                #
+                # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
+                OrbitRead.__init__(self, gal1, location)
+            elif host == 2:
+                # Select the subhalo indices at z = 0
+                z0_inds = ut.array.get_indices(tree['snapshot'], 600)
+                z0_inds = z0_inds[z0_inds != tree['host2.index'][0]]
+                # Select luminous subhalos at z = 0 and find their progenitor indices
+                z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [3e4, np.inf], z0_inds)
+                z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
+                # Set attributes for subhalo indices and the shape of the array
+                self.sub_inds = z0_inds_w_star_prog
+                self.shape = self.sub_inds.shape
+                #
+                # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
+                OrbitRead.__init__(self, gal1, location)
 
     def halo_distances(self, tree, host=1):
         """
@@ -885,12 +914,12 @@ class OrbitAnalysis:
 
 class OrbitGalpy(OrbitAnalysis):
 
-    def __init__(self, tree, gal1, location):
+    def __init__(self, tree, gal1, location, host=1):
         """
         Need to do this to inherit the subhalo indices defined from __init__
         in OrbitAnalysis
         """
-        OrbitAnalysis.__init__(self, tree, gal1, location)
+        OrbitAnalysis.__init__(self, tree, gal1, location, host)
 
     def galpy_orbit_init(self, tree, host=1):
         sub_orbits = []
@@ -1251,12 +1280,12 @@ class OrbitGalpy(OrbitAnalysis):
 
 class OrbitPlot(OrbitAnalysis):
 
-    def __init__(self, tree, gal1, location):
+    def __init__(self, tree, gal1, location, host=1):
         """
         Need to do this to inherit the subhalo indices defined from __init__
         in OrbitAnalysis
         """
-        OrbitAnalysis.__init__(self, tree, gal1, location)
+        OrbitAnalysis.__init__(self, tree, gal1, location, host=1)
 
     def orbit_energy_plot(
         self,
