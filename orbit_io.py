@@ -910,7 +910,7 @@ class OrbitAnalysis:
 
 class OrbitGalpy(OrbitAnalysis):
 
-    def __init__(self, tree, gal1, location, hos):
+    def __init__(self, tree, gal1, location, host):
         """
         Need to do this to inherit the subhalo indices defined from __init__
         in OrbitAnalysis
