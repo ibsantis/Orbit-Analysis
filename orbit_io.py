@@ -139,6 +139,9 @@ class OrbitAnalysis:
             - Each row has a length of 597. There are no halos that exist in
               snapshots 0,1,2,3.
         """
+        # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
+        OrbitRead.__init__(self, gal1, location)
+        #
         if self.num_gal == 1:
             # Select the subhalo indices at z = 0
             z0_inds = ut.array.get_indices(tree['snapshot'], 600)
@@ -149,9 +152,7 @@ class OrbitAnalysis:
             # Set attributes for subhalo indices and the shape of the array
             self.sub_inds = z0_inds_w_star_prog
             self.shape = self.sub_inds.shape
-            #
-            # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
-            OrbitRead.__init__(self, gal1, location)
+        #
         elif self.num_gal == 2:
             if host == 1:
                 # Select the subhalo indices at z = 0
@@ -163,9 +164,7 @@ class OrbitAnalysis:
                 # Set attributes for subhalo indices and the shape of the array
                 self.sub_inds = z0_inds_w_star_prog
                 self.shape = self.sub_inds.shape
-                #
-                # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
-                OrbitRead.__init__(self, gal1, location)
+            #
             elif host == 2:
                 # Select the subhalo indices at z = 0
                 z0_inds = ut.array.get_indices(tree['snapshot'], 600)
@@ -176,9 +175,6 @@ class OrbitAnalysis:
                 # Set attributes for subhalo indices and the shape of the array
                 self.sub_inds = z0_inds_w_star_prog
                 self.shape = self.sub_inds.shape
-                #
-                # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
-                OrbitRead.__init__(self, gal1, location)
 
     def halo_distances(self, tree, host=1):
         """
