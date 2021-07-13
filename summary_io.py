@@ -710,31 +710,44 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def plot_hist(self, x, binsize, file_path_and_name, pdf=False, xtype='d.sim', xlimits=None):
+    def plot_hist(self, x, binsize, file_path_and_name, pdf=False, xtype='d.sim', xlimits=None, title=None):
         """
         TBD
         """
         if pdf:
-            den = True
             y_label = 'PDF'
         else:
-            den = False
             y_label = 'N'
         #
+        if 'M.' in xtype:
+            x = np.log10(x)
         # Plot the data
         plt.figure(figsize=(10, 8))
         #
         if 'N.' not in xtype:
-            if binsize*np.floor(np.min(x)/binsize) % 1 != 0:
-                minn = int(np.floor(binsize*np.floor(np.min(x)/binsize)))
-            else:
-                minn = int(binsize*np.floor(np.min(x)/binsize))
-            if binsize*np.ceil(np.max(x)/binsize) % 1 != 0:
-                maxx = int(np.ceil(binsize*np.ceil(np.max(x)/binsize)))
-            else:
-                maxx = int(binsize*np.ceil(np.max(x)/binsize))
-            bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
-            bin_array = np.linspace(minn, maxx, bin_num)
+            if 'M.' not in xtype:
+                if binsize*np.floor(np.min(x)/binsize) % 1 != 0:
+                    minn = int(np.floor(binsize*np.floor(np.min(x)/binsize)))
+                else:
+                    minn = int(binsize*np.floor(np.min(x)/binsize))
+                if binsize*np.ceil(np.max(x)/binsize) % 1 != 0:
+                    maxx = int(np.ceil(binsize*np.ceil(np.max(x)/binsize)))
+                else:
+                    maxx = int(binsize*np.ceil(np.max(x)/binsize))
+                bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
+                bin_array = np.linspace(minn, maxx, bin_num)
+            #
+            elif 'M.' in xtype:
+                if binsize*np.floor(np.min(x)/binsize) % 1 != 0:
+                    minn = int(np.floor(binsize*np.floor(np.min(x)/binsize)))
+                else:
+                    minn = int(binsize*np.floor(np.min(x)/binsize))
+                if binsize*np.ceil(np.max(x)/binsize) % 1 != 0:
+                    maxx = int(np.ceil(binsize*np.ceil(np.max(x)/binsize)))
+                else:
+                    maxx = int(binsize*np.ceil(np.max(x)/binsize))
+                bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
+                bin_array = np.linspace(minn, maxx, bin_num)
             #
             # Calculate the scatter
             onesigp = 84.13
@@ -742,9 +755,9 @@ class SummaryDataPlot(SummaryDataSort):
             sigma_one_op = np.nanpercentile(x, onesigp)
             sigma_one_om = np.nanpercentile(x, onesigm)
             #
-            y_med = np.max(np.histogram(x, bin_array, normed=den)[0])*1.1
+            y_med = np.max(np.histogram(x, bin_array, normed=pdf)[0])*1.1
             #
-            plt.hist(x, bin_array, density=den, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
+            plt.hist(x, bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
             plt.errorbar(np.median(x), y_med, xerr=np.array([[np.median(x)-sigma_one_om],[sigma_one_op-np.median(x)]]), color='k', lw=5, capsize=8)
             plt.scatter(np.median(x), y_med, s=250, marker='s', c='k')
         #
@@ -754,9 +767,9 @@ class SummaryDataPlot(SummaryDataSort):
             bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
             bin_array = np.linspace(minn, maxx, bin_num)
             #
-            y_mean = np.max(np.histogram(x, bin_array, normed=den)[0])*1.1
+            y_mean = np.max(np.histogram(x, bin_array, normed=pdf)[0])*1.1
             #
-            plt.hist(x, bin_array, density=den, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
+            plt.hist(x, bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
             plt.errorbar(np.mean(x), y_mean, xerr=np.array([[2*np.std(x)],[2*np.std(x)]]), color='k', lw=5, capsize=8, alpha=0.3)
             plt.errorbar(np.mean(x), y_mean, xerr=np.array([[np.std(x)],[np.std(x)]]), color='k', lw=5, capsize=8)
             plt.scatter(np.mean(x), y_mean, s=250, marker='s', c='k')
@@ -764,147 +777,9 @@ class SummaryDataPlot(SummaryDataSort):
         plt.xlim(xlimits)
         plt.xlabel(self.labels[xtype], fontsize=28)
         plt.ylabel(y_label, fontsize=28)
-        plt.title(self.titles[xtype], fontsize=24)
+        if title:
+            plt.title(self.titles[title], fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
         plt.tight_layout()
         plt.savefig(file_path_and_name)
         plt.close()
-
-    def delta_dperi_hist(self, x, binsize, file_path_and_name, xlimits=None, fraction=True, pdf=True):
-        """
-        TBD
-        """
-        #
-        if fraction:
-            x_label = '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$'
-        else:
-            x_label = '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$) [kpc]'
-        #
-        minn = int(binsize*np.floor(np.min(x)/binsize))
-        maxx = int(binsize*np.ceil(np.max(x)/binsize))
-        bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
-        bin_array = np.linspace(minn, maxx, bin_num)
-        #
-        y_med = np.max(np.histogram(x, bin_array, normed=pdf)[0])*1.1
-        #
-        # Calculate the scatter
-        onesigp = 84.13
-        onesigm = 15.87
-        sigma_one_op = np.nanpercentile(x, onesigp)
-        sigma_one_om = np.nanpercentile(x, onesigm)
-        #
-        # Plot the data
-        plt.figure(figsize=(10, 8))
-        plt.hist(x, bin_array, density=True, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
-        #
-        plt.errorbar(np.median(x), y_med, xerr=np.array([[np.median(x)-sigma_one_om],[sigma_one_op-np.median(x)]]), color='k', lw=5, capsize=8)
-        plt.scatter(np.median(x), y_med, s=250, marker='s', c='k')
-        #
-        plt.xlim(xlimits)
-        plt.xlabel(x_label, fontsize=28)
-        plt.ylabel('PDF', fontsize=28)
-        plt.title('Recent Pericenter Distances', fontsize=24)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
-    def delta_tperi_hist(self, x, binsize, file_path_and_name, xlimits=None, fraction=True, pdf=True):
-        """
-        TBD
-        """
-        #
-        if fraction:
-            x_label = '(t$_{\\rm peri,lb,model}$ - t$_{\\rm peri,lb,sim}$)/t$_{\\rm peri,lb,sim}$'
-        else:
-            x_label = '(t$_{\\rm peri,lb,model}$ - t$_{\\rm peri,lb,sim}$) [Gyr]'
-        #
-        if binsize*np.floor(np.min(x)/binsize) % 1 != 0:
-            minn = int(np.floor(binsize*np.floor(np.min(x)/binsize)))
-        else:
-            minn = int(binsize*np.floor(np.min(x)/binsize))
-        if binsize*np.ceil(np.max(x)/binsize) % 1 != 0:
-            maxx = int(np.ceil(binsize*np.ceil(np.max(x)/binsize)))
-        else:
-            maxx = int(binsize*np.ceil(np.max(x)/binsize))
-        bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
-        bin_array = np.linspace(minn, maxx, bin_num)
-        #
-        y_med = np.max(np.histogram(x, bin_array, normed=pdf)[0])*1.1
-        #
-        # Calculate the scatter
-        onesigp = 84.13
-        onesigm = 15.87
-        sigma_one_op = np.nanpercentile(x, onesigp)
-        sigma_one_om = np.nanpercentile(x, onesigm)
-        #
-        # Plot the data
-        plt.figure(figsize=(10, 8))
-        plt.hist(x, bin_array, density=True, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
-        #
-        plt.errorbar(np.median(x), y_med, xerr=np.array([[np.median(x)-sigma_one_om],[sigma_one_op-np.median(x)]]), color='k', lw=5, capsize=8)
-        plt.scatter(np.median(x), y_med, s=250, marker='s', c='k')
-        #
-        if xlimits:
-            plt.xlim(xlimits)
-        plt.xlabel(x_label, fontsize=28)
-        plt.ylabel('PDF', fontsize=28)
-        plt.title('Recent Pericenter Lookback Times', fontsize=24)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
-    def mstar_hist(self, x, binsize, file_path_and_name, log=False, selection='z0', xlimits=None, pdf=True):
-        """
-        TBD
-        """
-        #
-        if log == True:
-            if binsize*np.floor(np.min(np.log10(x))/binsize) % 1 != 0:
-                minn = int(np.floor(binsize*np.floor(np.min(np.log10(x))/binsize)))
-            else:
-                minn = int(binsize*np.floor(np.min(np.log10(x))/binsize))
-            if binsize*np.ceil(np.max(np.log10(x))/binsize) % 1 != 0:
-                maxx = int(np.ceil(binsize*np.ceil(np.max(np.log10(x))/binsize)))
-            else:
-                maxx = int(binsize*np.ceil(np.max(np.log10(x))/binsize))
-            bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
-            bin_array = np.linspace(minn, maxx, bin_num)
-            #
-            if selection == 'z0':
-                x_label = 'log$_{\\rm 10}$($M_{\\rm star}(z = 0)/M_{\\odot}$)'
-            elif selection == 'peak':
-                x_label = 'log$_{\\rm 10}$($M_{\\rm star,peak}/M_{\\odot}$)'
-            #
-            if pdf:
-                y_label = 'PDF'
-            else:
-                y_label = 'N'
-            #
-            # Calculate the scatter
-            onesigp = 84.13
-            onesigm = 15.87
-            sigma_one_op = np.nanpercentile(np.log10(x), onesigp)
-            sigma_one_om = np.nanpercentile(np.log10(x), onesigm)
-            #
-            y_med = np.max(np.histogram(np.log10(x), bin_array, normed=pdf)[0])*1.1
-            #
-            # Plot the data
-            plt.figure(figsize=(10, 8))
-            plt.hist(np.log10(x), bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
-            #
-            plt.errorbar(np.median(np.log10(x)), y_med, xerr=np.array([[np.median(np.log10(x))-sigma_one_om],[sigma_one_op-np.median(np.log10(x))]]), color='k', lw=5, capsize=8)
-            plt.scatter(np.median(np.log10(x)), y_med, s=250, marker='s', c='k')
-            #
-            if xlimits:
-                plt.xlim(xlimits)
-            plt.xlabel(x_label, fontsize=28)
-            plt.ylabel(y_label, fontsize=28)
-            plt.title('Satellite M$_{\\rm star}$ Histogram', fontsize=24)
-            plt.tick_params(axis='both', which='major', labelsize=24)
-            plt.tight_layout()
-            plt.savefig(file_path_and_name)
-            plt.close()
-        elif log == False:
-            print('Haven\'t thought far enough ahead to bin outside of log-space :(')
