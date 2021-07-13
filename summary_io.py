@@ -46,7 +46,7 @@ class SummaryDataSort:
         #
         return data_dict
 
-    def data_mask(self, dictionary, outliers=False, peri_sim=True, peri_model=False, current_sat=False):
+    def data_mask(self, dictionary, outliers=False, peri_sim=True, peri_model=False, current_sat=False, either=False):
         """
         DESCRIPTION:
             Create a dictionary of masks for the satellites that depends on whether they
@@ -70,52 +70,108 @@ class SummaryDataSort:
         # If not interested in outliers, do the following masks
         if outliers == False:
             #
-            # Pericenter in simulation but not required in the model
-            if (peri_sim == True) & (peri_model == False):
+            if either == True:
                 #
                 # If not interested in whether they are currently satellites, do this
                 if current_sat == False:
                     for name in self.host_names:
-                        mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']
+                        mask_dict[name] = dictionary[name]['infall.check']*(dictionary[name]['pericenter.check.sim'] | dictionary[name]['pericenter.check.galpy'])
                 #
                 # If interested in current sats only, do this
                 elif current_sat == True:
                     for name in self.host_names:
-                        mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*(dictionary[name]['dtot.sim'][:,0] < dictionary[name]['host.radius'][0])
+                        mask_dict[name] = dictionary[name]['infall.check']*(dictionary[name]['pericenter.check.sim'] | dictionary[name]['pericenter.check.galpy'])*(dictionary[name]['dtot.sim'][:,0] < dictionary[name]['host.radius'][0])
             #
-            # Pericenter required in simulation and in model
-            elif (peri_sim == True) & (peri_model == True):
+            elif either == False:
                 #
-                # If not interested in whether they are currently satellites, do this
-                if current_sat == False:
-                    for name in self.host_names:
-                        mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*dictionary[name]['pericenter.check.galpy']
-                #
-                # If interested in current sats only, do this
-                elif current_sat == True:
-                    for name in self.host_names:
-                        mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*dictionary[name]['pericenter.check.galpy']*(dictionary[name]['dtot.sim'][:,0] < dictionary[name]['host.radius'][0])
-            #
-            # Pericenter not required in simulation or model
-            elif (peri_sim == False) & (peri_model == False):
+                # Pericenter in simulation but not required in the model
+                if (peri_sim == True) & (peri_model == False):
                     #
                     # If not interested in whether they are currently satellites, do this
                     if current_sat == False:
                         for name in self.host_names:
-                            dictionary[name]['infall.check'][0] = False
-                            mask_dict[name] = dictionary[name]['infall.check']
+                            mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']
                     #
                     # If interested in current sats only, do this
                     elif current_sat == True:
                         for name in self.host_names:
-                            dictionary[name]['infall.check'][0] = False
-                            mask_dict[name] = dictionary[name]['infall.check']*(dictionary[name]['dtot.sim'][:,0] < dictionary[name]['host.radius'][0])
+                            mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*(dictionary[name]['dtot.sim'][:,0] < dictionary[name]['host.radius'][0])
+                #
+                # Pericenter required in simulation and in model
+                elif (peri_sim == True) & (peri_model == True):
+                    #
+                    # If not interested in whether they are currently satellites, do this
+                    if current_sat == False:
+                        for name in self.host_names:
+                            mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*dictionary[name]['pericenter.check.galpy']
+                    #
+                    # If interested in current sats only, do this
+                    elif current_sat == True:
+                        for name in self.host_names:
+                            mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*dictionary[name]['pericenter.check.galpy']*(dictionary[name]['dtot.sim'][:,0] < dictionary[name]['host.radius'][0])
+                #
+                # Pericenter not required in simulation or model
+                elif (peri_sim == False) & (peri_model == False):
+                        #
+                        # If not interested in whether they are currently satellites, do this
+                        if current_sat == False:
+                            for name in self.host_names:
+                                mask_dict[name] = dictionary[name]['infall.check']
+                        #
+                        # If interested in current sats only, do this
+                        elif current_sat == True:
+                            for name in self.host_names:
+                                mask_dict[name] = dictionary[name]['infall.check']*(dictionary[name]['dtot.sim'][:,0] < dictionary[name]['host.radius'][0])
         #
         # If interested in outliers do this.
         elif outliers == True:
             for name in self.host_names:
                 mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*(~dictionary[name]['pericenter.check.galpy'])
         return mask_dict
+
+    def mass_masking_property(self, data_dict, mask_dict, prop, mass_type='Mstar.z0', oversample=False):
+        props = dict()
+        prop_low = []
+        prop_mid = []
+        prop_high = []
+        #
+        if oversample == False:
+            for name in self.host_names:
+                mask_low = (data_dict[name][mass_type][mask_dict[name]] < 1e5)
+                mask_mid = ((data_dict[name][mass_type][mask_dict[name]] > 1e5)*(data_dict[name][mass_type][mask_dict[name]] < 1e7))
+                mask_high = (data_dict[name][mass_type][mask_dict[name]] > 1e7)
+                if prop == 't.infall':
+                    prop_low.append(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_low])
+                    prop_mid.append(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_mid])
+                    prop_high.append(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_high])
+                elif prop == 'dz0':
+                    prop_low.append(data_dict[name]['dtot.sim'][mask_dict[name]][mask_low][:,0])
+                    prop_mid.append(data_dict[name]['dtot.sim'][mask_dict[name]][mask_mid][:,0])
+                    prop_high.append(data_dict[name]['dtot.sim'][mask_dict[name]][mask_high][:,0])
+            #
+            props['low'] = np.hstack(prop_low)
+            props['mid'] = np.hstack(prop_mid)
+            props['high'] = np.hstack(prop_high)
+        #
+        elif oversample == True:
+            for name in self.host_names:
+                mask_low = (data_dict[name][mass_type][mask_dict[name]] < 1e5)
+                mask_mid = ((data_dict[name][mass_type][mask_dict[name]] > 1e5)*(data_dict[name][mass_type][mask_dict[name]] < 1e7))
+                mask_high = (data_dict[name][mass_type][mask_dict[name]] > 1e7)
+                if prop == 't.infall':
+                    prop_low.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_low], self.oversample[name]))
+                    prop_mid.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_mid], self.oversample[name]))
+                    prop_high.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_high], self.oversample[name]))
+                elif prop == 'dz0':
+                    prop_low.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_low][:,0], self.oversample[name]))
+                    prop_mid.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_mid][:,0], self.oversample[name]))
+                    prop_high.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_high][:,0], self.oversample[name]))
+            #
+            props['low'] = np.hstack(prop_low)
+            props['mid'] = np.hstack(prop_mid)
+            props['high'] = np.hstack(prop_high)
+        #
+        return props
 
     def delta_nperi(self, data_dict, mask_dict, oversample=True):
         """
@@ -231,41 +287,55 @@ class SummaryDataSort:
         if fraction == False:
             if oversample == False:
                 for name in self.host_names:
-                    temp_array = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
+                    temp_array_model = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array_model == -1)
+                    temp_array_model[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
                     #
-                    data.append(temp_array - \
-                                data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0])
+                    temp_array_sim = data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array_sim == -1)
+                    temp_array_sim[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
+                    #
+                    data.append(temp_array_model - temp_array_sim)
             #
             elif oversample == True:
                 for name in self.host_names:
-                    temp_array = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
+                    temp_array_model = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array_model == -1)
+                    temp_array_model[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
                     #
-                    data.append(np.repeat(temp_array,self.oversample[name]) - \
-                                 np.repeat(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0],self.oversample[name]))
+                    temp_array_sim = data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array_sim == -1)
+                    temp_array_sim[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
+                    #
+                    data.append(np.repeat(temp_array_model,self.oversample[name]) - \
+                                 np.repeat(temp_array_sim,self.oversample[name]))
         #
         elif fraction == True:
             if oversample == False:
                 for name in self.host_names:
-                    temp_array = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
+                    temp_array_model = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array_model == -1)
+                    temp_array_model[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
                     #
-                    data.append((temp_array - \
-                                data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0])/data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0])
+                    temp_array_sim = data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array_sim == -1)
+                    temp_array_sim[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
+                    #
+                    data.append((temp_array_model - temp_array_sim)/temp_array_sim)
             #
             elif oversample == True:
                 for name in self.host_names:
-                    temp_array = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
+                    temp_array_model = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array_model == -1)
+                    temp_array_model[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
                     #
-                    data.append((np.repeat(temp_array,self.oversample[name]) - \
-                                 np.repeat(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0],self.oversample[name]))\
-                                 /np.repeat(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0],self.oversample[name]))
+                    temp_array_sim = data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array_sim == -1)
+                    temp_array_sim[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
+                    #
+                    data.append((np.repeat(temp_array_model,self.oversample[name]) - \
+                                 np.repeat(temp_array_sim,self.oversample[name]))\
+                                 /np.repeat(temp_array_sim,self.oversample[name]))
         return np.hstack(data)
 
     def tperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False):
@@ -315,41 +385,59 @@ class SummaryDataSort:
         if fraction == False:
             if oversample == False:
                 for name in self.host_names:
-                    temp_array = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = 0.0
+                    temp_array_model = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array_model == -1)
+                    temp_array_model[mask_temp] = 0.0
                     #
-                    data.append(temp_array - \
-                                data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0])
+                    temp_array_sim = data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array_sim == -1)
+                    temp_array_sim[mask_temp] = 0.0
+                    #
+                    data.append(temp_array_model - temp_array_sim)
             #
             elif oversample == True:
                 for name in self.host_names:
-                    temp_array = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = 0.0
+                    temp_array_model = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array_model == -1)
+                    temp_array_model[mask_temp] = 0.0
                     #
-                    data.append(np.repeat(temp_array,self.oversample[name]) - \
-                                 np.repeat(data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0],self.oversample[name]))
+                    temp_array_sim = data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array_sim == -1)
+                    temp_array_sim[mask_temp] = 0.0
+                    #
+                    data.append(np.repeat(temp_array_model,self.oversample[name]) - \
+                                 np.repeat(temp_array_sim,self.oversample[name]))
         #
         elif fraction == True:
             if oversample == False:
                 for name in self.host_names:
-                    temp_array = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = 0.0
+                    temp_array_model = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array_model == -1)
+                    temp_array_model[mask_temp] = 0.0
                     #
-                    data.append((temp_array - \
-                                data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0])/data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0])
+                    temp_array_sim = data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array_sim == -1)
+                    temp_array_sim[mask_temp] = 0.0
+                    #
+                    ratio = (temp_array_model - temp_array_sim)/temp_array_sim
+                    ratio[~np.isfinite(ratio)] = 0
+                    data.append(ratio)
             #
             elif oversample == True:
                 for name in self.host_names:
-                    temp_array = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = 0.0
+                    temp_array_model = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array_model == -1)
+                    temp_array_model[mask_temp] = 0.0
                     #
-                    data.append((np.repeat(temp_array,self.oversample[name]) - \
-                                 np.repeat(data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0],self.oversample[name]))\
-                                 /np.repeat(data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0],self.oversample[name]))
+                    temp_array_sim = data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array_sim == -1)
+                    temp_array_sim[mask_temp] = 0.0
+                    #
+                    ratio = (np.repeat(temp_array_model,self.oversample[name]) - \
+                                 np.repeat(temp_array_sim,self.oversample[name]))\
+                                 /np.repeat(temp_array_sim,self.oversample[name])
+                    ratio[~np.isfinite(ratio)] = 0
+                    data.append(ratio)
         return np.hstack(data)
 
     def first_infall(self, data_dict, mask_dict, oversample=False):
@@ -394,6 +482,32 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    def mhalo(self, data_dict, mask_dict, selection='z0', oversample=False):
+        """
+        TBD
+        """
+        data = []
+        #
+        if selection == 'z0':
+            if oversample == False:
+                for name in self.host_names:
+                    data.append(data_dict[name]['Mhalo.z0'][mask_dict[name]])
+            #
+            elif oversample == True:
+                for name in self.host_names:
+                    data.append(np.repeat(data_dict[name]['Mhalo.z0'][mask_dict[name]], self.oversample[name]))
+        #
+        elif selection == 'peak':
+            if oversample == False:
+                for name in self.host_names:
+                    data.append(data_dict[name]['Mhalo.peak'][mask_dict[name]])
+            #
+            elif oversample == True:
+                for name in self.host_names:
+                    data.append(np.repeat(data_dict[name]['Mhalo.peak'][mask_dict[name]], self.oversample[name]))
+        #
+        return np.hstack(data)
+
     def d_z0(self, data_dict, mask_dict, oversample=False):
         """
         TBD
@@ -418,52 +532,69 @@ class SummaryDataPlot(SummaryDataSort):
         TBD
         """
         SummaryDataSort.__init__(self)
+        #
         self.colors = ['#2f4f4f', '#006400', '#8b0000', '#000080', '#00ced1',\
                        '#ff8c00', '#c71585', '#7fff00', '#00fa9a', '#0000ff',\
                        '#ff00ff', '#1e90ff', '#f0e68c', '#ffc0cb']
+        #
+        self.labels = {'d.sim': 'd$_{\\rm peri,sim}$ [kpc]',\
+                       'd.model': 'd$_{\\rm peri,model}$ [kpc]',\
+                       'd.z0': 'd(z = 0) [kpc]',\
+                       'delta.d.frac': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$',\
+                       'delta.d': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$) [kpc]',\
+                       't.sim': 't$_{\\rm peri,lb,sim}$ [Gyr]',\
+                       't.model': 't$_{\\rm peri,lb,model}$ [Gyr]',\
+                       't.infall': 't$_{\\rm infall,lb}$ [Gyr]',\
+                       'delta.t.frac': '(t$_{\\rm peri,model}$ - t$_{\\rm peri,sim}$)/t$_{\\rm peri,sim}$',\
+                       'delta.t': '(t$_{\\rm peri,model}$ - t$_{\\rm peri,sim}$) [Gyr]',\
+                       'N.sim': 'N$_{\\rm peri,sim}$',\
+                       'N.model': 'N$_{\\rm peri,model}$',\
+                       'delta.N': 'N$_{\\rm model}$ - N$_{\\rm sim}$',\
+                       'M.star.z0': 'log$_{\\rm 10}$[M$_{\\rm star}(z = 0)$/M$_{\\odot}$]',\
+                       'M.star.peak': 'log$_{\\rm 10}$[M$_{\\rm star, peak}$/M$_{\\odot}$]',\
+                       'M.halo.z0': 'log$_{\\rm 10}$[M$_{\\rm halo}(z = 0)$/M$_{\\odot}$]',\
+                       'M.halo.peak': 'log$_{\\rm 10}$[M$_{\\rm halo, peak}$/M$_{\\odot}$]'}
+        #
+        self.titles = {'d.sim': 'Recent Minimum Distances',\
+                       'd.model': 'Recent Minimum Distances',\
+                       'd.z0': 'Present-day Distances',\
+                       't.sim': 'Recent Minimum Distance Lookback Times',\
+                       't.model': 'Recent Minimum Distance Lookback Times',\
+                       't.infall': 'Host Infall Lookback Times',\
+                       'N.sim': 'Pericenters',\
+                       'N.model': 'Pericenters',\
+                       'N.delta': 'Pericenters'}
 
-    def delta_nperi_hist(self, x, bin_array, file_path_and_name):
+    def scatter_plot(self, x, y, xtype, ytype, file_path_and_name, x_out=None, y_out=None, limits=None, title=None):
         """
         TBD
         """
-        plt.figure(figsize=(10, 8))
-        ax = plt.subplot(111)
-        ax.hist(x, bins=bin_array, density=True, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
-        #plt.errorbar(np.mean(delta_No_tot), 0.36, xerr=np.array([[np.mean(delta_No_tot)-sigma_one_om],[sigma_one_op-np.mean(delta_No_tot)]]), color='k', lw=5, capsize=8)
-        plt.errorbar(np.mean(x), 0.40, xerr=np.array([[2*np.std(x)],[2*np.std(x)]]), color='k', lw=5, capsize=8, alpha=0.3)
-        plt.errorbar(np.mean(x), 0.40, xerr=np.array([[np.std(x)],[np.std(x)]]), color='k', lw=5, capsize=8)
-        plt.scatter(np.mean(x), 0.40, s=250, marker='s', c='k')
-        #plt.text(6.5, 0.45,'Mean: '+str(np.around(np.mean(delta_No_tot), 2)), fontsize=18)
-        plt.xlabel('N$_{\\rm model}$ - N$_{\\rm sim}$', fontsize=28)
-        plt.ylabel('PDF', fontsize=28)
-        plt.xlim(-5,5)
-        plt.ylim(ymax=0.43)
-        plt.xticks(ticks=np.linspace(-5,5,11), labels=['-5','-4','-3','-2','-1','0','1','2','3','4','5'])
-        plt.minorticks_off()
-        plt.title('Pericenters', fontsize=24)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
-    def dperi_comparison_scatter(self, x, y, file_path_and_name, x_out=None, y_out=None, limits=None):
-        """
-        TBD
-        """
+        if 'M.' in xtype:
+            x = np.log10(x)
+            x_out = np.log10(x_out)
+        if 'M.' in ytype:
+            y = np.log10(y)
+            y_out = np.lg=og10(y_out)
+        #
         f, ax = plt.subplots(figsize=(10, 8))
         ax.scatter(x, y, color='k', s=50, marker='x', alpha=0.5)
         ax.scatter(x_out, y_out, color='r', s=50, marker='x', alpha=0.5)
-        if limits:
+        if (xtype == 'd.sim' or xtype == 't.sim') & (ytype == 'd.model' or ytype == 't.model'):
             ax.set_xlim(left=limits[0], right=limits[1])
             ax.set_ylim(bottom=limits[0], top=limits[1])
             ax.plot([0, 1], [0, 1], linestyle=':', color='k', transform=ax.transAxes)
-        plt.xlabel('d$_{\\rm peri, sim}$ [kpc]', fontsize=28)
-        plt.ylabel('d$_{\\rm peri, model}$ [kpc]', fontsize=28)
-        plt.title('Most Recent Pericenter', fontsize=24)
+        elif limits:
+            plt.xlim(limits[0])
+            plt.ylim(limits[1])
+        plt.xlabel(self.labels[xtype], fontsize=28)
+        plt.ylabel(self.labels[ytype], fontsize=28)
+        if title:
+            plt.title(self.titles[title], fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
         plt.tight_layout()
         plt.savefig(file_path_and_name)
         plt.close()
+        pass
 
     def dperi_comparison_median(self, x, y, binsize, file_path_and_name, limits=None):
         """
@@ -506,31 +637,6 @@ class SummaryDataPlot(SummaryDataSort):
         """
         TBD
         """
-        if xtype == 'd.sim':
-            x_label = 'd$_{\\rm peri,sim}$ [kpc]'
-            title = 'Recent Pericenter Distances'
-        elif xtype == 'd.model':
-            x_label = 'd$_{\\rm peri,model}$ [kpc]'
-            title = 'Recent Pericenter Distances'
-        elif xtype == 'd.z0':
-            x_label = 'd(z = 0) [kpc]'
-            title = 'Present-day Distances'
-        elif xtype == 't.sim':
-            x_label = 't$_{\\rm peri,lb,sim}$ [Gyr]'
-            title = 'Recent Pericenter Lookback Times'
-        elif xtype == 't.model':
-            x_label = 't$_{\\rm peri,lb,model}$ [Gyr]'
-            title = 'Recent Pericenter Lookback Times'
-        elif xtype == 't.infall':
-            x_label = 't$_{\\rm infall,lb}$ [Gyr]'
-            title = 'Host Infall Lookback Times'
-        elif xtype == 'N.sim':
-            x_label = 'N$_{\\rm peri,sim}$'
-            title = 'Pericenters'
-        elif xtype == 'N.model':
-            x_label = 'N$_{\\rm peri,model}$'
-            title = 'Pericenters'
-        #
         if pdf:
             den = True
             y_label = 'PDF'
@@ -579,30 +685,30 @@ class SummaryDataPlot(SummaryDataSort):
             plt.scatter(np.mean(x), y_mean, s=250, marker='s', c='k')
         #
         plt.xlim(xlimits)
-        plt.xlabel(x_label, fontsize=28)
+        plt.xlabel(self.labels[xtype], fontsize=28)
         plt.ylabel(y_label, fontsize=28)
-        plt.title(title, fontsize=24)
+        plt.title(self.titles[xtype], fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
         plt.tight_layout()
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def delta_dperi_hist(self, x, binsize, file_path_and_name, xlimits=None, fraction=True):
+    def delta_dperi_hist(self, x, binsize, file_path_and_name, xlimits=None, fraction=True, pdf=True):
         """
         TBD
         """
         #
         if fraction:
             x_label = '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$'
-            y_med = 1.9
         else:
             x_label = '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$) [kpc]'
-            y_med = 0.023
         #
         minn = int(binsize*np.floor(np.min(x)/binsize))
         maxx = int(binsize*np.ceil(np.max(x)/binsize))
         bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
         bin_array = np.linspace(minn, maxx, bin_num)
+        #
+        y_med = np.max(np.histogram(x, bin_array, normed=pdf)[0])*1.1
         #
         # Calculate the scatter
         onesigp = 84.13
@@ -626,75 +732,10 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def delta_dperi_vs_prop_scatter(self, x, y, file_path_and_name, versus='d.sim', x_out=None, y_out=None, limits=None, fraction=True):
-        if versus == 'd.sim':
-            x_label = 'd$_{\\rm peri,sim}$ [kpc]'
-        elif versus == 'd.model':
-            x_label = 'd$_{\\rm peri,model}$ [kpc]'
-        elif versus == 'd.z0':
-            x_label = 'd(z = 0) [kpc]'
-        elif versus == 't.sim':
-            x_label = 't$_{\\rm peri,lb,sim}$ [Gyr]'
-        elif versus == 't.model':
-            x_label = 't$_{\\rm peri,lb,model}$ [Gyr]'
-        elif versus == 't.infall':
-            x_label = 't$_{\\rm infall,lb}$ [Gyr]'
-        elif versus == 'N.sim':
-            x_label = 'N$_{\\rm sim}$'
-        elif versus == 'N.model':
-            x_label = 'N$_{\\rm model}$'
-        elif versus == 'M.z0':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star}(z = 0)$)'
-        elif versus == 'M.peak':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star, peak}$)'
-        #
-        if fraction:
-            y_label = '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$'
-        else:
-            y_label = '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$) [kpc]'
-        f, ax = plt.subplots(figsize=(10, 8))
-        if 'M.' not in versus:
-            ax.scatter(x, y, color='k', s=50, marker='x', alpha=0.5)
-            ax.scatter(x_out, y_out, color='r', s=50, marker='x', alpha=0.5)
-        elif 'M.' in versus:
-            ax.scatter(np.log10(x), y, color='k', s=50, marker='x', alpha=0.5)
-            ax.scatter(np.log10(x_out), y_out, color='r', s=50, marker='x', alpha=0.5)
-        if limits:
-            plt.xlim(limits[0])
-            plt.ylim(limits[1])
-        plt.xlabel(x_label, fontsize=28)
-        plt.ylabel(y_label, fontsize=28)
-        plt.title('Most Recent Pericenter', fontsize=24)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
     def delta_dperi_vs_prop_median(self, x, y, file_path_and_name, binsize, versus='d.sim', limits=None, fraction=True):
         """
         TBD
         """
-        if versus == 'd.sim':
-            x_label = 'd$_{\\rm peri,sim}$ [kpc]'
-        elif versus == 'd.model':
-            x_label = 'd$_{\\rm peri,model}$ [kpc]'
-        elif versus == 'd.z0':
-            x_label = 'd(z = 0) [kpc]'
-        elif versus == 't.sim':
-            x_label = 't$_{\\rm peri,lb,sim}$ [Gyr]'
-        elif versus == 't.model':
-            x_label = 't$_{\\rm peri,lb,model}$ [Gyr]'
-        elif versus == 't.infall':
-            x_label = 't$_{\\rm infall,lb}$ [Gyr]'
-        elif versus == 'N.sim':
-            x_label = 'N$_{\\rm sim}$'
-        elif versus == 'N.model':
-            x_label = 'N$_{\\rm model}$'
-        elif versus == 'M.z0':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star}(z = 0)$)'
-        elif versus == 'M.peak':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star, peak}$)'
-        #
         if fraction:
             y_label = '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$'
         else:
@@ -772,27 +813,8 @@ class SummaryDataPlot(SummaryDataSort):
         if limits:
             plt.xlim(limits[0])
             plt.ylim(limits[1])
-        plt.xlabel(x_label, fontsize=28)
+        plt.xlabel(self.labels[versus], fontsize=28)
         plt.ylabel(y_label, fontsize=28)
-        plt.title('Most Recent Pericenter', fontsize=24)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
-    def tperi_comparison_scatter(self, x, y, file_path_and_name, x_out=None, y_out=None, limits=None):
-        """
-        TBD
-        """
-        f, ax = plt.subplots(figsize=(10, 8))
-        ax.scatter(x, y, color='k', s=50, marker='x', alpha=0.5)
-        ax.scatter(x_out, y_out, color='r', s=50, marker='x', alpha=0.5)
-        if limits:
-            ax.set_xlim(left=limits[0], right=limits[1])
-            ax.set_ylim(bottom=limits[0], top=limits[1])
-            ax.plot([0, 1], [0, 1], linestyle=':', color='k', transform=ax.transAxes)
-        plt.xlabel('t$_{\\rm peri, sim}$ [Gyr]', fontsize=28)
-        plt.ylabel('t$_{\\rm peri, model}$ [Gyr]', fontsize=28)
         plt.title('Most Recent Pericenter', fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
         plt.tight_layout()
@@ -842,17 +864,15 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def delta_tperi_hist(self, x, binsize, file_path_and_name, xlimits=None, fraction=True):
+    def delta_tperi_hist(self, x, binsize, file_path_and_name, xlimits=None, fraction=True, pdf=True):
         """
         TBD
         """
         #
         if fraction:
             x_label = '(t$_{\\rm peri,lb,model}$ - t$_{\\rm peri,lb,sim}$)/t$_{\\rm peri,lb,sim}$'
-            y_med = 2.8
         else:
             x_label = '(t$_{\\rm peri,lb,model}$ - t$_{\\rm peri,lb,sim}$) [Gyr]'
-            y_med = 0.87
         #
         if binsize*np.floor(np.min(x)/binsize) % 1 != 0:
             minn = int(np.floor(binsize*np.floor(np.min(x)/binsize)))
@@ -864,6 +884,8 @@ class SummaryDataPlot(SummaryDataSort):
             maxx = int(binsize*np.ceil(np.max(x)/binsize))
         bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
         bin_array = np.linspace(minn, maxx, bin_num)
+        #
+        y_med = np.max(np.histogram(x, bin_array, normed=pdf)[0])*1.1
         #
         # Calculate the scatter
         onesigp = 84.13
@@ -888,74 +910,10 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def delta_tperi_vs_prop_scatter(self, x, y, file_path_and_name, versus='t.sim', x_out=None, y_out=None, limits=None, fraction=True):
-        if versus == 'd.sim':
-            x_label = 'd$_{\\rm peri,sim}$ [kpc]'
-        elif versus == 'd.model':
-            x_label = 'd$_{\\rm peri,model}$ [kpc]'
-        elif versus == 'd.z0':
-            x_label = 'd(z = 0) [kpc]'
-        elif versus == 't.sim':
-            x_label = 't$_{\\rm peri,lb,sim}$ [Gyr]'
-        elif versus == 't.model':
-            x_label = 't$_{\\rm peri,lb,model}$ [Gyr]'
-        elif versus == 't.infall':
-            x_label = 't$_{\\rm infall,lb}$ [Gyr]'
-        elif versus == 'N.sim':
-            x_label = 'N$_{\\rm sim}$'
-        elif versus == 'N.model':
-            x_label = 'N$_{\\rm model}$'
-        elif versus == 'M.z0':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star}(z = 0)$)'
-        elif versus == 'M.peak':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star, peak}$)'
-        #
-        if fraction:
-            y_label = '(t$_{\\rm peri,lb,model}$ - t$_{\\rm peri,lb,sim}$)/t$_{\\rm peri,lb,sim}$'
-        else:
-            y_label = '(t$_{\\rm peri,lb,model}$ - t$_{\\rm peri,lb,sim}$) [Gyr]'
-        f, ax = plt.subplots(figsize=(10, 8))
-        if 'M.' not in versus:
-            ax.scatter(x, y, color='k', s=50, marker='x', alpha=0.5)
-            ax.scatter(x_out, y_out, color='r', s=50, marker='x', alpha=0.5)
-        elif 'M.' in versus:
-            ax.scatter(np.log10(x), y, color='k', s=50, marker='x', alpha=0.5)
-            ax.scatter(np.log10(x_out), y_out, color='r', s=50, marker='x', alpha=0.5)
-        if limits:
-            plt.xlim(limits[0])
-            plt.ylim(limits[1])
-        plt.xlabel(x_label, fontsize=28)
-        plt.ylabel(y_label, fontsize=28)
-        plt.title('Most Recent Pericenter', fontsize=24)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
     def delta_tperi_vs_prop_median(self, x, y, file_path_and_name, binsize, versus='t.sim', limits=None, fraction=True):
         """
         TBD
         """
-        if versus == 'd.sim':
-            x_label = 'd$_{\\rm peri,sim}$ [kpc]'
-        elif versus == 'd.model':
-            x_label = 'd$_{\\rm peri,model}$ [kpc]'
-        elif versus == 'd.z0':
-            x_label = 'd(z = 0) [kpc]'
-        elif versus == 't.sim':
-            x_label = 't$_{\\rm peri,lb,sim}$ [Gyr]'
-        elif versus == 't.model':
-            x_label = 't$_{\\rm peri,lb,model}$ [Gyr]'
-        elif versus == 't.infall':
-            x_label = 't$_{\\rm infall,lb}$ [Gyr]'
-        elif versus == 'N.sim':
-            x_label = 'N$_{\\rm sim}$'
-        elif versus == 'N.model':
-            x_label = 'N$_{\\rm model}$'
-        elif versus == 'M.z0':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star}(z = 0)$)'
-        elif versus == 'M.peak':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star, peak}$)'
         #
         if fraction:
             y_label = '(t$_{\\rm peri,lb,model}$ - t$_{\\rm peri,lb,sim}$)/t$_{\\rm peri,lb,sim}$'
@@ -1035,7 +993,7 @@ class SummaryDataPlot(SummaryDataSort):
         if limits:
             plt.xlim(limits[0])
             plt.ylim(limits[1])
-        plt.xlabel(x_label, fontsize=28)
+        plt.xlabel(self.labels[versus], fontsize=28)
         plt.ylabel(y_label, fontsize=28)
         plt.title('Most Recent Pericenter', fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
@@ -1043,67 +1001,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def delta_nperi_vs_prop_scatter(self, x, y, file_path_and_name, versus='d.sim', x_out=None, y_out=None, limits=None):
-        if versus == 'd.sim':
-            x_label = 'd$_{\\rm peri,recent,sim}$ [kpc]'
-        elif versus == 'd.model':
-            x_label = 'd$_{\\rm peri,recent,model}$ [kpc]'
-        elif versus == 'd.z0':
-            x_label = 'd(z = 0) [kpc]'
-        elif versus == 't.sim':
-            x_label = 't$_{\\rm peri,lb,recent,sim}$ [Gyr]'
-        elif versus == 't.model':
-            x_label = 't$_{\\rm peri,lb,recent,model}$ [Gyr]'
-        elif versus == 't.infall':
-            x_label = 't$_{\\rm infall,lb}$ [Gyr]'
-        elif versus == 'N.sim':
-            x_label = 'N$_{\\rm sim}$'
-        elif versus == 'N.model':
-            x_label = 'N$_{\\rm model}$'
-        elif versus == 'M.z0':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star}(z = 0)$)'
-        elif versus == 'M.peak':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star, peak}$)'
-        #
-        f, ax = plt.subplots(figsize=(10, 8))
-        if 'M.' not in versus:
-            ax.scatter(x, y, color='k', s=50, marker='x', alpha=0.5)
-            ax.scatter(x_out, y_out, color='r', s=50, marker='x', alpha=0.5)
-        elif 'M.' in versus:
-            ax.scatter(np.log10(x), y, color='k', s=50, marker='x', alpha=0.5)
-            ax.scatter(np.log10(x_out), y_out, color='r', s=50, marker='x', alpha=0.5)
-        if limits:
-            plt.xlim(limits[0])
-            plt.ylim(limits[1])
-        plt.xlabel(x_label, fontsize=28)
-        plt.ylabel('N$_{\\rm model}$ - N$_{\\rm sim}$', fontsize=28)
-        plt.title('Pericenters', fontsize=24)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
     def delta_nperi_vs_prop_median(self, x, y, binsize, file_path_and_name, versus='d.sim', limits=None):
-        if versus == 'd.sim':
-            x_label = 'd$_{\\rm peri,recent,sim}$ [kpc]'
-        elif versus == 'd.model':
-            x_label = 'd$_{\\rm peri,recent,model}$ [kpc]'
-        elif versus == 'd.z0':
-            x_label = 'd(z = 0) [kpc]'
-        elif versus == 't.sim':
-            x_label = 't$_{\\rm peri,lb,recent,sim}$ [Gyr]'
-        elif versus == 't.model':
-            x_label = 't$_{\\rm peri,lb,recent,model}$ [Gyr]'
-        elif versus == 't.infall':
-            x_label = 't$_{\\rm infall,lb}$ [Gyr]'
-        elif versus == 'N.sim':
-            x_label = 'N$_{\\rm sim}$'
-        elif versus == 'N.model':
-            x_label = 'N$_{\\rm model}$'
-        elif versus == 'M.z0':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star}(z = 0)$)'
-        elif versus == 'M.peak':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star, peak}$)'
         #
         if 'N.' not in versus:
             if 'M.' not in versus:
@@ -1162,77 +1060,14 @@ class SummaryDataPlot(SummaryDataSort):
         if limits:
             plt.xlim(limits[0])
             plt.ylim(limits[1])
-        plt.xlabel(x_label, fontsize=28)
+        plt.xlabel(self.labels[versus], fontsize=28)
         plt.ylabel('N$_{\\rm model}$ - N$_{\\rm sim}$', fontsize=28)
         plt.tick_params(axis='both', which='major', labelsize=24)
         plt.tight_layout()
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def nperi_vs_prop_scatter(self, x, y, file_path_and_name, xtype='d.sim', ytype='N.sim', x_out=None, y_out=None, limits=None):
-        if xtype == 'd.sim':
-            x_label = 'd$_{\\rm peri,recent,sim}$ [kpc]'
-        elif xtype == 'd.model':
-            x_label = 'd$_{\\rm peri,recent,model}$ [kpc]'
-        elif xtype == 'd.z0':
-            x_label = 'd(z = 0) [kpc]'
-        elif xtype == 't.sim':
-            x_label = 't$_{\\rm peri,lb,recent,sim}$ [Gyr]'
-        elif xtype == 't.model':
-            x_label = 't$_{\\rm peri,lb,recent,model}$ [Gyr]'
-        elif xtype == 't.infall':
-            x_label = 't$_{\\rm infall,lb}$ [Gyr]'
-        elif xtype == 'M.z0':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star}(z = 0)$)'
-        elif xtype == 'M.peak':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star, peak}$)'
-        #
-        if ytype == 'N.sim':
-            y_label = 'N$_{\\rm sim}$'
-        elif ytype == 'N.model':
-            y_label = 'N$_{\\rm model}$'
-        #
-        f, ax = plt.subplots(figsize=(10, 8))
-        if 'M.' not in xtype:
-            ax.scatter(x, y, color='k', s=50, marker='x', alpha=0.5)
-            ax.scatter(x_out, y_out, color='r', s=50, marker='x', alpha=0.5)
-        elif 'M.' in xtype:
-            ax.scatter(np.log10(x), y, color='k', s=50, marker='x', alpha=0.5)
-            ax.scatter(np.log10(x_out), y_out, color='r', s=50, marker='x', alpha=0.5)
-        if limits:
-            plt.xlim(limits[0])
-            plt.ylim(limits[1])
-        plt.xlabel(x_label, fontsize=28)
-        plt.ylabel(y_label, fontsize=28)
-        plt.title('Pericenters', fontsize=24)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
     def nperi_vs_prop_median(self, x, y, binsize, file_path_and_name, xtype='d.sim', ytype='N.sim', limits=None):
-        if xtype == 'd.sim':
-            x_label = 'd$_{\\rm peri,recent,sim}$ [kpc]'
-        elif xtype == 'd.model':
-            x_label = 'd$_{\\rm peri,recent,model}$ [kpc]'
-        elif xtype == 'd.z0':
-            x_label = 'd(z = 0) [kpc]'
-        elif xtype == 't.sim':
-            x_label = 't$_{\\rm peri,lb,recent,sim}$ [Gyr]'
-        elif xtype == 't.model':
-            x_label = 't$_{\\rm peri,lb,recent,model}$ [Gyr]'
-        elif xtype == 't.infall':
-            x_label = 't$_{\\rm infall,lb}$ [Gyr]'
-        elif xtype == 'M.z0':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star}(z = 0)$)'
-        elif xtype == 'M.peak':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star, peak}$)'
-        #
-        if ytype == 'N.sim':
-            y_label = 'N$_{\\rm sim}$'
-        elif ytype == 'N.model':
-            y_label = 'N$_{\\rm model}$'
-        #
         if 'M.' not in xtype:
             minn = int(binsize*np.floor(np.min(x)/binsize))
             maxx = int(binsize*np.ceil(np.max(x)/binsize))
@@ -1276,14 +1111,14 @@ class SummaryDataPlot(SummaryDataSort):
         if limits:
             plt.xlim(limits[0])
             plt.ylim(limits[1])
-        plt.xlabel(x_label, fontsize=28)
-        plt.ylabel(y_label, fontsize=28)
+        plt.xlabel(self.labels[xtype], fontsize=28)
+        plt.ylabel(self.labels[ytype], fontsize=28)
         plt.tick_params(axis='both', which='major', labelsize=24)
         plt.tight_layout()
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def mstar_hist(self, x, binsize, file_path_and_name, log=False, selection='z0', xlimits=None):
+    def mstar_hist(self, x, binsize, file_path_and_name, log=False, selection='z0', xlimits=None, pdf=True):
         """
         TBD
         """
@@ -1302,10 +1137,13 @@ class SummaryDataPlot(SummaryDataSort):
             #
             if selection == 'z0':
                 x_label = 'log$_{\\rm 10}$($M_{\\rm star}(z = 0)/M_{\\odot}$)'
-                y_med = 1
             elif selection == 'peak':
                 x_label = 'log$_{\\rm 10}$($M_{\\rm star,peak}/M_{\\odot}$)'
-                y_med = 1
+            #
+            if pdf:
+                y_label = 'PDF'
+            else:
+                y_label = 'N'
             #
             # Calculate the scatter
             onesigp = 84.13
@@ -1313,9 +1151,11 @@ class SummaryDataPlot(SummaryDataSort):
             sigma_one_op = np.nanpercentile(np.log10(x), onesigp)
             sigma_one_om = np.nanpercentile(np.log10(x), onesigm)
             #
+            y_med = np.max(np.histogram(np.log10(x), bin_array, normed=pdf)[0])*1.1
+            #
             # Plot the data
             plt.figure(figsize=(10, 8))
-            plt.hist(np.log10(x), bin_array, density=True, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
+            plt.hist(np.log10(x), bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
             #
             plt.errorbar(np.median(np.log10(x)), y_med, xerr=np.array([[np.median(np.log10(x))-sigma_one_om],[sigma_one_op-np.median(np.log10(x))]]), color='k', lw=5, capsize=8)
             plt.scatter(np.median(np.log10(x)), y_med, s=250, marker='s', c='k')
@@ -1323,7 +1163,7 @@ class SummaryDataPlot(SummaryDataSort):
             if xlimits:
                 plt.xlim(xlimits)
             plt.xlabel(x_label, fontsize=28)
-            plt.ylabel('PDF', fontsize=28)
+            plt.ylabel(y_label, fontsize=28)
             plt.title('Satellite M$_{\\rm star}$ Histogram', fontsize=24)
             plt.tick_params(axis='both', which='major', labelsize=24)
             plt.tight_layout()
@@ -1332,38 +1172,7 @@ class SummaryDataPlot(SummaryDataSort):
         elif log == False:
             print('Haven\'t thought far enough ahead to bin outside of log-space :(')
 
-    def infall_vs_prop_scatter(self, x, y, file_path_and_name, xtype='M.z0', x_out=None, y_out=None, limits=None):
-        if xtype == 'd.z0':
-            x_label = 'd(z = 0) [kpc]'
-        elif xtype == 'M.z0':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star}(z = 0)$)'
-        elif xtype == 'M.peak':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star, peak}$)'
-        #
-        f, ax = plt.subplots(figsize=(10, 8))
-        if 'M.' not in xtype:
-            ax.scatter(x, y, color='k', s=50, marker='x', alpha=0.5)
-            ax.scatter(x_out, y_out, color='r', s=50, marker='x', alpha=0.5)
-        elif 'M.' in xtype:
-            ax.scatter(np.log10(x), y, color='k', s=50, marker='x', alpha=0.5)
-            ax.scatter(np.log10(x_out), y_out, color='r', s=50, marker='x', alpha=0.5)
-        if limits:
-            plt.xlim(limits[0])
-            plt.ylim(limits[1])
-        plt.xlabel(x_label, fontsize=28)
-        plt.ylabel('t$_{\\rm infall,lb}$ [Gyr]', fontsize=28)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
     def infall_vs_prop_median(self, x, y, binsize, file_path_and_name, xtype='d.z0', limits=None):
-        if xtype == 'd.z0':
-            x_label = 'd(z = 0) [kpc]'
-        elif xtype == 'M.z0':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star}(z = 0)$)'
-        elif xtype == 'M.peak':
-            x_label = 'log$_{\\rm 10}$(M$_{\\rm star, peak}$)'
         #
         if 'M.' not in xtype:
             minn = int(binsize*np.floor(np.min(x)/binsize))
@@ -1417,34 +1226,8 @@ class SummaryDataPlot(SummaryDataSort):
         if limits:
             plt.xlim(limits[0])
             plt.ylim(limits[1])
-        plt.xlabel(x_label, fontsize=28)
+        plt.xlabel(self.labels[xtype], fontsize=28)
         plt.ylabel('t$_{\\rm infall,lb}$ [Gyr]', fontsize=28)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
-    def mstar_vs_prop_scatter(self, x, y, file_path_and_name, xtype='M.z0', ytype='d.z0', x_out=None, y_out=None, limits=None):
-        if xtype == 'M.z0':
-            x_label = 'log$_{\\rm 10}$($M_{\\rm star}(z = 0)/M_{\\odot}$)'
-        elif xtype == 'M.peak':
-            x_label = 'log$_{\\rm 10}$($M_{\\rm star, peak}/M_{\\odot}$)'
-        #
-        if ytype == 'd.z0':
-            y_label = 'd(z = 0) [kpc]'
-        #
-        f, ax = plt.subplots(figsize=(10, 8))
-        if 'M.' not in xtype:
-            ax.scatter(x, y, color='k', s=50, marker='x', alpha=0.5)
-            ax.scatter(x_out, y_out, color='r', s=50, marker='x', alpha=0.5)
-        elif 'M.' in xtype:
-            ax.scatter(np.log10(x), y, color='k', s=50, marker='x', alpha=0.5)
-            ax.scatter(np.log10(x_out), y_out, color='r', s=50, marker='x', alpha=0.5)
-        if limits:
-            plt.xlim(limits[0])
-            plt.ylim(limits[1])
-        plt.xlabel(x_label, fontsize=28)
-        plt.ylabel(y_label, fontsize=28)
         plt.tick_params(axis='both', which='major', labelsize=24)
         plt.tight_layout()
         plt.savefig(file_path_and_name)
@@ -1504,6 +1287,107 @@ class SummaryDataPlot(SummaryDataSort):
                 med[i] = np.nanmedian(y[mask])
                 upper[i] = np.nanpercentile(y[mask], onesigp)
                 lower[i] = np.nanpercentile(y[mask], onesigm)
+        #
+        f, ax = plt.subplots(figsize=(10, 8))
+        plt.plot(bins[:-1]+half_bin, med, color=self.colors[1], marker='s', markersize=10, alpha=0.5)
+        plt.fill_between(bins[:-1]+half_bin, upper, lower, color=self.colors[1], alpha=0.3)
+        if limits:
+            plt.xlim(limits[0])
+            plt.ylim(limits[1])
+        plt.xlabel(x_label, fontsize=28)
+        plt.ylabel(y_label, fontsize=28)
+        plt.tick_params(axis='both', which='major', labelsize=24)
+        plt.tight_layout()
+        plt.savefig(file_path_and_name)
+        plt.close()
+
+    def mhalo_hist(self, x, binsize, file_path_and_name, log=False, selection='z0', xlimits=None, pdf=True):
+        """
+        TBD
+        """
+        #
+        if log == True:
+            if binsize*np.floor(np.min(np.log10(x))/binsize) % 1 != 0:
+                minn = int(np.floor(binsize*np.floor(np.min(np.log10(x))/binsize)))
+            else:
+                minn = int(binsize*np.floor(np.min(np.log10(x))/binsize))
+            if binsize*np.ceil(np.max(np.log10(x))/binsize) % 1 != 0:
+                maxx = int(np.ceil(binsize*np.ceil(np.max(np.log10(x))/binsize)))
+            else:
+                maxx = int(binsize*np.ceil(np.max(np.log10(x))/binsize))
+            bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
+            bin_array = np.linspace(minn, maxx, bin_num)
+            #
+            if pdf:
+                y_label = 'PDF'
+            else:
+                y_label = 'N'
+            #
+            y_med = np.nanmax(np.histogram(np.log10(x), bin_array, normed=pdf)[0])*1.1
+            #
+            if selection == 'z0':
+                x_label = 'log$_{\\rm 10}$($M_{\\rm halo}(z = 0)/M_{\\odot}$)'
+            elif selection == 'peak':
+                x_label = 'log$_{\\rm 10}$($M_{\\rm halo,peak}/M_{\\odot}$)'
+            #
+            # Calculate the scatter
+            onesigp = 84.13
+            onesigm = 15.87
+            sigma_one_op = np.nanpercentile(np.log10(x), onesigp)
+            sigma_one_om = np.nanpercentile(np.log10(x), onesigm)
+            #
+            # Plot the data
+            plt.figure(figsize=(10, 8))
+            plt.hist(np.log10(x), bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
+            #
+            plt.errorbar(np.median(np.log10(x)), y_med, xerr=np.array([[np.median(np.log10(x))-sigma_one_om],[sigma_one_op-np.median(np.log10(x))]]), color='k', lw=5, capsize=8)
+            plt.scatter(np.median(np.log10(x)), y_med, s=250, marker='s', c='k')
+            #
+            if xlimits:
+                plt.xlim(xlimits)
+            plt.xlabel(x_label, fontsize=28)
+            plt.ylabel(y_label, fontsize=28)
+            plt.title('Satellite M$_{\\rm halo}$ Histogram', fontsize=24)
+            plt.tick_params(axis='both', which='major', labelsize=24)
+            plt.tight_layout()
+            plt.savefig(file_path_and_name)
+            plt.close()
+        elif log == False:
+            print('Haven\'t thought far enough ahead to bin outside of log-space :(')
+
+    def mstar_mhalo_median(self, x, y, binsize, file_path_and_name, masstype='z0',limits=None):
+        if masstype == 'z0':
+            x_label = self.labels['M.halo.z0']
+            y_label = self.labels['M.star.z0']
+        elif masstype == 'peak':
+            x_label = self.labels['M.halo.peak']
+            y_label = self.labels['M.star.peak']
+        #
+        if binsize*np.floor(np.min(np.log10(x))/binsize) % 1 != 0:
+            minn = int(np.floor(binsize*np.floor(np.min(np.log10(x))/binsize)))
+        else:
+            minn = int(binsize*np.floor(np.min(np.log10(x))/binsize))
+        if binsize*np.ceil(np.max(np.log10(x))/binsize) % 1 != 0:
+            maxx = int(np.ceil(binsize*np.ceil(np.max(np.log10(x))/binsize)))
+        else:
+            maxx = int(binsize*np.ceil(np.max(np.log10(x))/binsize))
+        bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
+        bins = np.linspace(minn, maxx, bin_num)
+        #
+        half_bin = (bins[1]-bins[0])/2
+        #
+        onesigp = 84.13
+        onesigm = 15.87
+        #
+        med = np.zeros(len(bins)-1)
+        lower = np.zeros(len(bins)-1)
+        upper = np.zeros(len(bins)-1)
+        #
+        for i in range(0, len(bins)-1):
+            mask = (np.log10(x) >= bins[i]) & (np.log10(x) <= bins[i+1])
+            med[i] = np.nanmedian(np.log10(y)[mask])
+            upper[i] = np.nanpercentile(np.log10(y)[mask], onesigp)
+            lower[i] = np.nanpercentile(np.log10(y)[mask], onesigm)
         #
         f, ax = plt.subplots(figsize=(10, 8))
         plt.plot(bins[:-1]+half_bin, med, color=self.colors[1], marker='s', markersize=10, alpha=0.5)
