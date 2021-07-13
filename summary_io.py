@@ -606,15 +606,12 @@ class SummaryDataPlot(SummaryDataSort):
             y = np.log10(y)
         #
         if 'N.' not in xtype and 'N.' not in ytype:
-            if binsize*np.floor(np.min(x)/binsize) % 1 != 0:
-                minn = int(np.floor(binsize*np.floor(np.min(x)/binsize)))
+            minn = binsize*np.floor(np.min(x)/binsize)
+            maxx = binsize*np.ceil(np.max(x)/binsize)
+            if minn < 0:
+                bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
             else:
-                minn = int(binsize*np.floor(np.min(x)/binsize))
-            if binsize*np.ceil(np.max(x)/binsize) % 1 != 0:
-                maxx = int(np.ceil(binsize*np.ceil(np.max(x)/binsize)))
-            else:
-                maxx = int(binsize*np.ceil(np.max(x)/binsize))
-            bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
+                bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
             bins = np.linspace(minn, maxx, bin_num)
             half_bin = (bins[1]-bins[0])/2
             #
@@ -652,15 +649,12 @@ class SummaryDataPlot(SummaryDataSort):
                 lower[i] = np.nanpercentile(y[mask], onesigm)
         #
         if 'N.' not in xtype and 'N.' in ytype:
-            if binsize*np.floor(np.min(x)/binsize) % 1 != 0:
-                minn = int(np.floor(binsize*np.floor(np.min(x)/binsize)))
+            minn = binsize*np.floor(np.min(x)/binsize)
+            maxx = binsize*np.ceil(np.max(x)/binsize)
+            if minn < 0:
+                bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
             else:
-                minn = int(binsize*np.floor(np.min(x)/binsize))
-            if binsize*np.ceil(np.max(x)/binsize) % 1 != 0:
-                maxx = int(np.ceil(binsize*np.ceil(np.max(x)/binsize)))
-            else:
-                maxx = int(binsize*np.ceil(np.max(x)/binsize))
-            bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
+                bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
             bins = np.linspace(minn, maxx, bin_num)
             half_bin = (bins[1]-bins[0])/2
             #
@@ -725,29 +719,13 @@ class SummaryDataPlot(SummaryDataSort):
         plt.figure(figsize=(10, 8))
         #
         if 'N.' not in xtype:
-            if 'M.' not in xtype:
-                if binsize*np.floor(np.min(x)/binsize) % 1 != 0:
-                    minn = int(np.floor(binsize*np.floor(np.min(x)/binsize)))
-                else:
-                    minn = int(binsize*np.floor(np.min(x)/binsize))
-                if binsize*np.ceil(np.max(x)/binsize) % 1 != 0:
-                    maxx = int(np.ceil(binsize*np.ceil(np.max(x)/binsize)))
-                else:
-                    maxx = int(binsize*np.ceil(np.max(x)/binsize))
-                bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
-                bin_array = np.linspace(minn, maxx, bin_num)
-            #
-            elif 'M.' in xtype:
-                if binsize*np.floor(np.min(x)/binsize) % 1 != 0:
-                    minn = int(np.floor(binsize*np.floor(np.min(x)/binsize)))
-                else:
-                    minn = int(binsize*np.floor(np.min(x)/binsize))
-                if binsize*np.ceil(np.max(x)/binsize) % 1 != 0:
-                    maxx = int(np.ceil(binsize*np.ceil(np.max(x)/binsize)))
-                else:
-                    maxx = int(binsize*np.ceil(np.max(x)/binsize))
-                bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
-                bin_array = np.linspace(minn, maxx, bin_num)
+            minn = binsize*np.floor(np.min(x)/binsize)
+            maxx = binsize*np.ceil(np.max(x)/binsize)
+            if minn < 0:
+                bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+            else:
+                bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+            bin_array = np.linspace(minn, maxx, bin_num)
             #
             # Calculate the scatter
             onesigp = 84.13
