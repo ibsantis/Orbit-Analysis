@@ -574,7 +574,7 @@ class SummaryDataPlot(SummaryDataSort):
             x_out = np.log10(x_out)
         if 'M.' in ytype:
             y = np.log10(y)
-            y_out = np.lg=og10(y_out)
+            y_out = np.log10(y_out)
         #
         f, ax = plt.subplots(figsize=(10, 8))
         ax.scatter(x, y, color='k', s=50, marker='x', alpha=0.5)
