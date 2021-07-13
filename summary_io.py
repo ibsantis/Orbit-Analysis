@@ -549,7 +549,7 @@ class SummaryDataPlot(SummaryDataSort):
                        'delta.t': '(t$_{\\rm peri,model}$ - t$_{\\rm peri,sim}$) [Gyr]',\
                        'N.sim': 'N$_{\\rm peri,sim}$',\
                        'N.model': 'N$_{\\rm peri,model}$',\
-                       'delta.N': 'N$_{\\rm model}$ - N$_{\\rm sim}$',\
+                       'N.delta': 'N$_{\\rm model}$ - N$_{\\rm sim}$',\
                        'M.star.z0': 'log$_{\\rm 10}$[M$_{\\rm star}(z = 0)$/M$_{\\odot}$]',\
                        'M.star.peak': 'log$_{\\rm 10}$[M$_{\\rm star, peak}$/M$_{\\odot}$]',\
                        'M.halo.z0': 'log$_{\\rm 10}$[M$_{\\rm halo}(z = 0)$/M$_{\\odot}$]',\
@@ -596,28 +596,104 @@ class SummaryDataPlot(SummaryDataSort):
         plt.close()
         pass
 
-    def dperi_comparison_median(self, x, y, binsize, file_path_and_name, limits=None):
+    def median_plot(self, x, y, xtype, ytype, binsize, file_path_and_name, limits=None, title=None):
         """
         TBD
         """
-        minn = int(binsize*np.floor(np.min(x)/binsize))
-        maxx = int(binsize*np.ceil(np.max(x)/binsize))
-        bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
-        bins = np.linspace(minn, maxx, bin_num)
+        if 'M.' in xtype:
+            x = np.log10(x)
+        if 'M.' in ytype:
+            y = np.log10(y)
         #
-        half_bin = (bins[1]-bins[0])/2
-        onesigp = 84.13
-        onesigm = 15.87
+        if 'N.' not in xtype and 'N.' not in ytype:
+            if binsize*np.floor(np.min(x)/binsize) % 1 != 0:
+                minn = int(np.floor(binsize*np.floor(np.min(x)/binsize)))
+            else:
+                minn = int(binsize*np.floor(np.min(x)/binsize))
+            if binsize*np.ceil(np.max(x)/binsize) % 1 != 0:
+                maxx = int(np.ceil(binsize*np.ceil(np.max(x)/binsize)))
+            else:
+                maxx = int(binsize*np.ceil(np.max(x)/binsize))
+            bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
+            bins = np.linspace(minn, maxx, bin_num)
+            half_bin = (bins[1]-bins[0])/2
+            #
+            onesigp = 84.13
+            onesigm = 15.87
+            #
+            med = np.zeros(len(bins)-1)
+            lower = np.zeros(len(bins)-1)
+            upper = np.zeros(len(bins)-1)
+            #
+            for i in range(0, len(bins)-1):
+                mask = (x >= bins[i]) & (x <= bins[i+1])
+                med[i] = np.nanmedian(y[mask])
+                upper[i] = np.nanpercentile(y[mask], onesigp)
+                lower[i] = np.nanpercentile(y[mask], onesigm)
         #
-        med = np.zeros(len(bins)-1)
-        lower = np.zeros(len(bins)-1)
-        upper = np.zeros(len(bins)-1)
+        if 'N.' in xtype and 'N.' not in ytype:
+            minn = int(binsize*np.floor(np.min(x)/binsize))-0.5
+            maxx = int(binsize*np.ceil(np.max(x)/binsize))+0.5
+            bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
+            bins = np.linspace(minn, maxx, bin_num)
+            #
+            half_bin = (bins[1]-bins[0])/2
+            onesigp = 84.13
+            onesigm = 15.87
+            #
+            med = np.zeros(len(bins)-1)
+            lower = np.zeros(len(bins)-1)
+            upper = np.zeros(len(bins)-1)
+            #
+            for i in range(0, len(bins)-1):
+                mask = (x >= bins[i]) & (x <= bins[i+1])
+                med[i] = np.nanmedian(y[mask])
+                upper[i] = np.nanpercentile(y[mask], onesigp)
+                lower[i] = np.nanpercentile(y[mask], onesigm)
         #
-        for i in range(0, len(bins)-1):
-            mask = (x >= bins[i]) & (x <= bins[i+1])
-            med[i] = np.nanmedian(y[mask])
-            upper[i] = np.nanpercentile(y[mask], onesigp)
-            lower[i] = np.nanpercentile(y[mask], onesigm)
+        if 'N.' not in xtype and 'N.' in ytype:
+            if binsize*np.floor(np.min(x)/binsize) % 1 != 0:
+                minn = int(np.floor(binsize*np.floor(np.min(x)/binsize)))
+            else:
+                minn = int(binsize*np.floor(np.min(x)/binsize))
+            if binsize*np.ceil(np.max(x)/binsize) % 1 != 0:
+                maxx = int(np.ceil(binsize*np.ceil(np.max(x)/binsize)))
+            else:
+                maxx = int(binsize*np.ceil(np.max(x)/binsize))
+            bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
+            bins = np.linspace(minn, maxx, bin_num)
+            half_bin = (bins[1]-bins[0])/2
+            #
+            means = np.zeros(len(bins)-1)
+            scatter = np.zeros(len(bins)-1)
+            #
+            for i in range(0, len(bins)-1):
+                mask = (x >= bins[i]) & (x <= bins[i+1])
+                means[i] = np.nanmean(y[mask])
+                scatter[i] = np.nanstd(y[mask])
+            #
+            upper = means+scatter
+            lower = means-scatter
+            med = means
+        #
+        if 'N.' in xtype and 'N.' in ytype:
+            minn = int(binsize*np.floor(np.min(x)/binsize))-0.5
+            maxx = int(binsize*np.ceil(np.max(x)/binsize))+0.5
+            bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
+            bins = np.linspace(minn, maxx, bin_num)
+            half_bin = (bins[1]-bins[0])/2
+            #
+            means = np.zeros(len(bins)-1)
+            scatter = np.zeros(len(bins)-1)
+            #
+            for i in range(0, len(bins)-1):
+                mask = (x >= bins[i]) & (x <= bins[i+1])
+                means[i] = np.nanmean(y[mask])
+                scatter[i] = np.nanstd(y[mask])
+            #
+            upper = means+scatter
+            lower = means-scatter
+            med = means
         #
         f, ax = plt.subplots(figsize=(10, 8))
         plt.plot(bins[:-1]+half_bin, med, color=self.colors[1], marker='s', markersize=10, alpha=0.5)
@@ -625,9 +701,10 @@ class SummaryDataPlot(SummaryDataSort):
         if limits:
             plt.xlim(limits[0])
             plt.ylim(limits[1])
-        plt.xlabel('d$_{\\rm peri,sim}$ [kpc]', fontsize=28)
-        plt.ylabel('d$_{\\rm peri,model}$ [kpc]', fontsize=28)
-        plt.title('Most Recent Pericenter', fontsize=24)
+        plt.xlabel(self.labels[xtype], fontsize=28)
+        plt.ylabel(self.labels[ytype], fontsize=28)
+        if title:
+            plt.title(self.titles[title], fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
         plt.tight_layout()
         plt.savefig(file_path_and_name)
@@ -732,138 +809,6 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def delta_dperi_vs_prop_median(self, x, y, file_path_and_name, binsize, versus='d.sim', limits=None, fraction=True):
-        """
-        TBD
-        """
-        if fraction:
-            y_label = '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$'
-        else:
-            y_label = '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$) [kpc]'
-        #
-        if 'N.' not in versus:
-            if 'M.' not in versus:
-                minn = int(binsize*np.floor(np.min(x)/binsize))
-                maxx = int(binsize*np.ceil(np.max(x)/binsize))
-                bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
-                bins = np.linspace(minn, maxx, bin_num)
-                #
-                half_bin = (bins[1]-bins[0])/2
-                onesigp = 84.13
-                onesigm = 15.87
-                #
-                med = np.zeros(len(bins)-1)
-                lower = np.zeros(len(bins)-1)
-                upper = np.zeros(len(bins)-1)
-                #
-                for i in range(0, len(bins)-1):
-                    mask = (x >= bins[i]) & (x <= bins[i+1])
-                    med[i] = np.nanmedian(y[mask])
-                    upper[i] = np.nanpercentile(y[mask], onesigp)
-                    lower[i] = np.nanpercentile(y[mask], onesigm)
-            elif 'M.' in versus:
-                if binsize*np.floor(np.min(np.log10(x))/binsize) % 1 != 0:
-                    minn = int(np.floor(binsize*np.floor(np.min(np.log10(x))/binsize)))
-                else:
-                    minn = int(binsize*np.floor(np.min(np.log10(x))/binsize))
-                if binsize*np.ceil(np.max(np.log10(x))/binsize) % 1 != 0:
-                    maxx = int(np.ceil(binsize*np.ceil(np.max(np.log10(x))/binsize)))
-                else:
-                    maxx = int(binsize*np.ceil(np.max(np.log10(x))/binsize))
-                bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
-                bins = np.linspace(minn, maxx, bin_num)
-                #
-                half_bin = (bins[1]-bins[0])/2
-                #
-                onesigp = 84.13
-                onesigm = 15.87
-                #
-                med = np.zeros(len(bins)-1)
-                lower = np.zeros(len(bins)-1)
-                upper = np.zeros(len(bins)-1)
-                #
-                for i in range(0, len(bins)-1):
-                    mask = (np.log10(x) >= bins[i]) & (np.log10(x) <= bins[i+1])
-                    med[i] = np.nanmedian(y[mask])
-                    upper[i] = np.nanpercentile(y[mask], onesigp)
-                    lower[i] = np.nanpercentile(y[mask], onesigm)
-            #
-        if 'N.' in versus:
-            minn = int(binsize*np.floor(np.min(x)/binsize))-0.5
-            maxx = int(binsize*np.ceil(np.max(x)/binsize))+0.5
-            bin_num = int((np.abs(minn)+np.abs(maxx))/binsize)
-            bins = np.linspace(minn, maxx, bin_num)
-            #
-            half_bin = (bins[1]-bins[0])/2
-            onesigp = 84.13
-            onesigm = 15.87
-            #
-            med = np.zeros(len(bins)-1)
-            lower = np.zeros(len(bins)-1)
-            upper = np.zeros(len(bins)-1)
-            #
-            for i in range(0, len(bins)-1):
-                mask = (x >= bins[i]) & (x <= bins[i+1])
-                med[i] = np.nanmedian(y[mask])
-                upper[i] = np.nanpercentile(y[mask], onesigp)
-                lower[i] = np.nanpercentile(y[mask], onesigm)
-        f, ax = plt.subplots(figsize=(10, 8))
-        plt.plot(bins[:-1]+half_bin, med, color=self.colors[1], marker='s', markersize=10, alpha=0.5)
-        plt.fill_between(bins[:-1]+half_bin, upper, lower, color=self.colors[1], alpha=0.3)
-        if limits:
-            plt.xlim(limits[0])
-            plt.ylim(limits[1])
-        plt.xlabel(self.labels[versus], fontsize=28)
-        plt.ylabel(y_label, fontsize=28)
-        plt.title('Most Recent Pericenter', fontsize=24)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
-    def tperi_comparison_median(self, x, y, binsize, file_path_and_name, limits=None):
-        """
-        TBD
-        """
-        if binsize*np.floor(np.min(x)/binsize) % 1 != 0:
-            minn = int(np.floor(binsize*np.floor(np.min(x)/binsize)))
-        else:
-            minn = int(binsize*np.floor(np.min(x)/binsize))
-        if binsize*np.ceil(np.max(x)/binsize) % 1 != 0:
-            maxx = int(np.ceil(binsize*np.ceil(np.max(x)/binsize)))
-        else:
-            maxx = int(binsize*np.ceil(np.max(x)/binsize))
-        bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
-        bins = np.linspace(minn, maxx, bin_num)
-        half_bin = (bins[1]-bins[0])/2
-        #
-        onesigp = 84.13
-        onesigm = 15.87
-        #
-        med = np.zeros(len(bins)-1)
-        lower = np.zeros(len(bins)-1)
-        upper = np.zeros(len(bins)-1)
-        #
-        for i in range(0, len(bins)-1):
-            mask = (x >= bins[i]) & (x <= bins[i+1])
-            med[i] = np.nanmedian(y[mask])
-            upper[i] = np.nanpercentile(y[mask], onesigp)
-            lower[i] = np.nanpercentile(y[mask], onesigm)
-        #
-        f, ax = plt.subplots(figsize=(10, 8))
-        plt.plot(bins[:-1]+half_bin, med, color=self.colors[1], marker='s', markersize=10, alpha=0.5)
-        plt.fill_between(bins[:-1]+half_bin, upper, lower, color=self.colors[1], alpha=0.3)
-        if limits:
-            plt.xlim(limits[0])
-            plt.ylim(limits[1])
-        plt.xlabel('t$_{\\rm peri,sim}$ [Gyr]', fontsize=28)
-        plt.ylabel('t$_{\\rm peri,model}$ [Gyr]', fontsize=28)
-        plt.title('Most Recent Pericenter', fontsize=24)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
     def delta_tperi_hist(self, x, binsize, file_path_and_name, xlimits=None, fraction=True, pdf=True):
         """
         TBD
@@ -905,214 +850,6 @@ class SummaryDataPlot(SummaryDataSort):
         plt.xlabel(x_label, fontsize=28)
         plt.ylabel('PDF', fontsize=28)
         plt.title('Recent Pericenter Lookback Times', fontsize=24)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
-    def delta_tperi_vs_prop_median(self, x, y, file_path_and_name, binsize, versus='t.sim', limits=None, fraction=True):
-        """
-        TBD
-        """
-        #
-        if fraction:
-            y_label = '(t$_{\\rm peri,lb,model}$ - t$_{\\rm peri,lb,sim}$)/t$_{\\rm peri,lb,sim}$'
-        else:
-            y_label = '(t$_{\\rm peri,lb,model}$ - t$_{\\rm peri,lb,sim}$) [Gyr]'
-        #
-        if 'N.' not in versus:
-            if 'M.' not in versus:
-                minn = int(binsize*np.floor(np.min(x)/binsize))
-                maxx = int(binsize*np.ceil(np.max(x)/binsize))
-                bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
-                bins = np.linspace(minn, maxx, bin_num)
-                #
-                half_bin = (bins[1]-bins[0])/2
-                onesigp = 84.13
-                onesigm = 15.87
-                #
-                med = np.zeros(len(bins)-1)
-                lower = np.zeros(len(bins)-1)
-                upper = np.zeros(len(bins)-1)
-                #
-                for i in range(0, len(bins)-1):
-                    mask = (x >= bins[i]) & (x <= bins[i+1])
-                    med[i] = np.nanmedian(y[mask])
-                    upper[i] = np.nanpercentile(y[mask], onesigp)
-                    lower[i] = np.nanpercentile(y[mask], onesigm)
-            elif 'M.' in versus:
-                if binsize*np.floor(np.min(np.log10(x))/binsize) % 1 != 0:
-                    minn = int(np.floor(binsize*np.floor(np.min(np.log10(x))/binsize)))
-                else:
-                    minn = int(binsize*np.floor(np.min(np.log10(x))/binsize))
-                if binsize*np.ceil(np.max(np.log10(x))/binsize) % 1 != 0:
-                    maxx = int(np.ceil(binsize*np.ceil(np.max(np.log10(x))/binsize)))
-                else:
-                    maxx = int(binsize*np.ceil(np.max(np.log10(x))/binsize))
-                bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
-                bins = np.linspace(minn, maxx, bin_num)
-                #
-                half_bin = (bins[1]-bins[0])/2
-                #
-                onesigp = 84.13
-                onesigm = 15.87
-                #
-                med = np.zeros(len(bins)-1)
-                lower = np.zeros(len(bins)-1)
-                upper = np.zeros(len(bins)-1)
-                #
-                for i in range(0, len(bins)-1):
-                    mask = (np.log10(x) >= bins[i]) & (np.log10(x) <= bins[i+1])
-                    med[i] = np.nanmedian(y[mask])
-                    upper[i] = np.nanpercentile(y[mask], onesigp)
-                    lower[i] = np.nanpercentile(y[mask], onesigm)
-            #
-        if 'N.' in versus:
-            minn = int(binsize*np.floor(np.min(x)/binsize))-0.5
-            maxx = int(binsize*np.ceil(np.max(x)/binsize))+0.5
-            bin_num = int((np.abs(minn)+np.abs(maxx))/binsize)
-            bins = np.linspace(minn, maxx, bin_num)
-            #
-            half_bin = (bins[1]-bins[0])/2
-            onesigp = 84.13
-            onesigm = 15.87
-            #
-            med = np.zeros(len(bins)-1)
-            lower = np.zeros(len(bins)-1)
-            upper = np.zeros(len(bins)-1)
-            #
-            for i in range(0, len(bins)-1):
-                mask = (x >= bins[i]) & (x <= bins[i+1])
-                med[i] = np.nanmedian(y[mask])
-                upper[i] = np.nanpercentile(y[mask], onesigp)
-                lower[i] = np.nanpercentile(y[mask], onesigm)
-        #
-        f, ax = plt.subplots(figsize=(10, 8))
-        plt.plot(bins[:-1]+half_bin, med, color=self.colors[1], marker='s', markersize=10, alpha=0.5)
-        plt.fill_between(bins[:-1]+half_bin, upper, lower, color=self.colors[1], alpha=0.3)
-        if limits:
-            plt.xlim(limits[0])
-            plt.ylim(limits[1])
-        plt.xlabel(self.labels[versus], fontsize=28)
-        plt.ylabel(y_label, fontsize=28)
-        plt.title('Most Recent Pericenter', fontsize=24)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
-    def delta_nperi_vs_prop_median(self, x, y, binsize, file_path_and_name, versus='d.sim', limits=None):
-        #
-        if 'N.' not in versus:
-            if 'M.' not in versus:
-                minn = int(binsize*np.floor(np.min(x)/binsize))
-                maxx = int(binsize*np.ceil(np.max(x)/binsize))
-                bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
-                bins = np.linspace(minn, maxx, bin_num)
-                #
-                half_bin = (bins[1]-bins[0])/2
-                #
-                means = np.zeros(len(bins)-1)
-                scatter = np.zeros(len(bins)-1)
-                #
-                for i in range(0, len(bins)-1):
-                    mask = (x >= bins[i]) & (x <= bins[i+1])
-                    means[i] = np.nanmean(y[mask])
-                    scatter[i] = np.nanstd(y[mask])
-            elif 'M.' in versus:
-                if binsize*np.floor(np.min(np.log10(x))/binsize) % 1 != 0:
-                    minn = int(np.floor(binsize*np.floor(np.min(np.log10(x))/binsize)))
-                else:
-                    minn = int(binsize*np.floor(np.min(np.log10(x))/binsize))
-                if binsize*np.ceil(np.max(np.log10(x))/binsize) % 1 != 0:
-                    maxx = int(np.ceil(binsize*np.ceil(np.max(np.log10(x))/binsize)))
-                else:
-                    maxx = int(binsize*np.ceil(np.max(np.log10(x))/binsize))
-                bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
-                bins = np.linspace(minn, maxx, bin_num)
-                #
-                half_bin = (bins[1]-bins[0])/2
-                #
-                means = np.zeros(len(bins)-1)
-                scatter = np.zeros(len(bins)-1)
-                #
-                for i in range(0, len(bins)-1):
-                    mask = (np.log10(x) >= bins[i]) & (np.log10(x) <= bins[i+1])
-                    means[i] = np.nanmean(y[mask])
-                    scatter[i] = np.nanstd(y[mask])
-        if 'N.' in versus:
-            means = np.zeros(np.max(x)+1)
-            scatter = np.zeros(np.max(x)+1)
-            bins = np.arange(np.max(x)+1)
-            #
-            for i in range(0, np.max(x)+1):
-                mask = (x == i)
-                means[i] = np.nanmean(y[mask])
-                scatter[i] = np.std(y[mask])
-        #
-        f, ax = plt.subplots(figsize=(10, 8))
-        if 'N.' not in versus:
-            plt.plot(bins[:-1]+half_bin, means, color=self.colors[1], marker='s', markersize=10, alpha=0.5)
-            plt.errorbar(bins[:-1]+half_bin, means, yerr=np.array([scatter, scatter]), color=self.colors[1], alpha=0.5, lw=5, capsize=8)
-        elif 'N.' in versus:
-            plt.plot(np.arange(np.max(x)+1), means, color=self.colors[1], alpha=0.5)
-            plt.errorbar(np.arange(np.max(x)+1), means, yerr=np.array([scatter, scatter]), color=self.colors[1], alpha=0.5, lw=5, capsize=8)
-        if limits:
-            plt.xlim(limits[0])
-            plt.ylim(limits[1])
-        plt.xlabel(self.labels[versus], fontsize=28)
-        plt.ylabel('N$_{\\rm model}$ - N$_{\\rm sim}$', fontsize=28)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
-    def nperi_vs_prop_median(self, x, y, binsize, file_path_and_name, xtype='d.sim', ytype='N.sim', limits=None):
-        if 'M.' not in xtype:
-            minn = int(binsize*np.floor(np.min(x)/binsize))
-            maxx = int(binsize*np.ceil(np.max(x)/binsize))
-            bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
-            bins = np.linspace(minn, maxx, bin_num)
-            #
-            half_bin = (bins[1]-bins[0])/2
-            #
-            means = np.zeros(len(bins)-1)
-            scatter = np.zeros(len(bins)-1)
-            #
-            for i in range(0, len(bins)-1):
-                mask = (x >= bins[i]) & (x <= bins[i+1])
-                means[i] = np.nanmean(y[mask])
-                scatter[i] = np.nanstd(y[mask])
-        elif 'M.' in xtype:
-            if binsize*np.floor(np.min(np.log10(x))/binsize) % 1 != 0:
-                minn = int(np.floor(binsize*np.floor(np.min(np.log10(x))/binsize)))
-            else:
-                minn = int(binsize*np.floor(np.min(np.log10(x))/binsize))
-            if binsize*np.ceil(np.max(np.log10(x))/binsize) % 1 != 0:
-                maxx = int(np.ceil(binsize*np.ceil(np.max(np.log10(x))/binsize)))
-            else:
-                maxx = int(binsize*np.ceil(np.max(np.log10(x))/binsize))
-            bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
-            bins = np.linspace(minn, maxx, bin_num)
-            #
-            half_bin = (bins[1]-bins[0])/2
-            #
-            means = np.zeros(len(bins)-1)
-            scatter = np.zeros(len(bins)-1)
-            #
-            for i in range(0, len(bins)-1):
-                mask = (np.log10(x) >= bins[i]) & (np.log10(x) <= bins[i+1])
-                means[i] = np.nanmean(y[mask])
-                scatter[i] = np.nanstd(y[mask])
-        #
-        f, ax = plt.subplots(figsize=(10, 8))
-        plt.plot(bins[:-1]+half_bin, means, color=self.colors[1], marker='s', markersize=10, alpha=0.5)
-        plt.errorbar(bins[:-1]+half_bin, means, yerr=np.array([scatter, scatter]), color=self.colors[1], alpha=0.5, lw=5, capsize=8)
-        if limits:
-            plt.xlim(limits[0])
-            plt.ylim(limits[1])
-        plt.xlabel(self.labels[xtype], fontsize=28)
-        plt.ylabel(self.labels[ytype], fontsize=28)
         plt.tick_params(axis='both', which='major', labelsize=24)
         plt.tight_layout()
         plt.savefig(file_path_and_name)
@@ -1171,233 +908,3 @@ class SummaryDataPlot(SummaryDataSort):
             plt.close()
         elif log == False:
             print('Haven\'t thought far enough ahead to bin outside of log-space :(')
-
-    def infall_vs_prop_median(self, x, y, binsize, file_path_and_name, xtype='d.z0', limits=None):
-        #
-        if 'M.' not in xtype:
-            minn = int(binsize*np.floor(np.min(x)/binsize))
-            maxx = int(binsize*np.ceil(np.max(x)/binsize))
-            bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
-            bins = np.linspace(minn, maxx, bin_num)
-            #
-            half_bin = (bins[1]-bins[0])/2
-            onesigp = 84.13
-            onesigm = 15.87
-            #
-            med = np.zeros(len(bins)-1)
-            lower = np.zeros(len(bins)-1)
-            upper = np.zeros(len(bins)-1)
-            #
-            for i in range(0, len(bins)-1):
-                mask = (x >= bins[i]) & (x <= bins[i+1])
-                med[i] = np.nanmedian(y[mask])
-                upper[i] = np.nanpercentile(y[mask], onesigp)
-                lower[i] = np.nanpercentile(y[mask], onesigm)
-        elif 'M.' in xtype:
-            if binsize*np.floor(np.min(np.log10(x))/binsize) % 1 != 0:
-                minn = int(np.floor(binsize*np.floor(np.min(np.log10(x))/binsize)))
-            else:
-                minn = int(binsize*np.floor(np.min(np.log10(x))/binsize))
-            if binsize*np.ceil(np.max(np.log10(x))/binsize) % 1 != 0:
-                maxx = int(np.ceil(binsize*np.ceil(np.max(np.log10(x))/binsize)))
-            else:
-                maxx = int(binsize*np.ceil(np.max(np.log10(x))/binsize))
-            bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
-            bins = np.linspace(minn, maxx, bin_num)
-            #
-            half_bin = (bins[1]-bins[0])/2
-            #
-            onesigp = 84.13
-            onesigm = 15.87
-            #
-            med = np.zeros(len(bins)-1)
-            lower = np.zeros(len(bins)-1)
-            upper = np.zeros(len(bins)-1)
-            #
-            for i in range(0, len(bins)-1):
-                mask = (np.log10(x) >= bins[i]) & (np.log10(x) <= bins[i+1])
-                med[i] = np.nanmedian(y[mask])
-                upper[i] = np.nanpercentile(y[mask], onesigp)
-                lower[i] = np.nanpercentile(y[mask], onesigm)
-        #
-        f, ax = plt.subplots(figsize=(10, 8))
-        plt.plot(bins[:-1]+half_bin, med, color=self.colors[1], marker='s', markersize=10, alpha=0.5)
-        plt.fill_between(bins[:-1]+half_bin, upper, lower, color=self.colors[1], alpha=0.3)
-        if limits:
-            plt.xlim(limits[0])
-            plt.ylim(limits[1])
-        plt.xlabel(self.labels[xtype], fontsize=28)
-        plt.ylabel('t$_{\\rm infall,lb}$ [Gyr]', fontsize=28)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
-    def mstar_vs_prop_median(self, x, y, binsize, file_path_and_name, xtype='M.z0', ytype='d.z0', limits=None):
-        if xtype == 'M.z0':
-            x_label = 'log$_{\\rm 10}$($M_{\\rm star}(z = 0)/M_{\\odot}$)'
-        elif xtype == 'M.peak':
-            x_label = 'log$_{\\rm 10}$($M_{\\rm star, peak}/M_{\\odot}$)'
-        #
-        if ytype == 'd.z0':
-            y_label = 'd(z = 0) [kpc]'
-        #
-        if 'M.' not in xtype:
-            minn = int(binsize*np.floor(np.min(x)/binsize))
-            maxx = int(binsize*np.ceil(np.max(x)/binsize))
-            bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
-            bins = np.linspace(minn, maxx, bin_num)
-            #
-            half_bin = (bins[1]-bins[0])/2
-            onesigp = 84.13
-            onesigm = 15.87
-            #
-            med = np.zeros(len(bins)-1)
-            lower = np.zeros(len(bins)-1)
-            upper = np.zeros(len(bins)-1)
-            #
-            for i in range(0, len(bins)-1):
-                mask = (x >= bins[i]) & (x <= bins[i+1])
-                med[i] = np.nanmedian(y[mask])
-                upper[i] = np.nanpercentile(y[mask], onesigp)
-                lower[i] = np.nanpercentile(y[mask], onesigm)
-        elif 'M.' in xtype:
-            if binsize*np.floor(np.min(np.log10(x))/binsize) % 1 != 0:
-                minn = int(np.floor(binsize*np.floor(np.min(np.log10(x))/binsize)))
-            else:
-                minn = int(binsize*np.floor(np.min(np.log10(x))/binsize))
-            if binsize*np.ceil(np.max(np.log10(x))/binsize) % 1 != 0:
-                maxx = int(np.ceil(binsize*np.ceil(np.max(np.log10(x))/binsize)))
-            else:
-                maxx = int(binsize*np.ceil(np.max(np.log10(x))/binsize))
-            bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
-            bins = np.linspace(minn, maxx, bin_num)
-            #
-            half_bin = (bins[1]-bins[0])/2
-            #
-            onesigp = 84.13
-            onesigm = 15.87
-            #
-            med = np.zeros(len(bins)-1)
-            lower = np.zeros(len(bins)-1)
-            upper = np.zeros(len(bins)-1)
-            #
-            for i in range(0, len(bins)-1):
-                mask = (np.log10(x) >= bins[i]) & (np.log10(x) <= bins[i+1])
-                med[i] = np.nanmedian(y[mask])
-                upper[i] = np.nanpercentile(y[mask], onesigp)
-                lower[i] = np.nanpercentile(y[mask], onesigm)
-        #
-        f, ax = plt.subplots(figsize=(10, 8))
-        plt.plot(bins[:-1]+half_bin, med, color=self.colors[1], marker='s', markersize=10, alpha=0.5)
-        plt.fill_between(bins[:-1]+half_bin, upper, lower, color=self.colors[1], alpha=0.3)
-        if limits:
-            plt.xlim(limits[0])
-            plt.ylim(limits[1])
-        plt.xlabel(x_label, fontsize=28)
-        plt.ylabel(y_label, fontsize=28)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
-
-    def mhalo_hist(self, x, binsize, file_path_and_name, log=False, selection='z0', xlimits=None, pdf=True):
-        """
-        TBD
-        """
-        #
-        if log == True:
-            if binsize*np.floor(np.min(np.log10(x))/binsize) % 1 != 0:
-                minn = int(np.floor(binsize*np.floor(np.min(np.log10(x))/binsize)))
-            else:
-                minn = int(binsize*np.floor(np.min(np.log10(x))/binsize))
-            if binsize*np.ceil(np.max(np.log10(x))/binsize) % 1 != 0:
-                maxx = int(np.ceil(binsize*np.ceil(np.max(np.log10(x))/binsize)))
-            else:
-                maxx = int(binsize*np.ceil(np.max(np.log10(x))/binsize))
-            bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
-            bin_array = np.linspace(minn, maxx, bin_num)
-            #
-            if pdf:
-                y_label = 'PDF'
-            else:
-                y_label = 'N'
-            #
-            y_med = np.nanmax(np.histogram(np.log10(x), bin_array, normed=pdf)[0])*1.1
-            #
-            if selection == 'z0':
-                x_label = 'log$_{\\rm 10}$($M_{\\rm halo}(z = 0)/M_{\\odot}$)'
-            elif selection == 'peak':
-                x_label = 'log$_{\\rm 10}$($M_{\\rm halo,peak}/M_{\\odot}$)'
-            #
-            # Calculate the scatter
-            onesigp = 84.13
-            onesigm = 15.87
-            sigma_one_op = np.nanpercentile(np.log10(x), onesigp)
-            sigma_one_om = np.nanpercentile(np.log10(x), onesigm)
-            #
-            # Plot the data
-            plt.figure(figsize=(10, 8))
-            plt.hist(np.log10(x), bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
-            #
-            plt.errorbar(np.median(np.log10(x)), y_med, xerr=np.array([[np.median(np.log10(x))-sigma_one_om],[sigma_one_op-np.median(np.log10(x))]]), color='k', lw=5, capsize=8)
-            plt.scatter(np.median(np.log10(x)), y_med, s=250, marker='s', c='k')
-            #
-            if xlimits:
-                plt.xlim(xlimits)
-            plt.xlabel(x_label, fontsize=28)
-            plt.ylabel(y_label, fontsize=28)
-            plt.title('Satellite M$_{\\rm halo}$ Histogram', fontsize=24)
-            plt.tick_params(axis='both', which='major', labelsize=24)
-            plt.tight_layout()
-            plt.savefig(file_path_and_name)
-            plt.close()
-        elif log == False:
-            print('Haven\'t thought far enough ahead to bin outside of log-space :(')
-
-    def mstar_mhalo_median(self, x, y, binsize, file_path_and_name, masstype='z0',limits=None):
-        if masstype == 'z0':
-            x_label = self.labels['M.halo.z0']
-            y_label = self.labels['M.star.z0']
-        elif masstype == 'peak':
-            x_label = self.labels['M.halo.peak']
-            y_label = self.labels['M.star.peak']
-        #
-        if binsize*np.floor(np.min(np.log10(x))/binsize) % 1 != 0:
-            minn = int(np.floor(binsize*np.floor(np.min(np.log10(x))/binsize)))
-        else:
-            minn = int(binsize*np.floor(np.min(np.log10(x))/binsize))
-        if binsize*np.ceil(np.max(np.log10(x))/binsize) % 1 != 0:
-            maxx = int(np.ceil(binsize*np.ceil(np.max(np.log10(x))/binsize)))
-        else:
-            maxx = int(binsize*np.ceil(np.max(np.log10(x))/binsize))
-        bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
-        bins = np.linspace(minn, maxx, bin_num)
-        #
-        half_bin = (bins[1]-bins[0])/2
-        #
-        onesigp = 84.13
-        onesigm = 15.87
-        #
-        med = np.zeros(len(bins)-1)
-        lower = np.zeros(len(bins)-1)
-        upper = np.zeros(len(bins)-1)
-        #
-        for i in range(0, len(bins)-1):
-            mask = (np.log10(x) >= bins[i]) & (np.log10(x) <= bins[i+1])
-            med[i] = np.nanmedian(np.log10(y)[mask])
-            upper[i] = np.nanpercentile(np.log10(y)[mask], onesigp)
-            lower[i] = np.nanpercentile(np.log10(y)[mask], onesigm)
-        #
-        f, ax = plt.subplots(figsize=(10, 8))
-        plt.plot(bins[:-1]+half_bin, med, color=self.colors[1], marker='s', markersize=10, alpha=0.5)
-        plt.fill_between(bins[:-1]+half_bin, upper, lower, color=self.colors[1], alpha=0.3)
-        if limits:
-            plt.xlim(limits[0])
-            plt.ylim(limits[1])
-        plt.xlabel(x_label, fontsize=28)
-        plt.ylabel(y_label, fontsize=28)
-        plt.tick_params(axis='both', which='major', labelsize=24)
-        plt.tight_layout()
-        plt.savefig(file_path_and_name)
-        plt.close()
