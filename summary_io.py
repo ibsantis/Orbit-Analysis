@@ -529,7 +529,19 @@ class SummaryDataPlot(SummaryDataSort):
 
     def __init__(self):
         """
-        TBD
+        DESCRIPTION:
+            Initializes the plotting class and sets important attributes.
+
+        VARIABLES:
+
+
+        NOTES:
+            - Saves three attributes
+                - self.colors is an array of hex color codes. All 14 are different
+                  enough from one another to be distinct from one another to color-
+                  blind people.
+                - self.labels is a dictionary of plotting labels.
+                - self.titles is a dictionary of plotting titles.
         """
         SummaryDataSort.__init__(self)
         #
@@ -567,7 +579,24 @@ class SummaryDataPlot(SummaryDataSort):
 
     def scatter_plot(self, x, y, xtype, ytype, file_path_and_name, x_out=None, y_out=None, limits=None, title=None):
         """
-        TBD
+        DESCRIPTION:
+            Plots two quantities in a scatter plot.
+
+        VARIABLES:
+            - x                  : 1D array
+            - y                  : 1D array
+            - x_out              : 1D array
+            - y_out              : 1D array
+            - xtype              : string
+            - ytype              : string
+            - limits             : tuple of two tuples
+            - title              : string
+            - file_path_and_name : string
+
+        NOTES:
+            - If plotting mass quantities, this takes the log first.
+            - If comparing pericenter distances or times, this plots a 1-to-1
+              line from the bottom left corner to the top right.
         """
         if 'M.' in xtype:
             x = np.log10(x)
@@ -598,7 +627,29 @@ class SummaryDataPlot(SummaryDataSort):
 
     def median_plot(self, x, y, xtype, ytype, binsize, file_path_and_name, limits=None, title=None):
         """
-        TBD
+        DESCRIPTION:
+            Bins the x-axis quantity and plots either the mean or median, along
+            with the standard deviation or 68% scatter, of the y-axis quantity.
+
+        VARIABLES:
+            - x                  : 1D array
+            - y                  : 1D array
+            - xtype              : string
+            - ytype              : string
+            - binsize            : float or int
+            - limits             : tuple of two tuples
+            - title              : string
+            - file_path_and_name : string
+
+        NOTES:
+            - If plotting mass quantities, this takes the log first.
+            - If the x-axis quantity is an integer quantity (pericenter number
+              in particular), script bins differently than if not an integer
+              quantity.
+            - If the y-axis quantity is an integer quantity, then the method
+              calculates the mean and standard deviation.
+            - If the y-axis quantity is not an integer quantity, then the method
+              calculates the median and 68% scatter.
         """
         if 'M.' in xtype:
             x = np.log10(x)
@@ -704,9 +755,26 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def plot_hist(self, x, binsize, file_path_and_name, pdf=False, xtype='d.sim', xlimits=None, title=None):
+    def plot_hist(self, x, xtype, binsize, file_path_and_name, pdf=False, xlimits=None, title=None):
         """
-        TBD
+        DESCRIPTION:
+            Plots a histogram of a given property.
+
+        VARIABLES:
+            - x                  : 1D array
+            - xtype              : string
+            - binsize            : float or int
+            - xlimits            : tuple
+            - pdf                : boolean
+            - title              : string
+            - file_path_and_name : string
+
+        NOTES:
+            - If plotting mass quantities, this takes the log first.
+            - Bins things slightly differently if the x-axis quantity is an
+              integer quantity.
+            - Plots either a PDF or regular histogram depending on what 'pdf'
+              is set to.
         """
         if pdf:
             y_label = 'PDF'
