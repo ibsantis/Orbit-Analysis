@@ -26,33 +26,37 @@ print('Set paths')
 # Initialize the classes, read in the data, and create data masks
 summary = summary_io.SummaryDataSort()
 data_total = summary.data_read(directory=sim_data.home_dir)
-masks_1 = summary.data_mask(data_total) # for cases where there are pericenters in sim, but not required in model
-masks_2 = summary.data_mask(data_total, peri_model=True) # for cases where there are pericenters in both sim AND model
-masks_3 = summary.data_mask(data_total, peri_sim=False, peri_model=False) # For cases where no satellite is required to have experienced a pericenter
+masks_infall = summary.data_mask(data_total, peri_sim=False, peri_model=False) # For cases where no satellite is required to have experienced a pericenter
 masks_outliers = summary.data_mask(data_total, outliers=True)
 masks_either = summary.data_mask(data_total, either=True)
 summary_plot = summary_io.SummaryDataPlot()
 
 
+
+mask_selection = masks_either
+directory = sim_data.home_dir+'/orbit_data/plots/summary/sats_w_either_peri'
+
+
+
 ### Generate all of the data for the plots below
 # No oversample
-delta_N = summary.delta_nperi(data_total, masks_either, oversample=False)
-N_sim_tot = summary.nperi(data_total, masks_either, oversample=False, selection='sim')
-N_model_tot = summary.nperi(data_total, masks_either, oversample=False, selection='model')
-d_tot_sim = summary.dperi_recent(data_total, masks_either, selection='sim', oversample=False)
-d_tot_model = summary.dperi_recent(data_total, masks_either, selection='model', oversample=False)
-delta_df_tot = summary.delta_dperi(data_total, masks_either, fraction=True, oversample=False)
-delta_d_tot = summary.delta_dperi(data_total, masks_either, fraction=False, oversample=False)
-dz0_tot = summary.d_z0(data_total, masks_either, oversample=False)
-t_tot_sim = summary.tperi_recent(data_total, masks_either, selection='sim', oversample=False)
-t_tot_model = summary.tperi_recent(data_total, masks_either, selection='model', oversample=False)
-delta_tf_tot = summary.delta_tperi(data_total, masks_either, fraction=True, oversample=False)
-delta_t_tot = summary.delta_tperi(data_total, masks_either, fraction=False, oversample=False)
-t_in_tot = summary.first_infall(data_total, masks_either, oversample=False)
-Mstar_z0_tot = summary.mstar(data_total, masks_either, selection='z0', oversample=False)
-Mstar_peak_tot = summary.mstar(data_total, masks_either, selection='peak', oversample=False)
-Mhalo_z0_tot = summary.mhalo(data_total, masks_either, selection='z0', oversample=False)
-Mhalo_peak_tot = summary.mhalo(data_total, masks_either, selection='peak', oversample=False)
+delta_N = summary.delta_nperi(data_total, mask_selection, oversample=False)
+N_sim_tot = summary.nperi(data_total, mask_selection, oversample=False, selection='sim')
+N_model_tot = summary.nperi(data_total, mask_selection, oversample=False, selection='model')
+d_tot_sim = summary.dperi_recent(data_total, mask_selection, selection='sim', oversample=False)
+d_tot_model = summary.dperi_recent(data_total, mask_selection, selection='model', oversample=False)
+delta_df_tot = summary.delta_dperi(data_total, mask_selection, fraction=True, oversample=False)
+delta_d_tot = summary.delta_dperi(data_total, mask_selection, fraction=False, oversample=False)
+dz0_tot = summary.d_z0(data_total, mask_selection, oversample=False)
+t_tot_sim = summary.tperi_recent(data_total, mask_selection, selection='sim', oversample=False)
+t_tot_model = summary.tperi_recent(data_total, mask_selection, selection='model', oversample=False)
+delta_tf_tot = summary.delta_tperi(data_total, mask_selection, fraction=True, oversample=False)
+delta_t_tot = summary.delta_tperi(data_total, mask_selection, fraction=False, oversample=False)
+t_in_tot = summary.first_infall(data_total, mask_selection, oversample=False)
+Mstar_z0_tot = summary.mstar(data_total, mask_selection, selection='z0', oversample=False)
+Mstar_peak_tot = summary.mstar(data_total, mask_selection, selection='peak', oversample=False)
+Mhalo_z0_tot = summary.mhalo(data_total, mask_selection, selection='z0', oversample=False)
+Mhalo_peak_tot = summary.mhalo(data_total, mask_selection, selection='peak', oversample=False)
 
 
 
@@ -79,23 +83,23 @@ Mhalo_peak_tot_out = summary.mhalo(data_total, masks_outliers, selection='peak',
 
 
 # Oversample
-delta_No = summary.delta_nperi(data_total, masks_either, oversample=True)
-N_sim_o_tot = summary.nperi(data_total, masks_either, oversample=True, selection='sim')
-N_model_o_tot = summary.nperi(data_total, masks_either, oversample=True, selection='model')
-d_tot_sim_o = summary.dperi_recent(data_total, masks_either, selection='sim', oversample=True)
-d_tot_model_o = summary.dperi_recent(data_total, masks_either, selection='model', oversample=True)
-delta_dfo_tot = summary.delta_dperi(data_total, masks_either, fraction=True, oversample=True)
-delta_do_tot = summary.delta_dperi(data_total, masks_either, fraction=False, oversample=True)
-dz0_o_tot = summary.d_z0(data_total, masks_either, oversample=True)
-t_tot_sim_o = summary.tperi_recent(data_total, masks_either, selection='sim', oversample=True)
-t_tot_model_o = summary.tperi_recent(data_total, masks_either, selection='model', oversample=True)
-delta_tfo_tot = summary.delta_tperi(data_total, masks_either, fraction=True, oversample=True)
-delta_to_tot = summary.delta_tperi(data_total, masks_either, fraction=False, oversample=True)
-t_in_tot_o = summary.first_infall(data_total, masks_either, oversample=True)
-Mstar_z0_tot_o = summary.mstar(data_total, masks_either, selection='z0', oversample=True)
-Mstar_peak_tot_o = summary.mstar(data_total, masks_either, selection='peak', oversample=True)
-Mhalo_z0_tot_o = summary.mhalo(data_total, masks_either, selection='z0', oversample=True)
-Mhalo_peak_tot_o = summary.mhalo(data_total, masks_either, selection='peak', oversample=True)
+delta_No = summary.delta_nperi(data_total, mask_selection, oversample=True)
+N_sim_o_tot = summary.nperi(data_total, mask_selection, oversample=True, selection='sim')
+N_model_o_tot = summary.nperi(data_total, mask_selection, oversample=True, selection='model')
+d_tot_sim_o = summary.dperi_recent(data_total, mask_selection, selection='sim', oversample=True)
+d_tot_model_o = summary.dperi_recent(data_total, mask_selection, selection='model', oversample=True)
+delta_dfo_tot = summary.delta_dperi(data_total, mask_selection, fraction=True, oversample=True)
+delta_do_tot = summary.delta_dperi(data_total, mask_selection, fraction=False, oversample=True)
+dz0_o_tot = summary.d_z0(data_total, mask_selection, oversample=True)
+t_tot_sim_o = summary.tperi_recent(data_total, mask_selection, selection='sim', oversample=True)
+t_tot_model_o = summary.tperi_recent(data_total, mask_selection, selection='model', oversample=True)
+delta_tfo_tot = summary.delta_tperi(data_total, mask_selection, fraction=True, oversample=True)
+delta_to_tot = summary.delta_tperi(data_total, mask_selection, fraction=False, oversample=True)
+t_in_tot_o = summary.first_infall(data_total, mask_selection, oversample=True)
+Mstar_z0_tot_o = summary.mstar(data_total, mask_selection, selection='z0', oversample=True)
+Mstar_peak_tot_o = summary.mstar(data_total, mask_selection, selection='peak', oversample=True)
+Mhalo_z0_tot_o = summary.mhalo(data_total, mask_selection, selection='z0', oversample=True)
+Mhalo_peak_tot_o = summary.mhalo(data_total, mask_selection, selection='peak', oversample=True)
 
 
 
@@ -107,17 +111,17 @@ Mhalo_peak_tot_o = summary.mhalo(data_total, masks_either, selection='peak', ove
 
 ### Summary plots
 # N histogram
-summary_plot.plot_hist(x=N_sim_o_tot, binsize=1, xtype='N.sim', pdf=True, xlimits=(0,14), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/N_peri_sim_histogram_pdf.pdf')
-summary_plot.plot_hist(x=N_sim_tot, binsize=1, xtype='N.sim', pdf=False, xlimits=(0,14), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/N_peri_sim_histogram.pdf')
+summary_plot.plot_hist(x=N_sim_o_tot, binsize=1, xtype='N.sim', pdf=True, xlimits=(0,14), file_path_and_name=directory+'/histogram/N_peri_sim_histogram_pdf.pdf')
+summary_plot.plot_hist(x=N_sim_tot, binsize=1, xtype='N.sim', pdf=False, xlimits=(0,14), file_path_and_name=directory+'/histogram/N_peri_sim_histogram.pdf')
 #
-summary_plot.plot_hist(x=N_model_o_tot, binsize=1, xtype='N.model', pdf=True, xlimits=(0,14), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/N_peri_model_histogram_pdf.pdf')
-summary_plot.plot_hist(x=N_model_tot, binsize=1, xtype='N.model', pdf=False, xlimits=(0,14), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/N_peri_model_histogram.pdf')
+summary_plot.plot_hist(x=N_model_o_tot, binsize=1, xtype='N.model', pdf=True, xlimits=(0,14), file_path_and_name=directory+'/histogram/N_peri_model_histogram_pdf.pdf')
+summary_plot.plot_hist(x=N_model_tot, binsize=1, xtype='N.model', pdf=False, xlimits=(0,14), file_path_and_name=directory+'/histogram/N_peri_model_histogram.pdf')
 
 
 
 # Delta N histogram
-summary_plot.plot_hist(x=delta_No, binsize=1, xtype='N.delta', pdf=True, xlimits=(-5,5), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/delta_N_peri_histogram_pdf.pdf')
-summary_plot.plot_hist(x=delta_N, binsize=1, xtype='N.delta', pdf=False, xlimits=(-5,5), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/delta_N_peri_histogram.pdf')
+summary_plot.plot_hist(x=delta_No, binsize=1, xtype='N.delta', pdf=True, xlimits=(-5,5), file_path_and_name=directory+'/histogram/delta_N_peri_histogram_pdf.pdf')
+summary_plot.plot_hist(x=delta_N, binsize=1, xtype='N.delta', pdf=False, xlimits=(-5,5), file_path_and_name=directory+'/histogram/delta_N_peri_histogram.pdf')
 
 
 
@@ -125,655 +129,724 @@ summary_plot.plot_hist(x=delta_N, binsize=1, xtype='N.delta', pdf=False, xlimits
 # Delta N vs N
 #
 # Scatter plots
-summary_plot.delta_nperi_vs_prop_scatter(x=N_sim_tot, y=delta_N, x_out=N_sim_tot_out, y_out=delta_N_out, versus='N.sim', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_N_vs_N_sim.pdf')
-summary_plot.delta_nperi_vs_prop_scatter(x=N_model_tot, y=delta_N, x_out=N_model_tot_out, y_out=delta_N_out, versus='N.model', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_N_vs_N_model.pdf')
+summary_plot.scatter_plot(x=N_sim_tot, y=delta_N, x_out=N_sim_tot_out, y_out=delta_N_out, xtype='N.sim', ytype='N.delta', file_path_and_name=directory+'/scatter/delta_N_vs_N_sim.pdf')
+summary_plot.scatter_plot(x=N_model_tot, y=delta_N, x_out=N_model_tot_out, y_out=delta_N_out, xtype='N.model', ytype='N.delta', file_path_and_name=directory+'/scatter/delta_N_vs_N_model.pdf')
 #
 # oversample, cases with peris in sim, but not required in model
-summary_plot.delta_nperi_vs_prop_median(x=N_sim_o_tot, y=delta_No, versus='N.sim', binsize=None, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_N_vs_N_sim.pdf')
-summary_plot.delta_nperi_vs_prop_median(x=N_model_o_tot, y=delta_No, versus='N.model', binsize=None, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_N_vs_N_model.pdf')
+summary_plot.median_plot(x=N_sim_o_tot, y=delta_No, xtype='N.sim', ytype='N.delta', binsize=1, file_path_and_name=directory+'/median/delta_N_vs_N_sim.pdf')
+summary_plot.median_plot(x=N_model_o_tot, y=delta_No, xtype='N.model', ytype='N.delta', binsize=1, file_path_and_name=directory+'/median/delta_N_vs_N_model.pdf')
 
 
 
 # delta_N vs d_peri
 # Scatter plots
-summary_plot.delta_nperi_vs_prop_scatter(x=d_tot_sim, y=delta_N, x_out=d_tot_sim_out, y_out=delta_N_out, versus='d.sim', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_N_vs_d_sim.pdf')
-summary_plot.delta_nperi_vs_prop_scatter(x=d_tot_model, y=delta_N, x_out=d_tot_model_out, y_out=delta_N_out, versus='d.model', limits=((-5,350),None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_N_vs_d_model_zoom.pdf')
+summary_plot.scatter_plot(x=d_tot_sim, y=delta_N, x_out=d_tot_sim_out, y_out=delta_N_out, xtype='d.sim', ytype='N.delta', file_path_and_name=directory+'/scatter/delta_N_vs_d_sim.pdf')
+summary_plot.scatter_plot(x=d_tot_model, y=delta_N, x_out=d_tot_model_out, y_out=delta_N_out, xtype='d.model', ytype='N.delta', limits=((-5,350),None), file_path_and_name=directory+'/scatter/delta_N_vs_d_model_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_nperi_vs_prop_median(x=d_tot_sim_o, y=delta_No, binsize=50, versus='d.sim', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_N_vs_d_sim.pdf')
-summary_plot.delta_nperi_vs_prop_median(x=d_tot_model_o, y=delta_No, binsize=50, versus='d.model', limits=((-5,350), None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_N_vs_d_model_zoom.pdf')
+summary_plot.median_plot(x=d_tot_sim_o, y=delta_No, binsize=50, xtype='d.sim', ytype='N.delta', file_path_and_name=directory+'/median/delta_N_vs_d_sim.pdf')
+summary_plot.median_plot(x=d_tot_model_o, y=delta_No, binsize=50, xtype='d.model', ytype='N.delta', limits=((-5,350), None), file_path_and_name=directory+'/median/delta_N_vs_d_model_zoom.pdf')
 
 
 
 # delta_N vs d(z = 0)
 # Scatter plots
-summary_plot.delta_nperi_vs_prop_scatter(x=dz0_tot, y=delta_N, x_out=dz0_tot_out, y_out=delta_N_out, versus='d.z0', limits=((-5,350), None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_N_vs_dz0_zoom.pdf')
+summary_plot.scatter_plot(x=dz0_tot, y=delta_N, x_out=dz0_tot_out, y_out=delta_N_out, xtype='d.z0', ytype='N.delta', limits=((-5,350), None), file_path_and_name=directory+'/scatter/delta_N_vs_dz0_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_nperi_vs_prop_median(x=dz0_o_tot, y=delta_No, binsize=50, versus='d.z0', limits=((-5,350),None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_N_vs_dz0_zoom.pdf')
+summary_plot.median_plot(x=dz0_o_tot, y=delta_No, binsize=50, xtype='d.z0', ytype='N.delta', limits=((-5,350),None), file_path_and_name=directory+'/median/delta_N_vs_dz0_zoom.pdf')
 
 
 
 # delta_N vs t_peri
 # Scatter plots
-summary_plot.delta_nperi_vs_prop_scatter(x=t_tot_sim, y=delta_N, x_out=t_tot_sim_out, y_out=delta_N_out, versus='t.sim', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_N_vs_t_sim.pdf')
-summary_plot.delta_nperi_vs_prop_scatter(x=t_tot_model, y=delta_N, x_out=t_tot_model_out, y_out=delta_N_out, versus='t.model', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_N_vs_t_model.pdf')
+summary_plot.scatter_plot(x=t_tot_sim, y=delta_N, x_out=t_tot_sim_out, y_out=delta_N_out, xtype='t.sim', ytype='N.delta', file_path_and_name=directory+'/scatter/delta_N_vs_t_sim.pdf')
+summary_plot.scatter_plot(x=t_tot_model, y=delta_N, x_out=t_tot_model_out, y_out=delta_N_out, xtype='t.model', ytype='N.delta', file_path_and_name=directory+'/scatter/delta_N_vs_t_model.pdf')
 #
 # Median plots
-summary_plot.delta_nperi_vs_prop_median(x=t_tot_sim_o, y=delta_No, binsize=1, versus='t.sim', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_N_vs_t_sim.pdf')
-summary_plot.delta_nperi_vs_prop_median(x=t_tot_model_o, y=delta_No, binsize=1, versus='t.model', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_N_vs_t_model.pdf')
+summary_plot.median_plot(x=t_tot_sim_o, y=delta_No, binsize=1, xtype='t.sim', ytype='N.delta', file_path_and_name=directory+'/median/delta_N_vs_t_sim.pdf')
+summary_plot.median_plot(x=t_tot_model_o, y=delta_No, binsize=1, xtype='t.model', ytype='N.delta', file_path_and_name=directory+'/median/delta_N_vs_t_model.pdf')
 
 
 
 # delta_N vs t_infall
 # Scatter plots
-summary_plot.delta_nperi_vs_prop_scatter(x=t_in_tot, y=delta_N, x_out=t_in_tot_out, y_out=delta_N_out, versus='t.infall', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_N_vs_t_infall.pdf')
+summary_plot.scatter_plot(x=t_in_tot, y=delta_N, x_out=t_in_tot_out, y_out=delta_N_out, xtype='t.infall', ytype='N.delta', file_path_and_name=directory+'/scatter/delta_N_vs_t_infall.pdf')
 #
 # Median plots
-summary_plot.delta_nperi_vs_prop_median(x=t_in_tot_o, y=delta_No, binsize=1, versus='t.infall', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_N_vs_t_infall.pdf')
+summary_plot.median_plot(x=t_in_tot_o, y=delta_No, binsize=1, xtype='t.infall', ytype='N.delta', file_path_and_name=directory+'/median/delta_N_vs_t_infall.pdf')
 
 
 
 # delta_N vs Mstar (z = 0)
 # Scatter plots
-summary_plot.delta_nperi_vs_prop_scatter(x=Mstar_z0_tot, y=delta_N, x_out=Mstar_z0_tot_out, y_out=delta_N_out, versus='M.z0', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_N_vs_mstar_z0.pdf')
+summary_plot.scatter_plot(x=Mstar_z0_tot, y=delta_N, x_out=Mstar_z0_tot_out, y_out=delta_N_out, xtype='M.star.z0', ytype='N.delta', file_path_and_name=directory+'/scatter/delta_N_vs_mstar_z0.pdf')
 #
 # Median plots
-summary_plot.delta_nperi_vs_prop_median(x=Mstar_z0_tot_o, y=delta_No, binsize=0.5, versus='M.star.z0', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_N_vs_mstar_z0.pdf')
+summary_plot.median_plot(x=Mstar_z0_tot_o, y=delta_No, binsize=0.5, xtype='M.star.z0', ytype='N.delta', file_path_and_name=directory+'/median/delta_N_vs_mstar_z0.pdf')
 
 
 
 # delta_N vs Mstar (peak)
 # Scatter plots
-summary_plot.delta_nperi_vs_prop_scatter(x=Mstar_peak_tot, y=delta_N, x_out=Mstar_peak_tot_out, y_out=delta_N_out, versus='M.peak', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_N_vs_mstar_peak.pdf')
+summary_plot.scatter_plot(x=Mstar_peak_tot, y=delta_N, x_out=Mstar_peak_tot_out, y_out=delta_N_out, xtype='M.star.peak', ytype='N.delta', file_path_and_name=directory+'/scatter/delta_N_vs_mstar_peak.pdf')
 #
 # Median plots
-summary_plot.delta_nperi_vs_prop_median(x=Mstar_peak_tot_o, y=delta_No, binsize=0.5, versus='M.star.peak', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_N_vs_mstar_peak.pdf')
+summary_plot.median_plot(x=Mstar_peak_tot_o, y=delta_No, binsize=0.5, xtype='M.star.peak', ytype='N.delta', file_path_and_name=directory+'/median/delta_N_vs_mstar_peak.pdf')
 
 
 
 # delta_N vs Mhalo (z = 0)
 # Scatter plots
-summary_plot.delta_nperi_vs_prop_scatter(x=Mhalo_z0_tot, y=delta_N, x_out=Mhalo_z0_tot_out, y_out=delta_N_out, versus='M.halo.z0', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_peri_sim/scatter/delta_N_vs_mhalo_z0.pdf')
+summary_plot.scatter_plot(x=Mhalo_z0_tot, y=delta_N, x_out=Mhalo_z0_tot_out, y_out=delta_N_out, xtype='M.halo.z0', ytype='N.delta', file_path_and_name=directory+'/scatter/delta_N_vs_mhalo_z0.pdf')
 #
 # Median plots
-summary_plot.delta_nperi_vs_prop_median(x=Mhalo_z0_tot, y=delta_No, binsize=0.5, versus='M.halo.z0', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_peri_sim/median/delta_N_vs_mhalo_z0.pdf')
+summary_plot.median_plot(x=Mhalo_z0_tot, y=delta_No, binsize=0.5, xtype='M.halo.z0', ytype='N.delta', file_path_and_name=directory+'/median/delta_N_vs_mhalo_z0.pdf')
 
 
 
 # delta_N vs Mhalo (peak)
 # Scatter plots
-summary_plot.delta_nperi_vs_prop_scatter(x=Mhalo_peak_tot, y=delta_N, x_out=Mhalo_peak_tot_out, y_out=delta_N_out, versus='M.halo.peak', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/scatter/delta_N_vs_mhalo_peak.pdf')
+summary_plot.scatter_plot(x=Mhalo_peak_tot, y=delta_N, x_out=Mhalo_peak_tot_out, y_out=delta_N_out, xtype='M.halo.peak', ytype='N.delta', file_path_and_name=directory+'/scatter/delta_N_vs_mhalo_peak.pdf')
 #
 # Median plots
-summary_plot.delta_nperi_vs_prop_median(x=Mhalo_peak_tot_o, y=delta_No, binsize=0.5, versus='M.halo.peak', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/median/delta_N_vs_mhalo_peak.pdf')
+summary_plot.median_plot(x=Mhalo_peak_tot_o, y=delta_No, binsize=0.5, xtype='M.halo.peak', ytype='N.delta', file_path_and_name=directory+'/median/delta_N_vs_mhalo_peak.pdf')
 
 
 
 # N vs d_peri
 # Scatter plots
-summary_plot.nperi_vs_prop_scatter(x=d_tot_sim, y=N_sim_tot, x_out=d_tot_sim_out, y_out=N_sim_tot_out, xtype='d.sim', ytype='N.sim', limits=((-5,350),(-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/N_sim_vs_d_sim_zoom.pdf')
-summary_plot.nperi_vs_prop_scatter(x=d_tot_model, y=N_model_tot, x_out=d_tot_model_out, y_out=N_model_tot_out, xtype='d.model', ytype='N.model', limits=((-5,350),(-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/N_model_vs_d_model_zoom.pdf')
-summary_plot.nperi_vs_prop_scatter(x=d_tot_sim, y=N_model_tot, x_out=d_tot_sim_out, y_out=N_model_tot_out, xtype='d.sim', ytype='N.model', limits=((-5,350),(-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/N_model_vs_d_sim_zoom.pdf')
-summary_plot.nperi_vs_prop_scatter(x=d_tot_model, y=N_sim_tot, x_out=d_tot_model_out, y_out=N_sim_tot_out, xtype='d.model', ytype='N.sim', limits=((-5,350),(-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/N_sim_vs_d_model_zoom.pdf')
+summary_plot.scatter_plot(x=d_tot_sim, y=N_sim_tot, x_out=d_tot_sim_out, y_out=N_sim_tot_out, xtype='d.sim', ytype='N.sim', limits=((-5,350),(-0.5,13.5)), file_path_and_name=directory+'/scatter/N_sim_vs_d_sim_zoom.pdf')
+summary_plot.scatter_plot(x=d_tot_model, y=N_model_tot, x_out=d_tot_model_out, y_out=N_model_tot_out, xtype='d.model', ytype='N.model', limits=((-5,350),(-0.5,13.5)), file_path_and_name=directory+'/scatter/N_model_vs_d_model_zoom.pdf')
+summary_plot.scatter_plot(x=d_tot_sim, y=N_model_tot, x_out=d_tot_sim_out, y_out=N_model_tot_out, xtype='d.sim', ytype='N.model', limits=((-5,350),(-0.5,13.5)), file_path_and_name=directory+'/summary/scatter/N_model_vs_d_sim_zoom.pdf')
+summary_plot.scatter_plot(x=d_tot_model, y=N_sim_tot, x_out=d_tot_model_out, y_out=N_sim_tot_out, xtype='d.model', ytype='N.sim', limits=((-5,350),(-0.5,13.5)), file_path_and_name=directory+'/summary/scatter/N_sim_vs_d_model_zoom.pdf')
 #
 # Median plots
-summary_plot.nperi_vs_prop_median(x=d_tot_sim_o, y=N_sim_tot_o, xtype='d.sim', ytype='N.sim', binsize=50, limits=((-5,350),None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/N_sim_vs_d_sim_zoom.pdf')
-summary_plot.nperi_vs_prop_median(x=d_tot_model_o, y=N_model_tot_o, xtype='d.model', ytype='N.model', binsize=50, limits=((-5,350),None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/N_model_vs_d_model_zoom.pdf')
-summary_plot.nperi_vs_prop_median(x=d_tot_sim_o, y=N_model_tot_o, xtype='d.sim', ytype='N.model', binsize=50, limits=((-5,350),None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/N_model_vs_d_sim_zoom.pdf')
-summary_plot.nperi_vs_prop_median(x=d_tot_model_o, y=N_sim_tot_o, xtype='d.model', ytype='N.sim', binsize=50, limits=((-5,350),None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/N_sim_vs_d_model_zoom.pdf')
+summary_plot.median_plot(x=d_tot_sim_o, y=N_sim_tot_o, xtype='d.sim', ytype='N.sim', binsize=50, limits=((-5,350),None), file_path_and_name=directory+'/median/N_sim_vs_d_sim_zoom.pdf')
+summary_plot.median_plot(x=d_tot_model_o, y=N_model_tot_o, xtype='d.model', ytype='N.model', binsize=50, limits=((-5,350),None), file_path_and_name=directory+'/median/N_model_vs_d_model_zoom.pdf')
+summary_plot.median_plot(x=d_tot_sim_o, y=N_model_tot_o, xtype='d.sim', ytype='N.model', binsize=50, limits=((-5,350),None), file_path_and_name=directory+'/median/N_model_vs_d_sim_zoom.pdf')
+summary_plot.median_plot(x=d_tot_model_o, y=N_sim_tot_o, xtype='d.model', ytype='N.sim', binsize=50, limits=((-5,350),None), file_path_and_name=directory+'/median/N_sim_vs_d_model_zoom.pdf')
 
 
 
 # N vs d(z = 0)
 # Scatter plots
-summary_plot.nperi_vs_prop_scatter(x=dz0_tot, y=N_sim_tot, x_out=dz0_tot_out, y_out=N_sim_tot_out, xtype='d.z0', ytype='N.sim', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/N_sim_vs_dz0.pdf')
-summary_plot.nperi_vs_prop_scatter(x=dz0_tot, y=N_model_tot, x_out=dz0_tot_out, y_out=N_model_tot_out, xtype='d.z0', ytype='N.model', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/N_model_vs_dz0.pdf')
+summary_plot.scatter_plot(x=dz0_tot, y=N_sim_tot, x_out=dz0_tot_out, y_out=N_sim_tot_out, xtype='d.z0', ytype='N.sim', file_path_and_name=directory+'/scatter/N_sim_vs_dz0.pdf')
+summary_plot.scatter_plot(x=dz0_tot, y=N_model_tot, x_out=dz0_tot_out, y_out=N_model_tot_out, xtype='d.z0', ytype='N.model', file_path_and_name=directory+'/scatter/N_model_vs_dz0.pdf')
 #
 # Median plots
-summary_plot.nperi_vs_prop_median(x=dz0_o_tot, y=N_sim_tot_o, xtype='d.z0', ytype='N.sim', binsize=50, limits=((-5,350),None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/N_sim_vs_dz0_zoom.pdf')
-summary_plot.nperi_vs_prop_median(x=dz0_o_tot, y=N_model_tot_o, xtype='d.z0', ytype='N.model', binsize=50, limits=((-5,350),None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/N_model_vs_dz0_zoom.pdf')
+summary_plot.median_plot(x=dz0_o_tot, y=N_sim_tot_o, xtype='d.z0', ytype='N.sim', binsize=50, limits=((-5,350),None), file_path_and_name=directory+'/median/N_sim_vs_dz0_zoom.pdf')
+summary_plot.median_plot(x=dz0_o_tot, y=N_model_tot_o, xtype='d.z0', ytype='N.model', binsize=50, limits=((-5,350),None), file_path_and_name=directory+'/median/N_model_vs_dz0_zoom.pdf')
 
 
 
 # N vs t_peri
 # Scatter plots
-summary_plot.nperi_vs_prop_scatter(x=t_tot_sim, y=N_sim_tot, x_out=t_tot_sim_out, y_out=N_sim_tot_out, xtype='t.sim', ytype='N.sim', limits=((None), (-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/N_sim_vs_t_sim.pdf')
-summary_plot.nperi_vs_prop_scatter(x=t_tot_model, y=N_model_tot, x_out=t_tot_model_out, y_out=N_model_tot_out, xtype='t.model', ytype='N.model', limits=((None), (-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/N_model_vs_t_model.pdf')
-summary_plot.nperi_vs_prop_scatter(x=t_tot_sim, y=N_model_tot, x_out=t_tot_sim_out, y_out=N_model_tot_out, xtype='t.sim', ytype='N.model', limits=((None), (-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/N_model_vs_t_sim.pdf')
-summary_plot.nperi_vs_prop_scatter(x=t_tot_model, y=N_sim_tot, x_out=t_tot_model_out, y_out=N_sim_tot_out, xtype='t.model', ytype='N.sim', limits=((None), (-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/N_sim_vs_t_model.pdf')
+summary_plot.scatter_plot(x=t_tot_sim, y=N_sim_tot, x_out=t_tot_sim_out, y_out=N_sim_tot_out, xtype='t.sim', ytype='N.sim', limits=((None), (-0.5,13.5)), file_path_and_name=directory+'/scatter/N_sim_vs_t_sim.pdf')
+summary_plot.scatter_plot(x=t_tot_model, y=N_model_tot, x_out=t_tot_model_out, y_out=N_model_tot_out, xtype='t.model', ytype='N.model', limits=((None), (-0.5,13.5)), file_path_and_name=directory+'/scatter/N_model_vs_t_model.pdf')
+summary_plot.scatter_plot(x=t_tot_sim, y=N_model_tot, x_out=t_tot_sim_out, y_out=N_model_tot_out, xtype='t.sim', ytype='N.model', limits=((None), (-0.5,13.5)), file_path_and_name=directory+'/scatter/N_model_vs_t_sim.pdf')
+summary_plot.scatter_plot(x=t_tot_model, y=N_sim_tot, x_out=t_tot_model_out, y_out=N_sim_tot_out, xtype='t.model', ytype='N.sim', limits=((None), (-0.5,13.5)), file_path_and_name=directory+'/scatter/N_sim_vs_t_model.pdf')
 #
 # Median plots
-summary_plot.nperi_vs_prop_median(x=t_tot_sim_o, y=N_sim_o_tot, xtype='t.sim', ytype='N.sim', binsize=1, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/N_sim_vs_t_sim.pdf')
-summary_plot.nperi_vs_prop_median(x=t_tot_model_o, y=N_model_o_tot, xtype='t.model', ytype='N.model', binsize=1, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/N_model_vs_t_model.pdf')
-summary_plot.nperi_vs_prop_median(x=t_tot_sim_o, y=N_model_o_tot, xtype='t.sim', ytype='N.model', binsize=1, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/N_model_vs_t_sim.pdf')
-summary_plot.nperi_vs_prop_median(x=t_tot_model_o, y=N_sim_o_tot, xtype='t.model', ytype='N.sim', binsize=1, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/N_sim_vs_t_model.pdf')
+summary_plot.median_plot(x=t_tot_sim_o, y=N_sim_o_tot, xtype='t.sim', ytype='N.sim', binsize=1, file_path_and_name=directory+'/median/N_sim_vs_t_sim.pdf')
+summary_plot.median_plot(x=t_tot_model_o, y=N_model_o_tot, xtype='t.model', ytype='N.model', binsize=1, file_path_and_name=directory+'/median/N_model_vs_t_model.pdf')
+summary_plot.median_plot(x=t_tot_sim_o, y=N_model_o_tot, xtype='t.sim', ytype='N.model', binsize=1, file_path_and_name=directory+'/median/N_model_vs_t_sim.pdf')
+summary_plot.median_plot(x=t_tot_model_o, y=N_sim_o_tot, xtype='t.model', ytype='N.sim', binsize=1, file_path_and_name=directory+'/median/N_sim_vs_t_model.pdf')
 
 
 
 # N vs t_infall
 # Scatter plots
-summary_plot.nperi_vs_prop_scatter(x=t_in_tot, y=N_sim_tot, x_out=t_in_tot_out, y_out=N_sim_tot_out, xtype='t.infall', ytype='N.sim', limits=(None,(-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/N_sim_vs_t_infall.pdf')
-summary_plot.nperi_vs_prop_scatter(x=t_in_tot, y=N_model_tot, x_out=t_in_tot_out, y_out=N_model_tot_out, xtype='t.infall', ytype='N.model', limits=(None,(-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/N_model_vs_t_infall.pdf')
+summary_plot.scatter_plot(x=t_in_tot, y=N_sim_tot, x_out=t_in_tot_out, y_out=N_sim_tot_out, xtype='t.infall', ytype='N.sim', limits=(None,(-0.5,13.5)), file_path_and_name=directory+'/scatter/N_sim_vs_t_infall.pdf')
+summary_plot.scatter_plot(x=t_in_tot, y=N_model_tot, x_out=t_in_tot_out, y_out=N_model_tot_out, xtype='t.infall', ytype='N.model', limits=(None,(-0.5,13.5)), file_path_and_name=directory+'/scatter/N_model_vs_t_infall.pdf')
 #
 # Median plots
-summary_plot.nperi_vs_prop_median(x=t_in_tot_o, y=N_sim_o_tot, xtype='t.infall', ytype='N.sim', binsize=1, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/N_sim_vs_t_infall.pdf')
-summary_plot.nperi_vs_prop_median(x=t_in_tot_o, y=N_model_o_tot, xtype='t.infall', ytype='N.model', binsize=1, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/N_model_vs_t_infall.pdf')
+summary_plot.median_plot(x=t_in_tot_o, y=N_sim_o_tot, xtype='t.infall', ytype='N.sim', binsize=1, file_path_and_name=directory+'/median/N_sim_vs_t_infall.pdf')
+summary_plot.median_plot(x=t_in_tot_o, y=N_model_o_tot, xtype='t.infall', ytype='N.model', binsize=1, file_path_and_name=directory+'/median/N_model_vs_t_infall.pdf')
 
 
 
 # N vs Mstar (z = 0)
 # Scatter plots
-summary_plot.nperi_vs_prop_scatter(x=Mstar_z0_tot, y=N_sim_tot, x_out=Mstar_z0_tot_out, y_out=N_sim_tot_out, xtype='M.z0', ytype='N.sim', limits=(None,(-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/N_sim_vs_mstar_z0.pdf')
-summary_plot.nperi_vs_prop_scatter(x=Mstar_z0_tot, y=N_model_tot, x_out=Mstar_z0_tot_out, y_out=N_model_tot_out, xtype='M.z0', ytype='N.model', limits=(None,(-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/N_model_vs_mstar_z0.pdf')
+summary_plot.scatter_plot(x=Mstar_z0_tot, y=N_sim_tot, x_out=Mstar_z0_tot_out, y_out=N_sim_tot_out, xtype='M.star.z0', ytype='N.sim', limits=(None,(-0.5,13.5)), file_path_and_name=directory+'/scatter/N_sim_vs_mstar_z0.pdf')
+summary_plot.scatter_plot(x=Mstar_z0_tot, y=N_model_tot, x_out=Mstar_z0_tot_out, y_out=N_model_tot_out, xtype='M.star.z0', ytype='N.model', limits=(None,(-0.5,13.5)), file_path_and_name=directory+'/scatter/N_model_vs_mstar_z0.pdf')
 #
 # Median plots
-summary_plot.nperi_vs_prop_median(x=Mstar_z0_tot_o, y=N_sim_o_tot, xtype='M.star.z0', ytype='N.sim', binsize=0.5, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/N_sim_vs_mstar_z0.pdf')
-summary_plot.nperi_vs_prop_median(x=Mstar_z0_tot_o, y=N_model_o_tot, xtype='M.star.z0', ytype='N.model', binsize=0.5, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/N_model_vs_mstar_z0.pdf')
+summary_plot.median_plot(x=Mstar_z0_tot_o, y=N_sim_o_tot, xtype='M.star.z0', ytype='N.sim', binsize=0.5, file_path_and_name=directory+'/median/N_sim_vs_mstar_z0.pdf')
+summary_plot.median_plot(x=Mstar_z0_tot_o, y=N_model_o_tot, xtype='M.star.z0', ytype='N.model', binsize=0.5, file_path_and_name=directory+'/median/N_model_vs_mstar_z0.pdf')
 
 
 
 # N vs Mstar (peak)
 # Scatter plots
-summary_plot.nperi_vs_prop_scatter(x=Mstar_peak_tot, y=N_sim_tot, x_out=Mstar_peak_tot_out, y_out=N_sim_tot_out, xtype='M.peak', ytype='N.sim', limits=(None,(-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/N_sim_vs_mstar_peak.pdf')
-summary_plot.nperi_vs_prop_scatter(x=Mstar_peak_tot, y=N_model_tot, x_out=Mstar_peak_tot_out, y_out=N_model_tot_out, xtype='M.peak', ytype='N.model', limits=(None,(-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/N_model_vs_mstar_peak.pdf')
+summary_plot.scatter_plot(x=Mstar_peak_tot, y=N_sim_tot, x_out=Mstar_peak_tot_out, y_out=N_sim_tot_out, xtype='M.star.peak', ytype='N.sim', limits=(None,(-0.5,13.5)), file_path_and_name=directory+'/scatter/N_sim_vs_mstar_peak.pdf')
+summary_plot.scatter_plot(x=Mstar_peak_tot, y=N_model_tot, x_out=Mstar_peak_tot_out, y_out=N_model_tot_out, xtype='M.star.peak', ytype='N.model', limits=(None,(-0.5,13.5)), file_path_and_name=directory+'/scatter/N_model_vs_mstar_peak.pdf')
 #
 # Median plots
-summary_plot.nperi_vs_prop_median(x=Mstar_peak_tot_o, y=N_sim_o_tot, xtype='M.star.peak', ytype='N.sim', binsize=0.5, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/N_sim_vs_mstar_peak.pdf')
-summary_plot.nperi_vs_prop_median(x=Mstar_peak_tot_o, y=N_model_o_tot, xtype='M.star.peak', ytype='N.model', binsize=0.5, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/N_model_vs_mstar_peak.pdf')
+summary_plot.median_plot(x=Mstar_peak_tot_o, y=N_sim_o_tot, xtype='M.star.peak', ytype='N.sim', binsize=0.5, file_path_and_name=directory+'/median/N_sim_vs_mstar_peak.pdf')
+summary_plot.median_plot(x=Mstar_peak_tot_o, y=N_model_o_tot, xtype='M.star.peak', ytype='N.model', binsize=0.5, file_path_and_name=directory+'/median/N_model_vs_mstar_peak.pdf')
 
 
 
 # N vs Mhalo (z = 0)
 # Scatter plots
-summary_plot.nperi_vs_prop_scatter(x=Mhalo_z0_tot, y=N_sim_tot, x_out=Mhalo_z0_tot_out, y_out=N_sim_tot_out, xtype='M.halo.z0', ytype='N.sim', limits=(None,(-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/scatter/N_sim_vs_mhalo_z0.pdf')
-summary_plot.nperi_vs_prop_scatter(x=Mhalo_z0_tot, y=N_model_tot, x_out=Mhalo_z0_tot_out, y_out=N_model_tot_out, xtype='M.halo.z0', ytype='N.model', limits=(None,(-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/scatter/N_model_vs_mhalo_z0.pdf')
+summary_plot.scatter_plot(x=Mhalo_z0_tot, y=N_sim_tot, x_out=Mhalo_z0_tot_out, y_out=N_sim_tot_out, xtype='M.halo.z0', ytype='N.sim', limits=(None,(-0.5,13.5)), file_path_and_name=directory+'/scatter/N_sim_vs_mhalo_z0.pdf')
+summary_plot.scatter_plot(x=Mhalo_z0_tot, y=N_model_tot, x_out=Mhalo_z0_tot_out, y_out=N_model_tot_out, xtype='M.halo.z0', ytype='N.model', limits=(None,(-0.5,13.5)), file_path_and_name=directory+'/scatter/N_model_vs_mhalo_z0.pdf')
 #
 # Median plots
-summary_plot.nperi_vs_prop_median(x=Mhalo_z0_tot_o, y=N_sim_o_tot, xtype='M.halo.z0', ytype='N.sim', binsize=0.5, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/median/N_sim_vs_mhalo_z0.pdf')
-summary_plot.nperi_vs_prop_median(x=Mhalo_z0_tot_o, y=N_model_o_tot, xtype='M.halo.z0', ytype='N.model', binsize=0.5, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/median/N_model_vs_mhalo_z0.pdf')
+summary_plot.median_plot(x=Mhalo_z0_tot_o, y=N_sim_o_tot, xtype='M.halo.z0', ytype='N.sim', binsize=0.5, file_path_and_name=directory+'/median/N_sim_vs_mhalo_z0.pdf')
+summary_plot.median_plot(x=Mhalo_z0_tot_o, y=N_model_o_tot, xtype='M.halo.z0', ytype='N.model', binsize=0.5, file_path_and_name=directory+'/median/N_model_vs_mhalo_z0.pdf')
 
 
 
 # N vs Mhalo (peak)
 # Scatter plots
-summary_plot.nperi_vs_prop_scatter(x=Mhalo_peak_tot, y=N_sim_tot, x_out=Mhalo_peak_tot_out, y_out=N_sim_tot_out, xtype='M.halo.peak', ytype='N.sim', limits=(None,(-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_either_peri/scatter/N_sim_vs_mhalo_peak.pdf')
-summary_plot.nperi_vs_prop_scatter(x=Mhalo_peak_tot, y=N_model_tot, x_out=Mhalo_peak_tot_out, y_out=N_model_tot_out, xtype='M.halo.peak', ytype='N.model', limits=(None,(-0.5,13.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_either_peri/scatter/N_model_vs_mhalo_peak.pdf')
+summary_plot.scatter_plot(x=Mhalo_peak_tot, y=N_sim_tot, x_out=Mhalo_peak_tot_out, y_out=N_sim_tot_out, xtype='M.halo.peak', ytype='N.sim', limits=(None,(-0.5,13.5)), file_path_and_name=directory+'/scatter/N_sim_vs_mhalo_peak.pdf')
+summary_plot.scatter_plot(x=Mhalo_peak_tot, y=N_model_tot, x_out=Mhalo_peak_tot_out, y_out=N_model_tot_out, xtype='M.halo.peak', ytype='N.model', limits=(None,(-0.5,13.5)), file_path_and_name=directory+'/scatter/N_model_vs_mhalo_peak.pdf')
 #
 # Median plots
-summary_plot.nperi_vs_prop_median(x=Mhalo_peak_tot_o, y=N_sim_o_tot, xtype='M.halo.peak', ytype='N.sim', binsize=0.5, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_either_peri/median/N_sim_vs_mhalo_peak.pdf')
-summary_plot.nperi_vs_prop_median(x=Mhalo_peak_tot_o, y=N_model_o_tot, xtype='M.halo.peak', ytype='N.model', binsize=0.5, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_either_peri/median/N_model_vs_mhalo_peak.pdf')
+summary_plot.median_plot(x=Mhalo_peak_tot_o, y=N_sim_o_tot, xtype='M.halo.peak', ytype='N.sim', binsize=0.5, file_path_and_name=directory+'/median/N_sim_vs_mhalo_peak.pdf')
+summary_plot.median_plot(x=Mhalo_peak_tot_o, y=N_model_o_tot, xtype='M.halo.peak', ytype='N.model', binsize=0.5, file_path_and_name=directory+'/median/N_model_vs_mhalo_peak.pdf')
 
 
 
 # Recent pericenter distance comparison
 # no oversample, cases with peris in sim and model, but outliers in red
-summary_plot.dperi_comparison_scatter(x=d_tot_sim, y=d_tot_model, x_out=d_tot_sim_out, y_out=d_tot_model_out, limits=(-10,350), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/recent_peri_comparison.pdf')
+summary_plot.scatter_plot(x=d_tot_sim, y=d_tot_model, x_out=d_tot_sim_out, y_out=d_tot_model_out, xtype='d.sim', ytype='d.model', limits=(-10,350), file_path_and_name=directory+'/scatter/recent_peri_comparison.pdf')
 #
 # oversample, cases with peris in sim, but not required in model
-summary_plot.dperi_comparison_median(x=d_tot_sim_o, y=d_tot_model_o, binsize=20, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/recent_peri_comparison.pdf')
+summary_plot.median_plot(x=d_tot_sim_o, y=d_tot_model_o, binsize=20, xtype='d.sim', ytype='d.model', file_path_and_name=directory+'/median/recent_peri_comparison.pdf')
 
 
 
 # d_peri histograms
-summary_plot.plot_hist(x=d_tot_sim_o, binsize=10, pdf=True, xtype='d.sim', xlimits=(-5,350), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/d_peri_sim_histogram_pdf.pdf')
-summary_plot.plot_hist(x=d_tot_sim, binsize=10, pdf=False, xtype='d.sim', xlimits=(-5,350), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/d_peri_sim_histogram.pdf')
+summary_plot.plot_hist(x=d_tot_sim_o, binsize=10, pdf=True, xtype='d.sim', xlimits=(-5,350), file_path_and_name=directory+'/histogram/d_peri_sim_histogram_pdf.pdf')
+summary_plot.plot_hist(x=d_tot_sim, binsize=10, pdf=False, xtype='d.sim', xlimits=(-5,350), file_path_and_name=directory+'/histogram/d_peri_sim_histogram.pdf')
 #
-summary_plot.plot_hist(x=d_tot_model_o, binsize=10, pdf=True, xtype='d.model', xlimits=(-5,350), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/d_peri_model_histogram_pdf.pdf')
-summary_plot.plot_hist(x=d_tot_model, binsize=10, pdf=False, xtype='d.model', xlimits=(-5,350), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/d_peri_model_histogram.pdf')
+summary_plot.plot_hist(x=d_tot_model_o, binsize=10, pdf=True, xtype='d.model', xlimits=(-5,350), file_path_and_name=directory+'/histogram/d_peri_model_histogram_pdf.pdf')
+summary_plot.plot_hist(x=d_tot_model, binsize=10, pdf=False, xtype='d.model', xlimits=(-5,350), file_path_and_name=directory+'/histogram/d_peri_model_histogram.pdf')
 
 
 
 # delta d_peri fraction histogram
 # oversample, cases with pericenters in sim, but not required in model
-summary_plot.delta_dperi_hist(delta_dfo_tot, binsize=0.1, fraction=True, pdf=True, xlimits=(-1,2), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/peri_diff_frac_histogram_zoom.pdf')
+summary_plot.plot_hist(delta_dfo_tot, binsize=0.1, pdf=True, xlimits=(-1,2), xtype='delta.d.frac', file_path_and_name=directory+'/histogram/peri_diff_frac_histogram_zoom.pdf')
 
 
 
 # delta d_peri fraction vs d_peri
 # no oversample, cases with peris in sim and model, but outliers in red
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=d_tot_sim, y=delta_df_tot, x_out=d_tot_sim_out, y_out=delta_df_tot_out, versus='d.sim', limits=((-5,350),(-1.1,2.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_frac_vs_d_sim_zoom.pdf')
-summary_plot.delta_dperi_vs_prop_scatter(x=d_tot_model, y=delta_df_tot, x_out=d_tot_model_out, y_out=delta_df_tot_out, versus='d.model', limits=((-5,350),(-1.1,2.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_frac_vs_d_model_zoom.pdf')
+summary_plot.scatter_plot(x=d_tot_sim, y=delta_df_tot, x_out=d_tot_sim_out, y_out=delta_df_tot_out, xtype='d.sim', ytype='delta.d.frac', limits=((-5,350),(-1.1,2.5)), file_path_and_name=directory+'/scatter/delta_d_frac_vs_d_sim_zoom.pdf')
+summary_plot.scatter_plot(x=d_tot_model, y=delta_df_tot, x_out=d_tot_model_out, y_out=delta_df_tot_out, xtype='d.model', ytype='delta.d.frac', limits=((-5,350),(-1.1,2.5)), file_path_and_name=directory+'/scatter/delta_d_frac_vs_d_model_zoom.pdf')
 #
 # Median plots
 # oversample, cases with peris in sim, but not required in model
-summary_plot.delta_dperi_vs_prop_median(x=d_tot_sim_o, y=delta_dfo_tot, binsize=50, versus='d.sim', fraction=True, limits=((0,350),(-1,1.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_frac_vs_d_sim_zoom.pdf')
-summary_plot.delta_dperi_vs_prop_median(x=d_tot_model_o, y=delta_dfo_tot, binsize=50, versus='d.model', fraction=True, limits=((0,350),(-1,1.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_frac_vs_d_model_zoom.pdf')
+summary_plot.median_plot(x=d_tot_sim_o, y=delta_dfo_tot, binsize=50, xtype='d.sim', ytype='delta.d.frac', limits=((0,350),(-1,1.5)), file_path_and_name=directory+'/median/delta_d_frac_vs_d_sim_zoom.pdf')
+summary_plot.median_plot(x=d_tot_model_o, y=delta_dfo_tot, binsize=50, xtype='d.model', ytype='delta.d.frac', limits=((0,350),(-1,1.5)), file_path_and_name=directory+'/median/delta_d_frac_vs_d_model_zoom.pdf')
 
 
 
 # delta d_peri fraction vs d(z = 0)
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=dz0_tot, y=delta_df_tot, x_out=dz0_tot_out, y_out=delta_df_tot_out, versus='d.z0', limits=((-5,350),(-1.1,2.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_frac_vs_d_z0_zoom.pdf')
+summary_plot.scatter_plot(x=dz0_tot, y=delta_df_tot, x_out=dz0_tot_out, y_out=delta_df_tot_out, xtype='d.z0', ytype='delta.d.frac', limits=((-5,350),(-1.1,2.5)), file_path_and_name=directory+'/scatter/delta_d_frac_vs_d_z0_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_dperi_vs_prop_median(x=dz0_o_tot, y=delta_dfo_tot, binsize=50, versus='d.z0', fraction=True, limits=((-5,350),(-1.1,1.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_frac_vs_d_z0_zoom.pdf')
+summary_plot.median_plot(x=dz0_o_tot, y=delta_dfo_tot, binsize=50, xtype='d.z0', ytype='delta.d.frac', limits=((-5,350),(-1.1,1.5)), file_path_and_name=directory+'/median/delta_d_frac_vs_d_z0_zoom.pdf')
 
 
 
 # delta_d fraction vs t_peri
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=t_tot_sim, y=delta_df_tot, x_out=t_tot_sim_out, y_out=delta_df_tot_out, versus='t.sim', limits=((None),(-1,2.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_frac_vs_t_sim_zoom.pdf')
-summary_plot.delta_dperi_vs_prop_scatter(x=t_tot_model, y=delta_df_tot, x_out=t_tot_model_out, y_out=delta_df_tot_out, versus='t.model', limits=((None),(-1,2.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_frac_vs_t_model_zoom.pdf')
+summary_plot.scatter_plot(x=t_tot_sim, y=delta_df_tot, x_out=t_tot_sim_out, y_out=delta_df_tot_out, xtype='t.sim', ytype='delta.d.frac', limits=((None),(-1,2.5)), file_path_and_name=directory+'/scatter/delta_d_frac_vs_t_sim_zoom.pdf')
+summary_plot.scatter_plot(x=t_tot_model, y=delta_df_tot, x_out=t_tot_model_out, y_out=delta_df_tot_out, xtype='t.model', ytype='delta.d.frac', limits=((None),(-1,2.5)), file_path_and_name=directory+'/scatter/delta_d_frac_vs_t_model_zoom.pdf')
 #
 # Median plots
 # oversample, cases with peris in sim, but not required in model
-summary_plot.delta_dperi_vs_prop_median(x=t_tot_sim_o, y=delta_dfo_tot, binsize=1, versus='t.sim', fraction=True, limits=((None),(-1,4)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_frac_vs_t_sim_zoom.pdf')
-summary_plot.delta_dperi_vs_prop_median(x=t_tot_model_o, y=delta_dfo_tot, binsize=1, versus='t.model', fraction=True, limits=((None),(-1,4)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_frac_vs_t_model_zoom.pdf')
+summary_plot.median_plot(x=t_tot_sim_o, y=delta_dfo_tot, binsize=1, xtype='t.sim', ytype='delta.d.frac', limits=((None),(-1,4)), file_path_and_name=directory+'/median/delta_d_frac_vs_t_sim_zoom.pdf')
+summary_plot.median_plot(x=t_tot_model_o, y=delta_dfo_tot, binsize=1, xtype='t.model', ytype='delta.d.frac', limits=((None),(-1,4)), file_path_and_name=directory+'/median/delta_d_frac_vs_t_model_zoom.pdf')
 
 
 
 # delta_d fraction vs t_infall
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=t_in_tot, y=delta_df_tot, x_out=t_in_tot_out, y_out=delta_df_tot_out, versus='t.infall', limits=(None,(-1.1,2.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_frac_vs_t_infall_zoom.pdf')
+summary_plot.scatter_plot(x=t_in_tot, y=delta_df_tot, x_out=t_in_tot_out, y_out=delta_df_tot_out, xtype='t.infall', ytype='delta.d.frac', limits=(None,(-1.1,2.5)), file_path_and_name=directory+'/scatter/delta_d_frac_vs_t_infall_zoom.pdf')
 #
 # Median plots
 # oversample, cases with peris in sim, but not required in model
-summary_plot.delta_dperi_vs_prop_median(x=t_in_tot_o, y=delta_dfo_tot, binsize=1, versus='t.infall', fraction=True, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_frac_vs_t_infall.pdf')
+summary_plot.median_plot(x=t_in_tot_o, y=delta_dfo_tot, binsize=1, xtype='t.infall', ytype='delta.d.frac', file_path_and_name=directory+'/median/delta_d_frac_vs_t_infall.pdf')
 
 
 
 # delta_d fraction vs N
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=N_sim_tot, y=delta_df_tot, x_out=N_sim_tot_out, y_out=delta_df_tot_out, versus='N.sim', limits=((-0.5,13.5),(-1,3)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_frac_vs_N_sim_zoom.pdf')
-summary_plot.delta_dperi_vs_prop_scatter(x=N_model_tot, y=delta_df_tot, x_out=N_model_tot_out, y_out=delta_df_tot_out, versus='N.model', limits=((-0.5,13.5),(-1,3)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_frac_vs_N_model_zoom.pdf')
+summary_plot.scatter_plot(x=N_sim_tot, y=delta_df_tot, x_out=N_sim_tot_out, y_out=delta_df_tot_out, xtype='N.sim', ytype='delta.d.frac', limits=((-0.5,13.5),(-1,3)), file_path_and_name=directory+'/scatter/delta_d_frac_vs_N_sim_zoom.pdf')
+summary_plot.scatter_plot(x=N_model_tot, y=delta_df_tot, x_out=N_model_tot_out, y_out=delta_df_tot_out, xtype='N.model', ytype='delta.d.frac', limits=((-0.5,13.5),(-1,3)), file_path_and_name=directory+'/scatter/delta_d_frac_vs_N_model_zoom.pdf')
 #
 # Median plots
 # oversample, cases with peris in sim, but not required in model
-summary_plot.delta_dperi_vs_prop_median(x=N_sim_o_tot, y=delta_dfo_tot, binsize=1, versus='N.sim', fraction=True, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_frac_vs_N_sim.pdf')
-summary_plot.delta_dperi_vs_prop_median(x=N_model_o_tot, y=delta_dfo_tot, binsize=1, versus='N.model', fraction=True, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_frac_vs_N_model.pdf')
+summary_plot.median_plot(x=N_sim_o_tot, y=delta_dfo_tot, binsize=1, xtype='N.sim', ytype='delta.d.frac', file_path_and_name=directory+'/median/delta_d_frac_vs_N_sim.pdf')
+summary_plot.median_plot(x=N_model_o_tot, y=delta_dfo_tot, binsize=1, xtype='N.model', ytype='delta.d.frac', file_path_and_name=directory+'/median/delta_d_frac_vs_N_model.pdf')
 
 
 
 # delta_d fraction vs Mstar (z = 0)
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=Mstar_z0_tot, y=delta_df_tot, x_out=Mstar_z0_tot_out, y_out=delta_df_tot_out, versus='M.z0', limits=(None,(-1.1,2.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_frac_vs_mstar_z0_zoom.pdf')
+summary_plot.scatter_plot(x=Mstar_z0_tot, y=delta_df_tot, x_out=Mstar_z0_tot_out, y_out=delta_df_tot_out, xtype='M.star.z0', ytype='delta.d.frac', limits=(None,(-1.1,2.5)), file_path_and_name=directory+'/scatter/delta_d_frac_vs_mstar_z0_zoom.pdf')
 #
 # Median plots
 # oversample, cases with peris in sim, but not required in model
-summary_plot.delta_dperi_vs_prop_median(x=Mstar_z0_o_tot, y=delta_dfo_tot, binsize=0.5, versus='M.z0', fraction=True, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_frac_vs_mstar_z0.pdf')
+summary_plot.median_plot(x=Mstar_z0_o_tot, y=delta_dfo_tot, binsize=0.5, xtype='M.star.z0', ytype='delta.d.frac', file_path_and_name=directory+'/median/delta_d_frac_vs_mstar_z0.pdf')
 
 
 
 # delta_d fraction vs Mstar (peak)
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=Mstar_peak_tot, y=delta_df_tot, x_out=Mstar_peak_tot_out, y_out=delta_df_tot_out, versus='M.star.peak', limits=(None,(-1.1,2.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_frac_vs_mstar_peak_zoom.pdf')
+summary_plot.scatter_plot(x=Mstar_peak_tot, y=delta_df_tot, x_out=Mstar_peak_tot_out, y_out=delta_df_tot_out, xtype='M.star.peak', ytype='delta.d.frac', limits=(None,(-1.1,2.5)), file_path_and_name=directory+'/scatter/delta_d_frac_vs_mstar_peak_zoom.pdf')
 #
 # Median plots
 # oversample, cases with peris in sim, but not required in model
-summary_plot.delta_dperi_vs_prop_median(x=Mstar_peak_o_tot, y=delta_dfo_tot, binsize=0.5, versus='M.star.peak', fraction=True, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_frac_vs_mstar_peak.pdf')
+summary_plot.median_plot(x=Mstar_peak_o_tot, y=delta_dfo_tot, binsize=0.5, xtype='M.star.peak', ytype='delta.d.frac', file_path_and_name=directory+'/median/delta_d_frac_vs_mstar_peak.pdf')
 
 
 
 # delta_d fraction vs Mhalo (z = 0)
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=Mhalo_z0_tot, y=delta_df_tot, x_out=Mhalo_z0_tot_out, y_out=delta_df_tot_out, versus='M.halo.z0', limits=(None,(-1.1,2.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/scatter/delta_d_frac_vs_mhalo_z0_zoom.pdf')
+summary_plot.scatter_plot(x=Mhalo_z0_tot, y=delta_df_tot, x_out=Mhalo_z0_tot_out, y_out=delta_df_tot_out, xtype='M.halo.z0', ytype='delta.d.frac', limits=(None,(-1.1,2.5)), file_path_and_name=directory+'/scatter/delta_d_frac_vs_mhalo_z0_zoom.pdf')
 #
 # Median plots
 # oversample, cases with peris in sim, but not required in model
-summary_plot.delta_dperi_vs_prop_median(x=Mhalo_z0_o_tot, y=delta_dfo_tot, binsize=0.5, versus='M.halo.z0', fraction=True, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/median/delta_d_frac_vs_mhalo_z0.pdf')
+summary_plot.median_plot(x=Mhalo_z0_o_tot, y=delta_dfo_tot, binsize=0.5, xtype='M.halo.z0', ytype='delta.d.frac', file_path_and_name=directory+'/median/delta_d_frac_vs_mhalo_z0.pdf')
 
 
 
 # delta_d fraction vs Mhalo (peak)
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=Mhalo_peak_tot, y=delta_df_tot, x_out=Mhalo_peak_tot_out, y_out=delta_df_tot_out, versus='M.halo.peak', limits=(None,(-1.1,2.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_either_peri/scatter/delta_d_frac_vs_mhalo_peak_zoom.pdf')
+summary_plot.scatter_plot(x=Mhalo_peak_tot, y=delta_df_tot, x_out=Mhalo_peak_tot_out, y_out=delta_df_tot_out, xtype='M.halo.peak', ytype='delta.d.frac', limits=(None,(-1.1,2.5)), file_path_and_name=directory+'/scatter/delta_d_frac_vs_mhalo_peak_zoom.pdf')
 #
 # Median plots
 # oversample, cases with peris in sim, but not required in model
-summary_plot.delta_dperi_vs_prop_median(x=Mhalo_peak_o_tot, y=delta_dfo_tot, binsize=0.5, versus='M.halo.peak', fraction=True, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_either_peri/median/delta_d_frac_vs_mhalo_peak.pdf')
+summary_plot.median_plot(x=Mhalo_peak_o_tot, y=delta_dfo_tot, binsize=0.5, xtype='M.halo.peak', ytype='delta.d.frac', file_path_and_name=directory+'/median/delta_d_frac_vs_mhalo_peak.pdf')
 
 
 
 # delta d_peri histogram
-summary_plot.delta_dperi_hist(delta_do_tot, binsize=20, fraction=False, pdf=True, xlimits=(-100,150), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/peri_diff_histogram_zoom.pdf')
+summary_plot.plot_hist(delta_do_tot, binsize=20, pdf=True, xlimits=(-100,150), xtype='delta.d', file_path_and_name=directory+'/histogram/peri_diff_histogram_zoom.pdf')
 
 
 
 # delta d_peri vs d_peri
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=d_tot_sim, y=delta_d_tot, x_out=d_tot_sim_out, y_out=delta_d_tot_out, versus='d.sim', fraction=False, limits=((-5,350), (-300,400)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_vs_d_sim_zoom.pdf')
-summary_plot.delta_dperi_vs_prop_scatter(x=d_tot_model, y=delta_d_tot, x_out=d_tot_model_out, y_out=delta_d_tot_out, versus='d.model', fraction=False, limits=((-5,350), (-300,400)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_vs_d_model_zoom.pdf')
+summary_plot.scatter_plot(x=d_tot_sim, y=delta_d_tot, x_out=d_tot_sim_out, y_out=delta_d_tot_out, xtype='d.sim', ytype='delta.d', limits=((-5,350), (-300,400)), file_path_and_name=directory+'/scatter/delta_d_vs_d_sim_zoom.pdf')
+summary_plot.scatter_plot(x=d_tot_model, y=delta_d_tot, x_out=d_tot_model_out, y_out=delta_d_tot_out, xtype='d.model', ytype='delta.d', limits=((-5,350), (-300,400)), file_path_and_name=directory+'/scatter/delta_d_vs_d_model_zoom.pdf')
 #
 # Median Plots, oversample, with outliers
-summary_plot.delta_dperi_vs_prop_median(x=d_tot_sim_o, y=delta_do_tot, binsize=50, versus='d.sim', fraction=False, limits=((-5,350), (-100,300)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_vs_d_sim_zoom.pdf')
-summary_plot.delta_dperi_vs_prop_median(x=d_tot_model_o, y=delta_do_tot, binsize=50, versus='d.model', fraction=False, limits=((-5,350), (-100,300)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_vs_d_model_zoom.pdf')
+summary_plot.median_plot(x=d_tot_sim_o, y=delta_do_tot, binsize=50, xtype='d.sim', ytype='delta.d', limits=((-5,350), (-100,300)), file_path_and_name=directory+'/median/delta_d_vs_d_sim_zoom.pdf')
+summary_plot.median_plot(x=d_tot_model_o, y=delta_do_tot, binsize=50, xtype='d.model', ytype='delta.d', limits=((-5,350), (-100,300)), file_path_and_name=directory+'/median/delta_d_vs_d_model_zoom.pdf')
 
 
 
 # delta d_peri vs d(z = 0)
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=dz0_tot, y=delta_d_tot, x_out=dz0_tot_out, y_out=delta_d_tot_out, versus='d.z0', fraction=False, limits=((-5,350),(-200,200)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_vs_d_z0_zoom.pdf')
+summary_plot.scatter_plot(x=dz0_tot, y=delta_d_tot, x_out=dz0_tot_out, y_out=delta_d_tot_out, xtype='d.z0', ytype='delta.d', imits=((-5,350),(-200,200)), file_path_and_name=directory+'/scatter/delta_d_vs_d_z0_zoom.pdf')
 #
 # Median Plots, oversample, with outliers
-summary_plot.delta_dperi_vs_prop_median(x=dz0_o_tot, y=delta_do_tot, binsize=50, versus='d.z0', fraction=False, limits=((-5,350),(-50,100)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_vs_d_z0_zoom.pdf')
+summary_plot.median_plot(x=dz0_o_tot, y=delta_do_tot, binsize=50, xtype='d.z0', ytype='delta.d', limits=((-5,350),(-50,100)), file_path_and_name=directory+'/median/delta_d_vs_d_z0_zoom.pdf')
 
 
 
 # delta d_peri vs t_peri
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=t_tot_sim, y=delta_d_tot, x_out=t_tot_sim_out, y_out=delta_d_tot_out, versus='t.sim', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_vs_t_sim.pdf')
-summary_plot.delta_dperi_vs_prop_scatter(x=t_tot_model, y=delta_d_tot, x_out=t_tot_model_out, y_out=delta_d_tot_out, versus='t.model', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_vs_t_model.pdf')
+summary_plot.scatter_plot(x=t_tot_sim, y=delta_d_tot, x_out=t_tot_sim_out, y_out=delta_d_tot_out, xtype='t.sim', ytype='delta.d', file_path_and_name=directory+'/scatter/delta_d_vs_t_sim.pdf')
+summary_plot.scatter_plot(x=t_tot_model, y=delta_d_tot, x_out=t_tot_model_out, y_out=delta_d_tot_out, xtype='t.model', ytype='delta.d', file_path_and_name=directory+'/scatter/delta_d_vs_t_model.pdf')
 #
 # Median plots
-summary_plot.delta_dperi_vs_prop_median(x=t_tot_sim_o, y=delta_do_tot, binsize=1, versus='t.sim', fraction=False, limits=(None, (-150,150)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_vs_t_sim_zoom.pdf')
-summary_plot.delta_dperi_vs_prop_median(x=t_tot_model_o, y=delta_do_tot, binsize=1, versus='t.model', fraction=False, limits=(None, (-150,150)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_vs_t_model_zoom.pdf')
+summary_plot.median_plot(x=t_tot_sim_o, y=delta_do_tot, binsize=1, xtype='t.sim', ytype='delta.d', limits=(None, (-150,150)), file_path_and_name=directory+'/median/delta_d_vs_t_sim_zoom.pdf')
+summary_plot.median_plot(x=t_tot_model_o, y=delta_do_tot, binsize=1, xtype='t.model', ytype='delta.d', limits=(None, (-150,150)), file_path_and_name=directory+'/median/delta_d_vs_t_model_zoom.pdf')
 
 
 
 # delta d_peri vs t_infall
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=t_in_tot, y=delta_d_tot, x_out=t_in_tot_out, y_out=delta_d_tot_out, versus='t.infall', fraction=False, limits=(None,(-100,200)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_vs_t_infall_zoom.pdf')
+summary_plot.scatter_plot(x=t_in_tot, y=delta_d_tot, x_out=t_in_tot_out, y_out=delta_d_tot_out, xtype='t.infall', ytype='delta.d', limits=(None,(-100,200)), file_path_and_name=directory+'/scatter/delta_d_vs_t_infall_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_dperi_vs_prop_median(x=t_in_tot_o, y=delta_do_tot, binsize=1, versus='t.infall', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_vs_t_infall.pdf')
+summary_plot.median_plot(x=t_in_tot_o, y=delta_do_tot, binsize=1, xtype='t.infall', ytype='delta.d', file_path_and_name=directory+'/median/delta_d_vs_t_infall.pdf')
 
 
 
 # delta d_peri vs N
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=N_sim_tot, y=delta_d_tot, x_out=N_sim_tot_out, y_out=delta_d_tot_out, versus='N.sim', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_vs_N_sim.pdf')
-summary_plot.delta_dperi_vs_prop_scatter(x=N_model_tot, y=delta_d_tot, x_out=N_model_tot_out, y_out=delta_d_tot_out, versus='N.model', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_vs_N_model.pdf')
+summary_plot.scatter_plot(x=N_sim_tot, y=delta_d_tot, x_out=N_sim_tot_out, y_out=delta_d_tot_out, xtype='N.sim', ytype='delta.d', file_path_and_name=directory+'/scatter/delta_d_vs_N_sim.pdf')
+summary_plot.scatter_plot(x=N_model_tot, y=delta_d_tot, x_out=N_model_tot_out, y_out=delta_d_tot_out, xtype='N.model', ytype='delta.d', file_path_and_name=directory+'/scatter/delta_d_vs_N_model.pdf')
 #
 # Median plots
-summary_plot.delta_dperi_vs_prop_median(x=N_sim_o_tot, y=delta_do_tot, binsize=1, versus='N.sim', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_vs_N_sim.pdf')
-summary_plot.delta_dperi_vs_prop_median(x=N_model_o_tot, y=delta_do_tot, binsize=1, versus='N.model', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_vs_N_model.pdf')
+summary_plot.median_plot(x=N_sim_o_tot, y=delta_do_tot, binsize=1, xtype='N.sim', ytype='delta.d', file_path_and_name=directory+'/median/delta_d_vs_N_sim.pdf')
+summary_plot.median_plot(x=N_model_o_tot, y=delta_do_tot, binsize=1, xtype='N.model', ytype='delta.d', file_path_and_name=directory+'/median/delta_d_vs_N_model.pdf')
 
 
 
 # delta d_peri vs Mstar (z = 0)
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=Mstar_z0_tot, y=delta_d_tot, x_out=Mstar_z0_tot_out, y_out=delta_d_tot_out, versus='M.z0', fraction=False, limits=(None,(-100,200)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_vs_mstar_z0_zoom.pdf')
+summary_plot.scatter_plot(x=Mstar_z0_tot, y=delta_d_tot, x_out=Mstar_z0_tot_out, y_out=delta_d_tot_out, xtype='M.star.z0', ytype='delta.d', limits=(None,(-100,200)), file_path_and_name=directory+'/scatter/delta_d_vs_mstar_z0_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_dperi_vs_prop_median(x=Mstar_z0_o_tot, y=delta_do_tot, binsize=0.5, versus='M.z0', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_vs_mstar_z0.pdf')
+summary_plot.median_plot(x=Mstar_z0_o_tot, y=delta_do_tot, binsize=0.5, xtype='M.star.z0', ytype='delta.d', file_path_and_name=directory+'/median/delta_d_vs_mstar_z0.pdf')
 
 
 
 # delta d_peri vs Mstar (peak)
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=Mstar_peak_tot, y=delta_d_tot, x_out=Mstar_peak_tot_out, y_out=delta_d_tot_out, versus='M.star.peak', fraction=False, limits=(None,(-100,200)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_d_vs_mstar_peak_zoom.pdf')
+summary_plot.scatter_plot(x=Mstar_peak_tot, y=delta_d_tot, x_out=Mstar_peak_tot_out, y_out=delta_d_tot_out, xtype='M.star.peak', ytype='delta.d', limits=(None,(-100,200)), file_path_and_name=directory+'/scatter/delta_d_vs_mstar_peak_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_dperi_vs_prop_median(x=Mstar_peak_o_tot, y=delta_do_tot, binsize=0.5, versus='M.star.peak', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_d_vs_mstar_peak.pdf')
+summary_plot.median_plot(x=Mstar_peak_o_tot, y=delta_do_tot, binsize=0.5, xtype='M.star.peak', ytype='delta.d', file_path_and_name=directory+'/median/delta_d_vs_mstar_peak.pdf')
 
 
 
 # delta d_peri vs Mhalo (z = 0)
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=Mhalo_z0_tot, y=delta_d_tot, x_out=Mhalo_z0_tot_out, y_out=delta_d_tot_out, versus='M.halo.z0', fraction=False, limits=(None,(-100,200)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/scatter/delta_d_vs_mhalo_z0_zoom.pdf')
+summary_plot.scatter_plot(x=Mhalo_z0_tot, y=delta_d_tot, x_out=Mhalo_z0_tot_out, y_out=delta_d_tot_out, xtype='M.halo.z0', ytype='delta.d', limits=(None,(-100,200)), file_path_and_name=directory+'/scatter/delta_d_vs_mhalo_z0_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_dperi_vs_prop_median(x=Mhalo_z0_o_tot, y=delta_do_tot, binsize=0.5, versus='M.halo.z0', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/median/delta_d_vs_mhalo_z0.pdf')
+summary_plot.median_plot(x=Mhalo_z0_o_tot, y=delta_do_tot, binsize=0.5, xtype='M.halo.z0', ytype='delta.d', file_path_and_name=directory+'/median/delta_d_vs_mhalo_z0.pdf')
 
 
 
 # delta d_peri vs Mhalo (peak)
 # Scatter plots
-summary_plot.delta_dperi_vs_prop_scatter(x=Mhalo_peak_tot, y=delta_d_tot, x_out=Mhalo_peak_tot_out, y_out=delta_d_tot_out, versus='M.halo.peak', fraction=False, limits=(None,(-100,200)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_either_peri/scatter/delta_d_vs_mhalo_peak_zoom.pdf')
+summary_plot.scatter_plot(x=Mhalo_peak_tot, y=delta_d_tot, x_out=Mhalo_peak_tot_out, y_out=delta_d_tot_out, xtype='M.halo.peak', ytype='delta.d', limits=(None,(-100,200)), file_path_and_name=directory+'/scatter/delta_d_vs_mhalo_peak_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_dperi_vs_prop_median(x=Mhalo_peak_o_tot, y=delta_do_tot, binsize=0.5, versus='M.halo.peak', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_either_peri/median/delta_d_vs_mhalo_peak.pdf')
+summary_plot.median_plot(x=Mhalo_peak_o_tot, y=delta_do_tot, binsize=0.5, xtype='M.halo.peak', ytype='delta.d', file_path_and_name=directory+'/median/delta_d_vs_mhalo_peak.pdf')
 
 
 
 # Recent pericenter time comparison
 # no oversample, cases with peris in sim and model, but outliers in red
-summary_plot.tperi_comparison_scatter(x=t_tot_sim, y=t_tot_model, x_out=t_tot_sim_out, y_out=t_tot_model_out, limits=((-0.5, 13.8)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/recent_tperi_comparison.pdf')
+summary_plot.scatter_plot(x=t_tot_sim, y=t_tot_model, x_out=t_tot_sim_out, y_out=t_tot_model_out, xtype='t.sim', ytype='t.model', limits=((-0.5, 13.8)), file_path_and_name=directory+'/scatter/recent_tperi_comparison.pdf')
 #
 # Median plot
-summary_plot.tperi_comparison_median(x=t_tot_sim_o, y=t_tot_model_o, binsize=0.5, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/recent_tperi_comparison.pdf')
+summary_plot.median_plot(x=t_tot_sim_o, y=t_tot_model_o, xtype='t.sim', ytype='t.model', binsize=0.5, file_path_and_name=directory+'/median/recent_tperi_comparison.pdf')
 
 
 
 # t_peri histograms
-summary_plot.plot_hist(x=t_tot_o_sim, binsize=0.5, pdf=True, xtype='t.sim', xlimits=(-0.5,14), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/t_peri_sim_histogram_pdf.pdf')
-summary_plot.plot_hist(x=t_tot_sim, binsize=0.5, pdf=False, xtype='t.sim', xlimits=(-0.5,14), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/t_peri_sim_histogram.pdf')
+summary_plot.plot_hist(x=t_tot_o_sim, binsize=0.5, pdf=True, xtype='t.sim', xlimits=(-0.5,14), file_path_and_name=directory+'/histogram/t_peri_sim_histogram_pdf.pdf')
+summary_plot.plot_hist(x=t_tot_sim, binsize=0.5, pdf=False, xtype='t.sim', xlimits=(-0.5,14), file_path_and_name=directory+'/histogram/t_peri_sim_histogram.pdf')
 #
-summary_plot.plot_hist(x=t_tot_o_model, binsize=0.5, pdf=True, xtype='t.model', xlimits=(-0.5,14), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/t_peri_model_histogram_pdf.pdf')
-summary_plot.plot_hist(x=t_tot_model, binsize=0.5, pdf=False, xtype='t.model', xlimits=(-0.5,14), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/t_peri_model_histogram.pdf')
+summary_plot.plot_hist(x=t_tot_o_model, binsize=0.5, pdf=True, xtype='t.model', xlimits=(-0.5,14), file_path_and_name=directory+'/histogram/t_peri_model_histogram_pdf.pdf')
+summary_plot.plot_hist(x=t_tot_model, binsize=0.5, pdf=False, xtype='t.model', xlimits=(-0.5,14), file_path_and_name=directory+'/histogram/t_peri_model_histogram.pdf')
 
 
 
 # delta t_peri fractions
 # Histogram
 # oversample, cases with pericenters in sim, but not required in model
-summary_plot.delta_tperi_hist(delta_tfo_tot, binsize=0.1, xlimits=(-1,2), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/peri_tlb_diff_frac_histogram_zoom.pdf')
+summary_plot.plot_hist(delta_tfo_tot, binsize=0.1, xlimits=(-1,2), xtype='delta.t.frac', file_path_and_name=directory+'/histogram/peri_tlb_diff_frac_histogram_zoom.pdf')
 
 
 
 # delta t_peri fraction vs t_peri
 # no oversample, cases with peris in sim and model, but outliers in red
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=t_tot_sim, y=delta_tf_tot, x_out=t_tot_sim_out, y_out=delta_tf_tot_out, versus='t.sim', limits=((0, 10.5),(-1.1,2)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_frac_vs_t_sim_zoom.pdf')
-summary_plot.delta_tperi_vs_prop_scatter(x=t_tot_model, y=delta_tf_tot, x_out=t_tot_model_out, y_out=delta_tf_tot_out, versus='t.model', limits=((0, 10.5),(-1.1,2)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_frac_vs_t_model_zoom.pdf')
+summary_plot.scatter_plot(x=t_tot_sim, y=delta_tf_tot, x_out=t_tot_sim_out, y_out=delta_tf_tot_out, xtype='t.sim', ytype='delta.t.frac', limits=((0, 10.5),(-1.1,2)), file_path_and_name=directory+'/scatter/delta_t_frac_vs_t_sim_zoom.pdf')
+summary_plot.scatter_plot(x=t_tot_model, y=delta_tf_tot, x_out=t_tot_model_out, y_out=delta_tf_tot_out, xtype='t.model', ytype='delta.t.frac', limits=((0, 10.5),(-1.1,2)), file_path_and_name=directory+'/scatter/delta_t_frac_vs_t_model_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=t_tot_sim_o, y=delta_tfo_tot, binsize=0.5, versus='t.sim', fraction=True, limits=((0, 11),(-1.1, 1)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_frac_vs_t_sim_zoom.pdf')
-summary_plot.delta_tperi_vs_prop_median(x=t_tot_model_o, y=delta_tfo_tot, binsize=0.5, versus='t.model', fraction=True, limits=((0, 14),(-1.1, 5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_frac_vs_t_model_zoom.pdf')
+summary_plot.median_plot(x=t_tot_sim_o, y=delta_tfo_tot, binsize=0.5, xtype='t.sim', ytype='delta.t.frac', limits=((0, 11),(-1.1, 1)), file_path_and_name=directory+'/median/delta_t_frac_vs_t_sim_zoom.pdf')
+summary_plot.median_plot(x=t_tot_model_o, y=delta_tfo_tot, binsize=0.5, xtype='t.model', ytype='delta.t.frac', limits=((0, 14),(-1.1, 5)), file_path_and_name=directory+'/median/delta_t_frac_vs_t_model_zoom.pdf')
 
 
 
 # delta t_peri fraction vs t_infall
 # no oversample, cases with peris in sim and model, but outliers in red
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=t_in_tot, y=delta_tf_tot, x_out=t_in_tot_out, y_out=delta_tf_tot_out, versus='t.infall', limits=(None,(-1.1,2)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_frac_vs_t_infall_zoom.pdf')
+summary_plot.scatter_plot(x=t_in_tot, y=delta_tf_tot, x_out=t_in_tot_out, y_out=delta_tf_tot_out, xtype='t.infall', ytype='delta.t.frac', limits=(None,(-1.1,2)), file_path_and_name=directory+'/scatter/delta_t_frac_vs_t_infall_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=t_in_tot_o, y=delta_tfo_tot, binsize=0.5, versus='t.infall', fraction=True, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_frac_vs_t_infall.pdf')
+summary_plot.median_plot(x=t_in_tot_o, y=delta_tfo_tot, binsize=0.5, xtype='t.infall', ytype='delta.t.frac', file_path_and_name=directory+'/median/delta_t_frac_vs_t_infall.pdf')
 
 
 
 # delta t_peri fraction vs d_peri
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=d_tot_sim, y=delta_tf_tot, x_out=d_tot_sim_out, y_out=delta_tf_tot_out, versus='d.sim', limits=((-5,350),(-1.1,2)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_frac_vs_d_sim_zoom.pdf')
-summary_plot.delta_tperi_vs_prop_scatter(x=d_tot_model, y=delta_tf_tot, x_out=d_tot_model_out, y_out=delta_tf_tot_out, versus='d.model', limits=((-5,350),(-1.1,2)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_frac_vs_d_model_zoom.pdf')
+summary_plot.scatter_plot(x=d_tot_sim, y=delta_tf_tot, x_out=d_tot_sim_out, y_out=delta_tf_tot_out, xtype='d.sim', ytype='delta.t.frac', limits=((-5,350),(-1.1,2)), file_path_and_name=directory+'/scatter/delta_t_frac_vs_d_sim_zoom.pdf')
+summary_plot.scatter_plot(x=d_tot_model, y=delta_tf_tot, x_out=d_tot_model_out, y_out=delta_tf_tot_out, xtype='d.model', ytype='delta.t.frac', limits=((-5,350),(-1.1,2)), file_path_and_name=directory+'/scatter/delta_t_frac_vs_d_model_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=d_tot_sim_o, y=delta_tfo_tot, binsize=50, versus='d.sim', fraction=True, limits=((-5,350),(-1,1)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_frac_vs_d_sim_zoom.pdf')
-summary_plot.delta_tperi_vs_prop_median(x=d_tot_model_o, y=delta_tfo_tot, binsize=50, versus='d.model', fraction=True, limits=((-5,350),None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_frac_vs_d_model_zoom.pdf')
+summary_plot.median_plot(x=d_tot_sim_o, y=delta_tfo_tot, binsize=50, xtype='d.sim', ytype='delta.t.frac', limits=((-5,350),(-1,1)), file_path_and_name=directory+'/median/delta_t_frac_vs_d_sim_zoom.pdf')
+summary_plot.median_plot(x=d_tot_model_o, y=delta_tfo_tot, binsize=50, xtype='d.model', ytype='delta.t.frac', limits=((-5,350),None), file_path_and_name=directory+'/median/delta_t_frac_vs_d_model_zoom.pdf')
 
 
 
 # delta t_peri fraction vs d(z = 0)
 # no oversample, cases with peris in sim and model, but outliers in red
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=dz0_tot, y=delta_tf_tot, x_out=dz0_tot_out, y_out=delta_tf_tot_out, versus='d.z0', limits=((-5,350),(-1.1,2)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_frac_vs_d_z0_zoom.pdf')
+summary_plot.scatter_plot(x=dz0_tot, y=delta_tf_tot, x_out=dz0_tot_out, y_out=delta_tf_tot_out, xtype='d.z0', ytype='delta.t.frac', limits=((-5,350),(-1.1,2)), file_path_and_name=directory+'/scatter/delta_t_frac_vs_d_z0_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=dz0_o_tot, y=delta_tfo_tot, binsize=50, versus='d.z0', fraction=True, limits=((-5,350),None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_frac_vs_d_z0_zoom.pdf')
+summary_plot.median_plot(x=dz0_o_tot, y=delta_tfo_tot, binsize=50, xtype='d.z0', ytype='delta.t.frac', limits=((-5,350),None), file_path_and_name=directory+'/median/delta_t_frac_vs_d_z0_zoom.pdf')
 
 
 
 # delta t_peri fraction vs Nperi
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=N_sim_tot, y=delta_tf_tot, x_out=N_sim_tot_out, y_out=delta_tf_tot_out, versus='N.sim', limits=((-0.5,13.5),(-1.1,2)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_frac_vs_N_sim_zoom.pdf')
-summary_plot.delta_tperi_vs_prop_scatter(x=N_model_tot, y=delta_tf_tot, x_out=N_model_tot_out, y_out=delta_tf_tot_out, versus='N.model', limits=((-0.5,13.5),(-1.1,2)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_frac_vs_N_model_zoom.pdf')
+summary_plot.scatter_plot(x=N_sim_tot, y=delta_tf_tot, x_out=N_sim_tot_out, y_out=delta_tf_tot_out, xtype='N.sim', ytype='delta.t.frac', limits=((-0.5,13.5),(-1.1,2)), file_path_and_name=directory+'/scatter/delta_t_frac_vs_N_sim_zoom.pdf')
+summary_plot.scatter_plot(x=N_model_tot, y=delta_tf_tot, x_out=N_model_tot_out, y_out=delta_tf_tot_out, xtype='N.model', ytype='delta.t.frac', limits=((-0.5,13.5),(-1.1,2)), file_path_and_name=directory+'/scatter/delta_t_frac_vs_N_model_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=N_sim_o_tot, y=delta_tfo_tot, binsize=1, versus='N.sim', fraction=True, limits=((-0.5,13.5),(-1,1)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_frac_vs_N_sim_zoom.pdf')
-summary_plot.delta_tperi_vs_prop_median(x=N_model_o_tot, y=delta_tfo_tot, binsize=1, versus='N.model', fraction=True, limits=((-0.5,13.5),(-1,1)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_frac_vs_N_model_zoom.pdf')
+summary_plot.median_plot(x=N_sim_o_tot, y=delta_tfo_tot, binsize=1, xtype='N.sim', ytype='delta.t.frac', limits=((-0.5,13.5),(-1,1)), file_path_and_name=directory+'/median/delta_t_frac_vs_N_sim_zoom.pdf')
+summary_plot.median_plot(x=N_model_o_tot, y=delta_tfo_tot, binsize=1, xtype='N.model', ytype='delta.t.frac', limits=((-0.5,13.5),(-1,1)), file_path_and_name=directory+'/median/delta_t_frac_vs_N_model_zoom.pdf')
 
 
 
 # delta t_peri fraction vs Mstar (z = 0)
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=Mstar_z0_tot, y=delta_tf_tot, x_out=Mstar_z0_tot_out, y_out=delta_tf_tot_out, versus='M.z0', limits=(None,(-1.1,4.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_frac_vs_mstar_z0_zoom.pdf')
+summary_plot.scatter_plot(x=Mstar_z0_tot, y=delta_tf_tot, x_out=Mstar_z0_tot_out, y_out=delta_tf_tot_out, xtype='M.star.z0', ytype='delta.t.frac', limits=(None,(-1.1,4.5)), file_path_and_name=directory+'/scatter/delta_t_frac_vs_mstar_z0_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=Mstar_z0_o_tot, y=delta_tfo_tot, binsize=0.5, versus='M.z0', fraction=True, limits=(None,(-1,1)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_frac_vs_mstar_z0_zoom.pdf')
+summary_plot.median_plot(x=Mstar_z0_o_tot, y=delta_tfo_tot, binsize=0.5, xtype='M.star.z0', ytype='delta.t.frac', limits=(None,(-1,1)), file_path_and_name=directory+'/median/delta_t_frac_vs_mstar_z0_zoom.pdf')
 
 
 
 # delta t_peri fraction vs Mstar (peak)
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=Mstar_peak_tot, y=delta_tf_tot, x_out=Mstar_peak_tot_out, y_out=delta_tf_tot_out, versus='M.peak', limits=(None,(-1.1,4.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_frac_vs_mstar_peak_zoom.pdf')
+summary_plot.scatter_plot(x=Mstar_peak_tot, y=delta_tf_tot, x_out=Mstar_peak_tot_out, y_out=delta_tf_tot_out, xtype='M.star.peak', ytype='delta.t.frac', limits=(None,(-1.1,4.5)), file_path_and_name=directory+'/scatter/delta_t_frac_vs_mstar_peak_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=Mstar_peak_o_tot, y=delta_tfo_tot, binsize=0.5, versus='M.peak', fraction=True, limits=(None,(-1,1)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_frac_vs_mstar_peak_zoom.pdf')
+summary_plot.median_plot(x=Mstar_peak_o_tot, y=delta_tfo_tot, binsize=0.5, xtype='M.star.peak', ytype='delta.t.frac', limits=(None,(-1,1)), file_path_and_name=directory+'/median/delta_t_frac_vs_mstar_peak_zoom.pdf')
 
 
 
 # delta t_peri fraction vs Mhalo (z = 0)
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=Mhalo_z0_tot, y=delta_tf_tot, x_out=Mhalo_z0_tot_out, y_out=delta_tf_tot_out, versus='M.halo.z0', limits=(None,(-1.1,4.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/scatter/delta_t_frac_vs_mhalo_z0_zoom.pdf')
+summary_plot.scatter_plot(x=Mhalo_z0_tot, y=delta_tf_tot, x_out=Mhalo_z0_tot_out, y_out=delta_tf_tot_out, xtype='M.halo.z0', ytype='delta.t.frac', limits=(None,(-1.1,4.5)), file_path_and_name=directory+'/scatter/delta_t_frac_vs_mhalo_z0_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=Mhalo_z0_o_tot, y=delta_tfo_tot, binsize=0.5, versus='M.halo.z0', fraction=True, limits=(None,(-1,1)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/median/delta_t_frac_vs_mhalo_z0_zoom.pdf')
+summary_plot.median_plot(x=Mhalo_z0_o_tot, y=delta_tfo_tot, binsize=0.5, xtype='M.halo.z0', ytype='delta.t.frac', limits=(None,(-1,1)), file_path_and_name=directory+'/median/delta_t_frac_vs_mhalo_z0_zoom.pdf')
 
 
 
 # delta t_peri fraction vs Mhalo (z = 0)
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=Mhalo_peak_tot, y=delta_tf_tot, x_out=Mhalo_peak_tot_out, y_out=delta_tf_tot_out, versus='M.halo.peak', limits=(None,(-1.1,4.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_either_peri/scatter/delta_t_frac_vs_mhalo_peak_zoom.pdf')
+summary_plot.scatter_plot(x=Mhalo_peak_tot, y=delta_tf_tot, x_out=Mhalo_peak_tot_out, y_out=delta_tf_tot_out, xtype='M.halo.peak', ytype='delta.t.frac', limits=(None,(-1.1,4.5)), file_path_and_name=directory+'/scatter/delta_t_frac_vs_mhalo_peak_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=Mhalo_peak_o_tot, y=delta_tfo_tot, binsize=0.5, versus='M.halo.peak', fraction=True, limits=(None,(-1,1)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_either_peri/median/delta_t_frac_vs_mhalo_peak_zoom.pdf')
+summary_plot.median_plot(x=Mhalo_peak_o_tot, y=delta_tfo_tot, binsize=0.5, xtype='M.halo.peak', ytype='delta.t.frac', limits=(None,(-1,1)), file_path_and_name=directory+'/median/delta_t_frac_vs_mhalo_peak_zoom.pdf')
 
 
 
 # delta t_peri histogram
-summary_plot.delta_tperi_hist(delta_to_tot, binsize=0.5, xlimits=(-3,4), fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/peri_tlb_diff_histogram_zoom.pdf')
+summary_plot.plot_hist(delta_to_tot, binsize=0.5, xlimits=(-3,4), xtype='delta.t', file_path_and_name=directory+'/histogram/peri_tlb_diff_histogram_zoom.pdf')
 
 
 
 # delta t_peri vs t_peri
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=t_tot_sim, y=delta_t_tot, x_out=t_tot_sim_out, y_out=delta_t_tot_out, versus='t.sim', fraction=False, limits=((-0.1, 10.5),(-5, 10)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_vs_t_sim_zoom.pdf')
-summary_plot.delta_tperi_vs_prop_scatter(x=t_tot_model, y=delta_t_tot, x_out=t_tot_model_out, y_out=delta_t_tot_out, versus='t.model', fraction=False, limits=((-0.1, 13.8),(-5, 10)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_vs_t_model_zoom.pdf')
+summary_plot.scatter_plot(x=t_tot_sim, y=delta_t_tot, x_out=t_tot_sim_out, y_out=delta_t_tot_out, xtype='t.sim', ytype='delta.t', limits=((-0.1, 10.5),(-5, 10)), file_path_and_name=directory+'/scatter/delta_t_vs_t_sim_zoom.pdf')
+summary_plot.scatter_plot(x=t_tot_model, y=delta_t_tot, x_out=t_tot_model_out, y_out=delta_t_tot_out, xtype='t.model', ytype='delta.t', limits=((-0.1, 13.8),(-5, 10)), file_path_and_name=directory+'/scatter/delta_t_vs_t_model_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=t_tot_sim_o, y=delta_to_tot, binsize=1, versus='t.sim', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_vs_t_sim.pdf')
-summary_plot.delta_tperi_vs_prop_median(x=t_tot_model_o, y=delta_to_tot, binsize=1, versus='t.model', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_vs_t_model.pdf')
+summary_plot.median_plot(x=t_tot_sim_o, y=delta_to_tot, binsize=1, xtype='t.sim', ytype='delta.t', file_path_and_name=directory+'/median/delta_t_vs_t_sim.pdf')
+summary_plot.median_plot(x=t_tot_model_o, y=delta_to_tot, binsize=1, xtype='t.model', ytype='delta.t', file_path_and_name=directory+'/median/delta_t_vs_t_model.pdf')
 
 
 
 # delta t_peri vs t_infall
 # no oversample, cases with peris in sim and model, but outliers in red
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=t_in_tot, y=delta_t_tot, x_out=t_in_tot_out, y_out=delta_t_tot_out, versus='t.infall', fraction=False, limits=(None, (-3,3)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_vs_t_infall_zoom.pdf')
+summary_plot.scatter_plot(x=t_in_tot, y=delta_t_tot, x_out=t_in_tot_out, y_out=delta_t_tot_out, xtype='t.infall', ytype='delta.t', limits=(None, (-3,3)), file_path_and_name=directory+'/scatter/delta_t_vs_t_infall_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=t_in_tot_o, y=delta_to_tot, binsize=1, versus='t.infall', fraction=False, limits=(None, (-1,3)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_vs_t_infall_zoom.pdf')
+summary_plot.median_plot(x=t_in_tot_o, y=delta_to_tot, binsize=1, xtype='t.infall', ytype='delta.t', limits=(None, (-1,3)), file_path_and_name=directory+'/median/delta_t_vs_t_infall_zoom.pdf')
 
 
 
 # delta t_peri vs d_peri
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=d_tot_sim, y=delta_t_tot, x_out=d_tot_sim_out, y_out=delta_t_tot_out, versus='d.sim', fraction=False, limits=((-5,350),None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_vs_d_sim_zoom.pdf')
-summary_plot.delta_tperi_vs_prop_scatter(x=d_tot_model, y=delta_t_tot, x_out=d_tot_model_out, y_out=delta_t_tot_out, versus='d.model', fraction=False, limits=((-5,350),None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_vs_d_model_zoom.pdf')
+summary_plot.scatter_plot(x=d_tot_sim, y=delta_t_tot, x_out=d_tot_sim_out, y_out=delta_t_tot_out, xtype='d.sim', ytype='delta.t', limits=((-5,350),None), file_path_and_name=directory+'/scatter/delta_t_vs_d_sim_zoom.pdf')
+summary_plot.scatter_plot(x=d_tot_model, y=delta_t_tot, x_out=d_tot_model_out, y_out=delta_t_tot_out, xtype='d.model', ytype='delta.t', limits=((-5,350),None), file_path_and_name=directory+'/scatter/delta_t_vs_d_model_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=d_tot_sim_o, y=delta_to_tot, binsize=50, versus='d.sim', fraction=False, limits=((-5,350),None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_vs_d_sim.pdf')
-summary_plot.delta_tperi_vs_prop_median(x=d_tot_model_o, y=delta_to_tot, binsize=50, versus='d.model', fraction=False, limits=((-5,350),(-2,4)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_vs_d_model_zoom.pdf')
+summary_plot.median_plot(x=d_tot_sim_o, y=delta_to_tot, binsize=50, xtype='d.sim', ytype='delta.t', limits=((-5,350),None), file_path_and_name=directory+'/median/delta_t_vs_d_sim.pdf')
+summary_plot.median_plot(x=d_tot_model_o, y=delta_to_tot, binsize=50, xtype='d.model', ytype='delta.t', limits=((-5,350),(-2,4)), file_path_and_name=directory+'/median/delta_t_vs_d_model_zoom.pdf')
 
 
 
 # delta t_peri vs d(z = 0)
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=dz0_tot, y=delta_t_tot, x_out=dz0_tot_out, y_out=delta_t_tot_out, versus='d.z0', fraction=False, limits=((-5,350),(-5,5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_vs_d_z0_zoom.pdf')
+summary_plot.scatter_plot(x=dz0_tot, y=delta_t_tot, x_out=dz0_tot_out, y_out=delta_t_tot_out, xtype='d.z0', ytype='delta.t', limits=((-5,350),(-5,5)), file_path_and_name=directory+'/scatter/delta_t_vs_d_z0_zoom.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=dz0_o_tot, y=delta_to_tot, binsize=50, versus='d.z0', fraction=False, limits=((-5,350),(-1,2)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_vs_d_z0_zoom.pdf')
+summary_plot.median_plot(x=dz0_o_tot, y=delta_to_tot, binsize=50, xtype='d.z0', ytype='delta.t', limits=((-5,350),(-1,2)), file_path_and_name=directory+'/median/delta_t_vs_d_z0_zoom.pdf')
 
 
 
 # delta t_peri vs N_peri
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=N_sim_tot, y=delta_t_tot, x_out=N_sim_tot_out, y_out=delta_t_tot_out, versus='N.sim', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_vs_N_sim.pdf')
-summary_plot.delta_tperi_vs_prop_scatter(x=N_model_tot, y=delta_t_tot, x_out=N_model_tot_out, y_out=delta_t_tot_out, versus='N.model', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_vs_N_model.pdf')
+summary_plot.scatter_plot(x=N_sim_tot, y=delta_t_tot, x_out=N_sim_tot_out, y_out=delta_t_tot_out, xtype='N.sim', ytype='delta.t', file_path_and_name=directory+'/scatter/delta_t_vs_N_sim.pdf')
+summary_plot.scatter_plot(x=N_model_tot, y=delta_t_tot, x_out=N_model_tot_out, y_out=delta_t_tot_out, xtype='N.model', ytype='delta.t', file_path_and_name=directory+'/scatter/delta_t_vs_N_model.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=N_sim_o_tot, y=delta_to_tot, binsize=1, versus='N.sim', fraction=False, limits=((-0.5,13.5),(-2,2.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_vs_N_sim_zoom.pdf')
-summary_plot.delta_tperi_vs_prop_median(x=N_model_o_tot, y=delta_to_tot, binsize=1, versus='N.model', fraction=False, limits=((-0.5,13.5),(-2,2)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_vs_N_model_zoom.pdf')
+summary_plot.median_plot(x=N_sim_o_tot, y=delta_to_tot, binsize=1, xtype='N.sim', ytype='delta.t', limits=((-0.5,13.5),(-2,2.5)), file_path_and_name=directory+'/median/delta_t_vs_N_sim_zoom.pdf')
+summary_plot.median_plot(x=N_model_o_tot, y=delta_to_tot, binsize=1, xtype='N.model', ytype='delta.t', limits=((-0.5,13.5),(-2,2)), file_path_and_name=directory+'/median/delta_t_vs_N_model_zoom.pdf')
 
 
 
 # delta t_peri vs Mstar (z = 0)
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=Mstar_z0_tot, y=delta_t_tot, x_out=Mstar_z0_tot_out, y_out=delta_t_tot_out, versus='M.z0', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_vs_mstar_z0.pdf')
+summary_plot.scatter_plot(x=Mstar_z0_tot, y=delta_t_tot, x_out=Mstar_z0_tot_out, y_out=delta_t_tot_out, xtype='M.star.z0', ytype='delta.t', file_path_and_name=directory+'/scatter/delta_t_vs_mstar_z0.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=Mstar_z0_o_tot, y=delta_to_tot, binsize=0.5, versus='M.z0', fraction=False, limits=((4,9.5),(-1,3)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_vs_mstar_z0_zoom.pdf')
+summary_plot.median_plot(x=Mstar_z0_o_tot, y=delta_to_tot, binsize=0.5, xtype='M.star.z0', ytype='delta.t', limits=((4,9.5),(-1,3)), file_path_and_name=directory+'/median/delta_t_vs_mstar_z0_zoom.pdf')
 
 
 
 # delta t_peri vs Mstar (peak)
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=Mstar_peak_tot, y=delta_t_tot, x_out=Mstar_peak_tot_out, y_out=delta_t_tot_out, versus='M.peak', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/delta_t_vs_mstar_peak.pdf')
+summary_plot.scatter_plot(x=Mstar_peak_tot, y=delta_t_tot, x_out=Mstar_peak_tot_out, y_out=delta_t_tot_out, xtype='M.star.peak', ytype='delta.t', file_path_and_name=directory+'/scatter/delta_t_vs_mstar_peak.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=Mstar_peak_o_tot, y=delta_to_tot, binsize=0.5, versus='M.peak', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/delta_t_vs_mstar_peak.pdf')
+summary_plot.median_plot(x=Mstar_peak_o_tot, y=delta_to_tot, binsize=0.5, xtype='M.star.peak', ytype='delta.t', file_path_and_name=directory+'/median/delta_t_vs_mstar_peak.pdf')
 
 
 
 # delta t_peri vs Mhalo (z = 0)
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=Mhalo_z0_tot, y=delta_t_tot, x_out=Mhalo_z0_tot_out, y_out=delta_t_tot_out, versus='M.halo.z0', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/scatter/delta_t_vs_mhalo_z0.pdf')
+summary_plot.scatter_plot(x=Mhalo_z0_tot, y=delta_t_tot, x_out=Mhalo_z0_tot_out, y_out=delta_t_tot_out, xtype='M.halo.z0', ytype='delta.t', file_path_and_name=directory+'/scatter/delta_t_vs_mhalo_z0.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=Mhalo_z0_o_tot, y=delta_to_tot, binsize=0.5, versus='M.halo.z0', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/median/delta_t_vs_mhalo_z0.pdf')
+summary_plot.median_plot(x=Mhalo_z0_o_tot, y=delta_to_tot, binsize=0.5, xtype='M.halo.z0', ytype='delta.t', file_path_and_name=directory+'/median/delta_t_vs_mhalo_z0.pdf')
 
 
 
 # delta t_peri vs Mhalo (peak)
 # Scatter plots
-summary_plot.delta_tperi_vs_prop_scatter(x=Mhalo_peak_tot, y=delta_t_tot, x_out=Mhalo_peak_tot_out, y_out=delta_t_tot_out, versus='M.halo.peak', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_either_peri/scatter/delta_t_vs_mhalo_peak.pdf')
+summary_plot.scatter_plot(x=Mhalo_peak_tot, y=delta_t_tot, x_out=Mhalo_peak_tot_out, y_out=delta_t_tot_out, xtype='M.halo.peak', ytype='delta.t', file_path_and_name=directory+'/scatter/delta_t_vs_mhalo_peak.pdf')
 #
 # Median plots
-summary_plot.delta_tperi_vs_prop_median(x=Mhalo_peak_o_tot, y=delta_to_tot, binsize=0.5, versus='M.halo.peak', fraction=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_either_peri/median/delta_t_vs_mhalo_peak.pdf')
+summary_plot.median_plot(x=Mhalo_peak_o_tot, y=delta_to_tot, binsize=0.5, xtype='M.halo.peak', ytype='delta.t', file_path_and_name=directory+'/median/delta_t_vs_mhalo_peak.pdf')
+
+
+
+# M_star histogram (z = 0)
+summary_plot.plot_hist(Mstar_z0_tot, binsize=0.1, log=True, pdf=False, xtype='M.star.z0', file_path_and_name=directory+'/histogram/mstar_z0_histogram.pdf')
+summary_plot.plot_hist(Mstar_z0_o_tot, binsize=0.1, log=True, pdf=True, xtype='M.star.z0', file_path_and_name=directory+'/histogram/mstar_z0_histogram_pdf.pdf')
+
+
+
+# Mstar(z = 0) vs d(z = 0)
+# Scatter plot
+summary_plot.scatter_plot(x=Mstar_z0_tot, y=dz0_tot, x_out=Mstar_z0_tot_out, y_out=dz0_tot_out, xtype='M.star.z0', ytype='d.z0', limits=(None,(-5,350)), file_path_and_name=directory+'/scatter/mstar_z0_vs_d_z0_zoom.pdf')
+#
+# Median plot
+summary_plot.median_plot(x=Mstar_z0_o_tot, y=dz0_o_tot, binsize=0.5, xtype='M.star.z0', ytype='d.z0', file_path_and_name=directory+'/median/mstar_z0_vs_d_z0.pdf')
+
+
+
+# Mstar(z = 0) vs Mhalo(z = 0)
+# Scatter plot
+summary_plot.scatter_plot(x=Mhalo_z0_tot, y=Mstar_z0_tot, x_out=Mhalo_z0_tot_out, y_out=Mstar_z0_tot_out, xtype='M.halo.z0', ytype='M.star.z0', file_path_and_name=directory+'/scatter/mstar_mhalo_z0.pdf')
+#
+# Median plot
+summary_plot.median_plot(x=Mhalo_z0_o_tot, y=Mstar_z0_o_tot, binsize=0.5, xtype='M.halo.z0', ytype='M.star.z0', file_path_and_name=directory+'/median/mstar_mhalo_z0.pdf')
+
+
+
+# Mstar(peak) vs Mhalo(peak)
+# Scatter plot
+summary_plot.scatter_plot(x=Mhalo_peak_tot, y=Mstar_peak_tot, x_out=Mhalo_peak_tot_out, y_out=Mstar_peak_tot_out, xtype='M.halo.peak', ytype='M.star.peak', file_path_and_name=directory+'/scatter/mstar_mhalo_peak.pdf')
+#
+# Median plot
+summary_plot.median_plot(x=Mhalo_peak_o_tot, y=Mstar_peak_o_tot, binsize=0.5, xtype='M.halo.peak', ytype='M.star.peak', file_path_and_name=directory+'/median/mstar_mhalo_peak.pdf')
+
+
+
+# Mstar histogram (peak)
+summary_plot.plot_hist(Mstar_peak_tot, binsize=0.1, log=True, pdf=False, xtype='M.star.peak', file_path_and_name=directory+'/histogram/mstar_peak_histogram.pdf')
+summary_plot.plot_hist(Mstar_peak_o_tot, binsize=0.1, log=True, pdf=True, xtype='M.star.peak', file_path_and_name=directory+'/histogram/mstar_peak_histogram_pdf.pdf')
+
+
+
+# Mstar(peak) vs d(z = 0)
+# Scatter plot
+summary_plot.scatter_plot(x=Mstar_peak_tot, y=dz0_tot, x_out=Mstar_peak_tot_out, y_out=dz0_tot_out, xtype='M.star.peak', ytype='d.z0', limits=(None,(-5,350)), file_path_and_name=directory+'/scatter/mstar_peak_vs_d_z0_zoom.pdf')
+#
+# Median plot
+summary_plot.median_plot(x=Mstar_peak_o_tot, y=dz0_o_tot, binsize=0.5, xtype='M.star.peak', ytype='d.z0', file_path_and_name=directory+'/median/mstar_peak_vs_d_z0.pdf')
+
+
+
+# d_z0
+summary_plot.plot_hist(x=dz0_o_tot, binsize=10, pdf=True, xtype='d.z0', file_path_and_name=directory+'/histogram/d_z0_histogram_pdf.pdf')
+summary_plot.plot_hist(x=dz0_o_tot, binsize=10, pdf=True, xtype='d.z0', xlimits=(-5,350), file_path_and_name=directory+'/histogram/d_z0_histogram_pdf_zoom.pdf')
+#
+summary_plot.plot_hist(x=dz0_tot, binsize=10, pdf=False, xtype='d.z0', file_path_and_name=directory+'/histogram/d_z0_histogram.pdf')
+summary_plot.plot_hist(x=dz0_tot, binsize=10, pdf=False, xtype='d.z0', xlimits=(-5,350), file_path_and_name=directory+'/histogram/d_z0_histogram_zoom.pdf')
+
+
+
+# M_halo histogram (z = 0)
+summary_plot.plot_hist(Mhalo_z0_tot, binsize=0.1, log=True, xtype='M.halo.z0', pdf=False, file_path_and_name=directory+'/histogram/mhalo_z0_histogram.pdf')
+summary_plot.plot_hist(Mhalo_z0_o_tot, binsize=0.1, log=True, xtype='M.halo.z0', pdf=True, file_path_and_name=directory+'/histogram/mhalo_z0_histogram_pdf.pdf')
+
+
+
+# M_halo histogram (peak)
+summary_plot.plot_hist(Mhalo_peak_tot, binsize=0.1, log=True, xtype='M.halo.peak', pdf=False, file_path_and_name=directory+'/histogram/mhalo_peak_histogram.pdf')
+summary_plot.plot_hist(Mhalo_peak_o_tot, binsize=0.1, log=True, xtype='M.halo.peak', pdf=True, file_path_and_name=directory+'/histogram/mhalo_peak_histogram_pdf.pdf')
 
 
 
 # t_infall histogram
-summary_plot.plot_hist(t_in_tot_o, binsize=0.5, pdf=True, xtype='t.infall', xlimits=(-0.5,14), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/infall_histogram_pdf.pdf')
-summary_plot.plot_hist(t_in_tot, binsize=0.5, pdf=False, xtype='t.infall', xlimits=(-0.5,14), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/infall_histogram.pdf')
+summary_plot.plot_hist(t_in_tot_o, binsize=0.5, pdf=True, xtype='t.infall', xlimits=(-0.5,14), file_path_and_name=directory+'/histogram/infall_histogram_pdf.pdf')
+summary_plot.plot_hist(t_in_tot, binsize=0.5, pdf=False, xtype='t.infall', xlimits=(-0.5,14), file_path_and_name=directory+'/histogram/infall_histogram.pdf')
 
 
 
 # t_infall vs Mstar (z = 0)
 # Scatter plot
-summary_plot.infall_vs_prop_scatter(x=Mstar_z0_tot, y=t_in_tot, x_out=Mstar_z0_tot_out, y_out=t_in_tot_out, xtype='M.star.z0', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/infall_vs_mstar_z0.pdf')
+summary_plot.scatter_plot(x=Mstar_z0_tot, y=t_in_tot, x_out=Mstar_z0_tot_out, y_out=t_in_tot_out, xtype='M.star.z0', ytype='t.infall', file_path_and_name=directory+'/scatter/infall_vs_mstar_z0.pdf')
 #
 # Median plot
-summary_plot.infall_vs_prop_median(x=Mstar_z0_o_tot, y=t_in_tot_o, binsize=0.5, xtype='M.star.z0', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/infall_vs_mstar_z0.pdf')
+summary_plot.median_plot(x=Mstar_z0_o_tot, y=t_in_tot_o, binsize=0.5, xtype='M.star.z0', ytype='t.infall', file_path_and_name=directory+'/median/infall_vs_mstar_z0.pdf')
 
 
 
 # t_infall vs Mstar (peak)
 # Scatter plot
-summary_plot.infall_vs_prop_scatter(x=Mstar_peak_tot, y=t_in_tot, x_out=Mstar_peak_tot_out, y_out=t_in_tot_out, xtype='M.star.peak', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/infall_vs_mstar_peak.pdf')
+summary_plot.scatter_plot(x=Mstar_peak_tot, y=t_in_tot, x_out=Mstar_peak_tot_out, y_out=t_in_tot_out, xtype='M.star.peak', ytype='t.infall', file_path_and_name=directory+'/scatter/infall_vs_mstar_peak.pdf')
 #
 # Median plot
-summary_plot.infall_vs_prop_median(x=Mstar_peak_o_tot, y=t_in_tot_o, binsize=0.5, xtype='M.star.peak', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/infall_vs_mstar_peak.pdf')
+summary_plot.median_plot(x=Mstar_peak_o_tot, y=t_in_tot_o, binsize=0.5, xtype='M.star.peak', ytype='t.infall', file_path_and_name=directory+'/median/infall_vs_mstar_peak.pdf')
 
 
 
 # t_infall vs Mhalo (z = 0)
 # Scatter plot
-summary_plot.infall_vs_prop_scatter(x=Mhalo_z0_tot, y=t_in_tot, x_out=Mhalo_z0_tot_out, y_out=t_in_tot_out, xtype='M.halo.z0', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/scatter/infall_vs_mhalo_z0.pdf')
+summary_plot.scatter_plot(x=Mhalo_z0_tot, y=t_in_tot, x_out=Mhalo_z0_tot_out, y_out=t_in_tot_out, xtype='M.halo.z0', ytype='t.infall', file_path_and_name=directory+'/scatter/infall_vs_mhalo_z0.pdf')
 #
 # Median plot
-summary_plot.infall_vs_prop_median(x=Mhalo_z0_o_tot, y=t_in_tot_o, binsize=0.5, xtype='M.halo.z0', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/median/infall_vs_mhalo_z0.pdf')
+summary_plot.median_plot(x=Mhalo_z0_o_tot, y=t_in_tot_o, binsize=0.5, xtype='M.halo.z0', ytype='t.infall', file_path_and_name=directory+'/median/infall_vs_mhalo_z0.pdf')
 
 
 
 # t_infall vs Mhalo (peak)
 # Scatter plot
-summary_plot.infall_vs_prop_scatter(x=Mhalo_peak_tot, y=t_in_tot, x_out=Mhalo_peak_tot_out, y_out=t_in_tot_out, xtype='M.halo.peak', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_either_peri/scatter/infall_vs_mhalo_peak.pdf')
+summary_plot.scatter_plot(x=Mhalo_peak_tot, y=t_in_tot, x_out=Mhalo_peak_tot_out, y_out=t_in_tot_out, xtype='M.halo.peak', ytype='t.infall', file_path_and_name=directory+'/scatter/infall_vs_mhalo_peak.pdf')
 #
 # Median plot
-summary_plot.infall_vs_prop_median(x=Mhalo_peak_o_tot, y=t_in_tot_o, binsize=0.5, xtype='M.halo.peak', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_either_peri/median/infall_vs_mhalo_peak.pdf')
+summary_plot.median_plot(x=Mhalo_peak_o_tot, y=t_in_tot_o, binsize=0.5, xtype='M.halo.peak', ytype='t.infall', file_path_and_name=directory+'/median/infall_vs_mhalo_peak.pdf')
 
 
 
 # t_infall vs d(z = 0)
 # Scatter plot
-summary_plot.infall_vs_prop_scatter(x=dz0_tot, y=t_in_tot, x_out=dz0_tot_out, y_out=t_in_tot_out, xtype='d.z0', limits=((-5,350), None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/infall_vs_d_z0_zoom.pdf')
+summary_plot.scatter_plot(x=dz0_tot, y=t_in_tot, x_out=dz0_tot_out, y_out=t_in_tot_out, xtype='d.z0', ytype='t.infall', limits=((-5,350), None), file_path_and_name=directory+'/scatter/infall_vs_d_z0_zoom.pdf')
 #
 # Median plot
-summary_plot.infall_vs_prop_median(x=dz0_o_tot, y=t_in_tot_o, binsize=50, xtype='d.z0', limits=((-5,350), None), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/infall_vs_d_z0_zoom.pdf')
+summary_plot.median_plot(x=dz0_o_tot, y=t_in_tot_o, binsize=50, xtype='d.z0', ytype='t.infall', limits=((-5,350), None), file_path_and_name=directory+'/median/infall_vs_d_z0_zoom.pdf')
 #
 #
 #
@@ -829,83 +902,5 @@ plt.ylabel('t$_{\\rm infall,lb}$ [Gyr]', fontsize=28)
 plt.legend(prop={'size': 16})
 plt.tick_params(axis='both', which='major', labelsize=24)
 plt.tight_layout()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/median/infall_vs_d_z0_mass_bins.pdf')
+plt.savefig(directory+'/median/infall_vs_d_z0_mass_bins.pdf')
 plt.close()
-
-
-
-
-
-
-
-
-
-
-
-
-# M_star histogram (z = 0)
-summary_plot.mstar_hist(Mstar_z0_tot, binsize=0.1, log=True, pdf=False, selection='z0', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/histogram/mstar_z0_histogram.pdf')
-summary_plot.mstar_hist(Mstar_z0_o_tot, binsize=0.1, log=True, pdf=True, selection='z0', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/histogram/mstar_z0_histogram_pdf.pdf')
-
-
-
-# Mstar(z = 0) vs d(z = 0)
-# Scatter plot
-summary_plot.mstar_vs_prop_scatter(x=Mstar_z0_tot, y=dz0_tot, x_out=Mstar_z0_tot_out, y_out=dz0_tot_out, xtype='M.z0', ytype='d.z0', limits=(None,(-5,350)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/mstar_z0_vs_d_z0_zoom.pdf')
-#
-# Median plot
-summary_plot.mstar_vs_prop_median(x=Mstar_z0_o_tot, y=dz0_o_tot, binsize=0.5, xtype='M.z0', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/mstar_z0_vs_d_z0.pdf')
-
-
-
-# Mstar(z = 0) vs Mhalo(z = 0)
-# Scatter plot
-summary_plot.mstar_mhalo_scatter(x=Mhalo_z0_tot, y=Mstar_z0_tot, x_out=Mhalo_z0_tot_out, y_out=Mstar_z0_tot_out, masstype='z0', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/scatter/mstar_mhalo_z0.pdf')
-#
-# Median plot
-summary_plot.mstar_mhalo_median(x=Mhalo_z0_o_tot, y=Mstar_z0_o_tot, binsize=0.5, masstype='z0', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/median/mstar_mhalo_z0.pdf')
-
-
-
-# Mstar(peak) vs Mhalo(peak)
-# Scatter plot
-summary_plot.mstar_mhalo_scatter(x=Mhalo_peak_tot, y=Mstar_peak_tot, x_out=Mhalo_peak_tot_out, y_out=Mstar_peak_tot_out, masstype='peak', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/scatter/mstar_mhalo_peak.pdf')
-#
-# Median plot
-summary_plot.mstar_mhalo_median(x=Mhalo_peak_o_tot, y=Mstar_peak_o_tot, binsize=0.5, masstype='peak', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/median/mstar_mhalo_peak.pdf')
-
-
-
-# Mstar histogram (peak)
-summary_plot.mstar_hist(Mstar_peak_tot, binsize=0.1, log=True, pdf=False, selection='peak', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_peri_sim/histogram/mstar_peak_histogram.pdf')
-summary_plot.mstar_hist(Mstar_peak_o_tot, binsize=0.1, log=True, pdf=True, selection='peak', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_peri_sim/histogram/mstar_peak_histogram_pdf.pdf')
-
-
-
-# Mstar(peak) vs d(z = 0)
-# Scatter plot
-summary_plot.mstar_vs_prop_scatter(x=Mstar_peak_tot, y=dz0_tot, x_out=Mstar_peak_tot_out, y_out=dz0_tot_out, xtype='M.peak', ytype='d.z0', limits=(None,(-5,350)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/scatter/mstar_peak_vs_d_z0_zoom.pdf')
-#
-# Median plot
-summary_plot.mstar_vs_prop_median(x=Mstar_peak_o_tot, y=dz0_o_tot, binsize=0.5, xtype='M.peak', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/median/mstar_peak_vs_d_z0.pdf')
-
-
-
-# d_z0
-summary_plot.plot_hist(x=dz0_o_tot, binsize=10, pdf=True, xtype='d.z0', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/d_z0_histogram_pdf.pdf')
-summary_plot.plot_hist(x=dz0_o_tot, binsize=10, pdf=True, xtype='d.z0', xlimits=(-5,350), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/d_z0_histogram_pdf_zoom.pdf')
-#
-summary_plot.plot_hist(x=dz0_tot, binsize=10, pdf=False, xtype='d.z0', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/d_z0_histogram.pdf')
-summary_plot.plot_hist(x=dz0_tot, binsize=10, pdf=False, xtype='d.z0', xlimits=(-5,350), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/histogram/d_z0_histogram_zoom.pdf')
-
-
-
-# M_halo histogram (z = 0)
-summary_plot.mhalo_hist(Mhalo_z0_tot, binsize=0.1, log=True, selection='z0', pdf=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_peri_sim/histogram/mhalo_z0_histogram.pdf')
-summary_plot.mhalo_hist(Mhalo_z0_o_tot, binsize=0.1, log=True, selection='z0', pdf=True, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/sats_w_peri_sim/histogram/mhalo_z0_histogram_pdf.pdf')
-
-
-
-# M_halo histogram (peak)
-summary_plot.mhalo_hist(Mhalo_peak_tot, binsize=0.1, log=True, selection='peak', pdf=False, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/histogram/mhalo_peak_histogram.pdf')
-summary_plot.mhalo_hist(Mhalo_peak_o_tot, binsize=0.1, log=True, selection='peak', pdf=True, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats/histogram/mhalo_peak_histogram_pdf.pdf')
