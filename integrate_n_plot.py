@@ -39,9 +39,9 @@ halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_k
 if sim_data.num_gal == 1:
 
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton')
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location='peloton')
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location='peloton')
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
@@ -69,7 +69,7 @@ if sim_data.num_gal == 1:
     potential_two_power = disk_inner+disk_outer+halo_2p
 
     # Integrate all of the orbits in both potentials
-    ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
+    ts = np.flip(snaps['time'] - snaps['time'][-1])*u.Gyr
     galpy_orbits.integrate(ts, potential_two_power, method='odeint')
     print('Done integrating in potential model')
 
@@ -78,7 +78,7 @@ if sim_data.num_gal == 1:
     print(poles)
     print(np.sum(poles))
 
-    for i in range(1, orbits.shape[0]):
+    for i in range(0, orbits.shape[0]):
         if (infall_info['check'][i]) & (peris['pericenter.check'][i]):
             # Integrate the subhalo orbit in each potential
             d_model = galpy_orbits[i]._parse_plot_quantity(quant='r')
@@ -142,16 +142,16 @@ if sim_data.num_gal == 1:
             ax3.set_xlabel('lookback time [Gyr]', fontsize=32)
             plt.tight_layout()
             plt.subplots_adjust(wspace=0, hspace=0)
-            plt.savefig(orbits.home_dir+'/orbit_data/plots/subhalo_integration/'+sim_data.galaxy+'/'+sim_data.galaxy+'_sub_'+str(i)+'.pdf')
+            plt.savefig(orbits.home_dir+'/orbit_data/plots/subhalo_integration/'+sim_data.galaxy+'/'+sim_data.galaxy+'_sub_'+str(i+1)+'.pdf')
             plt.close()
 
 if sim_data.num_gal == 2:
     #
     ### GALAXY 1
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton')
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton')
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton')
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt, host=1) # set host=1 for the first host, host=2 for the other
@@ -179,7 +179,7 @@ if sim_data.num_gal == 2:
     potential_two_power = disk_inner+disk_outer+halo_2p
 
     # Integrate all of the orbits in both potentials
-    ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
+    ts = np.flip(snaps['time'] - snaps['time'][-1])*u.Gyr
     galpy_orbits.integrate(ts, potential_two_power, method='odeint')
     print('Done integrating in potential model')
 
@@ -252,14 +252,14 @@ if sim_data.num_gal == 2:
             ax3.set_xlabel('lookback time [Gyr]', fontsize=32)
             plt.tight_layout()
             plt.subplots_adjust(wspace=0, hspace=0)
-            plt.savefig(orbits.home_dir+'/orbit_data/plots/subhalo_integration/'+sim_data.gal_1+'/'+sim_data.gal_1+'_sub_'+str(i)+'.pdf')
+            plt.savefig(orbits.home_dir+'/orbit_data/plots/subhalo_integration/'+sim_data.gal_1+'/'+sim_data.gal_1+'_sub_'+str(i+1)+'.pdf')
             plt.close()
 
     ### GALAXY 2
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton')
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton')
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton')
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt, host=2) # set host=1 for the first host, host=2 for the other
@@ -287,7 +287,7 @@ if sim_data.num_gal == 2:
     potential_two_power = disk_inner+disk_outer+halo_2p
 
     # Integrate all of the orbits in both potentials
-    ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
+    ts = np.flip(snaps['time'] - snaps['time'][-1])*u.Gyr
     galpy_orbits.integrate(ts, potential_two_power, method='odeint')
     print('Done integrating in potential model')
 
@@ -360,5 +360,5 @@ if sim_data.num_gal == 2:
             ax3.set_xlabel('lookback time [Gyr]', fontsize=32)
             plt.tight_layout()
             plt.subplots_adjust(wspace=0, hspace=0)
-            plt.savefig(orbits.home_dir+'/orbit_data/plots/subhalo_integration/'+sim_data.gal_2+'/'+sim_data.gal_2+'_sub_'+str(i)+'.pdf')
+            plt.savefig(orbits.home_dir+'/orbit_data/plots/subhalo_integration/'+sim_data.gal_2+'/'+sim_data.gal_2+'_sub_'+str(i+1)+'.pdf')
             plt.close()
