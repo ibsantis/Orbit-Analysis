@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12m', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -68,7 +68,7 @@ if sim_data.num_gal == 1:
     potential_two_power = disk_inner+disk_outer+halo_2p
 
     # Integrate all of the orbits in both potentials
-    ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
+    ts = np.flip(snaps['time'] - snaps['time'][-1])*u.Gyr
     galpy_orbits.integrate(ts, potential_two_power, method='odeint')
     print('Done integrating in potential model')
 
@@ -78,7 +78,7 @@ if sim_data.num_gal == 1:
     print(np.sum(poles))
 
     galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vR(ts), galpy_orbits.vT(ts))
-    tts = (-1)*np.linspace(0.0, -13.78, 1378)
+    tts = (-1)*np.flip(snaps['time'] - snaps['time'][-1])
     peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, tts)
     apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, tts)
 
@@ -201,7 +201,7 @@ if sim_data.num_gal == 2:
     potential_two_power = disk_inner+disk_outer+halo_2p
 
     # Integrate all of the orbits in both potentials
-    ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
+    ts = np.flip(snaps['time'] - snaps['time'][-1])*u.Gyr
     galpy_orbits.integrate(ts, potential_two_power, method='odeint')
     print('Done integrating in potential model')
 
@@ -211,7 +211,7 @@ if sim_data.num_gal == 2:
     print(np.sum(poles))
 
     galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vR(ts), galpy_orbits.vT(ts))
-    tts = (-1)*np.linspace(0.0, -13.78, 1378)
+    tts = (-1)*np.flip(snaps['time'] - snaps['time'][-1])
     peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, tts)
     apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, tts)
 
@@ -333,7 +333,7 @@ if sim_data.num_gal == 2:
     potential_two_power = disk_inner+disk_outer+halo_2p
 
     # Integrate all of the orbits in both potentials
-    ts = np.linspace(0.0, -13.78, 1378)*u.Gyr
+    ts = np.flip(snaps['time'] - snaps['time'][-1])*u.Gyr
     galpy_orbits.integrate(ts, potential_two_power, method='odeint')
     print('Done integrating in potential model')
 
@@ -343,7 +343,7 @@ if sim_data.num_gal == 2:
     print(np.sum(poles))
 
     galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vR(ts), galpy_orbits.vT(ts))
-    tts = (-1)*np.linspace(0.0, -13.78, 1378)
+    tts = (-1)*np.flip(snaps['time'] - snaps['time'][-1])
     peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, tts)
     apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, tts)
 
