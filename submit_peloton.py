@@ -19,11 +19,10 @@ Submit a job to the SLURM queue.
 '''
 
 import os
-from utilities.basic import io as ut_io    # if you want to use my print diagnostics
+from utilities.basic import io as ut_io
 
 # print run-time and CPU information
 ScriptPrint = ut_io.SubmissionScriptClass('slurm')
-#os.system('python /home/ibsantis/scripts/orbit_analysis/integrate_n_plot.py')
 os.system('python /home/ibsantis/scripts/orbit_analysis/mass_profile_parallel.py')
 # print run-time information
 ScriptPrint.print_runtime()
