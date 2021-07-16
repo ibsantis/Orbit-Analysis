@@ -13,16 +13,16 @@
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
 #SBATCH --mail-type=begin
-'''
+"""
 Submit a job to the SLURM queue.
 @author: Isaiah Santistevan <ibsantistevan@ucdavis.edu>
-'''
+"""
 
 import os
 from utilities.basic import io as ut_io
 
 # print run-time and CPU information
-ScriptPrint = ut_io.SubmissionScriptClass('slurm')
-os.system('python /home/ibsantis/scripts/orbit_analysis/mass_profile_parallel.py')
+ScriptPrint = ut_io.SubmissionScriptClass("slurm")
+os.system("python /home/ibsantis/scripts/orbit_analysis/mass_profile_parallel.py")
 # print run-time information
 ScriptPrint.print_runtime()
