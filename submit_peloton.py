@@ -20,6 +20,6 @@ from utilities.basic import io as ut_io    # if you want to use my print diagnos
 # print run-time and CPU information
 ScriptPrint = ut_io.SubmissionScriptClass('slurm')
 #os.system('python /home/ibsantis/scripts/orbit_analysis/integrate_n_plot.py')
-os.system('python /home1/05400/ibsantis/scripts/orbit_analysis/mass_profile_evolution.py')
+os.system('python /home1/05400/ibsantis/scripts/orbit_analysis/mass_profile_parallel.py')
 # print run-time information
 ScriptPrint.print_runtime()
