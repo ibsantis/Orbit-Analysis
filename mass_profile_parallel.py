@@ -70,7 +70,7 @@ args_list = [
     (snapshot, sim_data, rs) for snapshot in snaps
     ]
 
-ut.io.run_in_parallel(mass_evolution, args_list, proc=4)
+ut.io.run_in_parallel(mass_evolution, args_list, proc_number=4)
 # Try 4 at first, then try 8
 # How many snaps can I read in simultaneously? Divide total mem by snapshots to get proc number
 #
