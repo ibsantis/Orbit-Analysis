@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -152,13 +152,15 @@ if sim_data.num_gal == 1:
     # distance, velocity, Lz vs time
     data_dict['dtot.sim'] = halt_dists
     data_dict['vtot.sim'] = halt_vels
-    #data_dict['Ltot.sim'] = angs['ang.mom.total']
+    data_dict['L.sim'] = angs['ang.mom.vector']
+    data_dict['Ltot.sim'] = angs['ang.mom.total']
     data_dict['Lz.sim'] = angs['ang.mom.vector'][:,:,2]
     ###### NEED TANGENTIAL VELOCITIES
     data_dict['time.sim'] = snaps['time']
     #
     data_dict['dtot.galpy'] = galpy_orbits.r(ts)
     data_dict['vtot.galpy'] = galpy_vels
+    data_dict['L.galpy'] = galpy_orbits.L(ts)
     data_dict['Lz.galpy'] = galpy_orbits.Lz(ts)
     data_dict['time.galpy'] = ts
     #
@@ -285,13 +287,15 @@ if sim_data.num_gal == 2:
     # distance, velocity, Lz vs time
     data_dict['dtot.sim'] = halt_dists
     data_dict['vtot.sim'] = halt_vels
-    #data_dict['Ltot.sim'] = angs['ang.mom.total']
+    data_dict['L.sim'] = angs['ang.mom.vector']
+    data_dict['Ltot.sim'] = angs['ang.mom.total']
     data_dict['Lz.sim'] = angs['ang.mom.vector'][:,:,2]
     ###### NEED TANGENTIAL VELOCITIES
     data_dict['time.sim'] = snaps['time']
     #
     data_dict['dtot.galpy'] = galpy_orbits.r(ts)
     data_dict['vtot.galpy'] = galpy_vels
+    data_dict['L.galpy'] = galpy_orbits.L(ts)
     data_dict['Lz.galpy'] = galpy_orbits.Lz(ts)
     data_dict['time.galpy'] = ts
     #
@@ -417,13 +421,15 @@ if sim_data.num_gal == 2:
     # distance, velocity, Lz vs time
     data_dict['dtot.sim'] = halt_dists
     data_dict['vtot.sim'] = halt_vels
-    #data_dict['Ltot.sim'] = angs['ang.mom.total']
+    data_dict['L.sim'] = angs['ang.mom.vector']
+    data_dict['Ltot.sim'] = angs['ang.mom.total']
     data_dict['Lz.sim'] = angs['ang.mom.vector'][:,:,2]
     ###### NEED TANGENTIAL VELOCITIES
     data_dict['time.sim'] = snaps['time']
     #
     data_dict['dtot.galpy'] = galpy_orbits.r(ts)
     data_dict['vtot.galpy'] = galpy_vels
+    data_dict['L.galpy'] = galpy_orbits.L(ts)
     data_dict['Lz.galpy'] = galpy_orbits.Lz(ts)
     data_dict['time.galpy'] = ts
     #
