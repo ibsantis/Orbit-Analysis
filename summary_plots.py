@@ -33,8 +33,8 @@ summary_plot = summary_io.SummaryDataPlot()
 
 
 # Select which mask you want to use and the corresponding directory
-mask_selection = masks_infall
-directory = sim_data.home_dir+'/orbit_data/plots/summary/all_infall_sats'
+mask_selection = masks_either
+directory = sim_data.home_dir+'/orbit_data/plots/summary/sats_w_either_peri'
 
 
 ### Generate all of the data for the plots below
@@ -43,11 +43,13 @@ delta_N = summary.delta_nperi(data_total, mask_selection, oversample=False)
 N_sim_tot = summary.nperi(data_total, mask_selection, oversample=False, selection='sim')
 N_model_tot = summary.nperi(data_total, mask_selection, oversample=False, selection='model')
 d_sim_tot = summary.dperi_recent(data_total, mask_selection, selection='sim', oversample=False)
+d_sim_min_tot = summary.dperi_min(data_total, mask_selection, oversample=False)
 d_model_tot = summary.dperi_recent(data_total, mask_selection, selection='model', oversample=False)
 delta_df_tot = summary.delta_dperi(data_total, mask_selection, fraction=True, oversample=False)
 delta_d_tot = summary.delta_dperi(data_total, mask_selection, fraction=False, oversample=False)
 dz0_tot = summary.d_z0(data_total, mask_selection, oversample=False)
 t_sim_tot = summary.tperi_recent(data_total, mask_selection, selection='sim', oversample=False)
+t_sim_min_tot = summary.tperi_min(data_total, mask_selection, oversample=False)
 t_model_tot = summary.tperi_recent(data_total, mask_selection, selection='model', oversample=False)
 delta_tf_tot = summary.delta_tperi(data_total, mask_selection, fraction=True, oversample=False)
 delta_t_tot = summary.delta_tperi(data_total, mask_selection, fraction=False, oversample=False)
@@ -63,11 +65,13 @@ delta_N_out = summary.delta_nperi(data_total, masks_outliers, oversample=False)
 N_sim_tot_out = summary.nperi(data_total, masks_outliers, oversample=False, selection='sim')
 N_model_tot_out = summary.nperi(data_total, masks_outliers, oversample=False, selection='model')
 d_sim_tot_out = summary.dperi_recent(data_total, masks_outliers, selection='sim', oversample=False)
+d_sim_min_tot_out = summary.dperi_min(data_total, masks_outliers, oversample=False)
 d_model_tot_out = summary.dperi_recent(data_total, masks_outliers, selection='model', oversample=False)
 delta_df_tot_out = summary.delta_dperi(data_total, masks_outliers, fraction=True, oversample=False)
 delta_d_tot_out = summary.delta_dperi(data_total, masks_outliers, fraction=False, oversample=False)
 dz0_tot_out = summary.d_z0(data_total, masks_outliers, oversample=False)
 t_sim_tot_out = summary.tperi_recent(data_total, masks_outliers, selection='sim', oversample=False)
+t_sim_min_tot_out = summary.tperi_min(data_total, masks_outliers, oversample=False)
 t_model_tot_out = summary.tperi_recent(data_total, masks_outliers, selection='model', oversample=False)
 delta_tf_tot_out = summary.delta_tperi(data_total, masks_outliers, fraction=True, oversample=False)
 delta_t_tot_out = summary.delta_tperi(data_total, masks_outliers, fraction=False, oversample=False)
@@ -83,11 +87,13 @@ delta_No = summary.delta_nperi(data_total, mask_selection, oversample=True)
 N_sim_o_tot = summary.nperi(data_total, mask_selection, oversample=True, selection='sim')
 N_model_o_tot = summary.nperi(data_total, mask_selection, oversample=True, selection='model')
 d_sim_o_tot = summary.dperi_recent(data_total, mask_selection, selection='sim', oversample=True)
+d_sim_min_o_tot = summary.dperi_min(data_total, mask_selection, oversample=True)
 d_model_o_tot = summary.dperi_recent(data_total, mask_selection, selection='model', oversample=True)
 delta_dfo_tot = summary.delta_dperi(data_total, mask_selection, fraction=True, oversample=True)
 delta_do_tot = summary.delta_dperi(data_total, mask_selection, fraction=False, oversample=True)
 dz0_o_tot = summary.d_z0(data_total, mask_selection, oversample=True)
 t_sim_o_tot = summary.tperi_recent(data_total, mask_selection, selection='sim', oversample=True)
+t_sim_min_o_tot = summary.tperi_min(data_total, mask_selection, oversample=True)
 t_model_o_tot = summary.tperi_recent(data_total, mask_selection, selection='model', oversample=True)
 delta_tfo_tot = summary.delta_tperi(data_total, mask_selection, fraction=True, oversample=True)
 delta_to_tot = summary.delta_tperi(data_total, mask_selection, fraction=False, oversample=True)
@@ -579,8 +585,8 @@ summary_plot.plot_hist(x=t_model_tot, binsize=0.5, pdf=False, xtype='t.model', x
 # delta t_peri fractions
 # Histogram
 # oversample, cases with pericenters in sim, but not required in model
-summary_plot.plot_hist(delta_tfo_tot, binsize=0.1, xtype='delta.t.frac', file_path_and_name=directory+'/histogram/peri_tlb_diff_frac_histogram.pdf')
-summary_plot.plot_hist(delta_tfo_tot, binsize=0.1, xlimits=(-1,2), xtype='delta.t.frac', file_path_and_name=directory+'/histogram/peri_tlb_diff_frac_histogram_zoom.pdf')
+summary_plot.plot_hist(delta_tfo_tot, binsize=0.1, pdf=True, xtype='delta.t.frac', file_path_and_name=directory+'/histogram/peri_tlb_diff_frac_histogram.pdf')
+summary_plot.plot_hist(delta_tfo_tot, binsize=0.1, pdf=True, xlimits=(-1,2), xtype='delta.t.frac', file_path_and_name=directory+'/histogram/peri_tlb_diff_frac_histogram_zoom.pdf')
 
 
 
@@ -698,8 +704,8 @@ summary_plot.median_plot(x=Mhalo_peak_o_tot, y=delta_tfo_tot, binsize=0.5, xtype
 
 
 # delta t_peri histogram
-summary_plot.plot_hist(delta_to_tot, binsize=0.5, xtype='delta.t', file_path_and_name=directory+'/histogram/peri_tlb_diff_histogram.pdf')
-summary_plot.plot_hist(delta_to_tot, binsize=0.5, xlimits=(-3,4), xtype='delta.t', file_path_and_name=directory+'/histogram/peri_tlb_diff_histogram_zoom.pdf')
+summary_plot.plot_hist(delta_to_tot, pdf=True, binsize=0.5, xtype='delta.t', file_path_and_name=directory+'/histogram/peri_tlb_diff_histogram.pdf')
+summary_plot.plot_hist(delta_to_tot, pdf=True, binsize=0.5, xlimits=(-3,4), xtype='delta.t', file_path_and_name=directory+'/histogram/peri_tlb_diff_histogram_zoom.pdf')
 
 
 
