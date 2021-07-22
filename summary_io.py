@@ -173,7 +173,7 @@ class SummaryDataSort:
         #
         return props
 
-    def delta_nperi(self, data_dict, mask_dict, oversample=True):
+    def delta_nperi(self, data_dict, mask_dict, oversample=False):
         """
         DESCRIPTION:
             TBD
@@ -267,15 +267,21 @@ class SummaryDataSort:
             for name in self.host_names:
                 for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
                     mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
+                    if np.sum(mask_temp) == 0:
+                        data.append(data_dict[name]['dtot.sim'][mask_dict[name]][i][0])
+                    else:
+                        data.append(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]))
                     if np.sum(mask_temp) == 1:
                         count += 1
-                    data.append(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]))
             print(count)
         elif oversample == True:
             for name in self.host_names:
                 for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
                     mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
-                    data.append(np.repeat(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp])), self.oversample[name])
+                    if np.sum(mask_temp) == 0:
+                        data.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][i][0], self.oversample[name]))
+                    else:
+                        data.append(np.repeat(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]), self.oversample[name]))
         return np.hstack(data)
 
     def delta_dperi(self, data_dict, mask_dict, fraction=False, oversample=False):
@@ -374,6 +380,32 @@ class SummaryDataSort:
                     temp_array[mask_temp] = 0.0
                     data.append(np.repeat(temp_array, self.oversample[name]))
         #
+        return np.hstack(data)
+
+    def tperi_min(self, data_dict, mask_dict, oversample=False):
+        data = []
+        if oversample == False:
+            count = 0
+            for name in self.host_names:
+                for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
+                    mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
+                    if np.sum(mask_temp) == 0:
+                        data.append(0.0)
+                    else:
+                        index = np.where(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]) \
+                                         == data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp])[0][0]
+                        data.append(data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][i][mask_temp][index])
+        #
+        elif oversample == True:
+            for name in self.host_names:
+                for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
+                    mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
+                    if np.sum(mask_temp) == 0:
+                        data.append(np.repeat(0.0, self.oversample[name]))
+                    else:
+                        index = np.where(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]) \
+                                         == data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp])[0][0]
+                        data.append(np.repeat(data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][i][mask_temp][index], self.oversample[name]))
         return np.hstack(data)
 
     def delta_tperi(self, data_dict, mask_dict, fraction=False, oversample=False):
@@ -524,6 +556,36 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    def kinetic_energy(self, data_dict, mask_dict, ke_type, oversample=False):
+        data = []
+        #
+        if ke_type == 'max':
+            if oversample == False:
+                for name in self.host_names:
+                    for i in range(0, len(data_dict[name]['vtot.sim'][mask_dict[name]])):
+                        data.append(np.nanmax(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i]**2))
+            else:
+                for name in self.host_names:
+                    for i in range(0, len(data_dict[name]['vtot.sim'][mask_dict[name]])):
+                        data.append(np.repeat(np.nanmax(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i]**2), self.oversample[name]))
+        #
+        elif ke_type == 'peri':
+            if oversample == False:
+                for name in self.host_names:
+                    for i in range(0, len(data_dict[name]['pericenter.vel.sim'][mask_dict[name]])):
+                        if (data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0] == -1):
+                            data.append(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i][0]**2)
+                        else:
+                            data.append(0.5*data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0]**2)
+            else:
+                for name in self.host_names:
+                    for i in range(0, len(data_dict[name]['pericenter.vel.sim'][mask_dict[name]])):
+                        if (data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0] == -1):
+                            data.append(np.repeat(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i][0]**2, self.oversample[name]))
+                        else:
+                            data.append(np.repeat(0.5*data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0]**2, self.oversample[name]))
+        #
+        return np.hstack(data)
 
 class SummaryDataPlot(SummaryDataSort):
 
@@ -550,11 +612,13 @@ class SummaryDataPlot(SummaryDataSort):
                        '#ff00ff', '#1e90ff', '#f0e68c', '#ffc0cb']
         #
         self.labels = {'d.sim': 'd$_{\\rm peri,sim}$ [kpc]',\
+                       'd.sim.min': 'd$_{\\rm peri,min,sim}$ [kpc]',\
                        'd.model': 'd$_{\\rm peri,model}$ [kpc]',\
                        'd.z0': 'd(z = 0) [kpc]',\
                        'delta.d.frac': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$',\
                        'delta.d': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$) [kpc]',\
                        't.sim': 't$_{\\rm peri,lb,sim}$ [Gyr]',\
+                       't.sim.min': 't$_{\\rm peri_min,lb,sim}$ [Gyr]',\
                        't.model': 't$_{\\rm peri,lb,model}$ [Gyr]',\
                        't.infall': 't$_{\\rm infall,lb}$ [Gyr]',\
                        'delta.t.frac': '(t$_{\\rm peri,model}$ - t$_{\\rm peri,sim}$)/t$_{\\rm peri,sim}$',\
@@ -565,7 +629,9 @@ class SummaryDataPlot(SummaryDataSort):
                        'M.star.z0': 'log$_{\\rm 10}$[M$_{\\rm star}(z = 0)$/M$_{\\odot}$]',\
                        'M.star.peak': 'log$_{\\rm 10}$[M$_{\\rm star, peak}$/M$_{\\odot}$]',\
                        'M.halo.z0': 'log$_{\\rm 10}$[M$_{\\rm halo}(z = 0)$/M$_{\\odot}$]',\
-                       'M.halo.peak': 'log$_{\\rm 10}$[M$_{\\rm halo, peak}$/M$_{\\odot}$]'}
+                       'M.halo.peak': 'log$_{\\rm 10}$[M$_{\\rm halo, peak}$/M$_{\\odot}$]',\
+                       'KE.max.sim': 'KE$_{\\rm max,sim}$ [10$^4$ km$^2$/s$^2$]',\
+                       'KE.peri.sim': 'KE$_{\\rm peri,sim}$ [10$^4$ km$^2$/s$^2$]'}
         #
         self.titles = {'d.sim': 'Recent Minimum Distances',\
                        'd.model': 'Recent Minimum Distances',\
@@ -608,7 +674,7 @@ class SummaryDataPlot(SummaryDataSort):
         f, ax = plt.subplots(figsize=(10, 8))
         ax.scatter(x, y, color='k', s=50, marker='x', alpha=0.5)
         ax.scatter(x_out, y_out, color='r', s=50, marker='x', alpha=0.5)
-        if (xtype == 'd.sim' or xtype == 't.sim') & (ytype == 'd.model' or ytype == 't.model'):
+        if ('.sim' in xtype) & ('.sim' in ytype or '.model' in ytype):
             ax.set_xlim(left=limits[0], right=limits[1])
             ax.set_ylim(bottom=limits[0], top=limits[1])
             ax.plot([0, 1], [0, 1], linestyle=':', color='k', transform=ax.transAxes)
