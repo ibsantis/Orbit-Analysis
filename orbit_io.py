@@ -45,10 +45,10 @@ from astropy import units as u
 import pandas as pd
 import sys
 
-# Adding a class to read in the halo tree and set some variables
+
 class OrbitRead:
 
-    def __init__(self, gal1, location):
+    def __init__(self, gal1, location, dmo=False):
         """
         Set the home directory, simulation directory, and number of galaxies
 
@@ -112,11 +112,14 @@ class OrbitRead:
             self.simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+self.galaxy+resolution
             self.gal_1 = gal1
             self.gal_2 = gal2
+        #
+        if dmo:
+            self.simulation_dir = self.simulation_dir+'_dm'
 
 
 class OrbitAnalysis:
 
-    def __init__(self, tree, gal1, location, host):
+    def __init__(self, tree, gal1, location, host, dmo=False):
         """
         DESCRIPTION:
             Returns the indices of luminous subhalos along with their progenitor
@@ -140,21 +143,48 @@ class OrbitAnalysis:
               snapshots 0,1,2,3.
         """
         # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
-        OrbitRead.__init__(self, gal1, location)
+        OrbitRead.__init__(self, gal1, location, dmo=dmo)
         #
-        if self.num_gal == 1:
-            # Select the subhalo indices at z = 0
-            z0_inds = ut.array.get_indices(tree['snapshot'], 600)
-            z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
-            # Select luminous subhalos at z = 0 and find their progenitor indices
-            z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [3e4, np.inf], z0_inds)
-            z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
-            # Set attributes for subhalo indices and the shape of the array
-            self.sub_inds = z0_inds_w_star_prog
-            self.shape = self.sub_inds.shape
+        if dmo:
+            if self.num_gal == 1:
+                # Select the subhalo indices at z = 0
+                z0_inds = ut.array.get_indices(tree['snapshot'], 600)
+                z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
+                # Select subhalos based on their halo mass
+                self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega.matter']
+                z0_inds = ut.array.get_indices(tree['star.mass']*(1-self.baryon_frac), [1e7, np.inf], z0_inds)
+                z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
+                # Set attributes for subhalo indices and the shape of the array
+                self.sub_inds = z0_inds_w_prog
+                self.shape = self.sub_inds.shape
+            #
+            elif self.num_gal == 2:
+                if host == 1:
+                    # Select the subhalo indices at z = 0
+                    z0_inds = ut.array.get_indices(tree['snapshot'], 600)
+                    z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
+                    # Select subhalos based on their halo mass
+                    self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega.matter']
+                    z0_inds = ut.array.get_indices(tree['star.mass']*(1-self.baryon_frac), [1e7, np.inf], z0_inds)
+                    z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
+                    # Set attributes for subhalo indices and the shape of the array
+                    self.sub_inds = z0_inds_w_star_prog
+                    self.shape = self.sub_inds.shape
+                #
+                elif host == 2:
+                    # Select the subhalo indices at z = 0
+                    z0_inds = ut.array.get_indices(tree['snapshot'], 600)
+                    z0_inds = z0_inds[z0_inds != tree['host2.index'][0]]
+                    # Select subhalos based on their halo mass
+                    self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega.matter']
+                    z0_inds = ut.array.get_indices(tree['star.mass']*(1-self.baryon_frac), [1e7, np.inf], z0_inds)
+                    z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
+                    # Set attributes for subhalo indices and the shape of the array
+                    self.sub_inds = z0_inds_w_star_prog
+                    self.shape = self.sub_inds.shape
         #
-        elif self.num_gal == 2:
-            if host == 1:
+        else:
+            if self.num_gal == 1:
                 # Select the subhalo indices at z = 0
                 z0_inds = ut.array.get_indices(tree['snapshot'], 600)
                 z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
@@ -165,16 +195,28 @@ class OrbitAnalysis:
                 self.sub_inds = z0_inds_w_star_prog
                 self.shape = self.sub_inds.shape
             #
-            elif host == 2:
-                # Select the subhalo indices at z = 0
-                z0_inds = ut.array.get_indices(tree['snapshot'], 600)
-                z0_inds = z0_inds[z0_inds != tree['host2.index'][0]]
-                # Select luminous subhalos at z = 0 and find their progenitor indices
-                z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [3e4, np.inf], z0_inds)
-                z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
-                # Set attributes for subhalo indices and the shape of the array
-                self.sub_inds = z0_inds_w_star_prog
-                self.shape = self.sub_inds.shape
+            elif self.num_gal == 2:
+                if host == 1:
+                    # Select the subhalo indices at z = 0
+                    z0_inds = ut.array.get_indices(tree['snapshot'], 600)
+                    z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
+                    # Select luminous subhalos at z = 0 and find their progenitor indices
+                    z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [3e4, np.inf], z0_inds)
+                    z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
+                    # Set attributes for subhalo indices and the shape of the array
+                    self.sub_inds = z0_inds_w_star_prog
+                    self.shape = self.sub_inds.shape
+                #
+                elif host == 2:
+                    # Select the subhalo indices at z = 0
+                    z0_inds = ut.array.get_indices(tree['snapshot'], 600)
+                    z0_inds = z0_inds[z0_inds != tree['host2.index'][0]]
+                    # Select luminous subhalos at z = 0 and find their progenitor indices
+                    z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [3e4, np.inf], z0_inds)
+                    z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
+                    # Set attributes for subhalo indices and the shape of the array
+                    self.sub_inds = z0_inds_w_star_prog
+                    self.shape = self.sub_inds.shape
 
     def halo_distances(self, tree, host=1):
         """
@@ -910,12 +952,12 @@ class OrbitAnalysis:
 
 class OrbitGalpy(OrbitAnalysis):
 
-    def __init__(self, tree, gal1, location, host):
+    def __init__(self, tree, gal1, location, host, dmo=False):
         """
         Need to do this to inherit the subhalo indices defined from __init__
         in OrbitAnalysis
         """
-        OrbitAnalysis.__init__(self, tree, gal1, location, host)
+        OrbitAnalysis.__init__(self, tree, gal1, location, host, dmo=dmo)
 
     def galpy_orbit_init(self, tree, host=1):
         sub_orbits = []
@@ -1276,12 +1318,12 @@ class OrbitGalpy(OrbitAnalysis):
 
 class OrbitPlot(OrbitAnalysis):
 
-    def __init__(self, tree, gal1, location, host):
+    def __init__(self, tree, gal1, location, host, dmo=False):
         """
         Need to do this to inherit the subhalo indices defined from __init__
         in OrbitAnalysis
         """
-        OrbitAnalysis.__init__(self, tree, gal1, location, host)
+        OrbitAnalysis.__init__(self, tree, gal1, location, host, dmo=dmo)
 
     def orbit_energy_plot(
         self,
