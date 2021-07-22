@@ -152,7 +152,7 @@ class OrbitAnalysis:
                 z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
                 # Select subhalos based on their halo mass
                 self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega_matter']
-                z0_inds = ut.array.get_indices(tree['mass']*(1-self.baryon_frac), [1e7, np.inf], z0_inds)
+                z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds)*(1-self.baryon_frac), [1e7,np.inf])]
                 z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
                 # Set attributes for subhalo indices and the shape of the array
                 self.sub_inds = z0_inds_w_prog
@@ -164,8 +164,8 @@ class OrbitAnalysis:
                     z0_inds = ut.array.get_indices(tree['snapshot'], 600)
                     z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
                     # Select subhalos based on their halo mass
-                    self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega.matter']
-                    z0_inds = ut.array.get_indices(tree['mass']*(1-self.baryon_frac), [1e7, np.inf], z0_inds)
+                    self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega_matter']
+                    z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds)*(1-self.baryon_frac), [1e7,np.inf])]
                     z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
                     # Set attributes for subhalo indices and the shape of the array
                     self.sub_inds = z0_inds_w_star_prog
@@ -176,8 +176,8 @@ class OrbitAnalysis:
                     z0_inds = ut.array.get_indices(tree['snapshot'], 600)
                     z0_inds = z0_inds[z0_inds != tree['host2.index'][0]]
                     # Select subhalos based on their halo mass
-                    self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega.matter']
-                    z0_inds = ut.array.get_indices(tree['mass']*(1-self.baryon_frac), [1e7, np.inf], z0_inds)
+                    self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega_matter']
+                    z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds)*(1-self.baryon_frac), [1e7,np.inf])]
                     z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
                     # Set attributes for subhalo indices and the shape of the array
                     self.sub_inds = z0_inds_w_star_prog
