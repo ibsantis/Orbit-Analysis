@@ -168,7 +168,7 @@ class OrbitAnalysis:
                     z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds)*(1-self.baryon_frac), [1e7,np.inf])]
                     z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
                     # Set attributes for subhalo indices and the shape of the array
-                    self.sub_inds = z0_inds_w_star_prog
+                    self.sub_inds = z0_inds_w_prog
                     self.shape = self.sub_inds.shape
                 #
                 elif host == 2:
@@ -180,7 +180,7 @@ class OrbitAnalysis:
                     z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds)*(1-self.baryon_frac), [1e7,np.inf])]
                     z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
                     # Set attributes for subhalo indices and the shape of the array
-                    self.sub_inds = z0_inds_w_star_prog
+                    self.sub_inds = z0_inds_w_prog
                     self.shape = self.sub_inds.shape
         #
         else:
