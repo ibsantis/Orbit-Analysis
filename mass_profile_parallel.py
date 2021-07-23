@@ -44,7 +44,7 @@ snaps = np.array([600,587,582,578,573,569,564,560,556,551,547,543,538,534,530,52
 times = np.array([13.8,13.7,13.6,13.5,13.4,13.3,13.2,13.1,13.0,12.9,12.8,12.7,12.6,12.5,12.4,12.3,12.2,12.1,12.0,11.9,11.8, 11.36, 10.37,9.51,8.73,8.06,7.43,6.90,6.43,6.00,5.60,5.24,4.94,4.66,4.38,4.14,3.92,3.73,3.54,3.37,3.21,3.07,2.93,2.82 ,2.69,2.58,2.49,2.29,2.38])
 rs = np.logspace(np.log10(0.1), np.log10(500), 100)
 
-# function from first loop down
+# function from first loop down # TRY RUNNING A COUPLE SNAPSHOTS IN A LOOP FIRST TO MAKE SURE IT WORKS
 def mass_evolution(snap, sim_data, rs):
     # Check if one or two hosts
     if sim_data.num_gal == 1:
@@ -63,14 +63,14 @@ def mass_evolution(snap, sim_data, rs):
             mass_array[j] = np.sum(part['star']['mass'][star_inds]) + np.sum(part['gas']['mass'][gas_inds]) + np.sum(part['dark']['mass'][dark_inds])
             print('Done with step', j)
         #
-        # Save this data to a file
+        # Save this data to a file ADD VERBOSE
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.galaxy+'_mass_profile_evolution_'+str(snap), dict_or_array_to_write=mass_array, verbose=True)
 
 args_list = [
     (snapshot, sim_data, rs) for snapshot in snaps
     ]
 
-ut.io.run_in_parallel(mass_evolution, args_list, proc_number=4)
+ut.io.run_in_parallel(mass_evolution, args_list, proc_number=4) # ADD VERBOSE
 # Try 4 at first, then try 8
 # How many snaps can I read in simultaneously? Divide total mem by snapshots to get proc number
 #
