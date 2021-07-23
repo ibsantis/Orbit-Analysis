@@ -43,13 +43,11 @@ delta_N = summary.delta_nperi(data_total, mask_selection, oversample=False)
 N_sim_tot = summary.nperi(data_total, mask_selection, oversample=False, selection='sim')
 N_model_tot = summary.nperi(data_total, mask_selection, oversample=False, selection='model')
 d_sim_tot = summary.dperi_recent(data_total, mask_selection, selection='sim', oversample=False)
-d_sim_min_tot = summary.dperi_min(data_total, mask_selection, oversample=False)
 d_model_tot = summary.dperi_recent(data_total, mask_selection, selection='model', oversample=False)
 delta_df_tot = summary.delta_dperi(data_total, mask_selection, fraction=True, oversample=False)
 delta_d_tot = summary.delta_dperi(data_total, mask_selection, fraction=False, oversample=False)
 dz0_tot = summary.d_z0(data_total, mask_selection, oversample=False)
 t_sim_tot = summary.tperi_recent(data_total, mask_selection, selection='sim', oversample=False)
-t_sim_min_tot = summary.tperi_min(data_total, mask_selection, oversample=False)
 t_model_tot = summary.tperi_recent(data_total, mask_selection, selection='model', oversample=False)
 delta_tf_tot = summary.delta_tperi(data_total, mask_selection, fraction=True, oversample=False)
 delta_t_tot = summary.delta_tperi(data_total, mask_selection, fraction=False, oversample=False)
@@ -58,6 +56,8 @@ Mstar_z0_tot = summary.mstar(data_total, mask_selection, selection='z0', oversam
 Mstar_peak_tot = summary.mstar(data_total, mask_selection, selection='peak', oversample=False)
 Mhalo_z0_tot = summary.mhalo(data_total, mask_selection, selection='z0', oversample=False)
 Mhalo_peak_tot = summary.mhalo(data_total, mask_selection, selection='peak', oversample=False)
+ke_max_tot = summary.kinetic_energy(data_total, mask_selection, ke_type='max', oversample=False)
+ke_peri_tot = summary.kinetic_energy(data_total, mask_selection, ke_type='peri', oversample=False)
 
 
 # Outliers
@@ -65,13 +65,11 @@ delta_N_out = summary.delta_nperi(data_total, masks_outliers, oversample=False)
 N_sim_tot_out = summary.nperi(data_total, masks_outliers, oversample=False, selection='sim')
 N_model_tot_out = summary.nperi(data_total, masks_outliers, oversample=False, selection='model')
 d_sim_tot_out = summary.dperi_recent(data_total, masks_outliers, selection='sim', oversample=False)
-d_sim_min_tot_out = summary.dperi_min(data_total, masks_outliers, oversample=False)
 d_model_tot_out = summary.dperi_recent(data_total, masks_outliers, selection='model', oversample=False)
 delta_df_tot_out = summary.delta_dperi(data_total, masks_outliers, fraction=True, oversample=False)
 delta_d_tot_out = summary.delta_dperi(data_total, masks_outliers, fraction=False, oversample=False)
 dz0_tot_out = summary.d_z0(data_total, masks_outliers, oversample=False)
 t_sim_tot_out = summary.tperi_recent(data_total, masks_outliers, selection='sim', oversample=False)
-t_sim_min_tot_out = summary.tperi_min(data_total, masks_outliers, oversample=False)
 t_model_tot_out = summary.tperi_recent(data_total, masks_outliers, selection='model', oversample=False)
 delta_tf_tot_out = summary.delta_tperi(data_total, masks_outliers, fraction=True, oversample=False)
 delta_t_tot_out = summary.delta_tperi(data_total, masks_outliers, fraction=False, oversample=False)
@@ -80,6 +78,8 @@ Mstar_z0_tot_out = summary.mstar(data_total, masks_outliers, selection='z0', ove
 Mstar_peak_tot_out = summary.mstar(data_total, masks_outliers, selection='peak', oversample=False)
 Mhalo_z0_tot_out = summary.mhalo(data_total, masks_outliers, selection='z0', oversample=False)
 Mhalo_peak_tot_out = summary.mhalo(data_total, masks_outliers, selection='peak', oversample=False)
+ke_max_tot_out = summary.kinetic_energy(data_total, masks_outliers, ke_type='max', oversample=False)
+ke_peri_tot_out = summary.kinetic_energy(data_total, masks_outliers, ke_type='peri', oversample=False)
 
 
 # Oversample
@@ -87,13 +87,11 @@ delta_No = summary.delta_nperi(data_total, mask_selection, oversample=True)
 N_sim_o_tot = summary.nperi(data_total, mask_selection, oversample=True, selection='sim')
 N_model_o_tot = summary.nperi(data_total, mask_selection, oversample=True, selection='model')
 d_sim_o_tot = summary.dperi_recent(data_total, mask_selection, selection='sim', oversample=True)
-d_sim_min_o_tot = summary.dperi_min(data_total, mask_selection, oversample=True)
 d_model_o_tot = summary.dperi_recent(data_total, mask_selection, selection='model', oversample=True)
 delta_dfo_tot = summary.delta_dperi(data_total, mask_selection, fraction=True, oversample=True)
 delta_do_tot = summary.delta_dperi(data_total, mask_selection, fraction=False, oversample=True)
 dz0_o_tot = summary.d_z0(data_total, mask_selection, oversample=True)
 t_sim_o_tot = summary.tperi_recent(data_total, mask_selection, selection='sim', oversample=True)
-t_sim_min_o_tot = summary.tperi_min(data_total, mask_selection, oversample=True)
 t_model_o_tot = summary.tperi_recent(data_total, mask_selection, selection='model', oversample=True)
 delta_tfo_tot = summary.delta_tperi(data_total, mask_selection, fraction=True, oversample=True)
 delta_to_tot = summary.delta_tperi(data_total, mask_selection, fraction=False, oversample=True)
@@ -102,6 +100,9 @@ Mstar_z0_o_tot = summary.mstar(data_total, mask_selection, selection='z0', overs
 Mstar_peak_o_tot = summary.mstar(data_total, mask_selection, selection='peak', oversample=True)
 Mhalo_z0_o_tot = summary.mhalo(data_total, mask_selection, selection='z0', oversample=True)
 Mhalo_peak_o_tot = summary.mhalo(data_total, mask_selection, selection='peak', oversample=True)
+ke_max_o_tot = summary.kinetic_energy(data_total, mask_selection, ke_type='max', oversample=True)
+ke_peri_o_tot = summary.kinetic_energy(data_total, mask_selection, ke_type='peri', oversample=True)
+
 
 
 
@@ -988,3 +989,8 @@ plt.tick_params(axis='both', which='major', labelsize=24)
 plt.tight_layout()
 plt.savefig(directory+'/median/infall_vs_d_z0_mass_bins.pdf')
 plt.close()
+
+
+# Compare the KE at pericenter and the maximum KE
+summary_plot.scatter_plot(x=ke_max_tot/1e4, y=ke_peri_tot/1e4, x_out=ke_max_tot_out/1e4, y_out=ke_peri_tot_out/1e4, xtype='KE.max.sim', ytype='KE.peri.sim', limits=(0,17), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/ke_test.pdf')
+summary_plot.median_plot(x=ke_max_o_tot/1e4, y=ke_peri_o_tot/1e4, xtype='KE.max.sim', ytype='KE.peri.sim', binsize=1, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/ke_test_med.pdf')
