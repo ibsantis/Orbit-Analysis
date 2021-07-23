@@ -37,7 +37,7 @@ class SummaryDataSort:
                            'm12r': 20, 'm12w': 14, 'm12z': 21, 'Romeo': 16, 'Juliet': 14,\
                            'Thelma': 17, 'Louise': 16, 'Romulus': 10, 'Remus': 17}
         #
-        # Oversampling factors
+        # Oversampling factors (STILL TBD)
         self.oversample_dmo = {'m12b': 16, 'm12c': 14, 'm12f': 13, 'm12i': 22, 'm12m': 12,\
                                'm12r': 20, 'm12w': 14, 'm12z': 21, 'Romeo': 16, 'Juliet': 14,\
                                'Thelma': 17, 'Louise': 16, 'Romulus': 10, 'Remus': 17}
@@ -901,6 +901,85 @@ class SummaryDataPlot(SummaryDataSort):
         plt.xlim(xlimits)
         plt.xlabel(self.labels[xtype], fontsize=28)
         plt.ylabel(y_label, fontsize=28)
+        if title:
+            plt.title(self.titles[title], fontsize=24)
+        plt.tick_params(axis='both', which='major', labelsize=24)
+        plt.tight_layout()
+        plt.savefig(file_path_and_name)
+        plt.close()
+
+    def plot_hist_mult(self, x, xtype, labels, binsize, file_path_and_name, pdf=False, xlimits=None, title=None):
+        """
+        DESCRIPTION:
+            Plots a histogram of a given property.
+
+        VARIABLES:
+            - x                  : list
+            - xtype              : list
+            - binsize            : float or int
+            - xlimits            : tuple
+            - pdf                : boolean
+            - title              : string
+            - labels             : list
+            - file_path_and_name : string
+
+        NOTES:
+            - If plotting mass quantities, this takes the log first.
+            - Bins things slightly differently if the x-axis quantity is an
+              integer quantity.
+            - Plots either a PDF or regular histogram depending on what 'pdf'
+              is set to.
+        """
+        colorss = ['#006400', '#000080']
+        if pdf:
+            y_label = 'PDF'
+        else:
+            y_label = 'N'
+        #
+        # Plot the data
+        plt.figure(figsize=(10, 8))
+        #
+        for i in range(0, len(x)):
+            if 'M.' in xtype[i]:
+                x[i] = np.log10(x[i])
+            if 'N.' not in xtype[i]:
+                minn = binsize*np.floor(np.min(x[i])/binsize)
+                maxx = binsize*np.ceil(np.max(x[i])/binsize)
+                if minn < 0:
+                    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+                else:
+                    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+                bin_array = np.linspace(minn, maxx, bin_num)
+                #
+                # Calculate the scatter
+                onesigp = 84.13
+                onesigm = 15.87
+                sigma_one_op = np.nanpercentile(x[i], onesigp)
+                sigma_one_om = np.nanpercentile(x[i], onesigm)
+                #
+                y_med = np.max(np.histogram(x[i], bin_array, normed=pdf)[0])*1.1
+                #
+                plt.hist(x[i], bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=colorss[i], alpha=0.4, label=labels[i])
+                plt.errorbar(np.median(x[i]), y_med, xerr=np.array([[np.median(x[i])-sigma_one_om],[sigma_one_op-np.median(x[i])]]), c=colorss[i], lw=5, capsize=8, alpha=0.8)
+                plt.scatter(np.median(x[i]), y_med, s=250, marker='s', c=colorss[i], alpha=0.8)
+            #
+            elif 'N.' in xtype[i]:
+                minn = int(binsize*np.floor(np.min(x[i])/binsize))-0.5
+                maxx = int(binsize*np.ceil(np.max(x[i])/binsize))+0.5
+                bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
+                bin_array = np.linspace(minn, maxx, bin_num)
+                #
+                y_mean = np.max(np.histogram(x[i], bin_array, normed=pdf)[0])*1.1
+                #
+                plt.hist(x[i], bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=colorss[i], alpha=0.4, label=labels[i])
+                plt.errorbar(np.mean(x[i]), y_mean, xerr=np.array([[2*np.std(x[i])],[2*np.std(x[i])]]), c=colorss[i], lw=5, capsize=8, alpha=0.3)
+                plt.errorbar(np.mean(x[i]), y_mean, xerr=np.array([[np.std(x[i])],[np.std(x[i])]]), c=colorss[i], lw=5, capsize=8, alpha=0.8)
+                plt.scatter(np.mean(x[i]), y_mean, s=250, marker='s', c=colorss[i])
+        #
+        plt.xlim(xlimits)
+        plt.xlabel(self.labels[xtype[0]], fontsize=28)
+        plt.ylabel(y_label, fontsize=28)
+        plt.legend(prop={'size': 18}, loc='best')
         if title:
             plt.title(self.titles[title], fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
