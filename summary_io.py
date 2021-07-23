@@ -26,27 +26,39 @@ class SummaryDataSort:
             - Oversampling factors
                 NOTE: It would be nice to not hard-code these factors...
         """
-        # Create a list of host names
-        self.host_names = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', 'm12z', \
-                           'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus']
+        # Create a dictionary of host name arrays depending on if you want different samples
+        self.host_names = {'all': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', 'm12z', \
+                           'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus'],
+                           'iso': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w'],
+                           'lg': ['Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus']}
         #
         # Oversampling factors
         self.oversample = {'m12b': 16, 'm12c': 14, 'm12f': 13, 'm12i': 22, 'm12m': 12,\
                            'm12r': 20, 'm12w': 14, 'm12z': 21, 'Romeo': 16, 'Juliet': 14,\
                            'Thelma': 17, 'Louise': 16, 'Romulus': 10, 'Remus': 17}
+        #
+        # Oversampling factors
+        self.oversample_dmo = {'m12b': 16, 'm12c': 14, 'm12f': 13, 'm12i': 22, 'm12m': 12,\
+                               'm12r': 20, 'm12w': 14, 'm12z': 21, 'Romeo': 16, 'Juliet': 14,\
+                               'Thelma': 17, 'Louise': 16, 'Romulus': 10, 'Remus': 17}
 
-    def data_read(self, directory):
+    def data_read(self, directory, hosts='all', dmo=False):
         """
         TBD
         """
         data_dict = dict()
-        for name in self.host_names:
-            data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
-            data_dict[name] = data
+        if dmo:
+            for name in self.host_names[hosts]:
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name+'_dmo', verbose=True)
+                data_dict[name] = data
+        else:
+            for name in self.host_names[hosts]:
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
+                data_dict[name] = data
         #
         return data_dict
 
-    def data_mask(self, dictionary, outliers=False, peri_sim=True, peri_model=False, current_sat=False, either=False):
+    def data_mask(self, dictionary, outliers=False, peri_sim=True, peri_model=False, current_sat=False, either=False, hosts='all'):
         """
         DESCRIPTION:
             Create a dictionary of masks for the satellites that depends on whether they
@@ -74,12 +86,12 @@ class SummaryDataSort:
                 #
                 # If not interested in whether they are currently satellites, do this
                 if current_sat == False:
-                    for name in self.host_names:
+                    for name in self.host_names[hosts]:
                         mask_dict[name] = dictionary[name]['infall.check']*(dictionary[name]['pericenter.check.sim'] | dictionary[name]['pericenter.check.galpy'])
                 #
                 # If interested in current sats only, do this
                 elif current_sat == True:
-                    for name in self.host_names:
+                    for name in self.host_names[hosts]:
                         mask_dict[name] = dictionary[name]['infall.check']*(dictionary[name]['pericenter.check.sim'] | dictionary[name]['pericenter.check.galpy'])*(dictionary[name]['dtot.sim'][:,0] < dictionary[name]['host.radius'][0])
             #
             elif either == False:
@@ -89,12 +101,12 @@ class SummaryDataSort:
                     #
                     # If not interested in whether they are currently satellites, do this
                     if current_sat == False:
-                        for name in self.host_names:
+                        for name in self.host_names[hosts]:
                             mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']
                     #
                     # If interested in current sats only, do this
                     elif current_sat == True:
-                        for name in self.host_names:
+                        for name in self.host_names[hosts]:
                             mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*(dictionary[name]['dtot.sim'][:,0] < dictionary[name]['host.radius'][0])
                 #
                 # Pericenter required in simulation and in model
@@ -102,12 +114,12 @@ class SummaryDataSort:
                     #
                     # If not interested in whether they are currently satellites, do this
                     if current_sat == False:
-                        for name in self.host_names:
+                        for name in self.host_names[hosts]:
                             mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*dictionary[name]['pericenter.check.galpy']
                     #
                     # If interested in current sats only, do this
                     elif current_sat == True:
-                        for name in self.host_names:
+                        for name in self.host_names[hosts]:
                             mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*dictionary[name]['pericenter.check.galpy']*(dictionary[name]['dtot.sim'][:,0] < dictionary[name]['host.radius'][0])
                 #
                 # Pericenter not required in simulation or model
@@ -115,28 +127,28 @@ class SummaryDataSort:
                         #
                         # If not interested in whether they are currently satellites, do this
                         if current_sat == False:
-                            for name in self.host_names:
+                            for name in self.host_names[hosts]:
                                 mask_dict[name] = dictionary[name]['infall.check']
                         #
                         # If interested in current sats only, do this
                         elif current_sat == True:
-                            for name in self.host_names:
+                            for name in self.host_names[hosts]:
                                 mask_dict[name] = dictionary[name]['infall.check']*(dictionary[name]['dtot.sim'][:,0] < dictionary[name]['host.radius'][0])
         #
         # If interested in outliers do this.
         elif outliers == True:
-            for name in self.host_names:
+            for name in self.host_names[hosts]:
                 mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*(~dictionary[name]['pericenter.check.galpy'])
         return mask_dict
 
-    def mass_masking_property(self, data_dict, mask_dict, prop, mass_type='Mstar.z0', oversample=False):
+    def mass_masking_property(self, data_dict, mask_dict, prop, mass_type='Mstar.z0', oversample=False, hosts='all'):
         props = dict()
         prop_low = []
         prop_mid = []
         prop_high = []
         #
         if oversample == False:
-            for name in self.host_names:
+            for name in self.host_names[hosts]:
                 mask_low = (data_dict[name][mass_type][mask_dict[name]] < 1e5)
                 mask_mid = ((data_dict[name][mass_type][mask_dict[name]] > 1e5)*(data_dict[name][mass_type][mask_dict[name]] < 1e7))
                 mask_high = (data_dict[name][mass_type][mask_dict[name]] > 1e7)
@@ -154,7 +166,7 @@ class SummaryDataSort:
             props['high'] = np.hstack(prop_high)
         #
         elif oversample == True:
-            for name in self.host_names:
+            for name in self.host_names[hosts]:
                 mask_low = (data_dict[name][mass_type][mask_dict[name]] < 1e5)
                 mask_mid = ((data_dict[name][mass_type][mask_dict[name]] > 1e5)*(data_dict[name][mass_type][mask_dict[name]] < 1e7))
                 mask_high = (data_dict[name][mass_type][mask_dict[name]] > 1e7)
@@ -173,7 +185,7 @@ class SummaryDataSort:
         #
         return props
 
-    def delta_nperi(self, data_dict, mask_dict, oversample=False):
+    def delta_nperi(self, data_dict, mask_dict, oversample=False, hosts='all'):
         """
         DESCRIPTION:
             TBD
@@ -186,18 +198,18 @@ class SummaryDataSort:
         """
         data = []
         if oversample == True:
-            for name in self.host_names:
+            for name in self.host_names[hosts]:
                 data.append(np.repeat(data_dict[name]['N.peri.galpy'][mask_dict[name]],self.oversample[name]) - \
                              np.repeat(data_dict[name]['N.peri.sim'][mask_dict[name]],self.oversample[name]))
         #
         elif oversample == False:
-            for name in self.host_names:
+            for name in self.host_names[hosts]:
                 data.append(data_dict[name]['N.peri.galpy'][mask_dict[name]] - \
                             data_dict[name]['N.peri.sim'][mask_dict[name]])
         #
         return np.hstack(data)
 
-    def nperi(self, data_dict, mask_dict, selection='sim', oversample=False):
+    def nperi(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all'):
         """
         TBD
         """
@@ -205,24 +217,24 @@ class SummaryDataSort:
         #
         if selection == 'sim':
             if oversample == False:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     data.append(data_dict[name]['N.peri.sim'][mask_dict[name]])
             #
             elif oversample == True:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     data.append(np.repeat(data_dict[name]['N.peri.sim'][mask_dict[name]], self.oversample[name]))
         #
         elif selection == 'model':
             if oversample == False:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     data.append(data_dict[name]['N.peri.galpy'][mask_dict[name]])
             #
             elif oversample == True:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     data.append(np.repeat(data_dict[name]['N.peri.galpy'][mask_dict[name]], self.oversample[name]))
         return np.hstack(data)
 
-    def dperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False):
+    def dperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all'):
         """
         TBD
         """
@@ -230,14 +242,14 @@ class SummaryDataSort:
         #
         if (selection == 'sim'):
             if oversample == False:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     temp_array = data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0]
                     mask_temp = (temp_array == -1)
                     temp_array[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
                     data.append(temp_array)
             #
             elif oversample == True:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     temp_array = data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0]
                     mask_temp = (temp_array == -1)
                     temp_array[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
@@ -245,14 +257,14 @@ class SummaryDataSort:
         #
         elif (selection == 'model'):
             if oversample == False:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     temp_array = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
                     mask_temp = (temp_array == -1)
                     temp_array[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
                     data.append(temp_array)
             #
             elif oversample == True:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     temp_array = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
                     mask_temp = (temp_array == -1)
                     temp_array[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
@@ -260,11 +272,11 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    def dperi_min(self, data_dict, mask_dict, oversample=False):
+    def dperi_min(self, data_dict, mask_dict, oversample=False, hosts='all'):
         data = []
         if oversample == False:
             count = 0
-            for name in self.host_names:
+            for name in self.host_names[hosts]:
                 for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
                     mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
                     if np.sum(mask_temp) == 0:
@@ -275,7 +287,7 @@ class SummaryDataSort:
                         count += 1
             print(count)
         elif oversample == True:
-            for name in self.host_names:
+            for name in self.host_names[hosts]:
                 for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
                     mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
                     if np.sum(mask_temp) == 0:
@@ -284,7 +296,7 @@ class SummaryDataSort:
                         data.append(np.repeat(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]), self.oversample[name]))
         return np.hstack(data)
 
-    def delta_dperi(self, data_dict, mask_dict, fraction=False, oversample=False):
+    def delta_dperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all'):
         """
         TBD
         """
@@ -292,7 +304,7 @@ class SummaryDataSort:
         #
         if fraction == False:
             if oversample == False:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     temp_array_model = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
                     mask_temp = (temp_array_model == -1)
                     temp_array_model[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
@@ -304,7 +316,7 @@ class SummaryDataSort:
                     data.append(temp_array_model - temp_array_sim)
             #
             elif oversample == True:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     temp_array_model = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
                     mask_temp = (temp_array_model == -1)
                     temp_array_model[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
@@ -318,7 +330,7 @@ class SummaryDataSort:
         #
         elif fraction == True:
             if oversample == False:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     temp_array_model = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
                     mask_temp = (temp_array_model == -1)
                     temp_array_model[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
@@ -330,7 +342,7 @@ class SummaryDataSort:
                     data.append((temp_array_model - temp_array_sim)/temp_array_sim)
             #
             elif oversample == True:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     temp_array_model = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
                     mask_temp = (temp_array_model == -1)
                     temp_array_model[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
@@ -344,7 +356,7 @@ class SummaryDataSort:
                                  /np.repeat(temp_array_sim,self.oversample[name]))
         return np.hstack(data)
 
-    def tperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False):
+    def tperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all'):
         """
         TBD
         """
@@ -352,14 +364,14 @@ class SummaryDataSort:
         #
         if (selection == 'sim'):
             if oversample == False:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     temp_array = data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0]
                     mask_temp = (temp_array == -1)
                     temp_array[mask_temp] = 0.0
                     data.append(temp_array)
             #
             elif oversample == True:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     temp_array = data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0]
                     mask_temp = (temp_array == -1)
                     temp_array[mask_temp] = 0.0
@@ -367,14 +379,14 @@ class SummaryDataSort:
         #
         elif (selection == 'model'):
             if oversample == False:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     temp_array = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
                     mask_temp = (temp_array == -1)
                     temp_array[mask_temp] = 0.0
                     data.append(temp_array)
             #
             elif oversample == True:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     temp_array = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
                     mask_temp = (temp_array == -1)
                     temp_array[mask_temp] = 0.0
@@ -382,11 +394,11 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    def tperi_min(self, data_dict, mask_dict, oversample=False):
+    def tperi_min(self, data_dict, mask_dict, oversample=False, hosts='all'):
         data = []
         if oversample == False:
             count = 0
-            for name in self.host_names:
+            for name in self.host_names[hosts]:
                 for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
                     mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
                     if np.sum(mask_temp) == 0:
@@ -397,7 +409,7 @@ class SummaryDataSort:
                         data.append(data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][i][mask_temp][index])
         #
         elif oversample == True:
-            for name in self.host_names:
+            for name in self.host_names[hosts]:
                 for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
                     mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
                     if np.sum(mask_temp) == 0:
@@ -408,7 +420,7 @@ class SummaryDataSort:
                         data.append(np.repeat(data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][i][mask_temp][index], self.oversample[name]))
         return np.hstack(data)
 
-    def delta_tperi(self, data_dict, mask_dict, fraction=False, oversample=False):
+    def delta_tperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all'):
         """
         TBD
         """
@@ -416,7 +428,7 @@ class SummaryDataSort:
         #
         if fraction == False:
             if oversample == False:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     temp_array_model = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
                     mask_temp = (temp_array_model == -1)
                     temp_array_model[mask_temp] = 0.0
@@ -428,7 +440,7 @@ class SummaryDataSort:
                     data.append(temp_array_model - temp_array_sim)
             #
             elif oversample == True:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     temp_array_model = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
                     mask_temp = (temp_array_model == -1)
                     temp_array_model[mask_temp] = 0.0
@@ -442,7 +454,7 @@ class SummaryDataSort:
         #
         elif fraction == True:
             if oversample == False:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     temp_array_model = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
                     mask_temp = (temp_array_model == -1)
                     temp_array_model[mask_temp] = 0.0
@@ -456,7 +468,7 @@ class SummaryDataSort:
                     data.append(ratio)
             #
             elif oversample == True:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     temp_array_model = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
                     mask_temp = (temp_array_model == -1)
                     temp_array_model[mask_temp] = 0.0
@@ -472,23 +484,23 @@ class SummaryDataSort:
                     data.append(ratio)
         return np.hstack(data)
 
-    def first_infall(self, data_dict, mask_dict, oversample=False):
+    def first_infall(self, data_dict, mask_dict, oversample=False, hosts='all'):
         """
         TBD
         """
         data = []
         #
         if oversample == False:
-            for name in self.host_names:
+            for name in self.host_names[hosts]:
                 data.append(data_dict[name]['first.infall.time.lb'][mask_dict[name]])
         #
         elif oversample == True:
-            for name in self.host_names:
+            for name in self.host_names[hosts]:
                 data.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]], self.oversample[name]))
         #
         return np.hstack(data)
 
-    def mstar(self, data_dict, mask_dict, selection='z0', oversample=False):
+    def mstar(self, data_dict, mask_dict, selection='z0', oversample=False, hosts='all'):
         """
         TBD
         """
@@ -496,25 +508,25 @@ class SummaryDataSort:
         #
         if selection == 'z0':
             if oversample == False:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     data.append(data_dict[name]['Mstar.z0'][mask_dict[name]])
             #
             elif oversample == True:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     data.append(np.repeat(data_dict[name]['Mstar.z0'][mask_dict[name]], self.oversample[name]))
         #
         elif selection == 'peak':
             if oversample == False:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     data.append(data_dict[name]['Mstar.peak'][mask_dict[name]])
             #
             elif oversample == True:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     data.append(np.repeat(data_dict[name]['Mstar.peak'][mask_dict[name]], self.oversample[name]))
         #
         return np.hstack(data)
 
-    def mhalo(self, data_dict, mask_dict, selection='z0', oversample=False):
+    def mhalo(self, data_dict, mask_dict, selection='z0', oversample=False, hosts='all'):
         """
         TBD
         """
@@ -522,63 +534,63 @@ class SummaryDataSort:
         #
         if selection == 'z0':
             if oversample == False:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     data.append(data_dict[name]['Mhalo.z0'][mask_dict[name]])
             #
             elif oversample == True:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     data.append(np.repeat(data_dict[name]['Mhalo.z0'][mask_dict[name]], self.oversample[name]))
         #
         elif selection == 'peak':
             if oversample == False:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     data.append(data_dict[name]['Mhalo.peak'][mask_dict[name]])
             #
             elif oversample == True:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     data.append(np.repeat(data_dict[name]['Mhalo.peak'][mask_dict[name]], self.oversample[name]))
         #
         return np.hstack(data)
 
-    def d_z0(self, data_dict, mask_dict, oversample=False):
+    def d_z0(self, data_dict, mask_dict, oversample=False, hosts='all'):
         """
         TBD
         """
         data = []
         #
         if oversample == False:
-            for name in self.host_names:
+            for name in self.host_names[hosts]:
                 data.append(data_dict[name]['dtot.sim'][mask_dict[name]][:,0])
         #
         elif oversample == True:
-            for name in self.host_names:
+            for name in self.host_names[hosts]:
                 data.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][:,0], self.oversample[name]))
         #
         return np.hstack(data)
 
-    def kinetic_energy(self, data_dict, mask_dict, ke_type, oversample=False):
+    def kinetic_energy(self, data_dict, mask_dict, ke_type, oversample=False, hosts='all'):
         data = []
         #
         if ke_type == 'max':
             if oversample == False:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     for i in range(0, len(data_dict[name]['vtot.sim'][mask_dict[name]])):
                         data.append(np.nanmax(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i]**2))
             else:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     for i in range(0, len(data_dict[name]['vtot.sim'][mask_dict[name]])):
                         data.append(np.repeat(np.nanmax(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i]**2), self.oversample[name]))
         #
         elif ke_type == 'peri':
             if oversample == False:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     for i in range(0, len(data_dict[name]['pericenter.vel.sim'][mask_dict[name]])):
                         if (data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0] == -1):
                             data.append(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i][0]**2)
                         else:
                             data.append(0.5*data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0]**2)
             else:
-                for name in self.host_names:
+                for name in self.host_names[hosts]:
                     for i in range(0, len(data_dict[name]['pericenter.vel.sim'][mask_dict[name]])):
                         if (data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0] == -1):
                             data.append(np.repeat(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i][0]**2, self.oversample[name]))
