@@ -26,7 +26,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton', dmo=True)
+sim_data = orbit_io.OrbitRead(gal1='Romeo', location='peloton', dmo=True)
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -189,6 +189,7 @@ if sim_data.num_gal == 2:
     #
     # Save the host radius
     data_dict['host.radius'] = host_radii
+    np.sum(peris['pericenter.check'])
     #
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_dmo', dict_or_array_to_write=data_dict, verbose=True)
     #
@@ -269,5 +270,6 @@ if sim_data.num_gal == 2:
     #
     # Save the host radius
     data_dict['host.radius'] = host_radii
+    np.sum(peris['pericenter.check'])
 
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_dmo', dict_or_array_to_write=data_dict, verbose=True)
