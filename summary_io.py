@@ -5,7 +5,7 @@
 
     This was written to create summary statistic plots with data output from
     orbit_io.py and model_io.py. Data that I import was previously compiled
-    using summary_data.py
+    using summary_data.py and summary_data_dmo.py
 
 """
 
@@ -24,7 +24,7 @@ class SummaryDataSort:
         Want to save:
             - Host names to loop over in the following methods
             - Oversampling factors
-                NOTE: It would be nice to not hard-code these factors...
+                NOTE: Still need to update the oversampling factors for DMO runs
         """
         # Create a dictionary of host name arrays depending on if you want different samples
         self.host_names = {'all': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', 'm12z', \
@@ -44,13 +44,33 @@ class SummaryDataSort:
 
     def data_read(self, directory, hosts='all', dmo=False):
         """
-        TBD
+        DESCRIPTION:
+            Reads in the summary data and stores it in a dictionary with each
+            key being the host name.
+
+        VARIABLES:
+            directory : string
+                        Home directory.
+
+            hosts     : string
+                        Choose either 'all', 'iso', or 'lg' to select different
+                        samples.
+
+            dmo       : boolean
+                        Choose whether or not to read in DMO simulation data.
+
+        NOTES:
+            - The dictionary that gets returned is a dictionary of dictionaries.
+            - Each key in the dictionary is a host name
+                - Each key in the sub-dictionaries is given in summary_data.py
         """
         data_dict = dict()
+        #
         if dmo:
             for name in self.host_names[hosts]:
                 data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name+'_dmo', verbose=True)
                 data_dict[name] = data
+        #
         else:
             for name in self.host_names[hosts]:
                 data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
@@ -68,13 +88,28 @@ class SummaryDataSort:
 
         VARIABLES:
             dictionary  : dictionary
+                          Dictionary of data for all hosts. This is read in by
+                          data_read()
+
             outliers    : bool
+                          Outliers are defined as the subhalos that have pericenters
+                          in the simulations, but not in the data.
+
             peri_sim    : bool
+                          Set to True if you want satellites that have expericenced
+                          pericenter in the simulations.
+
             peri_model  : bool
+                          Set to True if you want satellites that have expericenced
+                          pericenter in the model.
+
             current_sat : bool
+                          Set to True if you want satellites that are within
+                          R_vir of the host galaxy at z = 0.
 
         NOTES:
-            - TBD
+            - Returns a dictionary of masks where each key corresponds to each
+              host galaxy.
         """
         # Set up a dictionary to save the masks to
         mask_dict = dict()
@@ -139,9 +174,13 @@ class SummaryDataSort:
         elif outliers == True:
             for name in self.host_names[hosts]:
                 mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*(~dictionary[name]['pericenter.check.galpy'])
+        #
         return mask_dict
 
     def mass_masking_property(self, data_dict, mask_dict, prop, mass_type='Mstar.z0', oversample=False, hosts='all'):
+        """
+        STILL NEEDS A LOT OF WORK AND CHECKING...
+        """
         props = dict()
         prop_low = []
         prop_mid = []
