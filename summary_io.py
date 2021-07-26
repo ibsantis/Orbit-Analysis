@@ -972,9 +972,9 @@ class SummaryDataPlot(SummaryDataSort):
         #
         for j in range(0, len(x)):
             if 'M.' in xtype[j]:
-                x = np.log10(x[j])
+                x[j] = np.log10(x[j])
             if 'M.' in ytype[j]:
-                y = np.log10(y[j])
+                y[j] = np.log10(y[j])
             #
             if 'N.' not in xtype[j] and 'N.' not in ytype[j]:
                 minn = binsize*np.floor(np.min(x[j])/binsize)
