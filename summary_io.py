@@ -971,9 +971,9 @@ class SummaryDataPlot(SummaryDataSort):
         f, ax = plt.subplots(figsize=(10, 8))
         #
         for j in range(0, len(x)):
-            if 'M.' in xtype:
+            if 'M.' in xtype[j]:
                 x = np.log10(x[j])
-            if 'M.' in ytype:
+            if 'M.' in ytype[j]:
                 y = np.log10(y[j])
             #
             if 'N.' not in xtype[j] and 'N.' not in ytype[j]:
