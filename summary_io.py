@@ -1060,8 +1060,8 @@ class SummaryDataPlot(SummaryDataSort):
                 lower = means-scatter
                 med = means
             #
-            plt.plot(bins[:-1]+half_bin, med, color=colorss[i], marker='s', markersize=10, alpha=0.5, label=labels[i])
-            plt.fill_between(bins[:-1]+half_bin, upper, lower, color=colorss[i], alpha=0.3)
+            plt.plot(bins[:-1]+half_bin, med, color=colorss[j], marker='s', markersize=10, alpha=0.5, label=labels[j])
+            plt.fill_between(bins[:-1]+half_bin, upper, lower, color=colorss[j], alpha=0.3)
         if limits:
             plt.xlim(limits[0])
             plt.ylim(limits[1])
@@ -1074,7 +1074,6 @@ class SummaryDataPlot(SummaryDataSort):
         plt.tight_layout()
         plt.savefig(file_path_and_name)
         plt.close()
-
 
     def plot_hist(self, x, xtype, binsize, file_path_and_name, pdf=False, xlimits=None, title=None):
         """
