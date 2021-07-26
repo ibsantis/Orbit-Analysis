@@ -939,6 +939,143 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
+    def median_plot_mult(self, x, y, xtype, ytype, labels, binsize, file_path_and_name, limits=None, title=None):
+        """
+        DESCRIPTION:
+            Bins the x-axis quantity and plots either the mean or median, along
+            with the standard deviation or 68% scatter, of the y-axis quantity.
+
+        VARIABLES:
+            - x                  : list
+            - y                  : list
+            - xtype              : list
+            - ytype              : list
+            - labels             : list
+            - binsize            : float or int
+            - limits             : tuple of two tuples
+            - title              : string
+            - file_path_and_name : string
+
+        NOTES:
+            - If plotting mass quantities, this takes the log first.
+            - If the x-axis quantity is an integer quantity (pericenter number
+              in particular), script bins differently than if not an integer
+              quantity.
+            - If the y-axis quantity is an integer quantity, then the method
+              calculates the mean and standard deviation.
+            - If the y-axis quantity is not an integer quantity, then the method
+              calculates the median and 68% scatter.
+        """
+        colorss = ['#006400', '#000080']
+        #
+        f, ax = plt.subplots(figsize=(10, 8))
+        #
+        for j in range(0, len(x)):
+            if 'M.' in xtype:
+                x = np.log10(x[j])
+            if 'M.' in ytype:
+                y = np.log10(y[j])
+            #
+            if 'N.' not in xtype[j] and 'N.' not in ytype[j]:
+                minn = binsize*np.floor(np.min(x[j])/binsize)
+                maxx = binsize*np.ceil(np.max(x[j])/binsize)
+                if minn < 0:
+                    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+                else:
+                    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+                bins = np.linspace(minn, maxx, bin_num)
+                half_bin = (bins[1]-bins[0])/2
+                #
+                onesigp = 84.13
+                onesigm = 15.87
+                #
+                med = np.zeros(len(bins)-1)
+                lower = np.zeros(len(bins)-1)
+                upper = np.zeros(len(bins)-1)
+                #
+                for i in range(0, len(bins)-1):
+                    mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+                    med[i] = np.nanmedian(y[j][mask])
+                    upper[i] = np.nanpercentile(y[j][mask], onesigp)
+                    lower[i] = np.nanpercentile(y[j][mask], onesigm)
+            #
+            if 'N.' in xtype[j] and 'N.' not in ytype[j]:
+                minn = int(binsize*np.floor(np.min(x[j])/binsize))-0.5
+                maxx = int(binsize*np.ceil(np.max(x[j])/binsize))+0.5
+                bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
+                bins = np.linspace(minn, maxx, bin_num)
+                #
+                half_bin = (bins[1]-bins[0])/2
+                onesigp = 84.13
+                onesigm = 15.87
+                #
+                med = np.zeros(len(bins)-1)
+                lower = np.zeros(len(bins)-1)
+                upper = np.zeros(len(bins)-1)
+                #
+                for i in range(0, len(bins)-1):
+                    mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+                    med[i] = np.nanmedian(y[j][mask])
+                    upper[i] = np.nanpercentile(y[j][mask], onesigp)
+                    lower[i] = np.nanpercentile(y[j][mask], onesigm)
+            #
+            if 'N.' not in xtype[j] and 'N.' in ytype[j]:
+                minn = binsize*np.floor(np.min(x[j])/binsize)
+                maxx = binsize*np.ceil(np.max(x[j])/binsize)
+                if minn < 0:
+                    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+                else:
+                    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+                bins = np.linspace(minn, maxx, bin_num)
+                half_bin = (bins[1]-bins[0])/2
+                #
+                means = np.zeros(len(bins)-1)
+                scatter = np.zeros(len(bins)-1)
+                #
+                for i in range(0, len(bins)-1):
+                    mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+                    means[i] = np.nanmean(y[j][mask])
+                    scatter[i] = np.nanstd(y[j][mask])
+                #
+                upper = means+scatter
+                lower = means-scatter
+                med = means
+            #
+            if 'N.' in xtype[j] and 'N.' in ytype[j]:
+                minn = int(binsize*np.floor(np.min(x[j])/binsize))-0.5
+                maxx = int(binsize*np.ceil(np.max(x[j])/binsize))+0.5
+                bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
+                bins = np.linspace(minn, maxx, bin_num)
+                half_bin = (bins[1]-bins[0])/2
+                #
+                means = np.zeros(len(bins)-1)
+                scatter = np.zeros(len(bins)-1)
+                #
+                for i in range(0, len(bins)-1):
+                    mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+                    means[i] = np.nanmean(y[j][mask])
+                    scatter[i] = np.nanstd(y[j][mask])
+                #
+                upper = means+scatter
+                lower = means-scatter
+                med = means
+            #
+            plt.plot(bins[:-1]+half_bin, med, color=colorss[i], marker='s', markersize=10, alpha=0.5, label=labels[i])
+            plt.fill_between(bins[:-1]+half_bin, upper, lower, color=colorss[i], alpha=0.3)
+        if limits:
+            plt.xlim(limits[0])
+            plt.ylim(limits[1])
+        plt.xlabel(self.labels[xtype[0]], fontsize=28)
+        plt.ylabel(self.labels[ytype[0]], fontsize=28)
+        plt.legend(prop={'size': 18}, loc='best')
+        if title:
+            plt.title(self.titles[title], fontsize=24)
+        plt.tick_params(axis='both', which='major', labelsize=24)
+        plt.tight_layout()
+        plt.savefig(file_path_and_name)
+        plt.close()
+
+
     def plot_hist(self, x, xtype, binsize, file_path_and_name, pdf=False, xlimits=None, title=None):
         """
         DESCRIPTION:
