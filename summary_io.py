@@ -42,7 +42,7 @@ class SummaryDataSort:
                                'm12r': 16, 'm12w': 16, 'm12z': 0, 'Romeo': 0, 'Juliet': 0,\
                                'Thelma': 0, 'Louise': 0, 'Romulus': 0, 'Remus': 0}
 
-    def data_read(self, directory, hosts='all', dmo=False):
+    def data_read(self, directory, selection, hosts='all'):
         """
         DESCRIPTION:
             Reads in the summary data and stores it in a dictionary with each
@@ -66,14 +66,19 @@ class SummaryDataSort:
         """
         data_dict = dict()
         #
-        if dmo:
-            for name in self.host_names[hosts]:
-                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name+'_dmo', verbose=True)
-                data_dict[name] = data
-        #
-        else:
+        if selection == 'baryon':
             for name in self.host_names[hosts]:
                 data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
+                data_dict[name] = data
+        #
+        elif selection == 'all_baryon':
+            for name in self.host_names[hosts]:
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name+'_dmo_selection', verbose=True)
+                data_dict[name] = data
+        #
+        elif selection == 'dmo':
+            for name in self.host_names[hosts]:
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name+'_dmo', verbose=True)
                 data_dict[name] = data
         #
         return data_dict
