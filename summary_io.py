@@ -33,16 +33,17 @@ class SummaryDataSort:
                            'lg': ['Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus']}
         #
         # Oversampling factors
-        self.oversample = {'m12b': 16, 'm12c': 14, 'm12f': 13, 'm12i': 22, 'm12m': 12,\
-                           'm12r': 20, 'm12w': 14, 'm12z': 21, 'Romeo': 16, 'Juliet': 14,\
-                           'Thelma': 17, 'Louise': 16, 'Romulus': 10, 'Remus': 17}
-        #
-        # Oversampling factors (STILL TBD)
-        self.oversample_dmo = {'m12b': 13, 'm12c': 12, 'm12f': 10, 'm12i': 14, 'm12m': 11,\
-                               'm12r': 16, 'm12w': 16, 'm12z': 0, 'Romeo': 0, 'Juliet': 0,\
-                               'Thelma': 0, 'Louise': 0, 'Romulus': 0, 'Remus': 0}
+        self.oversample = {'baryon': {'m12b': 16, 'm12c': 14, 'm12f': 13, 'm12i': 22, 'm12m': 12,\
+                                      'm12r': 20, 'm12w': 14, 'm12z': 21, 'Romeo': 16, 'Juliet': 14,\
+                                      'Thelma': 17, 'Louise': 16, 'Romulus': 10, 'Remus': 17},\
+                           'baryon_all': {'m12b': 17, 'm12c': 14, 'm12f': 14, 'm12i': 18, 'm12m': 14,\
+                                          'm12r': 18, 'm12w': 19, 'm12z': 18, 'Romeo': 19, 'Juliet': 18,\
+                                          'Thelma': 15, 'Louise': 15, 'Romulus': 10, 'Remus': 20},\
+                           'dmo': {'m12b': 13, 'm12c': 12, 'm12f': 10, 'm12i': 14, 'm12m': 11,\
+                                   'm12r': 16, 'm12w': 16, 'm12z': 0, 'Romeo': 0, 'Juliet': 0,\
+                                   'Thelma': 0, 'Louise': 0, 'Romulus': 0, 'Remus': 0}}
 
-    def data_read(self, directory, selection, hosts='all'):
+    def data_read(self, directory, sim_type='baryon', hosts='all'):
         """
         DESCRIPTION:
             Reads in the summary data and stores it in a dictionary with each
@@ -66,17 +67,17 @@ class SummaryDataSort:
         """
         data_dict = dict()
         #
-        if selection == 'baryon':
+        if sim_type == 'baryon':
             for name in self.host_names[hosts]:
                 data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
                 data_dict[name] = data
         #
-        elif selection == 'all_baryon':
+        elif sim_type == 'all_baryon':
             for name in self.host_names[hosts]:
                 data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name+'_dmo_selection', verbose=True)
                 data_dict[name] = data
         #
-        elif selection == 'dmo':
+        elif sim_type == 'dmo':
             for name in self.host_names[hosts]:
                 data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name+'_dmo', verbose=True)
                 data_dict[name] = data
@@ -182,7 +183,7 @@ class SummaryDataSort:
         #
         return mask_dict
 
-    def delta_nperi(self, data_dict, mask_dict, oversample=False, hosts='all'):
+    def delta_nperi(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
             TBD
@@ -196,8 +197,8 @@ class SummaryDataSort:
         data = []
         if oversample == True:
             for name in self.host_names[hosts]:
-                data.append(np.repeat(data_dict[name]['N.peri.galpy'][mask_dict[name]],self.oversample[name]) - \
-                             np.repeat(data_dict[name]['N.peri.sim'][mask_dict[name]],self.oversample[name]))
+                data.append(np.repeat(data_dict[name]['N.peri.galpy'][mask_dict[name]],self.oversample[sim_type][name]) - \
+                             np.repeat(data_dict[name]['N.peri.sim'][mask_dict[name]],self.oversample[sim_type][name]))
         #
         elif oversample == False:
             for name in self.host_names[hosts]:
@@ -206,7 +207,7 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    def nperi(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', dmo=False):
+    def nperi(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         TBD
         """
@@ -219,10 +220,7 @@ class SummaryDataSort:
             #
             elif oversample == True:
                 for name in self.host_names[hosts]:
-                    if dmo:
-                        data.append(np.repeat(data_dict[name]['N.peri.sim'][mask_dict[name]], self.oversample_dmo[name]))
-                    else:
-                        data.append(np.repeat(data_dict[name]['N.peri.sim'][mask_dict[name]], self.oversample[name]))
+                    data.append(np.repeat(data_dict[name]['N.peri.sim'][mask_dict[name]], self.oversample[sim_type][name]))
         #
         elif selection == 'model':
             if oversample == False:
@@ -231,10 +229,10 @@ class SummaryDataSort:
             #
             elif oversample == True:
                 for name in self.host_names[hosts]:
-                    data.append(np.repeat(data_dict[name]['N.peri.galpy'][mask_dict[name]], self.oversample[name]))
+                    data.append(np.repeat(data_dict[name]['N.peri.galpy'][mask_dict[name]], self.oversample[sim_type][name]))
         return np.hstack(data)
 
-    def dperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', dmo=False):
+    def dperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         TBD
         """
@@ -253,10 +251,7 @@ class SummaryDataSort:
                     temp_array = data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0]
                     mask_temp = (temp_array == -1)
                     temp_array[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
-                    if dmo:
-                        data.append(np.repeat(temp_array, self.oversample_dmo[name]))
-                    else:
-                        data.append(np.repeat(temp_array, self.oversample[name]))
+                    data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
         #
         elif (selection == 'model'):
             if oversample == False:
@@ -271,11 +266,11 @@ class SummaryDataSort:
                     temp_array = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
                     mask_temp = (temp_array == -1)
                     temp_array[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
-                    data.append(np.repeat(temp_array, self.oversample[name]))
+                    data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
         #
         return np.hstack(data)
 
-    def dperi_min(self, data_dict, mask_dict, oversample=False, hosts='all', dmo=False):
+    def dperi_min(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
         TBD
         """
@@ -300,20 +295,14 @@ class SummaryDataSort:
                     mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
                     #
                     if np.sum(mask_temp) == 0:
-                        if dmo:
-                            data.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][i][0], self.oversample_dmo[name]))
-                        else:
-                            data.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][i][0], self.oversample[name]))
+                        data.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][i][0], self.oversample[sim_type][name]))
                     #
                     else:
-                        if dmo:
-                            data.append(np.repeat(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]), self.oversample_dmo[name]))
-                        else:
-                            data.append(np.repeat(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]), self.oversample[name]))
+                        data.append(np.repeat(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]), self.oversample[sim_type][name]))
         #
         return np.hstack(data)
 
-    def delta_dperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all'):
+    def delta_dperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all', sim_type='baryon'):
         """
         TBD
         """
@@ -342,8 +331,8 @@ class SummaryDataSort:
                     mask_temp = (temp_array_sim == -1)
                     temp_array_sim[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
                     #
-                    data.append(np.repeat(temp_array_model,self.oversample[name]) - \
-                                 np.repeat(temp_array_sim,self.oversample[name]))
+                    data.append(np.repeat(temp_array_model,self.oversample[sim_type][name]) - \
+                                 np.repeat(temp_array_sim,self.oversample[sim_type][name]))
         #
         elif fraction == True:
             if oversample == False:
@@ -368,12 +357,12 @@ class SummaryDataSort:
                     mask_temp = (temp_array_sim == -1)
                     temp_array_sim[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
                     #
-                    data.append((np.repeat(temp_array_model,self.oversample[name]) - \
-                                 np.repeat(temp_array_sim,self.oversample[name]))\
-                                 /np.repeat(temp_array_sim,self.oversample[name]))
+                    data.append((np.repeat(temp_array_model,self.oversample[sim_type][name]) - \
+                                 np.repeat(temp_array_sim,self.oversample[sim_type][name]))\
+                                 /np.repeat(temp_array_sim,self.oversample[sim_type][name]))
         return np.hstack(data)
 
-    def tperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', dmo=False):
+    def tperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         TBD
         """
@@ -392,10 +381,7 @@ class SummaryDataSort:
                     temp_array = data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0]
                     mask_temp = (temp_array == -1)
                     temp_array[mask_temp] = 0.0
-                    if dmo:
-                        data.append(np.repeat(temp_array, self.oversample_dmo[name]))
-                    else:
-                        data.append(np.repeat(temp_array, self.oversample[name]))
+                    data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
         #
         elif (selection == 'model'):
             if oversample == False:
@@ -410,11 +396,11 @@ class SummaryDataSort:
                     temp_array = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
                     mask_temp = (temp_array == -1)
                     temp_array[mask_temp] = 0.0
-                    data.append(np.repeat(temp_array, self.oversample[name]))
+                    data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
         #
         return np.hstack(data)
 
-    def tperi_min(self, data_dict, mask_dict, oversample=False, hosts='all', dmo=False):
+    def tperi_min(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         data = []
         if oversample == False:
             count = 0
@@ -437,22 +423,16 @@ class SummaryDataSort:
                     mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
                     #
                     if np.sum(mask_temp) == 0:
-                        if dmo:
-                            data.append(np.repeat(0.0, self.oversample_dmo[name]))
-                        else:
-                            data.append(np.repeat(0.0, self.oversample[name]))
+                        data.append(np.repeat(0.0, self.oversample[sim_type][name]))
                     #
                     else:
                         index = np.where(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]) \
                                          == data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp])[0][0]
-                        if dmo:
-                            data.append(np.repeat(data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][i][mask_temp][index], self.oversample_dmo[name]))
-                        else:
-                            data.append(np.repeat(data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][i][mask_temp][index], self.oversample[name]))
+                        data.append(np.repeat(data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][i][mask_temp][index], self.oversample[sim_type][name]))
         #
         return np.hstack(data)
 
-    def delta_tperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all'):
+    def delta_tperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all', sim_type='baryon'):
         """
         TBD
         """
@@ -481,8 +461,8 @@ class SummaryDataSort:
                     mask_temp = (temp_array_sim == -1)
                     temp_array_sim[mask_temp] = 0.0
                     #
-                    data.append(np.repeat(temp_array_model,self.oversample[name]) - \
-                                 np.repeat(temp_array_sim,self.oversample[name]))
+                    data.append(np.repeat(temp_array_model,self.oversample[sim_type][name]) - \
+                                 np.repeat(temp_array_sim,self.oversample[sim_type][name]))
         #
         elif fraction == True:
             if oversample == False:
@@ -509,14 +489,14 @@ class SummaryDataSort:
                     mask_temp = (temp_array_sim == -1)
                     temp_array_sim[mask_temp] = 0.0
                     #
-                    ratio = (np.repeat(temp_array_model,self.oversample[name]) - \
-                                 np.repeat(temp_array_sim,self.oversample[name]))\
-                                 /np.repeat(temp_array_sim,self.oversample[name])
+                    ratio = (np.repeat(temp_array_model,self.oversample[sim_type][name]) - \
+                                 np.repeat(temp_array_sim,self.oversample[sim_type][name]))\
+                                 /np.repeat(temp_array_sim,self.oversample[sim_type][name])
                     ratio[~np.isfinite(ratio)] = 0
                     data.append(ratio)
         return np.hstack(data)
 
-    def first_infall(self, data_dict, mask_dict, oversample=False, hosts='all', dmo=False):
+    def first_infall(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
         TBD
         """
@@ -528,14 +508,11 @@ class SummaryDataSort:
         #
         elif oversample == True:
             for name in self.host_names[hosts]:
-                if dmo:
-                    data.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]], self.oversample_dmo[name]))
-                else:
-                    data.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]], self.oversample[name]))
+                data.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]], self.oversample[sim_type][name]))
         #
         return np.hstack(data)
 
-    def mstar(self, data_dict, mask_dict, selection='z0', oversample=False, hosts='all'):
+    def mstar(self, data_dict, mask_dict, selection='z0', oversample=False, hosts='all', sim_type='baryon'):
         """
         TBD
         """
@@ -548,7 +525,7 @@ class SummaryDataSort:
             #
             elif oversample == True:
                 for name in self.host_names[hosts]:
-                    data.append(np.repeat(data_dict[name]['Mstar.z0'][mask_dict[name]], self.oversample[name]))
+                    data.append(np.repeat(data_dict[name]['Mstar.z0'][mask_dict[name]], self.oversample[sim_type][name]))
         #
         elif selection == 'peak':
             if oversample == False:
@@ -557,11 +534,11 @@ class SummaryDataSort:
             #
             elif oversample == True:
                 for name in self.host_names[hosts]:
-                    data.append(np.repeat(data_dict[name]['Mstar.peak'][mask_dict[name]], self.oversample[name]))
+                    data.append(np.repeat(data_dict[name]['Mstar.peak'][mask_dict[name]], self.oversample[sim_type][name]))
         #
         return np.hstack(data)
 
-    def mhalo(self, data_dict, mask_dict, selection='z0', oversample=False, hosts='all', dmo=False):
+    def mhalo(self, data_dict, mask_dict, selection='z0', oversample=False, hosts='all', sim_type='baryon'):
         """
         TBD
         """
@@ -574,10 +551,7 @@ class SummaryDataSort:
             #
             elif oversample == True:
                 for name in self.host_names[hosts]:
-                    if dmo:
-                        data.append(np.repeat(data_dict[name]['Mhalo.z0'][mask_dict[name]], self.oversample_dmo[name]))
-                    else:
-                        data.append(np.repeat(data_dict[name]['Mhalo.z0'][mask_dict[name]], self.oversample[name]))
+                    data.append(np.repeat(data_dict[name]['Mhalo.z0'][mask_dict[name]], self.oversample[sim_type][name]))
         #
         elif selection == 'peak':
             if oversample == False:
@@ -586,14 +560,11 @@ class SummaryDataSort:
             #
             elif oversample == True:
                 for name in self.host_names[hosts]:
-                    if dmo:
-                        data.append(np.repeat(data_dict[name]['Mhalo.peak'][mask_dict[name]], self.oversample_dmo[name]))
-                    else:
-                        data.append(np.repeat(data_dict[name]['Mhalo.peak'][mask_dict[name]], self.oversample[name]))
+                    data.append(np.repeat(data_dict[name]['Mhalo.peak'][mask_dict[name]], self.oversample[sim_type][name]))
         #
         return np.hstack(data)
 
-    def d_z0(self, data_dict, mask_dict, oversample=False, hosts='all', dmo=False):
+    def d_z0(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
         TBD
         """
@@ -605,14 +576,11 @@ class SummaryDataSort:
         #
         elif oversample == True:
             for name in self.host_names[hosts]:
-                if dmo:
-                    data.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][:,0], self.oversample_dmo[name]))
-                else:
-                    data.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][:,0], self.oversample[name]))
+                data.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
         #
         return np.hstack(data)
 
-    def kinetic_energy(self, data_dict, mask_dict, ke_type, oversample=False, hosts='all', dmo=False):
+    def kinetic_energy(self, data_dict, mask_dict, ke_type, oversample=False, hosts='all', sim_type='baryon'):
         data = []
         #
         if ke_type == 'max':
@@ -623,10 +591,7 @@ class SummaryDataSort:
             else:
                 for name in self.host_names[hosts]:
                     for i in range(0, len(data_dict[name]['vtot.sim'][mask_dict[name]])):
-                        if dmo:
-                            data.append(np.repeat(np.nanmax(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i]**2), self.oversample_dmo[name]))
-                        else:
-                            data.append(np.repeat(np.nanmax(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i]**2), self.oversample[name]))
+                        data.append(np.repeat(np.nanmax(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i]**2), self.oversample[sim_type][name]))
         #
         elif ke_type == 'peri':
             if oversample == False:
@@ -640,19 +605,13 @@ class SummaryDataSort:
                 for name in self.host_names[hosts]:
                     for i in range(0, len(data_dict[name]['pericenter.vel.sim'][mask_dict[name]])):
                         if (data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0] == -1):
-                            if dmo:
-                                data.append(np.repeat(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i][0]**2, self.oversample_dmo[name]))
-                            else:
-                                data.append(np.repeat(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i][0]**2, self.oversample[name]))
+                            data.append(np.repeat(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i][0]**2, self.oversample[sim_type][name]))
                         else:
-                            if dmo:
-                                data.append(np.repeat(0.5*data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0]**2, self.oversample_dmo[name]))
-                            else:
-                                data.append(np.repeat(0.5*data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0]**2, self.oversample[name]))
+                            data.append(np.repeat(0.5*data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0]**2, self.oversample[sim_type][name]))
         #
         return np.hstack(data)
 
-    def mass_masking_property(self, data_dict, mask_dict, prop, mass_type='Mstar.z0', oversample=False, hosts='all', dmo=False):
+    def mass_masking_property(self, data_dict, mask_dict, prop, mass_type='Mstar.z0', oversample=False, hosts='all', sim_type='baryon'):
         """
         STILL NEEDS A LOT OF WORK AND CHECKING...
         """
@@ -685,23 +644,13 @@ class SummaryDataSort:
                 mask_mid = ((data_dict[name][mass_type][mask_dict[name]] > 1e5)*(data_dict[name][mass_type][mask_dict[name]] < 1e7))
                 mask_high = (data_dict[name][mass_type][mask_dict[name]] > 1e7)
                 if prop == 't.infall':
-                    if dmo:
-                        prop_low.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_low], self.oversample_dmo[name]))
-                        prop_mid.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_mid], self.oversample_dmo[name]))
-                        prop_high.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_high], self.oversample_dmo[name]))
-                    else:
-                        prop_low.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_low], self.oversample[name]))
-                        prop_mid.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_mid], self.oversample[name]))
-                        prop_high.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_high], self.oversample[name]))
+                    prop_low.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_low], self.oversample[sim_type][name]))
+                    prop_mid.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_mid], self.oversample[sim_type][name]))
+                    prop_high.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_high], self.oversample[sim_type][name]))
                 elif prop == 'dz0':
-                    if dmo:
-                        prop_low.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_low][:,0], self.oversample_dmo[name]))
-                        prop_mid.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_mid][:,0], self.oversample_dmo[name]))
-                        prop_high.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_high][:,0], self.oversample_dmo[name]))
-                    else:
-                        prop_low.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_low][:,0], self.oversample[name]))
-                        prop_mid.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_mid][:,0], self.oversample[name]))
-                        prop_high.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_high][:,0], self.oversample[name]))
+                    prop_low.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_low][:,0], self.oversample[sim_type][name]))
+                    prop_mid.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_mid][:,0], self.oversample[sim_type][name]))
+                    prop_high.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_high][:,0], self.oversample[sim_type][name]))
             #
             props['low'] = np.hstack(prop_low)
             props['mid'] = np.hstack(prop_mid)
