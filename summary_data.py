@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -155,7 +155,8 @@ if sim_data.num_gal == 1:
     data_dict['L.sim'] = angs['ang.mom.vector']
     data_dict['Ltot.sim'] = angs['ang.mom.total']
     data_dict['Lz.sim'] = angs['ang.mom.vector'][:,:,2]
-    ###### NEED TANGENTIAL VELOCITIES
+    data_dict['v.tan.z0'] = halt.prop('host.velocity.tan', orbits.sub_inds[:,0])
+    data_dict['v.rad.z0'] = halt.prop('host.velocity.rad', orbits.sub_inds[:,0])
     data_dict['time.sim'] = snaps['time']
     #
     data_dict['dtot.galpy'] = galpy_orbits.r(ts)
@@ -290,7 +291,8 @@ if sim_data.num_gal == 2:
     data_dict['L.sim'] = angs['ang.mom.vector']
     data_dict['Ltot.sim'] = angs['ang.mom.total']
     data_dict['Lz.sim'] = angs['ang.mom.vector'][:,:,2]
-    ###### NEED TANGENTIAL VELOCITIES
+    data_dict['v.tan.z0'] = halt.prop('host.velocity.tan', orbits.sub_inds[:,0])
+    data_dict['v.rad.z0'] = halt.prop('host.velocity.rad', orbits.sub_inds[:,0])
     data_dict['time.sim'] = snaps['time']
     #
     data_dict['dtot.galpy'] = galpy_orbits.r(ts)
@@ -424,7 +426,8 @@ if sim_data.num_gal == 2:
     data_dict['L.sim'] = angs['ang.mom.vector']
     data_dict['Ltot.sim'] = angs['ang.mom.total']
     data_dict['Lz.sim'] = angs['ang.mom.vector'][:,:,2]
-    ###### NEED TANGENTIAL VELOCITIES
+    data_dict['v.tan.z0'] = halt.prop('host2.velocity.tan', orbits.sub_inds[:,0])
+    data_dict['v.rad.z0'] = halt.prop('host2.velocity.rad', orbits.sub_inds[:,0])
     data_dict['time.sim'] = snaps['time']
     #
     data_dict['dtot.galpy'] = galpy_orbits.r(ts)
