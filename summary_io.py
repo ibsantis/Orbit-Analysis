@@ -797,16 +797,22 @@ class SummaryDataPlot(SummaryDataSort):
             #
             onesigp = 84.13
             onesigm = 15.87
+            twosigp = 100
+            twosigm = 0
             #
             med = np.zeros(len(bins)-1)
             lower = np.zeros(len(bins)-1)
             upper = np.zeros(len(bins)-1)
+            lowest = np.zeros(len(bins)-1)
+            highest = np.zeros(len(bins)-1)
             #
             for i in range(0, len(bins)-1):
                 mask = (x >= bins[i]) & (x <= bins[i+1])
                 med[i] = np.nanmedian(y[mask])
                 upper[i] = np.nanpercentile(y[mask], onesigp)
                 lower[i] = np.nanpercentile(y[mask], onesigm)
+                highest[i] = np.nanpercentile(y[mask], twosigp)
+                lowest[i] = np.nanpercentile(y[mask], twosigm)
         #
         if 'N.' in xtype and 'N.' not in ytype:
             minn = int(binsize*np.floor(np.min(x)/binsize))-0.5
@@ -817,16 +823,22 @@ class SummaryDataPlot(SummaryDataSort):
             half_bin = (bins[1]-bins[0])/2
             onesigp = 84.13
             onesigm = 15.87
+            twosigp = 100
+            twosigm = 0
             #
             med = np.zeros(len(bins)-1)
             lower = np.zeros(len(bins)-1)
             upper = np.zeros(len(bins)-1)
+            lowest = np.zeros(len(bins)-1)
+            highest = np.zeros(len(bins)-1)
             #
             for i in range(0, len(bins)-1):
                 mask = (x >= bins[i]) & (x <= bins[i+1])
                 med[i] = np.nanmedian(y[mask])
                 upper[i] = np.nanpercentile(y[mask], onesigp)
                 lower[i] = np.nanpercentile(y[mask], onesigm)
+                highest[i] = np.nanpercentile(y[mask], twosigp)
+                lowest[i] = np.nanpercentile(y[mask], twosigm)
         #
         if 'N.' not in xtype and 'N.' in ytype:
             minn = binsize*np.floor(np.min(x)/binsize)
@@ -838,13 +850,20 @@ class SummaryDataPlot(SummaryDataSort):
             bins = np.linspace(minn, maxx, bin_num)
             half_bin = (bins[1]-bins[0])/2
             #
+            twosigp = 100
+            twosigm = 0
+            #
             means = np.zeros(len(bins)-1)
             scatter = np.zeros(len(bins)-1)
+            highest = np.zeros(len(bins)-1)
+            lowest = np.zeros(len(bins)-1)
             #
             for i in range(0, len(bins)-1):
                 mask = (x >= bins[i]) & (x <= bins[i+1])
                 means[i] = np.nanmean(y[mask])
                 scatter[i] = np.nanstd(y[mask])
+                highest[i] = np.nanpercentile(y[mask], twosigp)
+                lowest[i] = np.nanpercentile(y[mask], twosigm)
             #
             upper = means+scatter
             lower = means-scatter
@@ -857,13 +876,20 @@ class SummaryDataPlot(SummaryDataSort):
             bins = np.linspace(minn, maxx, bin_num)
             half_bin = (bins[1]-bins[0])/2
             #
+            twosigp = 100
+            twosigm = 0
+            #
             means = np.zeros(len(bins)-1)
             scatter = np.zeros(len(bins)-1)
+            highest = np.zeros(len(bins)-1)
+            lowest = np.zeros(len(bins)-1)
             #
             for i in range(0, len(bins)-1):
                 mask = (x >= bins[i]) & (x <= bins[i+1])
                 means[i] = np.nanmean(y[mask])
                 scatter[i] = np.nanstd(y[mask])
+                highest[i] = np.nanpercentile(y[mask], twosigp)
+                lowest[i] = np.nanpercentile(y[mask], twosigm)
             #
             upper = means+scatter
             lower = means-scatter
@@ -872,6 +898,7 @@ class SummaryDataPlot(SummaryDataSort):
         f, ax = plt.subplots(figsize=(10, 8))
         plt.plot(bins[:-1]+half_bin, med, color=self.colors[1], marker='s', markersize=10, alpha=0.5)
         plt.fill_between(bins[:-1]+half_bin, upper, lower, color=self.colors[1], alpha=0.3)
+        plt.fill_between(bins[:-1]+half_bin, highest, lowest, color=self.colors[1], alpha=0.15)
         if limits:
             plt.xlim(limits[0])
             plt.ylim(limits[1])
