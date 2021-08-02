@@ -611,50 +611,41 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    def mass_masking_property(self, data_dict, mask_dict, prop, mass_type='Mstar.z0', oversample=False, hosts='all', sim_type='baryon'):
+    def mass_masking_property(self, data_dict, mask_dict, prop, mass_array, mass_type='Mstar.z0', oversample=False, hosts='all', sim_type='baryon'):
         """
         STILL NEEDS A LOT OF WORK AND CHECKING...
         """
         props = dict()
         prop_low = []
         prop_mid = []
-        prop_high = []
         #
         if oversample == False:
             for name in self.host_names[hosts]:
-                mask_low = (data_dict[name][mass_type][mask_dict[name]] < 1e5)
-                mask_mid = ((data_dict[name][mass_type][mask_dict[name]] > 1e5)*(data_dict[name][mass_type][mask_dict[name]] < 1e7))
-                mask_high = (data_dict[name][mass_type][mask_dict[name]] > 1e7)
+                mask_low = ((data_dict[name][mass_type][mask_dict[name]] > mass_array[0])*(data_dict[name][mass_type][mask_dict[name]] < mass_array[1]))
+                mask_mid = (data_dict[name][mass_type][mask_dict[name]] > mass_array[1])
                 if prop == 't.infall':
                     prop_low.append(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_low])
                     prop_mid.append(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_mid])
-                    prop_high.append(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_high])
                 elif prop == 'dz0':
                     prop_low.append(data_dict[name]['dtot.sim'][mask_dict[name]][mask_low][:,0])
                     prop_mid.append(data_dict[name]['dtot.sim'][mask_dict[name]][mask_mid][:,0])
-                    prop_high.append(data_dict[name]['dtot.sim'][mask_dict[name]][mask_high][:,0])
             #
             props['low'] = np.hstack(prop_low)
             props['mid'] = np.hstack(prop_mid)
-            props['high'] = np.hstack(prop_high)
         #
         elif oversample == True:
             for name in self.host_names[hosts]:
-                mask_low = (data_dict[name][mass_type][mask_dict[name]] < 1e5)
-                mask_mid = ((data_dict[name][mass_type][mask_dict[name]] > 1e5)*(data_dict[name][mass_type][mask_dict[name]] < 1e7))
-                mask_high = (data_dict[name][mass_type][mask_dict[name]] > 1e7)
+                mask_low = ((data_dict[name][mass_type][mask_dict[name]] > mass_array[0])*(data_dict[name][mass_type][mask_dict[name]] < mass_array[1]))
+                mask_mid = (data_dict[name][mass_type][mask_dict[name]] > mass_array[1])
                 if prop == 't.infall':
                     prop_low.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_low], self.oversample[sim_type][name]))
                     prop_mid.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_mid], self.oversample[sim_type][name]))
-                    prop_high.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_high], self.oversample[sim_type][name]))
                 elif prop == 'dz0':
                     prop_low.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_low][:,0], self.oversample[sim_type][name]))
                     prop_mid.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_mid][:,0], self.oversample[sim_type][name]))
-                    prop_high.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_high][:,0], self.oversample[sim_type][name]))
             #
             props['low'] = np.hstack(prop_low)
             props['mid'] = np.hstack(prop_mid)
-            props['high'] = np.hstack(prop_high)
         #
         return props
 
