@@ -960,16 +960,22 @@ class SummaryDataPlot(SummaryDataSort):
                 #
                 onesigp = 84.13
                 onesigm = 15.87
+                twosigp = 100
+                twosigm = 0
                 #
                 med = np.zeros(len(bins)-1)
                 lower = np.zeros(len(bins)-1)
                 upper = np.zeros(len(bins)-1)
+                lowest = np.zeros(len(bins)-1)
+                highest = np.zeros(len(bins)-1)
                 #
                 for i in range(0, len(bins)-1):
                     mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
                     med[i] = np.nanmedian(y[j][mask])
                     upper[i] = np.nanpercentile(y[j][mask], onesigp)
                     lower[i] = np.nanpercentile(y[j][mask], onesigm)
+                    highest[i] = np.nanpercentile(y[j][mask], twosigp)
+                    lowest[i] = np.nanpercentile(y[j][mask], twosigm)
             #
             if 'N.' in xtype[j] and 'N.' not in ytype[j]:
                 minn = int(binsize*np.floor(np.min(x[j])/binsize))-0.5
@@ -980,16 +986,22 @@ class SummaryDataPlot(SummaryDataSort):
                 half_bin = (bins[1]-bins[0])/2
                 onesigp = 84.13
                 onesigm = 15.87
+                twosigp = 100
+                twosigm = 0
                 #
                 med = np.zeros(len(bins)-1)
                 lower = np.zeros(len(bins)-1)
                 upper = np.zeros(len(bins)-1)
+                lowest = np.zeros(len(bins)-1)
+                highest = np.zeros(len(bins)-1)
                 #
                 for i in range(0, len(bins)-1):
                     mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
                     med[i] = np.nanmedian(y[j][mask])
                     upper[i] = np.nanpercentile(y[j][mask], onesigp)
                     lower[i] = np.nanpercentile(y[j][mask], onesigm)
+                    highest[i] = np.nanpercentile(y[j][mask], twosigp)
+                    lowest[i] = np.nanpercentile(y[j][mask], twosigm)
             #
             if 'N.' not in xtype[j] and 'N.' in ytype[j]:
                 minn = binsize*np.floor(np.min(x[j])/binsize)
@@ -1001,13 +1013,20 @@ class SummaryDataPlot(SummaryDataSort):
                 bins = np.linspace(minn, maxx, bin_num)
                 half_bin = (bins[1]-bins[0])/2
                 #
+                twosigp = 100
+                twosigm = 0
+                #
                 means = np.zeros(len(bins)-1)
                 scatter = np.zeros(len(bins)-1)
+                lowest = np.zeros(len(bins)-1)
+                highest = np.zeros(len(bins)-1)
                 #
                 for i in range(0, len(bins)-1):
                     mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
                     means[i] = np.nanmean(y[j][mask])
                     scatter[i] = np.nanstd(y[j][mask])
+                    highest[i] = np.nanpercentile(y[j][mask], twosigp)
+                    lowest[i] = np.nanpercentile(y[j][mask], twosigm)
                 #
                 upper = means+scatter
                 lower = means-scatter
@@ -1020,13 +1039,20 @@ class SummaryDataPlot(SummaryDataSort):
                 bins = np.linspace(minn, maxx, bin_num)
                 half_bin = (bins[1]-bins[0])/2
                 #
+                twosigp = 100
+                twosigm = 0
+                #
                 means = np.zeros(len(bins)-1)
                 scatter = np.zeros(len(bins)-1)
+                lowest = np.zeros(len(bins)-1)
+                highest = np.zeros(len(bins)-1)
                 #
                 for i in range(0, len(bins)-1):
                     mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
                     means[i] = np.nanmean(y[j][mask])
                     scatter[i] = np.nanstd(y[j][mask])
+                    highest[i] = np.nanpercentile(y[j][mask], twosigp)
+                    lowest[i] = np.nanpercentile(y[j][mask], twosigm)
                 #
                 upper = means+scatter
                 lower = means-scatter
@@ -1034,6 +1060,217 @@ class SummaryDataPlot(SummaryDataSort):
             #
             plt.plot(bins[:-1]+half_bin, med, color=colorss[j], marker='s', markersize=10, alpha=0.5, label=labels[j])
             plt.fill_between(bins[:-1]+half_bin, upper, lower, color=colorss[j], alpha=0.3)
+            plt.fill_between(bins[:-1]+half_bin, highest, lowest, color=colorss[j], alpha=0.15)
+        if limits:
+            plt.xlim(limits[0])
+            plt.ylim(limits[1])
+        plt.xlabel(self.labels[xtype[0]], fontsize=28)
+        plt.ylabel(self.labels[ytype[0]], fontsize=28)
+        plt.legend(prop={'size': 18}, loc='best')
+        if title:
+            plt.title(self.titles[title], fontsize=24)
+        plt.tick_params(axis='both', which='major', labelsize=24)
+        plt.tight_layout()
+        plt.savefig(file_path_and_name)
+        plt.close()
+
+    def median_plot_mult_one_scatter(self, x, y, xtype, ytype, labels, binsize, file_path_and_name, limits=None, title=None):
+        """
+        DESCRIPTION:
+            Bins the x-axis quantity and plots either the mean or median, along
+            with the standard deviation or 68% scatter, of the y-axis quantity.
+
+        VARIABLES:
+            - x                  : list
+            - y                  : list
+            - xtype              : list
+            - ytype              : list
+            - labels             : list
+            - binsize            : float or int
+            - limits             : tuple of two tuples
+            - title              : string
+            - file_path_and_name : string
+
+        NOTES:
+            - If plotting mass quantities, this takes the log first.
+            - If the x-axis quantity is an integer quantity (pericenter number
+              in particular), script bins differently than if not an integer
+              quantity.
+            - If the y-axis quantity is an integer quantity, then the method
+              calculates the mean and standard deviation.
+            - If the y-axis quantity is not an integer quantity, then the method
+              calculates the median and 68% scatter.
+        """
+        colorss = ['#006400', '#000080']
+        #
+        x_all = np.hstack(x)
+        y_all = np.hstack(y)
+        #
+        f, ax = plt.subplots(figsize=(10, 8))
+        #
+        if 'M.' in xtype[0]:
+            x_all = np.log10(x_all)
+            x[0] = np.log10(x[0])
+            x[1] = np.log10(x[1])
+        if 'M.' in ytype[0]:
+            y_all = np.log10(y_all)
+            y[0] = np.log10(y[0])
+            y[1] = np.log10(y[1])
+        #
+        if 'N.' not in xtype[0] and 'N.' not in ytype[0]:
+            minn = binsize*np.floor(np.min(x_all)/binsize)
+            maxx = binsize*np.ceil(np.max(x_all)/binsize)
+            if minn < 0:
+                bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+            else:
+                bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+            bins = np.linspace(minn, maxx, bin_num)
+            half_bin = (bins[1]-bins[0])/2
+            #
+            onesigp = 84.13
+            onesigm = 15.87
+            twosigp = 100
+            twosigm = 0
+            #
+            med_all = np.zeros(len(bins)-1)
+            med_1 = np.zeros(len(bins)-1)
+            med_2 = np.zeros(len(bins)-1)
+            #
+            lower = np.zeros(len(bins)-1)
+            upper = np.zeros(len(bins)-1)
+            lowest = np.zeros(len(bins)-1)
+            highest = np.zeros(len(bins)-1)
+            #
+            for i in range(0, len(bins)-1):
+                mask_all = (x_all >= bins[i]) & (x_all <= bins[i+1])
+                med_all[i] = np.nanmedian(y_all[mask_all])
+                upper[i] = np.nanpercentile(y_all[mask_all], onesigp)
+                lower[i] = np.nanpercentile(y_all[mask_all], onesigm)
+                highest[i] = np.nanpercentile(y_all[mask_all], twosigp)
+                lowest[i] = np.nanpercentile(y_all[mask_all], twosigm)
+                #
+                mask_1 = (x[0] >= bins[i]) & (x[0] <= bins[i+1])
+                med_1[i] = np.nanmedian(y[0][mask_1])
+                #
+                mask_2 = (x[1] >= bins[i]) & (x[1] <= bins[i+1])
+                med_2[i] = np.nanmedian(y[1][mask_2])
+        #
+        if 'N.' in xtype[0] and 'N.' not in ytype[0]:
+            minn = int(binsize*np.floor(np.min(x_all)/binsize))-0.5
+            maxx = int(binsize*np.ceil(np.max(x_all)/binsize))+0.5
+            bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
+            bins = np.linspace(minn, maxx, bin_num)
+            #
+            half_bin = (bins[1]-bins[0])/2
+            onesigp = 84.13
+            onesigm = 15.87
+            twosigp = 100
+            twosigm = 0
+            #
+            med_all = np.zeros(len(bins)-1)
+            med_1 = np.zeros(len(bins)-1)
+            med_2 = np.zeros(len(bins)-1)
+            #
+            lower = np.zeros(len(bins)-1)
+            upper = np.zeros(len(bins)-1)
+            lowest = np.zeros(len(bins)-1)
+            highest = np.zeros(len(bins)-1)
+            #
+            for i in range(0, len(bins)-1):
+                mask_all = (x_all >= bins[i]) & (x_all <= bins[i+1])
+                med_all[i] = np.nanmedian(y_all[mask_all])
+                upper[i] = np.nanpercentile(y_all[mask_all], onesigp)
+                lower[i] = np.nanpercentile(y_all[mask_all], onesigm)
+                highest[i] = np.nanpercentile(y_all[mask_all], twosigp)
+                lowest[i] = np.nanpercentile(y_all[mask_all], twosigm)
+                #
+                mask_1 = (x[0] >= bins[i]) & (x[0] <= bins[i+1])
+                med_1[i] = np.nanmedian(y[0][mask_1])
+                #
+                mask_2 = (x[1] >= bins[i]) & (x[1] <= bins[i+1])
+                med_2[i] = np.nanmedian(y[1][mask_2])
+        #
+        if 'N.' not in xtype[0] and 'N.' in ytype[0]:
+            minn = binsize*np.floor(np.min(x_all)/binsize)
+            maxx = binsize*np.ceil(np.max(x_all)/binsize)
+            if minn < 0:
+                bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+            else:
+                bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+            bins = np.linspace(minn, maxx, bin_num)
+            half_bin = (bins[1]-bins[0])/2
+            #
+            twosigp = 100
+            twosigm = 0
+            #
+            means_all = np.zeros(len(bins)-1)
+            means_1 = np.zeros(len(bins)-1)
+            means_2 = np.zeros(len(bins)-1)
+            #
+            scatter = np.zeros(len(bins)-1)
+            lowest = np.zeros(len(bins)-1)
+            highest = np.zeros(len(bins)-1)
+            #
+            for i in range(0, len(bins)-1):
+                mask_all = (x_all >= bins[i]) & (x_all <= bins[i+1])
+                means_all[i] = np.nanmean(y_all[mask_all])
+                scatter[i] = np.nanstd(y_all[mask_all])
+                highest[i] = np.nanpercentile(y_all[mask_all], twosigp)
+                lowest[i] = np.nanpercentile(y_all[mask_all], twosigm)
+                #
+                mask_1 = (x[0] >= bins[i]) & (x[0] <= bins[i+1])
+                means_1 = np.nanmean(y[0][mask_1])
+                #
+                mask_2 = (x[1] >= bins[i]) & (x[1] <= bins[i+1])
+                means_2 = np.nanmean(y[0][mask_2])
+            #
+            upper = means_all+scatter
+            lower = means_all-scatter
+            med_all = means_all
+            med_1 = means_1
+            med_2 = means_2
+        #
+        if 'N.' in xtype[0] and 'N.' in ytype[0]:
+            minn = int(binsize*np.floor(np.min(x_all)/binsize))-0.5
+            maxx = int(binsize*np.ceil(np.max(x_all)/binsize))+0.5
+            bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
+            bins = np.linspace(minn, maxx, bin_num)
+            half_bin = (bins[1]-bins[0])/2
+            #
+            twosigp = 100
+            twosigm = 0
+            #
+            means_all = np.zeros(len(bins)-1)
+            means_1 = np.zeros(len(bins)-1)
+            means_2 = np.zeros(len(bins)-1)
+            #
+            scatter = np.zeros(len(bins)-1)
+            lowest = np.zeros(len(bins)-1)
+            highest = np.zeros(len(bins)-1)
+            #
+            for i in range(0, len(bins)-1):
+                mask_all = (x_all >= bins[i]) & (x_all <= bins[i+1])
+                means_all[i] = np.nanmean(y_all[mask_all])
+                scatter[i] = np.nanstd(y_all[mask_all])
+                highest[i] = np.nanpercentile(y_all[mask_all], twosigp)
+                lowest[i] = np.nanpercentile(y_all[mask_all], twosigm)
+                #
+                mask_1 = (x[0] >= bins[i]) & (x[0] <= bins[i+1])
+                means_1 = np.nanmean(y[0][mask_1])
+                #
+                mask_2 = (x[1] >= bins[i]) & (x[1] <= bins[i+1])
+                means_2 = np.nanmean(y[0][mask_2])
+            #
+            med_all = means_all
+            med_1 = means_1
+            med_2 = means_2
+        #
+        plt.plot(bins[:-1]+half_bin, med_all, color='k', markersize=10, alpha=0.8)
+        plt.fill_between(bins[:-1]+half_bin, upper, lower, color='k', alpha=0.2)
+        plt.fill_between(bins[:-1]+half_bin, highest, lowest, color='k', alpha=0.1)
+        plt.plot(bins[:-1]+half_bin, med_1, color=colorss[0], markersize=10, alpha=0.5, label=labels[0])
+        plt.plot(bins[:-1]+half_bin, med_2, color=colorss[1], markersize=10, alpha=0.5, label=labels[1])
+        #
         if limits:
             plt.xlim(limits[0])
             plt.ylim(limits[1])
