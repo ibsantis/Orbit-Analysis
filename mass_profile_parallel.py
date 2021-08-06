@@ -5,9 +5,9 @@
 #SBATCH --mem=240G
 #SBATCH --nodes=1
 ##SBATCH --ntasks-per-node=8    # MPI tasks per node
-#SBATCH --ntasks=8    # processes total
+#SBATCH --ntasks=4    # processes total
 ##SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
-#SBATCH --time=24:00:00
+#SBATCH --time=48:00:00
 #SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/m12b_mass_profile_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
@@ -36,7 +36,7 @@ import orbit_io
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12b', location='stampede')
+sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
 print('Set paths')
 
 # Set up snapshot array to loop through
@@ -61,10 +61,11 @@ def mass_evolution(snap, sim_data, rs):
             gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [rs[j], rs[j+1]])
             dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [rs[j], rs[j+1]])
             mass_array[j] = np.sum(part['star']['mass'][star_inds]) + np.sum(part['gas']['mass'][gas_inds]) + np.sum(part['dark']['mass'][dark_inds])
-            print('Done with step', j)
+            #print('Done with step', j)
         #
         # Save this data to a file ADD VERBOSE
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.galaxy+'_mass_profile_evolution_'+str(snap), dict_or_array_to_write=mass_array, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.galaxy+'/'+sim_data.galaxy+'_mass_profile_evolution_'+str(snap), dict_or_array_to_write=mass_array, verbose=True)
+        print('Done with snapshot {0}'.format(snap))
 
 args_list = [
     (snapshot, sim_data, rs) for snapshot in snaps
