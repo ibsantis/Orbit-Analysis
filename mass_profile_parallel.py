@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=m12i_mass_profile
+#SBATCH --job-name=m12m_mass_profile
 ##SBATCH --partition=high2    # peloton node: 32 cores, 7.8 GB per core, 250 GB total
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=240G
@@ -7,8 +7,8 @@
 ##SBATCH --ntasks-per-node=8    # MPI tasks per node
 #SBATCH --ntasks=4    # processes total
 ##SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
-#SBATCH --time=8:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/m12i_mass_profile_%j.txt
+#SBATCH --time=12:00:00
+#SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/m12m_mass_profile_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -36,7 +36,7 @@ import orbit_io
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12m', location='peloton')
 print('Set paths')
 
 # Set up snapshot array to loop through
@@ -71,7 +71,7 @@ args_list = [
     (snapshot, sim_data, rs) for snapshot in snaps
     ]
 
-ut.io.run_in_parallel(mass_evolution, args_list, proc_number=4) # ADD VERBOSE
+ut.io.run_in_parallel(mass_evolution, args_list, proc_number=8) # ADD VERBOSE
 # Try 4 at first, then try 8
 # How many snaps can I read in simultaneously? Divide total mem by snapshots to get proc number
 #
