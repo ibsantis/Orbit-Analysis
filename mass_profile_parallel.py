@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=m12z_mass_profile
+#SBATCH --job-name=RJ_mass_profile
 ##SBATCH --partition=high2    # peloton node: 32 cores, 7.8 GB per core, 250 GB total
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=240G
 #SBATCH --nodes=1
-##SBATCH --ntasks-per-node=8    # MPI tasks per node
+##SBATCH --ntasks-per-node=4    # MPI tasks per node
 #SBATCH --ntasks=4    # processes total
 ##SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
-#SBATCH --time=8:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/m12z_mass_profile_%j.txt
+#SBATCH --time=24:00:00
+#SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/RJ_mass_profile_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -36,7 +36,7 @@ import orbit_io
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12z', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='Romeo', location='peloton')
 print('Set paths')
 
 # Set up snapshot array to loop through
@@ -66,12 +66,40 @@ def mass_evolution(snap, sim_data, rs):
         # Save this data to a file ADD VERBOSE
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.galaxy+'/'+sim_data.galaxy+'_mass_profile_evolution_'+str(snap), dict_or_array_to_write=mass_array, verbose=True)
         print('Done with snapshot {0}'.format(snap))
+    #
+    # Check if one or two hosts
+    if sim_data.num_gal == 2:
+        #
+        mass_array_1 = np.zeros(len(rs)-1)
+        mass_array_2 = np.zeros(len(rs)-1)
+        #
+        # Read in the data
+        part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'snapshot', snap, simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
+        #print('Particles at snapshot {0} read in.'.format(snap))
+        #
+        # Find the enclosed mass of all particles within 0.1 < R < 500 kpc
+        for j in range(0, len(rs)-1):
+            star_inds_1 = ut.array.get_indices(part['star'].prop('host.distance.total'), [rs[j], rs[j+1]])
+            gas_inds_1 = ut.array.get_indices(part['gas'].prop('host.distance.total'), [rs[j], rs[j+1]])
+            dark_inds_1 = ut.array.get_indices(part['dark'].prop('host.distance.total'), [rs[j], rs[j+1]])
+            mass_array_1[j] = np.sum(part['star']['mass'][star_inds_1]) + np.sum(part['gas']['mass'][gas_inds_1]) + np.sum(part['dark']['mass'][dark_inds_1])
+            #
+            star_inds_2 = ut.array.get_indices(part['star'].prop('host2.distance.total'), [rs[j], rs[j+1]])
+            gas_inds_2 = ut.array.get_indices(part['gas'].prop('host2.distance.total'), [rs[j], rs[j+1]])
+            dark_inds_2 = ut.array.get_indices(part['dark'].prop('host2.distance.total'), [rs[j], rs[j+1]])
+            mass_array_2[j] = np.sum(part['star']['mass'][star_inds_2]) + np.sum(part['gas']['mass'][gas_inds_2]) + np.sum(part['dark']['mass'][dark_inds_2])
+            #print('Done with step', j)
+        #
+        # Save this data to a file ADD VERBOSE
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.gal_1+'/'+sim_data.gal_1+'_mass_profile_evolution_'+str(snap), dict_or_array_to_write=mass_array_1, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.gal_2+'/'+sim_data.gal_2+'_mass_profile_evolution_'+str(snap), dict_or_array_to_write=mass_array_2, verbose=True)
+        print('Done with snapshot {0}'.format(snap))
 
 args_list = [
     (snapshot, sim_data, rs) for snapshot in snaps
     ]
 
-ut.io.run_in_parallel(mass_evolution, args_list, proc_number=8) # ADD VERBOSE
+ut.io.run_in_parallel(mass_evolution, args_list, proc_number=4) # ADD VERBOSE
 # Try 4 at first, then try 8
 # How many snaps can I read in simultaneously? Divide total mem by snapshots to get proc number
 #
