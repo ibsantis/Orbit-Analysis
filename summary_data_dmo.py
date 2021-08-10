@@ -17,16 +17,10 @@ import gizmo_analysis as gizmo
 import utilities as ut
 import numpy as np
 import h5py
-import matplotlib
-from matplotlib import pyplot as plt
-from matplotlib import patches
-from scipy.interpolate import interp1d
-from astropy import units as u
-import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton', dmo=True)
+sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton', dmo=True)
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
