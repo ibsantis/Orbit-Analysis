@@ -649,6 +649,40 @@ class SummaryDataSort:
         #
         return props
 
+    def velocities(self, data_dict, mask_dict, selection='tan', oversample=False, hosts='all', sim_type='baryon'):
+        """
+        Only works with the simulation data right now, not the model data...
+
+        selection = rad or tan
+        """
+        data = []
+        #
+        if oversample == False:
+            for name in self.host_names[hosts]:
+                data.append(data_dict[name]['v.'+selection+'.z0'][mask_dict[name]])
+        #
+        elif oversample == True:
+            for name in self.host_names[hosts]:
+                data.append(np.repeat(data_dict[name]['v.'+selection+'.z0'][mask_dict[name]], self.oversample[sim_type][name]))
+        #
+        return np.hstack(data)
+
+    def L_z0(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
+        """
+        Only works with the simulation data right now, not the model data...
+        """
+        data = []
+        #
+        if oversample == False:
+            for name in self.host_names[hosts]:
+                data.append(data_dict[name]['Ltot.sim'][mask_dict[name]][:,0])
+        #
+        elif oversample == True:
+            for name in self.host_names[hosts]:
+                data.append(np.repeat(data_dict[name]['Ltot.sim'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
+        #
+        return np.hstack(data)
+
 
 class SummaryDataPlot(SummaryDataSort):
 
@@ -680,6 +714,8 @@ class SummaryDataPlot(SummaryDataSort):
                        'd.z0': 'd(z = 0) [kpc]',\
                        'delta.d.frac': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$',\
                        'delta.d': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$) [kpc]',\
+                       'v.tan': 'v$_{\\rm tan}(z = 0)$ [km s$^{-1}$]',\
+                       'v.rad': 'v$_{\\rm rad}(z = 0)$ [km s$^{-1}$]',\
                        't.sim': 't$_{\\rm peri,lb,sim}$ [Gyr]',\
                        't.sim.min': 't$_{\\rm peri_min,lb,sim}$ [Gyr]',\
                        't.model': 't$_{\\rm peri,lb,model}$ [Gyr]',\
@@ -694,7 +730,8 @@ class SummaryDataPlot(SummaryDataSort):
                        'M.halo.z0': 'log$_{\\rm 10}$[M$_{\\rm halo}(z = 0)$/M$_{\\odot}$]',\
                        'M.halo.peak': 'log$_{\\rm 10}$[M$_{\\rm halo, peak}$/M$_{\\odot}$]',\
                        'KE.max.sim': 'KE$_{\\rm max,sim}$ [10$^4$ km$^2$/s$^2$]',\
-                       'KE.peri.sim': 'KE$_{\\rm peri,sim}$ [10$^4$ km$^2$/s$^2$]'}
+                       'KE.peri.sim': 'KE$_{\\rm peri,sim}$ [10$^4$ km$^2$/s$^2$]',\
+                       'L.tot': 'L$_{\\rm tot}(z = 0)$ [10$^4$ kpc km s$^{-1}$]'}
         #
         self.titles = {'d.sim': 'Recent Minimum Distances',\
                        'd.model': 'Recent Minimum Distances',\
