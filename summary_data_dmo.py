@@ -26,12 +26,12 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12z', location='peloton', dmo=False)
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton', dmo=True)
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
-halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, host_number=sim_data.num_gal, file_kind='hdf5', species='star')
+halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, host_number=sim_data.num_gal)
 
 if sim_data.num_gal == 1:
     # This initializes the classes and makes sure they inherit from the OrbitRead class
@@ -111,7 +111,7 @@ if sim_data.num_gal == 1:
     # Save the host radius
     data_dict['host.radius'] = host_radii
 
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo', dict_or_array_to_write=data_dict, verbose=True)
 
 if sim_data.num_gal == 2:
     # This initializes the classes and makes sure they inherit from the OrbitRead class
@@ -192,7 +192,7 @@ if sim_data.num_gal == 2:
     data_dict['host.radius'] = host_radii
     np.sum(peris['pericenter.check'])
     #
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_dmo', dict_or_array_to_write=data_dict, verbose=True)
     #
     #
     ### GALAXY 2
@@ -274,4 +274,4 @@ if sim_data.num_gal == 2:
     data_dict['host.radius'] = host_radii
     np.sum(peris['pericenter.check'])
 
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_dmo', dict_or_array_to_write=data_dict, verbose=True)
