@@ -432,6 +432,39 @@ class OrbitAnalysis:
         d['all.infall.time.lb'] = all_infall_times_lookback
         return d
 
+    def first_infall_any(self, tree, time_array):
+        """
+        TBD
+        """
+        # Set up a dictionary to store the information you want
+        d = dict();
+        #
+        # Initialize some arrays for the dictionary
+        first_infall_snap = (-1)*np.ones(self.shape[0], int)
+        first_infall_times = (-1)*np.ones(self.shape[0])
+        first_infall_times_lookback = (-1)*np.ones(self.shape[0])
+        infall_check = np.zeros(self.shape[0], bool)
+        #
+        # Set up lookback time array
+        lookback = time_array['time'][-1] - time_array['time']
+        #
+        # Loop over subhalos
+        for i in range(0, self.shape[0]):
+            mask = (self.sub_inds[i] >= 0)
+            central_inds = tree.prop('central.index', self.sub_inds[i][mask])
+            if (len(central_inds[central_inds >= 0]) != 0):
+                first_infall_snap[i] = tree.prop('snapshot', central_inds[central_inds >= 0][-1])
+                first_infall_times[i] = time_array['time'][first_infall_snap[i]]
+                first_infall_times_lookback[i] = lookback[first_infall_snap[i]]
+                infall_check[i] = True
+        #
+        d['first.infall.snap.any'] = first_infall_snap
+        d['first.infall.time.any'] = first_infall_times
+        d['first.infall.time.lb.any'] = first_infall_times_lookback
+        d['infall.check.any'] = infall_check
+        #
+        return d
+
     def pericenter_interp(self, distances, velocities, virial_radii, time_array):
         """
         DESCRIPTION:
