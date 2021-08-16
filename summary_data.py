@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12c', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -48,6 +48,7 @@ if sim_data.num_gal == 1:
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
+    infall_info_any = orbits.first_infall_any(halt, snaps)
     peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps)
     apos = orbits.apocenter_interp(distances=halt_dists, velocities=halt_vels, time_array=snaps, infall_array=infall_info)
     angs = orbits.angular_momentum(tree=halt)
@@ -105,6 +106,11 @@ if sim_data.num_gal == 1:
     data_dict['all.infall.snap'] = infall_info['all.infall.snap']
     data_dict['all.infall.time'] = infall_info['all.infall.time']
     data_dict['all.infall.time.lb'] = infall_info['all.infall.time.lb']
+    #
+    data_dict['infall.check.any'] = infall_info_any['infall.check.any']
+    data_dict['first.infall.snap.any'] = infall_info_any['first.infall.snap.any']
+    data_dict['first.infall.time.any'] = infall_info_any['first.infall.time.any']
+    data_dict['first.infall.time.lb.any'] = infall_info_any['first.infall.time.lb.any']
     #
     # Pericenter checks and numbers
     data_dict['pericenter.check.sim'] = peris['pericenter.check']
@@ -184,6 +190,7 @@ if sim_data.num_gal == 2:
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
+    infall_info_any = orbits.first_infall_any(halt, snaps)
     peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps)
     apos = orbits.apocenter_interp(distances=halt_dists, velocities=halt_vels, time_array=snaps, infall_array=infall_info)
     angs = orbits.angular_momentum(tree=halt)
@@ -241,6 +248,11 @@ if sim_data.num_gal == 2:
     data_dict['all.infall.snap'] = infall_info['all.infall.snap']
     data_dict['all.infall.time'] = infall_info['all.infall.time']
     data_dict['all.infall.time.lb'] = infall_info['all.infall.time.lb']
+    #
+    data_dict['infall.check.any'] = infall_info_any['infall.check.any']
+    data_dict['first.infall.snap.any'] = infall_info_any['first.infall.snap.any']
+    data_dict['first.infall.time.any'] = infall_info_any['first.infall.time.any']
+    data_dict['first.infall.time.lb.any'] = infall_info_any['first.infall.time.lb.any']
     #
     # Pericenter checks and numbers
     data_dict['pericenter.check.sim'] = peris['pericenter.check']
@@ -319,6 +331,7 @@ if sim_data.num_gal == 2:
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host2.index'][0])]
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
+    infall_info_any = orbits.first_infall_any(halt, snaps)
     peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps)
     apos = orbits.apocenter_interp(distances=halt_dists, velocities=halt_vels, time_array=snaps, infall_array=infall_info)
     angs = orbits.angular_momentum(tree=halt, host=2)
@@ -376,6 +389,11 @@ if sim_data.num_gal == 2:
     data_dict['all.infall.snap'] = infall_info['all.infall.snap']
     data_dict['all.infall.time'] = infall_info['all.infall.time']
     data_dict['all.infall.time.lb'] = infall_info['all.infall.time.lb']
+    #
+    data_dict['infall.check.any'] = infall_info_any['infall.check.any']
+    data_dict['first.infall.snap.any'] = infall_info_any['first.infall.snap.any']
+    data_dict['first.infall.time.any'] = infall_info_any['first.infall.time.any']
+    data_dict['first.infall.time.lb.any'] = infall_info_any['first.infall.time.lb.any']
     #
     # Pericenter checks and numbers
     data_dict['pericenter.check.sim'] = peris['pericenter.check']
