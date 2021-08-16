@@ -717,7 +717,7 @@ class SummaryDataPlot(SummaryDataSort):
                        'v.tan': 'v$_{\\rm tan}(z = 0)$ [km s$^{-1}$]',\
                        'v.rad': 'v$_{\\rm rad}(z = 0)$ [km s$^{-1}$]',\
                        't.sim': 't$_{\\rm peri,lb,sim}$ [Gyr]',\
-                       't.sim.min': 't$_{\\rm peri_min,lb,sim}$ [Gyr]',\
+                       't.sim.min': 't$_{\\rm peri,min,lb,sim}$ [Gyr]',\
                        't.model': 't$_{\\rm peri,lb,model}$ [Gyr]',\
                        't.infall': 't$_{\\rm infall,lb}$ [Gyr]',\
                        'delta.t.frac': '(t$_{\\rm peri,model}$ - t$_{\\rm peri,sim}$)/t$_{\\rm peri,sim}$',\
