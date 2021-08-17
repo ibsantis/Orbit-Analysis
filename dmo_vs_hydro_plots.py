@@ -48,9 +48,12 @@ directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_1/baryon_vs_dmo'
 mask_selection = masks_infall
 N_sim_tot = summary.nperi(data_total, mask_selection, oversample=True, selection='sim', hosts='iso', sim_type='baryon_all')
 d_sim_tot = summary.dperi_recent(data_total, mask_selection, selection='sim', oversample=True, hosts='iso', sim_type='baryon_all')
+d_min_tot = summary.dperi_min(data_total, mask_selection, oversample=True, hosts='iso', sim_type='baryon_all')
 dz0_tot = summary.d_z0(data_total, mask_selection, oversample=True, hosts='iso', sim_type='baryon_all')
 t_sim_tot = summary.tperi_recent(data_total, mask_selection, selection='sim', oversample=True, hosts='iso', sim_type='baryon_all')
+t_min_tot = summary.tperi_min(data_total, mask_selection, oversample=True, hosts='iso', sim_type='baryon_all')
 t_in_tot = summary.first_infall(data_total, mask_selection, oversample=True, hosts='iso', sim_type='baryon_all')
+t_in_any_tot = summary.first_infall_any(data_total, mask_selection, oversample=True, hosts='iso', sim_type='baryon_all')
 Mhalo_peak_tot = summary.mhalo(data_total, mask_selection, selection='peak', oversample=True, hosts='iso', sim_type='baryon_all')
 vtan_tot = summary.velocities(data_total, mask_selection, selection='tan', oversample=True, hosts='iso', sim_type='baryon_all')
 vrad_tot = summary.velocities(data_total, mask_selection, selection='rad', oversample=True, hosts='iso', sim_type='baryon_all')
@@ -60,9 +63,12 @@ L_tot = summary.L_z0(data_total, mask_selection, selection='sim', oversample=Tru
 mask_selection = masks_infall_dmo
 N_sim_tot_dmo = summary.nperi(data_total_dmo, mask_selection, oversample=True, selection='sim', hosts='iso', sim_type='dmo')
 d_sim_tot_dmo = summary.dperi_recent(data_total_dmo, mask_selection, selection='sim', oversample=True, hosts='iso', sim_type='dmo')
+d_min_tot_dmo = summary.dperi_min(data_total_dmo, mask_selection, oversample=True, hosts='iso', sim_type='dmo')
 dz0_tot_dmo = summary.d_z0(data_total_dmo, mask_selection, oversample=True, hosts='iso', sim_type='dmo')
 t_sim_tot_dmo = summary.tperi_recent(data_total_dmo, mask_selection, selection='sim', oversample=True, hosts='iso', sim_type='dmo')
+t_min_tot_dmo = summary.tperi_min(data_total_dmo, mask_selection, oversample=True, hosts='iso', sim_type='dmo')
 t_in_tot_dmo = summary.first_infall(data_total_dmo, mask_selection, oversample=True, hosts='iso', sim_type='dmo')
+t_in_any_tot_dmo = summary.first_infall_any(data_total_dmo, mask_selection, oversample=True, hosts='iso', sim_type='dmo')
 Mhalo_peak_tot_dmo = summary.mhalo(data_total_dmo, mask_selection, selection='peak', oversample=True, hosts='iso', sim_type='dmo')
 vtan_tot_dmo = summary.velocities(data_total_dmo, mask_selection, selection='tan', oversample=True, hosts='iso', sim_type='dmo')
 vrad_tot_dmo = summary.velocities(data_total_dmo, mask_selection, selection='rad', oversample=True, hosts='iso', sim_type='dmo')
@@ -74,9 +80,17 @@ L_tot_dmo = summary.L_z0(data_total_dmo, mask_selection, selection='sim', oversa
 summary_plot.plot_hist_mult(x=[d_sim_tot, d_sim_tot_dmo], xtype=['d.sim', 'd.sim'], labels=['Baryon', 'DMO'], binsize=20, pdf=True, file_path_and_name=directory+'/histogram/d_sim_comare_iso.pdf')
 summary_plot.plot_hist_mult(x=[d_sim_tot, d_sim_tot_dmo], xtype=['d.sim', 'd.sim'], labels=['Baryon', 'DMO'], binsize=20, pdf=True, xlimits=[-5,400], file_path_and_name=directory+'/histogram/d_sim_comare_iso_zoom.pdf')
 
+# Minimum pericenter distances
+summary_plot.plot_hist_mult(x=[d_min_tot, d_min_tot_dmo], xtype=['d.sim.min', 'd.sim.min'], labels=['Baryon', 'DMO'], binsize=20, pdf=True, file_path_and_name=directory+'/histogram/d_min_comare_iso.pdf')
+summary_plot.plot_hist_mult(x=[d_min_tot, d_min_tot_dmo], xtype=['d.sim.min', 'd.sim.min'], labels=['Baryon', 'DMO'], binsize=20, pdf=True, xlimits=[-5,400], file_path_and_name=directory+'/histogram/d_min_comare_iso_zoom.pdf')
+
 # Recent pericenter times
 summary_plot.plot_hist_mult(x=[t_sim_tot, t_sim_tot_dmo], xtype=['t.sim', 't.sim'], labels=['Baryon', 'DMO'], binsize=0.5, pdf=True, file_path_and_name=directory+'/histogram/t_sim_comare_iso.pdf')
 summary_plot.plot_hist_mult(x=[t_sim_tot, t_sim_tot_dmo], xtype=['t.sim', 't.sim'], labels=['Baryon', 'DMO'], binsize=0.5, pdf=True, xlimits=[-0.1,11], file_path_and_name=directory+'/histogram/t_sim_comare_iso_zoom.pdf')
+
+# Time of minimum pericenter
+summary_plot.plot_hist_mult(x=[t_min_tot, t_min_tot_dmo], xtype=['t.sim.min', 't.sim.min'], labels=['Baryon', 'DMO'], binsize=0.5, pdf=True, file_path_and_name=directory+'/histogram/t_min_comare_iso.pdf')
+summary_plot.plot_hist_mult(x=[t_min_tot, t_min_tot_dmo], xtype=['t.sim.min', 't.sim.min'], labels=['Baryon', 'DMO'], binsize=0.5, pdf=True, xlimits=[-0.1,11], file_path_and_name=directory+'/histogram/t_min_comare_iso_zoom.pdf')
 
 # Pericenter number
 summary_plot.plot_hist_mult(x=[N_sim_tot, N_sim_tot_dmo], xtype=['N.sim', 'N.sim'], labels=['Baryon', 'DMO'], binsize=1, pdf=True, file_path_and_name=directory+'/histogram/N_sim_comare_iso.pdf')
@@ -85,6 +99,10 @@ summary_plot.plot_hist_mult(x=[N_sim_tot, N_sim_tot_dmo], xtype=['N.sim', 'N.sim
 # Infall times
 summary_plot.plot_hist_mult(x=[t_in_tot, t_in_tot_dmo], xtype=['t.infall', 't.infall'], labels=['Baryon', 'DMO'], binsize=0.5, pdf=True, file_path_and_name=directory+'/histogram/t_infall_comare_iso.pdf')
 summary_plot.plot_hist_mult(x=[t_in_tot, t_in_tot_dmo], xtype=['t.infall', 't.infall'], labels=['Baryon', 'DMO'], binsize=0.5, pdf=True, xlimits=[-0.1,13.8], file_path_and_name=directory+'/histogram/t_infall_comare_iso_zoom.pdf')
+
+# Infall times (any)
+summary_plot.plot_hist_mult(x=[t_in_any_tot, t_in_any_tot_dmo], xtype=['t.infall.any', 't.infall.any'], labels=['Baryon', 'DMO'], binsize=0.5, pdf=True, file_path_and_name=directory+'/histogram/t_infall_any_comare_iso.pdf')
+summary_plot.plot_hist_mult(x=[t_in_any_tot, t_in_any_tot_dmo], xtype=['t.infall.any', 't.infall.any'], labels=['Baryon', 'DMO'], binsize=0.5, pdf=True, xlimits=[-0.1,13.8], file_path_and_name=directory+'/histogram/t_infall_any_comare_iso_zoom.pdf')
 
 # d(z = 0)
 summary_plot.plot_hist_mult(x=[dz0_tot, dz0_tot_dmo], xtype=['d.z0', 'd.z0'], labels=['Baryon', 'DMO'], binsize=20, pdf=True, file_path_and_name=directory+'/histogram/dz0_comare_iso.pdf')
@@ -112,13 +130,25 @@ summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[N_sim_tot, N_sim_tot_
 summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[d_sim_tot, d_sim_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['d.sim', 'd.sim'], labels=['Baryon', 'DMO'], binsize=50, file_path_and_name=directory+'/median/d_sim_vs_dz0_compare_iso.pdf')
 summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[d_sim_tot, d_sim_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['d.sim', 'd.sim'], labels=['Baryon', 'DMO'], binsize=50, limits=((0,400),(0,200)), file_path_and_name=directory+'/median/d_sim_vs_dz0_compare_iso_zoom.pdf')
 
+# d_min vs d(z = 0)
+summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[d_min_tot, d_min_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['d.sim.min', 'd.sim.min'], labels=['Baryon', 'DMO'], binsize=50, file_path_and_name=directory+'/median/d_min_vs_dz0_compare_iso.pdf')
+summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[d_min_tot, d_min_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['d.sim.min', 'd.sim.min'], labels=['Baryon', 'DMO'], binsize=50, limits=((0,400),(0,200)), file_path_and_name=directory+'/median/d_min_vs_dz0_compare_iso_zoom.pdf')
+
 # t_sim vs d(z = 0)
 summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[t_sim_tot, t_sim_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['t.sim', 't.sim'], labels=['Baryon', 'DMO'], binsize=50, file_path_and_name=directory+'/median/t_sim_vs_dz0_compare_iso.pdf')
 summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[t_sim_tot, t_sim_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['t.sim', 't.sim'], labels=['Baryon', 'DMO'], binsize=50, limits=((0,400),(0,6)), file_path_and_name=directory+'/median/t_sim_vs_dz0_compare_iso_zoom.pdf')
 
+# t_min vs d(z = 0)
+summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[t_min_tot, t_min_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['t.sim.min', 't.sim.min'], labels=['Baryon', 'DMO'], binsize=50, file_path_and_name=directory+'/median/t_min_vs_dz0_compare_iso.pdf')
+summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[t_min_tot, t_min_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['t.sim.min', 't.sim.min'], labels=['Baryon', 'DMO'], binsize=50, limits=((0,400),(0,10)), file_path_and_name=directory+'/median/t_min_vs_dz0_compare_iso_zoom.pdf')
+
 # Infall time vs d(z = 0)
 summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[t_in_tot, t_in_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['t.infall', 't.infall'], labels=['Baryon', 'DMO'], binsize=50, file_path_and_name=directory+'/median/t_infall_vs_dz0_compare_iso.pdf')
 summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[t_in_tot, t_in_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['t.infall', 't.infall'], labels=['Baryon', 'DMO'], binsize=50, limits=((0,400),None), file_path_and_name=directory+'/median/t_infall_vs_dz0_compare_iso_zoom.pdf')
+
+# Infall time (any) vs d(z = 0)
+summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[t_in_any_tot, t_in_any_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['t.infall.any', 't.infall.any'], labels=['Baryon', 'DMO'], binsize=50, file_path_and_name=directory+'/median/t_infall_any_vs_dz0_compare_iso.pdf')
+summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[t_in_any_tot, t_in_any_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['t.infall.any', 't.infall.any'], labels=['Baryon', 'DMO'], binsize=50, limits=((0,400),None), file_path_and_name=directory+'/median/t_infall_any_vs_dz0_compare_iso_zoom.pdf')
 
 # vtan vs d(z = 0)
 summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[vtan_tot, vtan_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['v.tan', 'v.tan'], labels=['Baryon', 'DMO'], binsize=50, file_path_and_name=directory+'/median/vtan_z0_vs_dz0_compare_iso.pdf')
@@ -140,6 +170,10 @@ summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[N_sim_t
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[d_sim_tot, d_sim_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.sim', 'd.sim'], labels=['Baryon', 'DMO'], binsize=0.5, file_path_and_name=directory+'/median/d_sim_vs_Mhalo_peak_compare_iso.pdf')
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[d_sim_tot, d_sim_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.sim', 'd.sim'], labels=['Baryon', 'DMO'], binsize=0.5, limits=(None, (0,300)), file_path_and_name=directory+'/median/d_sim_vs_Mhalo_peak_compare_iso_zoom.pdf')
 
+# d_min vs Mhalo (peak)
+summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[d_min_tot, d_min_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.sim.min', 'd.sim.min'], labels=['Baryon', 'DMO'], binsize=0.5, file_path_and_name=directory+'/median/d_min_vs_Mhalo_peak_compare_iso.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[d_min_tot, d_min_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.sim.min', 'd.sim.min'], labels=['Baryon', 'DMO'], binsize=0.5, limits=(None, (0,200)), file_path_and_name=directory+'/median/d_min_vs_Mhalo_peak_compare_iso_zoom.pdf')
+
 # d(z = 0) vs Mhalo (peak)
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[dz0_tot, dz0_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.z0', 'd.z0'], labels=['Baryon', 'DMO'], binsize=0.5, file_path_and_name=directory+'/median/dz0_vs_Mhalo_peak_compare_iso.pdf')
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[dz0_tot, dz0_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.z0', 'd.z0'], labels=['Baryon', 'DMO'], binsize=0.5, limits=(None, (0,400)), file_path_and_name=directory+'/median/dz0_vs_Mhalo_peak_compare_iso_zoom.pdf')
@@ -148,8 +182,15 @@ summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[dz0_tot
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[t_sim_tot, t_sim_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.sim', 't.sim'], labels=['Baryon', 'DMO'], binsize=0.5, file_path_and_name=directory+'/median/t_sim_vs_Mhalo_peak_compare_iso.pdf')
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[t_sim_tot, t_sim_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.sim', 't.sim'], labels=['Baryon', 'DMO'], binsize=0.5, limits=(None, (0,6)), file_path_and_name=directory+'/median/t_sim_vs_Mhalo_peak_compare_iso_zoom.pdf')
 
+# t_min vs Mhalo (peak)
+summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[t_min_tot, t_min_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.sim.min', 't.sim.min'], labels=['Baryon', 'DMO'], binsize=0.5, file_path_and_name=directory+'/median/t_min_vs_Mhalo_peak_compare_iso.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[t_min_tot, t_min_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.sim.min', 't.sim.min'], labels=['Baryon', 'DMO'], binsize=0.5, limits=(None, (0,10)), file_path_and_name=directory+'/median/t_min_vs_Mhalo_peak_compare_iso_zoom.pdf')
+
 # t_infall vs Mhalo (peak)
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[t_in_tot, t_in_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.infall', 't.infall'], labels=['Baryon', 'DMO'], binsize=0.5, file_path_and_name=directory+'/median/t_infall_vs_Mhalo_peak_compare_iso.pdf')
+
+# t_infall (any) vs Mhalo (peak)
+summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[t_in_any_tot, t_in_any_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.infall.any', 't.infall.any'], labels=['Baryon', 'DMO'], binsize=0.5, file_path_and_name=directory+'/median/t_infall_any_vs_Mhalo_peak_compare_iso.pdf')
 
 # v_tan(z = 0) vs Mhalo (peak)
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[vtan_tot, vtan_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['v.tan', 'v.tan'], labels=['Baryon', 'DMO'], binsize=0.5, file_path_and_name=directory+'/median/vtan_z0_vs_Mhalo_peak_compare_iso.pdf')
