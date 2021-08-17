@@ -512,6 +512,22 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    def first_infall_any(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
+        """
+        TBD
+        """
+        data = []
+        #
+        if oversample == False:
+            for name in self.host_names[hosts]:
+                data.append(data_dict[name]['first.infall.time.lb.any'][mask_dict[name]])
+        #
+        elif oversample == True:
+            for name in self.host_names[hosts]:
+                data.append(np.repeat(data_dict[name]['first.infall.time.lb.any'][mask_dict[name]], self.oversample[sim_type][name]))
+        #
+        return np.hstack(data)
+
     def mstar(self, data_dict, mask_dict, selection='z0', oversample=False, hosts='all', sim_type='baryon'):
         """
         TBD
@@ -710,6 +726,8 @@ class SummaryDataPlot(SummaryDataSort):
         #
         self.labels = {'d.sim': 'd$_{\\rm peri,sim}$ [kpc]',\
                        'd.sim.min': 'd$_{\\rm peri,min,sim}$ [kpc]',\
+                       'd.sim.min.recent': '(d$_{\\rm peri,min,sim}$ - d$_{\\rm peri,sim}$) [kpc]',\
+                       'd.sim.min.recent.frac': '(d$_{\\rm peri,min,sim}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$',\
                        'd.model': 'd$_{\\rm peri,model}$ [kpc]',\
                        'd.z0': 'd(z = 0) [kpc]',\
                        'delta.d.frac': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$',\
@@ -718,8 +736,12 @@ class SummaryDataPlot(SummaryDataSort):
                        'v.rad': 'v$_{\\rm rad}(z = 0)$ [km s$^{-1}$]',\
                        't.sim': 't$_{\\rm peri,lb,sim}$ [Gyr]',\
                        't.sim.min': 't$_{\\rm peri,min,lb,sim}$ [Gyr]',\
+                       't.sim.min.recent': '(t$_{\\rm peri,min,lb,sim}$ - t$_{\\rm peri,lb,sim}$) [Gyr]',\
+                       't.sim.min.recent.frac': '(t$_{\\rm peri,min,lb,sim}$ - t$_{\\rm peri,lb,sim}$)/t$_{\\rm peri,lb,sim}$',\
                        't.model': 't$_{\\rm peri,lb,model}$ [Gyr]',\
                        't.infall': 't$_{\\rm infall,lb}$ [Gyr]',\
+                       't.infall.any': 't$_{\\rm infall,any,lb}$ [Gyr]',\
+                       't.infall.diff': '(t$_{\\rm infall,any,lb}$ - t$_{\\rm infall,lb}$) [Gyr]',\
                        'delta.t.frac': '(t$_{\\rm peri,model}$ - t$_{\\rm peri,sim}$)/t$_{\\rm peri,sim}$',\
                        'delta.t': '(t$_{\\rm peri,model}$ - t$_{\\rm peri,sim}$) [Gyr]',\
                        'N.sim': 'N$_{\\rm peri,sim}$',\
