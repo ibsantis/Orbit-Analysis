@@ -596,6 +596,23 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    def v_z0(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
+        """
+        TBD
+        """
+        data = []
+        #
+        if oversample == False:
+            for name in self.host_names[hosts]:
+                data.append(data_dict[name]['vtot.sim'][mask_dict[name]][:,0])
+        #
+        elif oversample == True:
+            for name in self.host_names[hosts]:
+                data.append(np.repeat(data_dict[name]['vtot.sim'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
+        #
+        return np.hstack(data)
+
+
     def kinetic_energy(self, data_dict, mask_dict, ke_type, oversample=False, hosts='all', sim_type='baryon'):
         data = []
         #
@@ -734,6 +751,7 @@ class SummaryDataPlot(SummaryDataSort):
                        'delta.d': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$) [kpc]',\
                        'v.tan': 'v$_{\\rm tan}(z = 0)$ [km s$^{-1}$]',\
                        'v.rad': 'v$_{\\rm rad}(z = 0)$ [km s$^{-1}$]',\
+                       'v.tot': 'v$_{\\rm tot}(z = 0)$ [km s$^{-1}$]',\
                        't.sim': 't$_{\\rm peri,lb,sim}$ [Gyr]',\
                        't.sim.min': 't$_{\\rm peri,min,lb,sim}$ [Gyr]',\
                        't.sim.min.recent': '(t$_{\\rm peri,min,lb,sim}$ - t$_{\\rm peri,lb,sim}$) [Gyr]',\
@@ -997,7 +1015,10 @@ class SummaryDataPlot(SummaryDataSort):
             - If the y-axis quantity is not an integer quantity, then the method
               calculates the median and 68% scatter.
         """
-        colorss = ['#006400', '#000080']
+        if len(x) == 2:
+            colorss = ['#006400', '#000080']
+        else:
+            colorss = self.colors
         #
         f, ax = plt.subplots(figsize=(10, 8))
         #
