@@ -22,9 +22,16 @@ class SummaryDataSort:
         Initialize the sorting class.
 
         Want to save:
-            - Host names to loop over in the following methods
-            - Oversampling factors
-                NOTE: Still need to update the oversampling factors for DMO runs
+            - Host names to loop over in the following methods.
+            - Oversampling factors.
+                - baryon     : Calculated for luminous halos (Mstar > 1e4 Msun) in the
+                               baryonic simulations (res 7100 Msun).
+                - baryon_all : Calculated for all subhalos (Mhalo,peak > 1e8 Msun)
+                               in the baryonic simulations.
+                - dmo        : Calculated for all subhalos (Mhalo,peak > 1e8 Msun)
+                               in the dark matter-only simulations.
+                               NOTE: m12z and LG-pairs don't have factors for the DMO
+                               runs because there are not DMO halo trees.
         """
         # Create a dictionary of host name arrays depending on if you want different samples
         self.host_names = {'all': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', 'm12z', \
@@ -53,17 +60,24 @@ class SummaryDataSort:
             directory : string
                         Home directory.
 
+            sim_type  : string
+                        Choose which subhalos you want to read in; same keys
+                        as in the oversampling factors:
+                        baryon     - luminous subhalos in baryonic simulations
+                        baryon_all - luminous + dark subhalos in baryonic simulations
+                        dmo        - dark subhalos in dark matter-only simulations
+
             hosts     : string
                         Choose either 'all', 'iso', or 'lg' to select different
                         samples.
-
-            dmo       : boolean
-                        Choose whether or not to read in DMO simulation data.
 
         NOTES:
             - The dictionary that gets returned is a dictionary of dictionaries.
             - Each key in the dictionary is a host name
                 - Each key in the sub-dictionaries is given in summary_data.py
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
         """
         data_dict = dict()
         #
@@ -97,25 +111,36 @@ class SummaryDataSort:
                           Dictionary of data for all hosts. This is read in by
                           data_read()
 
-            outliers    : bool
+            outliers    : boolean
                           Outliers are defined as the subhalos that have pericenters
                           in the simulations, but not in the data.
 
-            peri_sim    : bool
-                          Set to True if you want satellites that have expericenced
+            peri_sim    : boolean
+                          Set to True if you want subhalos that have expericenced
                           pericenter in the simulations.
 
-            peri_model  : bool
-                          Set to True if you want satellites that have expericenced
+            peri_model  : boolean
+                          Set to True if you want subhalos that have expericenced
                           pericenter in the model.
 
-            current_sat : bool
-                          Set to True if you want satellites that are within
+            current_sat : boolean
+                          Set to True if you want subhalos that are within
                           R_vir of the host galaxy at z = 0.
+
+            either      : boolean
+                          Set to True if you want subhalos that had a pericenter
+                          in either the simulations or model.
+
+            hosts       : Choose either 'all', 'iso', or 'lg' to select different
+                          samples.
 
         NOTES:
             - Returns a dictionary of masks where each key corresponds to each
               host galaxy.
+              - This masking dictionary is used by ALL other methods in this class.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
         """
         # Set up a dictionary to save the masks to
         mask_dict = dict()
@@ -186,21 +211,46 @@ class SummaryDataSort:
     def delta_nperi(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
-            TBD
+            Calculates the difference in the number of pericenters a subhalo
+            experiences between the model and the simulation.
 
         VARIABLES:
-            TBD
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
 
         NOTES:
-            - TBD
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
         """
+        # Set up an empty list to append values to.
         data = []
+        #
         if oversample == True:
+            # Loop through hosts and append data to the list
             for name in self.host_names[hosts]:
                 data.append(np.repeat(data_dict[name]['N.peri.galpy'][mask_dict[name]],self.oversample[sim_type][name]) - \
                              np.repeat(data_dict[name]['N.peri.sim'][mask_dict[name]],self.oversample[sim_type][name]))
         #
         elif oversample == False:
+            # Loop through hosts and append data to the list
             for name in self.host_names[hosts]:
                 data.append(data_dict[name]['N.peri.galpy'][mask_dict[name]] - \
                             data_dict[name]['N.peri.sim'][mask_dict[name]])
@@ -209,11 +259,47 @@ class SummaryDataSort:
 
     def nperi(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
-        TBD
+        DESCRIPTION:
+            Retrieve the number of pericenters a subhalo experiences from the
+            data and save these values in an array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            selection  : string
+                         Choose whether you want values from simulation data or
+                         data from the model.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
         """
+        # Set up an empty list to save values to
         data = []
         #
+        # Determines if working with sim or model data, and whether oversampling or not.
+        # Then appends values to list.
         if selection == 'sim':
+            #
             if oversample == False:
                 for name in self.host_names[hosts]:
                     data.append(data_dict[name]['N.peri.sim'][mask_dict[name]])
@@ -230,14 +316,52 @@ class SummaryDataSort:
             elif oversample == True:
                 for name in self.host_names[hosts]:
                     data.append(np.repeat(data_dict[name]['N.peri.galpy'][mask_dict[name]], self.oversample[sim_type][name]))
+        #
         return np.hstack(data)
 
     def dperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
-        TBD
+        DESCRIPTION:
+            Groups the recent pericenter distances a subhalo experiences, either
+            in the simulation or model, together into one array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            selection  : string
+                         Choose whether you want values from simulation data or
+                         data from the model.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
+            - If a subhalo has not experienced a pericenter, sets the most recent
+              pericenter distance equal to the present-day distance.
         """
+        # Set up an empty list to save values to
         data = []
         #
+        # Determines if working with sim or model data, then whether oversampling or not.
+        # Also masks values with no pericenter and sets them equal to d(z = 0)
         if (selection == 'sim'):
             if oversample == False:
                 for name in self.host_names[hosts]:
@@ -272,19 +396,58 @@ class SummaryDataSort:
 
     def dperi_min(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
-        TBD
+        DESCRIPTION:
+            Groups the minimum pericenter distances a subhalo experiences, either
+            in the simulation or model, together into one array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
+            - If a subhalo has not experienced a pericenter, sets the minimum
+              pericenter distance equal to the present-day distance.
+            - In the model, for a subhalo that experiences multiple pericenters,
+              the pericenter distances are always going to be the same, so the
+              minimum will be the same in the model.
         """
+        # Set up an empty list to save values to
         data = []
         #
+        # Determines whether oversampling or not, then
         if oversample == False:
             count = 0
             for name in self.host_names[hosts]:
                 for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
                     mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
+                    #
                     if np.sum(mask_temp) == 0:
                         data.append(data_dict[name]['dtot.sim'][mask_dict[name]][i][0])
+                    #
                     else:
                         data.append(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]))
+                    #
+                    # ...?
                     if np.sum(mask_temp) == 1:
                         count += 1
             print(count)
@@ -745,6 +908,7 @@ class SummaryDataPlot(SummaryDataSort):
                        'd.sim.min': 'd$_{\\rm peri,min,sim}$ [kpc]',\
                        'd.sim.min.recent': '(d$_{\\rm peri,min,sim}$ - d$_{\\rm peri,sim}$) [kpc]',\
                        'd.sim.min.recent.frac': '(d$_{\\rm peri,min,sim}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$',\
+                       'd.peri': 'd$_{\\rm peri}$ [kpc]',\
                        'd.model': 'd$_{\\rm peri,model}$ [kpc]',\
                        'd.z0': 'd(z = 0) [kpc]',\
                        'delta.d.frac': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$',\
@@ -757,6 +921,7 @@ class SummaryDataPlot(SummaryDataSort):
                        't.sim.min.recent': '(t$_{\\rm peri,min,lb,sim}$ - t$_{\\rm peri,lb,sim}$) [Gyr]',\
                        't.sim.min.recent.frac': '(t$_{\\rm peri,min,lb,sim}$ - t$_{\\rm peri,lb,sim}$)/t$_{\\rm peri,lb,sim}$',\
                        't.model': 't$_{\\rm peri,lb,model}$ [Gyr]',\
+                       't.peri': 't$_{\\rm peri}$ [Gyr]',\
                        't.infall': 't$_{\\rm infall,lb}$ [Gyr]',\
                        't.infall.any': 't$_{\\rm infall,any,lb}$ [Gyr]',\
                        't.infall.diff': '(t$_{\\rm infall,any,lb}$ - t$_{\\rm infall,lb}$) [Gyr]',\
