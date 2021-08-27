@@ -708,6 +708,14 @@ summary_plot.median_plot(x=Mhalo_peak_tot_all, y=d_min_tot_all, xtype='M.halo.pe
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot_all, Mhalo_peak_tot_all], y=[d_sim_tot_all, d_min_tot_all], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.peri', 'd.peri'], labels=['$d_{\\rm peri,recent}$', '$d_{\\rm peri,min}$'], binsize=0.5, file_path_and_name=directory+'/median/d_peri_both_vs_Mhalo_peak_baryon_all.pdf')
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot_all, Mhalo_peak_tot_all], y=[d_sim_tot_all, d_min_tot_all], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.peri', 'd.peri'], labels=['$d_{\\rm peri,recent}$', '$d_{\\rm peri,min}$'], binsize=0.5, limits=(None,(0,250)), file_path_and_name=directory+'/median/d_peri_both_vs_Mhalo_peak_baryon_all_zoom.pdf')
 
+# (d_min - d_recent) vs Mhalo (peak)
+summary_plot.median_plot(x=Mhalo_peak_tot_all, y=d_min_tot_all-d_sim_tot_all, xtype='M.halo.peak', ytype='d.sim.min.recent', binsize=0.5, file_path_and_name=directory+'/median/delta_d_vs_Mhalo_peak_baryon_all.pdf')
+summary_plot.median_plot(x=Mhalo_peak_tot_all, y=d_min_tot_all-d_sim_tot_all, xtype='M.halo.peak', ytype='d.sim.min.recent', binsize=0.5, limits=(None,(-50,5)), file_path_and_name=directory+'/median/delta_d_vs_Mhalo_peak_baryon_all_zoom.pdf')
+
+# (d_min - d_recent)/d_recent vs Mhalo (peak)
+summary_plot.median_plot(x=Mhalo_peak_tot_all, y=(d_min_tot_all-d_sim_tot_all)/d_sim_tot_all, xtype='M.halo.peak', ytype='d.sim.min.recent.frac', binsize=0.5, file_path_and_name=directory+'/median/delta_d_frac_vs_Mhalo_peak_baryon_all.pdf')
+summary_plot.median_plot(x=Mhalo_peak_tot_all, y=(d_min_tot_all-d_sim_tot_all)/d_sim_tot_all, xtype='M.halo.peak', ytype='d.sim.min.recent.frac', binsize=0.5, limits=(None,(-0.5,0.05)), file_path_and_name=directory+'/median/delta_d_frac_vs_Mhalo_peak_baryon_all_zoom.pdf')
+
 # d(z = 0) vs Mhalo (peak)
 summary_plot.median_plot(x=Mhalo_peak_tot_all, y=dz0_tot_all, xtype='M.halo.peak', ytype='d.z0', binsize=0.5, file_path_and_name=directory+'/median/dz0_vs_Mhalo_peak_baryon_all.pdf')
 summary_plot.median_plot(x=Mhalo_peak_tot_all, y=dz0_tot_all, xtype='M.halo.peak', ytype='d.z0', binsize=0.5, limits=(None,(0,400)), file_path_and_name=directory+'/median/dz0_vs_Mhalo_peak_baryon_all_zoom.pdf')
@@ -724,6 +732,14 @@ summary_plot.median_plot(x=Mhalo_peak_tot_all, y=t_min_tot_all, xtype='M.halo.pe
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot_all, Mhalo_peak_tot_all], y=[t_sim_tot_all, t_min_tot_all], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.peri', 't.peri'], labels=['$t_{\\rm peri,recent}$', '$t_{\\rm peri,min}$'], binsize=0.5, file_path_and_name=directory+'/median/t_peri_both_vs_Mhalo_peak_baryon_all.pdf')
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot_all, Mhalo_peak_tot_all], y=[t_sim_tot_all, t_min_tot_all], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.peri', 't.peri'], labels=['$t_{\\rm peri,recent}$', '$t_{\\rm peri,min}$'], binsize=0.5, limits=(None,(0,8.5)), file_path_and_name=directory+'/median/t_peri_both_vs_Mhalo_peak_baryon_all_zoom.pdf')
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot_all, Mhalo_peak_tot_all], y=[t_sim_tot_all, t_min_tot_all], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.peri', 't.peri'], labels=['$t_{\\rm peri,recent}$', '$t_{\\rm peri,min}$'], binsize=0.5, limits=(None,(0,5)), file_path_and_name=directory+'/median/t_peri_both_vs_Mhalo_peak_baryon_all_zoom2.pdf')
+
+# (t_min - t_recent) vs Mhalo (peak)
+summary_plot.median_plot(x=Mhalo_peak_tot_all, y=t_min_tot_all-t_sim_tot_all, xtype='M.halo.peak', ytype='t.sim.min.recent', binsize=0.5, file_path_and_name=directory+'/median/delta_t_vs_Mhalo_peak_baryon_all.pdf')
+summary_plot.median_plot(x=Mhalo_peak_tot_all, y=t_min_tot_all-t_sim_tot_all, xtype='M.halo.peak', ytype='t.sim.min.recent', binsize=0.5, limits=(None,(-0.1,6)), file_path_and_name=directory+'/median/delta_t_vs_Mhalo_peak_baryon_all_zoom.pdf')
+
+# (t_min - t_recent)/t_recent vs Mhalo (peak)
+summary_plot.median_plot(x=Mhalo_peak_tot_all, y=(t_min_tot_all-t_sim_tot_all)/t_sim_tot_all, xtype='M.halo.peak', ytype='d.sim.min.recent.frac', binsize=0.5, file_path_and_name=directory+'/median/delta_t_frac_vs_Mhalo_peak_baryon_all.pdf')
+summary_plot.median_plot(x=Mhalo_peak_tot_all, y=(t_min_tot_all-t_sim_tot_all)/t_sim_tot_all, xtype='M.halo.peak', ytype='d.sim.min.recent.frac', binsize=0.5, limits=(None,(-2,100)), file_path_and_name=directory+'/median/delta_t_frac_vs_Mhalo_peak_baryon_all_zoom.pdf')
 
 # t_infall vs Mhalo (peak)
 summary_plot.median_plot(x=Mhalo_peak_tot_all, y=t_in_tot_all, xtype='M.halo.peak', ytype='t.infall', binsize=0.5, file_path_and_name=directory+'/median/t_infall_vs_Mhalo_peak_baryon_all.pdf')
@@ -867,49 +883,51 @@ summary_plot.median_plot_mult(x=[d_sim_iso,d_sim_lg], y=[d_min_iso,d_min_lg], xt
 summary_plot.median_plot_mult(x=[t_sim_iso,t_sim_lg], y=[t_min_iso,t_min_lg], xtype=['t.sim','t.sim'], ytype=['t.sim.min','t.sim.min'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/t_sim_vs_t_min_iso_vs_lg.pdf')
 
 # N_sim vs Mstar(z = 0)
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[N_sim_iso, N_sim_lg], xtype=['M.star.z0','M.star.z0'], ytype=['N.sim','N.sim'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/N_sim_vs_Mstar_z0_iso_vs_lg.pdf')
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[N_sim_iso, N_sim_lg], xtype=['M.star.z0','M.star.z0'], ytype=['N.sim','N.sim'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None,(0,6)), file_path_and_name=directory+'/median/N_sim_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[N_sim_iso, N_sim_lg], xtype=['M.star.z0','M.star.z0'], ytype=['N.sim','N.sim'], labels=['Isolated', 'Paired'], binsize=1, file_path_and_name=directory+'/median/N_sim_vs_Mstar_z0_iso_vs_lg.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[N_sim_iso, N_sim_lg], xtype=['M.star.z0','M.star.z0'], ytype=['N.sim','N.sim'], labels=['Isolated', 'Paired'], binsize=1, limits=(None,(0,5.5)), file_path_and_name=directory+'/median/N_sim_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
 
 # d_sim vs Mstar (z = 0)
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[d_sim_iso, d_sim_lg], xtype=['M.star.z0','M.star.z0'], ytype=['d.sim','d.sim'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/d_sim_vs_Mstar_z0_iso_vs_lg.pdf')
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[d_sim_iso, d_sim_lg], xtype=['M.star.z0','M.star.z0'], ytype=['d.sim','d.sim'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None,(0,250)), file_path_and_name=directory+'/median/d_sim_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[d_sim_iso, d_sim_lg], xtype=['M.star.z0','M.star.z0'], ytype=['d.sim','d.sim'], labels=['Isolated', 'Paired'], binsize=1, file_path_and_name=directory+'/median/d_sim_vs_Mstar_z0_iso_vs_lg.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[d_sim_iso, d_sim_lg], xtype=['M.star.z0','M.star.z0'], ytype=['d.sim','d.sim'], labels=['Isolated', 'Paired'], binsize=1, limits=(None,(0,200)), file_path_and_name=directory+'/median/d_sim_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
 
 # d_min vs Mstar (z = 0)
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[d_min_iso, d_min_lg], xtype=['M.star.z0','M.star.z0'], ytype=['d.sim.min','d.sim.min'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/d_min_vs_Mstar_z0_iso_vs_lg.pdf')
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[d_min_iso, d_min_lg], xtype=['M.star.z0','M.star.z0'], ytype=['d.sim.min','d.sim.min'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None,(0,200)), file_path_and_name=directory+'/median/d_min_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[d_min_iso, d_min_lg], xtype=['M.star.z0','M.star.z0'], ytype=['d.sim.min','d.sim.min'], labels=['Isolated', 'Paired'], binsize=1, file_path_and_name=directory+'/median/d_min_vs_Mstar_z0_iso_vs_lg.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[d_min_iso, d_min_lg], xtype=['M.star.z0','M.star.z0'], ytype=['d.sim.min','d.sim.min'], labels=['Isolated', 'Paired'], binsize=1, limits=(None,(0,175)), file_path_and_name=directory+'/median/d_min_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
 
 # d(z = 0) vs Mstar (z = 0)
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[dz0_iso, dz0_lg], xtype=['M.star.z0','M.star.z0'], ytype=['d.z0','d.z0'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/dz0_vs_Mstar_z0_iso_vs_lg.pdf')
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[dz0_iso, dz0_lg], xtype=['M.star.z0','M.star.z0'], ytype=['d.z0','d.z0'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None,(0,400)), file_path_and_name=directory+'/median/dz0_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[dz0_iso, dz0_lg], xtype=['M.star.z0','M.star.z0'], ytype=['d.z0','d.z0'], labels=['Isolated', 'Paired'], binsize=1, file_path_and_name=directory+'/median/dz0_vs_Mstar_z0_iso_vs_lg.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[dz0_iso, dz0_lg], xtype=['M.star.z0','M.star.z0'], ytype=['d.z0','d.z0'], labels=['Isolated', 'Paired'], binsize=1, limits=(None,(0,400)), file_path_and_name=directory+'/median/dz0_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
 
 # t_sim vs Mstar (z = 0)
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_sim_iso, t_sim_lg], xtype=['M.star.z0','M.star.z0'], ytype=['t.sim','t.sim'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/t_sim_vs_Mstar_z0_iso_vs_lg.pdf')
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_sim_iso, t_sim_lg], xtype=['M.star.z0','M.star.z0'], ytype=['t.sim','t.sim'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None,(0,6)), file_path_and_name=directory+'/median/t_sim_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_sim_iso, t_sim_lg], xtype=['M.star.z0','M.star.z0'], ytype=['t.sim','t.sim'], labels=['Isolated', 'Paired'], binsize=1, file_path_and_name=directory+'/median/t_sim_vs_Mstar_z0_iso_vs_lg.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_sim_iso, t_sim_lg], xtype=['M.star.z0','M.star.z0'], ytype=['t.sim','t.sim'], labels=['Isolated', 'Paired'], binsize=1, limits=(None,(0,5)), file_path_and_name=directory+'/median/t_sim_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
 
 # t_min vs Mstar (z = 0)
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_min_iso, t_min_lg], xtype=['M.star.z0','M.star.z0'], ytype=['t.sim.min','t.sim.min'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/t_min_vs_Mstar_z0_iso_vs_lg.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_min_iso, t_min_lg], xtype=['M.star.z0','M.star.z0'], ytype=['t.sim.min','t.sim.min'], labels=['Isolated', 'Paired'], binsize=1, file_path_and_name=directory+'/median/t_min_vs_Mstar_z0_iso_vs_lg.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_min_iso, t_min_lg], xtype=['M.star.z0','M.star.z0'], ytype=['t.sim.min','t.sim.min'], labels=['Isolated', 'Paired'], binsize=1, limits=(None,(0,9)), file_path_and_name=directory+'/median/t_min_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
 
 # t_infall vs Mstar (z = 0)
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_in_iso, t_in_lg], xtype=['M.star.z0','M.star.z0'], ytype=['t.infall','t.infall'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/t_infall_vs_Mstar_z0_iso_vs_lg.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_in_iso, t_in_lg], xtype=['M.star.z0','M.star.z0'], ytype=['t.infall','t.infall'], labels=['Isolated', 'Paired'], binsize=1, file_path_and_name=directory+'/median/t_infall_vs_Mstar_z0_iso_vs_lg.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_in_iso, t_in_lg], xtype=['M.star.z0','M.star.z0'], ytype=['t.infall','t.infall'], labels=['Isolated', 'Paired'], binsize=1, limits=(None,(0,11)), file_path_and_name=directory+'/median/t_infall_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
 
 # t_infall (any) vs Mstar (z = 0)
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_in_any_iso, t_in_any_lg], xtype=['M.star.z0','M.star.z0'], ytype=['t.infall.any','t.infall.any'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/t_infall_any_vs_Mstar_z0_iso_vs_lg.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_in_any_iso, t_in_any_lg], xtype=['M.star.z0','M.star.z0'], ytype=['t.infall.any','t.infall.any'], labels=['Isolated', 'Paired'], binsize=1, file_path_and_name=directory+'/median/t_infall_any_vs_Mstar_z0_iso_vs_lg.pdf')
 
 # v_tan vs Mstar (z = 0)
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[vtan_iso, vtan_lg], xtype=['M.star.z0','M.star.z0'], ytype=['v.tan','v.tan'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/vtan_vs_Mstar_z0_iso_vs_lg.pdf')
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[vtan_iso, vtan_lg], xtype=['M.star.z0','M.star.z0'], ytype=['v.tan','v.tan'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None,(0,300)), file_path_and_name=directory+'/median/vtan_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[vtan_iso, vtan_lg], xtype=['M.star.z0','M.star.z0'], ytype=['v.tan','v.tan'], labels=['Isolated', 'Paired'], binsize=1, file_path_and_name=directory+'/median/vtan_vs_Mstar_z0_iso_vs_lg.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[vtan_iso, vtan_lg], xtype=['M.star.z0','M.star.z0'], ytype=['v.tan','v.tan'], labels=['Isolated', 'Paired'], binsize=1, limits=(None,(0,300)), file_path_and_name=directory+'/median/vtan_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
 
 # v_rad vs Mstar (z = 0)
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[vrad_iso, vrad_lg], xtype=['M.star.z0','M.star.z0'], ytype=['v.rad','v.rad'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/vrad_vs_Mstar_z0_iso_vs_lg.pdf')
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[vrad_iso, vrad_lg], xtype=['M.star.z0','M.star.z0'], ytype=['v.rad','v.rad'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None,(-200,200)), file_path_and_name=directory+'/median/vrad_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[vrad_iso, vrad_lg], xtype=['M.star.z0','M.star.z0'], ytype=['v.rad','v.rad'], labels=['Isolated', 'Paired'], binsize=1, file_path_and_name=directory+'/median/vrad_vs_Mstar_z0_iso_vs_lg.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[vrad_iso, vrad_lg], xtype=['M.star.z0','M.star.z0'], ytype=['v.rad','v.rad'], labels=['Isolated', 'Paired'], binsize=1, limits=(None,(-100,150)), file_path_and_name=directory+'/median/vrad_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
 
 # v_tot vs Mstar (z = 0)
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[vz0_iso, vz0_lg], xtype=['M.star.z0','M.star.z0'], ytype=['v.tot','v.tot'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/vtot_vs_Mstar_z0_iso_vs_lg.pdf')
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[vz0_iso, vz0_lg], xtype=['M.star.z0','M.star.z0'], ytype=['v.tot','v.tot'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None,(0,350)), file_path_and_name=directory+'/median/vtot_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[vz0_iso, vz0_lg], xtype=['M.star.z0','M.star.z0'], ytype=['v.tot','v.tot'], labels=['Isolated', 'Paired'], binsize=1, file_path_and_name=directory+'/median/vtot_vs_Mstar_z0_iso_vs_lg.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[vz0_iso, vz0_lg], xtype=['M.star.z0','M.star.z0'], ytype=['v.tot','v.tot'], labels=['Isolated', 'Paired'], binsize=1, limits=(None,(0,250)), file_path_and_name=directory+'/median/vtot_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
 
 # L_tot vs Mstar (z = 0)
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[L_iso/1e4, L_lg/1e4], xtype=['M.star.z0','M.star.z0'], ytype=['L.tot','L.tot'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/Ltot_vs_Mstar_z0_iso_vs_lg.pdf')
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[L_iso/1e4, L_lg/1e4], xtype=['M.star.z0','M.star.z0'], ytype=['L.tot','L.tot'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None,(0,4)), file_path_and_name=directory+'/median/Ltot_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[L_iso/1e4, L_lg/1e4], xtype=['M.star.z0','M.star.z0'], ytype=['L.tot','L.tot'], labels=['Isolated', 'Paired'], binsize=1, file_path_and_name=directory+'/median/Ltot_vs_Mstar_z0_iso_vs_lg.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[L_iso/1e4, L_lg/1e4], xtype=['M.star.z0','M.star.z0'], ytype=['L.tot','L.tot'], labels=['Isolated', 'Paired'], binsize=1, limits=(None,(0,3.5)), file_path_and_name=directory+'/median/Ltot_vs_Mstar_z0_iso_vs_lg_zoom.pdf')
 
 # N_sim vs d(z = 0)
 summary_plot.median_plot_mult(x=[dz0_iso, dz0_lg], y=[N_sim_iso, N_sim_lg], xtype=['d.z0', 'd.z0'], ytype=['N.sim', 'N.sim'], labels=['Isolated', 'Paired'], binsize=50, file_path_and_name=directory+'/median/N_sim_vs_dz0_iso_vs_lg.pdf')
@@ -1000,6 +1018,112 @@ summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[vz0_iso, vz0
 # L_tot(z = 0) vs Mhalo (peak)
 summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[L_iso/1e4, L_lg/1e4], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['L.tot', 'L.tot'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/Ltot_vs_Mhalo_peak_iso_vs_lg.pdf')
 summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[L_iso/1e4, L_lg/1e4], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['L.tot', 'L.tot'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None, (0,4)), file_path_and_name=directory+'/median/Ltot_vs_Mhalo_peak_iso_vs_lg_zoom.pdf')
+
+
+
+"""
+    Comparing the halos with the two different selections:
+        - Isolated
+        - Paired
+
+    NOTE: Doing this for all subhalos, luminous and dark
+"""
+directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_1/baryon_iso_vs_lg'
+
+### Generate all of the data for the plots below
+data_total_iso = summary.data_read(directory=sim_data.home_dir, hosts='iso', sim_type='all_baryon')
+masks_infall = summary.data_mask(data_total_iso, peri_sim=False, peri_model=False, hosts='iso')
+mask_selection = masks_infall
+#
+N_sim_iso = summary.nperi(data_total_iso, mask_selection, oversample=True, selection='sim', hosts='iso', sim_type='baryon_all')
+d_sim_iso = summary.dperi_recent(data_total_iso, mask_selection, selection='sim', oversample=True, hosts='iso', sim_type='baryon_all')
+d_min_iso = summary.dperi_min(data_total_iso, mask_selection, oversample=True, hosts='iso', sim_type='baryon_all')
+dz0_iso = summary.d_z0(data_total_iso, mask_selection, oversample=True, hosts='iso', sim_type='baryon_all')
+t_sim_iso = summary.tperi_recent(data_total_iso, mask_selection, selection='sim', oversample=True, hosts='iso', sim_type='baryon_all')
+t_min_iso = summary.tperi_min(data_total_iso, mask_selection, oversample=True, hosts='iso', sim_type='baryon_all')
+t_in_iso = summary.first_infall(data_total_iso, mask_selection, oversample=True, hosts='iso', sim_type='baryon_all')
+t_in_any_iso = summary.first_infall_any(data_total_iso, mask_selection, oversample=True, hosts='iso', sim_type='baryon_all')
+Mhalo_peak_iso = summary.mhalo(data_total_iso, mask_selection, selection='peak', oversample=True, hosts='iso', sim_type='baryon_all')
+vtan_iso = summary.velocities(data_total_iso, mask_selection, selection='tan', oversample=True, hosts='iso', sim_type='baryon_all')
+vrad_iso = summary.velocities(data_total_iso, mask_selection, selection='rad', oversample=True, hosts='iso', sim_type='baryon_all')
+vz0_iso = summary.v_z0(data_total_iso, mask_selection, oversample=True, hosts='iso', sim_type='baryon_all')
+L_iso = summary.L_z0(data_total_iso, mask_selection, selection='sim', oversample=True, hosts='iso', sim_type='baryon_all')
+#
+data_total_lg = summary.data_read(directory=sim_data.home_dir, hosts='lg', sim_type='all_baryon')
+masks_infall = summary.data_mask(data_total_lg, peri_sim=False, peri_model=False, hosts='lg')
+mask_selection = masks_infall
+#
+N_sim_lg = summary.nperi(data_total_lg, mask_selection, oversample=True, selection='sim', hosts='lg', sim_type='baryon_all')
+d_sim_lg = summary.dperi_recent(data_total_lg, mask_selection, selection='sim', oversample=True, hosts='lg', sim_type='baryon_all')
+d_min_lg = summary.dperi_min(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon_all')
+dz0_lg = summary.d_z0(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon_all')
+t_sim_lg = summary.tperi_recent(data_total_lg, mask_selection, selection='sim', oversample=True, hosts='lg', sim_type='baryon_all')
+t_min_lg = summary.tperi_min(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon_all')
+t_in_lg = summary.first_infall(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon_all')
+t_in_any_lg = summary.first_infall_any(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon_all')
+Mhalo_peak_lg = summary.mhalo(data_total_lg, mask_selection, selection='peak', oversample=True, hosts='lg', sim_type='baryon_all')
+vtan_lg = summary.velocities(data_total_lg, mask_selection, selection='tan', oversample=True, hosts='lg', sim_type='baryon_all')
+vrad_lg = summary.velocities(data_total_lg, mask_selection, selection='rad', oversample=True, hosts='lg', sim_type='baryon_all')
+vz0_lg = summary.v_z0(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon_all')
+L_lg = summary.L_z0(data_total_lg, mask_selection, selection='sim', oversample=True, hosts='lg', sim_type='baryon_all')
+
+
+## Median plots
+# N_sim vs Mhalo (peak)
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[N_sim_iso, N_sim_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['N.sim', 'N.sim'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/N_sim_vs_Mhalo_peak_iso_vs_lg_all.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[N_sim_iso, N_sim_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['N.sim', 'N.sim'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None, (0,5)), file_path_and_name=directory+'/median/N_sim_vs_Mhalo_peak_iso_vs_lg_all_zoom.pdf')
+
+# d_sim vs Mhalo (peak)
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[d_sim_iso, d_sim_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.sim', 'd.sim'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/d_sim_vs_Mhalo_peak_iso_vs_lg_all.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[d_sim_iso, d_sim_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.sim', 'd.sim'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None, (0,300)), file_path_and_name=directory+'/median/d_sim_vs_Mhalo_peak_iso_vs_lg_all_zoom.pdf')
+
+# d_min vs Mhalo (peak)
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[d_min_iso, d_min_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.sim.min', 'd.sim.min'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/d_min_vs_Mhalo_peak_iso_vs_lg_all.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[d_min_iso, d_min_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.sim.min', 'd.sim.min'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None, (0,175)), file_path_and_name=directory+'/median/d_min_vs_Mhalo_peak_iso_vs_lg_all_zoom.pdf')
+
+# d(z = 0) vs Mhalo (peak)
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[dz0_iso, dz0_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.z0', 'd.z0'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/dz0_vs_Mhalo_peak_iso_vs_lg_all.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[dz0_iso, dz0_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.z0', 'd.z0'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None, (0,400)), file_path_and_name=directory+'/median/dz0_vs_Mhalo_peak_iso_vs_lg_all_zoom.pdf')
+
+# t_sim vs Mhalo (peak)
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[t_sim_iso, t_sim_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.sim', 't.sim'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/t_sim_vs_Mhalo_peak_iso_vs_lg_all.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[t_sim_iso, t_sim_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.sim', 't.sim'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None, (0,6)), file_path_and_name=directory+'/median/t_sim_vs_Mhalo_peak_iso_vs_lg_all_zoom.pdf')
+
+# t_min vs Mhalo (peak)
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[t_min_iso, t_min_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.sim.min', 't.sim.min'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/t_min_vs_Mhalo_peak_iso_vs_lg_all.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[t_min_iso, t_min_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.sim.min', 't.sim.min'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None, (0,9)), file_path_and_name=directory+'/median/t_min_vs_Mhalo_peak_iso_vs_lg_all_zoom.pdf')
+
+# t_infall vs Mhalo (peak)
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[t_in_iso, t_in_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.infall', 't.infall'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/t_infall_vs_Mhalo_peak_iso_vs_lg_all.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[t_in_iso, t_in_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.infall', 't.infall'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None,(0,10)), file_path_and_name=directory+'/median/t_infall_vs_Mhalo_peak_iso_vs_lg_all_zoom.pdf')
+
+# t_infall (any) vs Mhalo (peak)
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[t_in_any_iso, t_in_any_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.infall.any', 't.infall.any'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/t_infall_any_vs_Mhalo_peak_iso_vs_lg_all.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[t_in_any_iso, t_in_any_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.infall.any', 't.infall.any'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None,(0,11.5)), file_path_and_name=directory+'/median/t_infall_any_vs_Mhalo_peak_iso_vs_lg_all_zoom.pdf')
+
+# v_tan(z = 0) vs Mhalo (peak)
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[vtan_iso, vtan_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['v.tan', 'v.tan'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/vtan_z0_vs_Mhalo_peak_iso_vs_lg_all.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[vtan_iso, vtan_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['v.tan', 'v.tan'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None, (0,220)), file_path_and_name=directory+'/median/vtan_z0_vs_Mhalo_peak_iso_vs_lg_all_zoom.pdf')
+
+# v_rad(z = 0) vs Mhalo (peak)
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[vrad_iso, vrad_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['v.rad', 'v.rad'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/vrad_z0_vs_Mhalo_peak_iso_vs_lg_all.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[vrad_iso, vrad_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['v.rad', 'v.rad'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None, (-100,150)), file_path_and_name=directory+'/median/vrad_z0_vs_Mhalo_peak_iso_vs_lg_all_zoom.pdf')
+
+# v_tot(z = 0) vs Mhalo (peak)
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[vz0_iso, vz0_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['v.tot', 'v.tot'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/vtot_z0_vs_Mhalo_peak_iso_vs_lg_all.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[vz0_iso, vz0_lg], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['v.tot', 'v.tot'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None, (0,250)), file_path_and_name=directory+'/median/vtot_z0_vs_Mhalo_peak_iso_vs_lg_all_zoom.pdf')
+
+# L_tot(z = 0) vs Mhalo (peak)
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[L_iso/1e4, L_lg/1e4], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['L.tot', 'L.tot'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/median/Ltot_vs_Mhalo_peak_iso_vs_lg_all.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[L_iso/1e4, L_lg/1e4], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['L.tot', 'L.tot'], labels=['Isolated', 'Paired'], binsize=0.5, limits=(None, (0,3.5)), file_path_and_name=directory+'/median/Ltot_vs_Mhalo_peak_iso_vs_lg_all_zoom.pdf')
+
+
+
+
+
+
+
+
 
 
 
