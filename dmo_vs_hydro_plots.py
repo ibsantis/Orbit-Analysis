@@ -139,6 +139,19 @@ summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[d_sim_tot, d_sim_tot_
 summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[d_min_tot, d_min_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['d.sim.min', 'd.sim.min'], labels=['Baryon', 'DMO'], binsize=50, file_path_and_name=directory+'/median/d_min_vs_dz0_compare_iso.pdf')
 summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[d_min_tot, d_min_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['d.sim.min', 'd.sim.min'], labels=['Baryon', 'DMO'], binsize=50, limits=((0,400),(0,200)), file_path_and_name=directory+'/median/d_min_vs_dz0_compare_iso_zoom.pdf')
 
+
+
+
+# d_sim and d_recent vs d(z = 0)
+summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot, dz0_tot_dmo, dz0_tot_dmo], y=[d_sim_tot, d_min_tot, d_sim_tot_dmo, d_min_tot_dmo], xtype=['d.z0', 'd.z0', 'd.z0', 'd.z0'], ytype=['d.sim', 'd.sim', 'd.sim', 'd.sim'], labels=['$d_{\\rm peri,recent}$, Baryon', '$d_{\\rm peri,min}$, Baryon', '$d_{\\rm peri,recent}$, DMO', '$d_{\\rm peri,min}$, DMO'], binsize=50, file_path_and_name=directory+'/median/d_peri_both_vs_dz0_compare_iso.pdf')
+summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot, dz0_tot_dmo, dz0_tot_dmo], y=[d_sim_tot, d_min_tot, d_sim_tot_dmo, d_min_tot_dmo], xtype=['d.z0', 'd.z0', 'd.z0', 'd.z0'], ytype=['d.sim', 'd.sim', 'd.sim', 'd.sim'], labels=['$d_{\\rm peri,recent}$, Baryon', '$d_{\\rm peri,min}$, Baryon', '$d_{\\rm peri,recent}$, DMO', '$d_{\\rm peri,min}$, DMO'], binsize=50, limits=((0,400), (0,200)), file_path_and_name=directory+'/median/d_peri_both_vs_dz0_compare_iso_zoom.pdf')
+
+
+
+
+
+
+
 # t_sim vs d(z = 0)
 summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[t_sim_tot, t_sim_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['t.sim', 't.sim'], labels=['Baryon', 'DMO'], binsize=50, file_path_and_name=directory+'/median/t_sim_vs_dz0_compare_iso.pdf')
 summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[t_sim_tot, t_sim_tot_dmo], xtype=['d.z0', 'd.z0'], ytype=['t.sim', 't.sim'], labels=['Baryon', 'DMO'], binsize=50, limits=((0,400),(0,6)), file_path_and_name=directory+'/median/t_sim_vs_dz0_compare_iso_zoom.pdf')
