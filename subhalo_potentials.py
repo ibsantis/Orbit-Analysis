@@ -63,9 +63,9 @@ potential_host_100 = np.mean(np.concatenate((part['star']['potential'][star_inds
 # Get the mean potential at 2*R_200
 host_2R = 2*halt['radius'][halt['host.index'][0]]
 #
-star_inds = ut.array.get_indices(part['star'].prop('host.distance.total'), [host_2R200-5, host_2R200+5])
-gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [host_2R200-5, host_2R200+5])
-dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [host_2R200-5, host_2R200+5])
+star_inds = ut.array.get_indices(part['star'].prop('host.distance.total'), [host_2R-5, host_2R+5])
+gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [host_2R-5, host_2R+5])
+dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [host_2R-5, host_2R+5])
 potential_host_2R = np.mean(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
 
 # Find the potential in the outer regions of the subhalos
