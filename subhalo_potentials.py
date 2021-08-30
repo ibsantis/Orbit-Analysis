@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=m12b_potential
+#SBATCH --job-name=m12c_potential
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=240G
 #SBATCH --nodes=1
 #SBATCH --ntasks=1    # processes total
 #SBATCH --time=04:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/m12b_potential_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/m12c_potential_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -43,7 +43,7 @@ from matplotlib import patches
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12c', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary, halo tree, and z = 0 snapshot
@@ -68,6 +68,8 @@ gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [host_2
 dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [host_2R-5, host_2R+5])
 potential_host_2R = np.mean(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
 
+import time
+start = time.time()
 # Find the potential in the outer regions of the subhalos
 orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
 #
@@ -75,7 +77,8 @@ sub_potentials = np.zeros(orbits.shape[0])
 for i in range(0, orbits.shape[0]):
     inds = ut.array.get_indices(np.linalg.norm(part['dark']['position']-halt['position'][orbits.sub_inds[i][0]],axis=1), [halt['radius'][orbits.sub_inds[i][0]]-5, halt['radius'][orbits.sub_inds[i][0]]+5])
     sub_potentials[i] = np.mean(part['dark']['potential'][inds])
-
+end = time.time()
+print('Done with {0} subhalo potentials in {1} seconds'.format(orbits.shape[0], end-start))
 
 # Make plots showing the difference of the subhalo potential with the host at the two checks
 plt.figure(figsize=(10,8))
