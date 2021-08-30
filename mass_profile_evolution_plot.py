@@ -27,15 +27,20 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location='mac')
-sim_data.galaxy = 'Remus' # this is only necessary for LG pairs
+sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
+#sim_data.galaxy = 'Remus' # this is only necessary for LG pairs
 print('Set paths')
 
 # Read in the data
-mass_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.galaxy+'_mass_profile_evolution')
+mass_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.galaxy+'/'+sim_data.galaxy+'_full_mass_profile')
+
+#inds = np.concatenate((np.arange(len(mass_data['time']))[:21], np.arange(len(mass_data['time']))[21::2]))
+inds = np.arange(len(mass_data['time']))[::2]
+times = np.around(13.8-mass_data['time'], decimals=2)
 
 # Cumulatively sum each array, then take the average over all of them
-mass_prof_avg = np.average(np.cumsum(mass_data['mass.profile'], axis=1), axis=0)
+mass_prof_avg_500M = np.average(np.cumsum(mass_data['mass.profile'][:6], axis=1), axis=0)
+mass_prof_avg_1G = np.average(np.cumsum(mass_data['mass.profile'][:11], axis=1), axis=0)
 
 # Plot each snapshot mass profile to the average mass profile
 rs = np.logspace(np.log10(0.1), np.log10(500), 100)
@@ -46,36 +51,35 @@ def color_cycle(cycle_length=len(mass_data['time']), cmap_name='plasma', low=0, 
     colors = cmap(np.linspace(low, high, cycle_length))
     return colors
 colorss = color_cycle(len(mass_data['time']), cmap_name='plasma', low=0, high=1)
-#
+
 plt.rcParams["font.family"] = "serif"
 plt.figure(figsize=(10, 12))
-#
-for i in range(0, len(mass_data['mass.profile'])):
-    plt.plot(rs[1:], np.cumsum(mass_data['mass.profile'][i])[:-1]/mass_prof_avg[:-1], color=colorss[i], label=str(mass_data['time'][i])+' Gyr')
-plt.xlim(5, 500)
-plt.ylim(0.97, 1.04)
+for i in inds:
+    plt.plot(rs[1:], np.cumsum(mass_data['mass.profile'][i])/mass_prof_avg_500M, color=colorss[i], label=str(times[i])+' Gyr ago')
+plt.xlim(5, 350)
+#plt.ylim(0.97, 1.04)
 plt.hlines(1, 0.1, 500, color='k', alpha=0.8, linestyles='dotted', zorder=100)
 plt.xscale('log')
 plt.xlabel('r [kpc]', fontsize=32)
-plt.ylabel('$M$(<r) / $M_{\\rm avg}$(<r)', fontsize=32)
+plt.ylabel('$M$(<r) / $M_{\\rm avg, 500\ Myr}$(<r)', fontsize=32)
 plt.title(sim_data.galaxy, fontsize=32)
-plt.legend(prop={'size': 16}, ncol=2)
+plt.legend(prop={'size': 12}, ncol=4)
 plt.tight_layout()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/mass_profiles/'+sim_data.galaxy+'_mass_profile_evolution.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/mass_profiles/'+sim_data.galaxy+'_mass_profile_evolution_500Myr_avg.pdf')
 
 
 plt.rcParams["font.family"] = "serif"
 plt.figure(figsize=(10, 12))
 #
-for i in range(0, len(mass_data['mass.profile'])):
-    plt.plot(rs[1:], np.cumsum(mass_data['mass.profile'][i])[:-1]/np.cumsum(mass_data['mass.profile'][0])[:-1], color=colorss[i], label=str(mass_data['time'][i])+' Gyr')
-plt.xlim(5, 500)
-plt.ylim(0.95, 1.02)
+for i in inds:
+    plt.plot(rs[1:], np.cumsum(mass_data['mass.profile'][i])/np.cumsum(mass_data['mass.profile'][0]), color=colorss[i], label=str(times[i])+' Gyr ago')
+plt.xlim(5, 350)
+#plt.ylim(0.95, 1.02)
 plt.xscale('log')
 plt.xlabel('r [kpc]', fontsize=32)
 plt.ylabel('$M$(<r) / $M_{\\rm z = 0}$(<r)', fontsize=32)
 plt.title(sim_data.galaxy, fontsize=32)
-plt.legend(prop={'size': 16}, ncol=2)
+plt.legend(prop={'size': 12}, ncol=4)
 plt.tight_layout()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/mass_profiles/'+sim_data.galaxy+'_mass_profile_evolution_z0.pdf')
 
