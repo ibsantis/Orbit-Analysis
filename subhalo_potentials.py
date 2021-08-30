@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=m12f_potential
+#SBATCH --job-name=m12i_potential
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=240G
 #SBATCH --nodes=1
 #SBATCH --ntasks=1    # processes total
 #SBATCH --time=04:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/m12f_potential_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/m12i_potential_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -43,7 +43,7 @@ from matplotlib import patches
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12f', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary, halo tree, and z = 0 snapshot
