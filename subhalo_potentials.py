@@ -43,7 +43,7 @@ from matplotlib import patches
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary, halo tree, and z = 0 snapshot
@@ -125,4 +125,4 @@ data_dict['host.potential.100kpc'] = potential_host_100
 data_dict['host.potential.2R200m'] = potential_host_2R
 data_dict['subhalo.potential'] = sub_potentials
 #
-ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'sim_data.galaxy+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
+ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
