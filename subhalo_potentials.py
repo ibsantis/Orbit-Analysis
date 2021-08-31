@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #SBATCH --job-name=RJ_potential
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
-#SBATCH --mem=240G
+#SBATCH --mem=450G
 #SBATCH --nodes=1
 #SBATCH --ntasks=1    # processes total
 #SBATCH --time=04:00:00
@@ -36,10 +36,8 @@ import halo_analysis as halo
 import gizmo_analysis as gizmo
 import utilities as ut
 import numpy as np
-import h5py
 import matplotlib
 from matplotlib import pyplot as plt
-from matplotlib import patches
 print('Read in the tools')
 
 ### Set path and initial parameters
