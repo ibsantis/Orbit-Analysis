@@ -60,13 +60,13 @@ if sim_data.num_gal == 1:
     #potential_median = np.median(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
     #potential_mean_dark = np.mean(part['dark']['potential'][dark_inds])
 
-    # Get the mean potential at 2*R_200
-    host_2R = 2*halt['radius'][halt['host.index'][0]]
+    # Get the mean potential at R_200
+    host_R200 = halt['radius'][halt['host.index'][0]]
     #
-    star_inds = ut.array.get_indices(part['star'].prop('host.distance.total'), [host_2R-5, host_2R+5])
-    gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [host_2R-5, host_2R+5])
-    dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [host_2R-5, host_2R+5])
-    potential_host_2R = np.mean(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
+    star_inds = ut.array.get_indices(part['star'].prop('host.distance.total'), [host_R200-5, host_R200+5])
+    gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [host_R200-5, host_R200+5])
+    dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [host_R200-5, host_R200+5])
+    potential_host_R200 = np.mean(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
 
     import time
     start = time.time()
@@ -91,12 +91,12 @@ if sim_data.num_gal == 1:
     plt.close()
     #
     plt.figure(figsize=(10,8))
-    plt.scatter(sub_potentials/10000, (potential_host_2R-sub_potentials)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
+    plt.scatter(sub_potentials/10000, (potential_host_R200-sub_potentials)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
     plt.xlabel('$\Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, 2R} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
+    plt.ylabel('$\Phi_{\\rm host, R200} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
     plt.title(sim_data.galaxy, fontsize=28)
     plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.galaxy+'_potential_2R.pdf')
+    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.galaxy+'_potential_R200.pdf')
     plt.close()
 
     # Make plots of the difference vs distance
@@ -113,19 +113,19 @@ if sim_data.num_gal == 1:
     #
     plt.figure(figsize=(10,8))
     ax = plt.subplot(111)
-    plt.scatter(halt.prop('host.distance.total', orbits.sub_inds[:,0]), (potential_host_2R-sub_potentials)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
+    plt.scatter(halt.prop('host.distance.total', orbits.sub_inds[:,0]), (potential_host_R200-sub_potentials)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
     ax.axvspan(95,105, color='k', alpha=0.3)
     plt.xlabel('$d_{\\rm host}$ [kpc]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, 2R} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
+    plt.ylabel('$\Phi_{\\rm host, R200} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
     plt.title(sim_data.galaxy, fontsize=28)
     plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.galaxy+'_potential_vs_d_2R.pdf')
+    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.galaxy+'_potential_vs_d_R200.pdf')
     plt.close()
 
     # Save the data to a file
     data_dict = dict()
     data_dict['host.potential.100kpc'] = potential_host_100
-    data_dict['host.potential.2R200m'] = potential_host_2R
+    data_dict['host.potential.R200m'] = potential_host_R200
     data_dict['subhalo.potential'] = sub_potentials
     #
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
@@ -145,13 +145,13 @@ if sim_data.num_gal == 2:
     dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [95, 105])
     potential_host_1_100 = np.mean(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
 
-    # Get the mean potential at 2*R_200
-    host_1_2R = 2*halt['radius'][halt['host.index'][0]]
+    # Get the mean potential at R_200
+    host_1_R200 = halt['radius'][halt['host.index'][0]]
     #
-    star_inds = ut.array.get_indices(part['star'].prop('host.distance.total'), [host_1_2R-5, host_1_2R+5])
-    gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [host_1_2R-5, host_1_2R+5])
-    dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [host_1_2R-5, host_1_2R+5])
-    potential_host_1_2R = np.mean(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
+    star_inds = ut.array.get_indices(part['star'].prop('host.distance.total'), [host_1_R200-5, host_1_R200+5])
+    gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [host_1_R200-5, host_1_R200+5])
+    dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [host_1_R200-5, host_1_R200+5])
+    potential_host_1_R200 = np.mean(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
 
     import time
     start = time.time()
@@ -176,12 +176,12 @@ if sim_data.num_gal == 2:
     plt.close()
     #
     plt.figure(figsize=(10,8))
-    plt.scatter(sub_potentials_1/10000, (potential_host_1_2R-sub_potentials_1)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
+    plt.scatter(sub_potentials_1/10000, (potential_host_1_R200-sub_potentials_1)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
     plt.xlabel('$\Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, 2R} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
+    plt.ylabel('$\Phi_{\\rm host, R200} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
     plt.title(sim_data.gal_1, fontsize=28)
     plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_1+'_potential_2R.pdf')
+    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_1+'_potential_R200.pdf')
     plt.close()
 
     # Make plots of the difference vs distance
@@ -198,19 +198,19 @@ if sim_data.num_gal == 2:
     #
     plt.figure(figsize=(10,8))
     ax = plt.subplot(111)
-    plt.scatter(halt.prop('host.distance.total', orbits.sub_inds[:,0]), (potential_host_1_2R-sub_potentials_1)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
+    plt.scatter(halt.prop('host.distance.total', orbits.sub_inds[:,0]), (potential_host_1_R200-sub_potentials_1)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
     ax.axvspan(95,105, color='k', alpha=0.3)
     plt.xlabel('$d_{\\rm host}$ [kpc]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, 2R} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
+    plt.ylabel('$\Phi_{\\rm host, R200} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
     plt.title(sim_data.gal_1, fontsize=28)
     plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_1+'_potential_vs_d_2R.pdf')
+    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_1+'_potential_vs_d_R200.pdf')
     plt.close()
 
     # Save the data to a file
     data_dict = dict()
     data_dict['host.potential.100kpc'] = potential_host_1_100
-    data_dict['host.potential.2R200m'] = potential_host_1_2R
+    data_dict['host.potential.R200m'] = potential_host_1_R200
     data_dict['subhalo.potential'] = sub_potentials_1
     #
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_1+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
@@ -223,12 +223,12 @@ if sim_data.num_gal == 2:
     potential_host_2_100 = np.mean(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
 
     # Get the mean potential at 2*R_200
-    host_2_2R = 2*halt['radius'][halt['host2.index'][0]]
+    host_2_R200 = halt['radius'][halt['host2.index'][0]]
     #
-    star_inds = ut.array.get_indices(part['star'].prop('host2.distance.total'), [host_2_2R-5, host_2_2R+5])
-    gas_inds = ut.array.get_indices(part['gas'].prop('host2.distance.total'), [host_2_2R-5, host_2_2R+5])
-    dark_inds = ut.array.get_indices(part['dark'].prop('host2.distance.total'), [host_2_2R-5, host_2_2R+5])
-    potential_host_2_2R = np.mean(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
+    star_inds = ut.array.get_indices(part['star'].prop('host2.distance.total'), [host_2_R200-5, host_2_R200+5])
+    gas_inds = ut.array.get_indices(part['gas'].prop('host2.distance.total'), [host_2_R200-5, host_2_R200+5])
+    dark_inds = ut.array.get_indices(part['dark'].prop('host2.distance.total'), [host_2_R200-5, host_2_R200+5])
+    potential_host_2_R200 = np.mean(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
 
     import time
     start = time.time()
@@ -253,12 +253,12 @@ if sim_data.num_gal == 2:
     plt.close()
     #
     plt.figure(figsize=(10,8))
-    plt.scatter(sub_potentials_2/10000, (potential_host_2_2R-sub_potentials_2)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
+    plt.scatter(sub_potentials_2/10000, (potential_host_2_R200-sub_potentials_2)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
     plt.xlabel('$\Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, 2R} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
+    plt.ylabel('$\Phi_{\\rm host, R200} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
     plt.title(sim_data.gal_2, fontsize=28)
     plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_2+'_potential_2R.pdf')
+    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_2+'_potential_R200.pdf')
     plt.close()
 
     # Make plots of the difference vs distance
@@ -275,19 +275,19 @@ if sim_data.num_gal == 2:
     #
     plt.figure(figsize=(10,8))
     ax = plt.subplot(111)
-    plt.scatter(halt.prop('host2.distance.total', orbits.sub_inds[:,0]), (potential_host_2_2R-sub_potentials_2)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
+    plt.scatter(halt.prop('host2.distance.total', orbits.sub_inds[:,0]), (potential_host_2_R200-sub_potentials_2)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
     ax.axvspan(95,105, color='k', alpha=0.3)
     plt.xlabel('$d_{\\rm host}$ [kpc]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, 2R} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
+    plt.ylabel('$\Phi_{\\rm host, R200} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
     plt.title(sim_data.gal_2, fontsize=28)
     plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_2+'_potential_vs_d_2R.pdf')
+    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_2+'_potential_vs_d_R200.pdf')
     plt.close()
 
     # Save the data to a file
     data_dict = dict()
     data_dict['host.potential.100kpc'] = potential_host_2_100
-    data_dict['host.potential.2R200m'] = potential_host_2_2R
+    data_dict['host.potential.R200m'] = potential_host_2_R200
     data_dict['subhalo.potential'] = sub_potentials_2
     #
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_2+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
