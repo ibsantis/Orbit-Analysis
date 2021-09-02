@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=m12w_potential
+#SBATCH --job-name=RJ_potential
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=450G
 #SBATCH --nodes=1
 #SBATCH --ntasks=1    # processes total
 #SBATCH --time=04:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/m12w_potential_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/RJ_potential_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -41,7 +41,7 @@ from matplotlib import pyplot as plt
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12w', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='Romeo', location='peloton')
 print('Set paths')
 
 if sim_data.num_gal == 1:
@@ -137,14 +137,14 @@ if sim_data.num_gal == 2:
     halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal)
     part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'redshift', 0, properties=['position', 'potential'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
     print('Particles at z = 0 read in')
-
+    #
     ### GALAXY 1
     # Get the mean + median potential at 100 +/- 5 kpc in the host galaxy using all particles
     star_inds = ut.array.get_indices(part['star'].prop('host.distance.total'), [95, 105])
     gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [95, 105])
     dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [95, 105])
     potential_host_1_100 = np.mean(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
-
+    #
     # Get the mean potential at R_200
     host_1_R200 = halt['radius'][halt['host.index'][0]]
     #
@@ -152,7 +152,7 @@ if sim_data.num_gal == 2:
     gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [host_1_R200-5, host_1_R200+5])
     dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [host_1_R200-5, host_1_R200+5])
     potential_host_1_R200 = np.mean(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
-
+    #
     import time
     start = time.time()
     # Find the potential in the outer regions of the subhalos
@@ -164,7 +164,7 @@ if sim_data.num_gal == 2:
         sub_potentials_1[i] = np.mean(part['dark']['potential'][inds])
     end = time.time()
     print('Done with {0} subhalo potentials in {1} seconds'.format(orbits.shape[0], end-start))
-
+    #
     # Make plots showing the difference of the subhalo potential with the host at the two checks
     plt.figure(figsize=(10,8))
     plt.scatter(sub_potentials_1/10000, (potential_host_1_100-sub_potentials_1)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
@@ -183,7 +183,7 @@ if sim_data.num_gal == 2:
     plt.tight_layout()
     plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_1+'_potential_R200.pdf')
     plt.close()
-
+    #
     # Make plots of the difference vs distance
     plt.figure(figsize=(10,8))
     ax = plt.subplot(111)
@@ -206,7 +206,7 @@ if sim_data.num_gal == 2:
     plt.tight_layout()
     plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_1+'_potential_vs_d_R200.pdf')
     plt.close()
-
+    #
     # Save the data to a file
     data_dict = dict()
     data_dict['host.potential.100kpc'] = potential_host_1_100
@@ -214,14 +214,14 @@ if sim_data.num_gal == 2:
     data_dict['subhalo.potential'] = sub_potentials_1
     #
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_1+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
-
+    #
     ### GALAXY 2
     # Get the mean + median potential at 100 +/- 5 kpc in the host galaxy using all particles
     star_inds = ut.array.get_indices(part['star'].prop('host2.distance.total'), [95, 105])
     gas_inds = ut.array.get_indices(part['gas'].prop('host2.distance.total'), [95, 105])
     dark_inds = ut.array.get_indices(part['dark'].prop('host2.distance.total'), [95, 105])
     potential_host_2_100 = np.mean(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
-
+    #
     # Get the mean potential at 2*R_200
     host_2_R200 = halt['radius'][halt['host2.index'][0]]
     #
@@ -229,7 +229,7 @@ if sim_data.num_gal == 2:
     gas_inds = ut.array.get_indices(part['gas'].prop('host2.distance.total'), [host_2_R200-5, host_2_R200+5])
     dark_inds = ut.array.get_indices(part['dark'].prop('host2.distance.total'), [host_2_R200-5, host_2_R200+5])
     potential_host_2_R200 = np.mean(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
-
+    #
     import time
     start = time.time()
     # Find the potential in the outer regions of the subhalos
@@ -241,7 +241,7 @@ if sim_data.num_gal == 2:
         sub_potentials_2[i] = np.mean(part['dark']['potential'][inds])
     end = time.time()
     print('Done with {0} subhalo potentials in {1} seconds'.format(orbits.shape[0], end-start))
-
+    #
     # Make plots showing the difference of the subhalo potential with the host at the two checks
     plt.figure(figsize=(10,8))
     plt.scatter(sub_potentials_2/10000, (potential_host_2_100-sub_potentials_2)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
@@ -260,7 +260,7 @@ if sim_data.num_gal == 2:
     plt.tight_layout()
     plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_2+'_potential_R200.pdf')
     plt.close()
-
+    #
     # Make plots of the difference vs distance
     plt.figure(figsize=(10,8))
     ax = plt.subplot(111)
@@ -283,7 +283,7 @@ if sim_data.num_gal == 2:
     plt.tight_layout()
     plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_2+'_potential_vs_d_R200.pdf')
     plt.close()
-
+    #
     # Save the data to a file
     data_dict = dict()
     data_dict['host.potential.100kpc'] = potential_host_2_100
