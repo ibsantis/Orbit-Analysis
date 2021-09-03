@@ -43,7 +43,7 @@ print('Read in the tools')
 ### Set path and initial parameters
 sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
 print('Set paths')
-
+#
 if sim_data.num_gal == 1:
     #
     # Read in the snapshot dictionary, halo tree, and z = 0 snapshot
@@ -129,7 +129,7 @@ if sim_data.num_gal == 1:
     data_dict['subhalo.potential'] = sub_potentials
     #
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
-
+#
 if sim_data.num_gal == 2:
     #
     # Read in the snapshot dictionary, halo tree, and z = 0 snapshot
