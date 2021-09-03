@@ -32,7 +32,7 @@ print('Set paths')
 # Initialize the classes, read in the data, and create data masks
 summary = summary_io.SummaryDataSort()
 data_total = summary.data_read(directory=sim_data.home_dir, hosts='all', sim_type='baryon')
-data_potentials = summary.data_read_potential(directory=sim_data.home_dir, hosts='iso_no_z', sim_type='baryon')
+data_potentials = summary.data_read_potential(directory=sim_data.home_dir, hosts='all2', sim_type='baryon')
 masks_infall = summary.data_mask(data_total, peri_sim=False, peri_model=False, hosts='all')
 summary_plot = summary_io.SummaryDataPlot()
 
@@ -1131,19 +1131,20 @@ summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[L_iso/1e4, L
     Checking how the orbit energy plots will look
 """
 # The properties below here don't have all of the isolated hosts, so I need to get different x-axis arrays to plot against later...
-potential_tot = summary.potential(data_potentials, mask_selection, oversample=True, hosts='iso_no_z', sim_type='baryon')
-ke_peri_tot = summary.kinetic_energy(data_total, mask_selection, ke_type='peri', oversample=True, hosts='iso_no_z', sim_type='baryon')
-ke_max_tot = summary.kinetic_energy(data_total, mask_selection, ke_type='max', oversample=True, hosts='iso_no_z', sim_type='baryon')
+potential_tot = summary.potential(data_potentials, mask_selection, oversample=True, hosts='all2', sim_type='baryon')
+#ke_peri_tot = summary.kinetic_energy(data_total, mask_selection, ke_type='peri', oversample=True, hosts='all2', sim_type='baryon')
+#ke_max_tot = summary.kinetic_energy(data_total, mask_selection, ke_type='max', oversample=True, hosts='all2', sim_type='baryon')
+ke_z0_tot = summary.kinetic_energy(data_total, mask_selection, ke_type='z0', oversample=True, hosts='all2', sim_type='baryon')
 #
-Mstar_z0_tot = summary.mstar(data_total, mask_selection, selection='z0', oversample=True, hosts='iso_no_z', sim_type='baryon')
-dz0_tot = summary.d_z0(data_total, mask_selection, oversample=True, hosts='iso_no_z', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, mask_selection, selection='z0', oversample=True, hosts='all2', sim_type='baryon')
+dz0_tot = summary.d_z0(data_total, mask_selection, oversample=True, hosts='all2', sim_type='baryon')
 
 
 # E_tot vs Mstar (z = 0)
-summary_plot.median_plot_mult(x=[Mstar_z0_tot, Mstar_z0_tot], y=[(ke_peri_tot+potential_tot)/1e4, (ke_max_tot+potential_tot)/1e4], xtype=['M.star.z0', 'M.star.z0'], ytype=['E.tot.sim', 'E.tot.sim'], labels=['KE at peri', 'KE max'], binsize=0.5, file_path_and_name=directory+'/Etot_vs_Mstar_z0.pdf')
+summary_plot.median_plot(x=Mstar_z0_tot, y=(ke_z0_tot+potential_tot)/1e4, xtype='M.star.z0', ytype='E.tot.sim', binsize=0.5, file_path_and_name=directory+'/Etot_vs_Mstar_z0.pdf')
 
 # E_tot vs d(z = 0)
-summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot], y=[(ke_peri_tot+potential_tot)/1e4, (ke_max_tot+potential_tot)/1e4], xtype=['d.z0', 'd.z0'], ytype=['E.tot.sim', 'E.tot.sim'], labels=['KE at peri', 'KE max'], binsize=50, limits=((0,400),None), file_path_and_name=directory+'/Etot_vs_dz0.pdf')
+summary_plot.median_plot(x=dz0_tot, y=(ke_z0_tot+potential_tot)/1e4, xtype='d.z0', ytype='E.tot.sim', binsize=50, limits=((0,400),None), file_path_and_name=directory+'/Etot_vs_dz0.pdf')
 
 
 
