@@ -28,6 +28,8 @@
         - The subhalo potential using R-5kpc < d < R gives almost the same
           results as when doing R +/- 5 kpc
 
+    COULDNT RUN ON M12Z OR ROMULUS & REMUS!
+
 """
 
 # Import packages
