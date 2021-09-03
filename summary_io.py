@@ -36,7 +36,16 @@ class SummaryDataSort:
         # Create a dictionary of host name arrays depending on if you want different samples
         self.host_names = {'all': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', 'm12z', \
                            'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus'],
-                           'iso': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w'],
+                           #
+                           'all2': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', \
+                           'Romeo', 'Juliet', 'Thelma', 'Louise'],
+                            #
+                           'iso': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', 'm12z'],
+                           #
+                           'iso_no_z': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w'],
+                           #
+                           'iso_dmo': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w'],
+                           #
                            'lg': ['Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus']}
         #
         # Oversampling factors
@@ -94,6 +103,30 @@ class SummaryDataSort:
         elif sim_type == 'dmo':
             for name in self.host_names[hosts]:
                 data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name+'_dmo', verbose=True)
+                data_dict[name] = data
+        #
+        return data_dict
+
+    def data_read_potential(self, directory, sim_type='baryon', hosts='all'):
+        """
+        TBD
+        """
+        data_dict = dict()
+        #
+        if sim_type == 'baryon':
+            for name in self.host_names[hosts]:
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/'+name+'_potentials', verbose=True)
+                data_dict[name] = data
+        #
+        ######## UPDATE THE TWO OPTIONS BELOW WHEN I ACTUALLY GET DATA FOR THESE SELECTIONS
+        elif sim_type == 'all_baryon':
+            for name in self.host_names[hosts]:
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/'+name+'_potentials', verbose=True)
+                data_dict[name] = data
+        #
+        elif sim_type == 'dmo':
+            for name in self.host_names[hosts]:
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/'+name+'_potentials', verbose=True)
                 data_dict[name] = data
         #
         return data_dict
@@ -775,6 +808,21 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    def potential(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
+        """
+        TBD
+        """
+        data = []
+        #
+        if oversample == False:
+            for name in self.host_names[hosts]:
+                data.append(data_dict[name]['subhalo.potential'][mask_dict[name]]-data_dict[name]['host.potential.R200m'])
+        #
+        elif oversample == True:
+            for name in self.host_names[hosts]:
+                data.append(np.repeat(data_dict[name]['subhalo.potential'][mask_dict[name]]-data_dict[name]['host.potential.R200m'], self.oversample[sim_type][name]))
+        #
+        return np.hstack(data)
 
     def kinetic_energy(self, data_dict, mask_dict, ke_type, oversample=False, hosts='all', sim_type='baryon'):
         data = []
@@ -788,6 +836,14 @@ class SummaryDataSort:
                 for name in self.host_names[hosts]:
                     for i in range(0, len(data_dict[name]['vtot.sim'][mask_dict[name]])):
                         data.append(np.repeat(np.nanmax(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i]**2), self.oversample[sim_type][name]))
+        #
+        elif ke_type == 'z0':
+            if oversample == False:
+                for name in self.host_names[hosts]:
+                    data.append(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][:,0]**2)
+            else:
+                for name in self.host_names[hosts]:
+                    data.append(np.repeat(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][:,0]**2, self.oversample[sim_type][name]))
         #
         elif ke_type == 'peri':
             if oversample == False:
@@ -930,12 +986,14 @@ class SummaryDataPlot(SummaryDataSort):
                        'N.sim': 'N$_{\\rm peri,sim}$',\
                        'N.model': 'N$_{\\rm peri,model}$',\
                        'N.delta': 'N$_{\\rm model}$ - N$_{\\rm sim}$',\
-                       'M.star.z0': 'log$_{\\rm 10}$[M$_{\\rm star}(z = 0)$/M$_{\\odot}$]',\
+                       'M.star.z0': 'M$_{\\rm star}$ [M$_{\\odot}$]',\
                        'M.star.peak': 'log$_{\\rm 10}$[M$_{\\rm star, peak}$/M$_{\\odot}$]',\
                        'M.halo.z0': 'log$_{\\rm 10}$[M$_{\\rm halo}(z = 0)$/M$_{\\odot}$]',\
-                       'M.halo.peak': 'log$_{\\rm 10}$[M$_{\\rm halo, peak}$/M$_{\\odot}$]',\
+                       'M.halo.peak': 'M$_{\\rm halo, peak}$ [M$_{\\odot}$]',\
                        'KE.max.sim': 'KE$_{\\rm max,sim}$ [10$^4$ km$^2$/s$^2$]',\
                        'KE.peri.sim': 'KE$_{\\rm peri,sim}$ [10$^4$ km$^2$/s$^2$]',\
+                       'KE.z0.sim': 'KE$_{\\rm sim}(z = 0)$ [10$^4$ km$^2$/s$^2$]',\
+                       'E.tot.sim': 'E$_{\\rm tot,sim}$ [10$^4$ km$^2$/s$^2$]',\
                        'L.tot': 'L$_{\\rm tot}(z = 0)$ [10$^4$ kpc km s$^{-1}$]'}
         #
         self.titles = {'d.sim': 'Recent Minimum Distances',\
@@ -996,7 +1054,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.close()
         pass
 
-    def median_plot(self, x, y, xtype, ytype, binsize, file_path_and_name, limits=None, title=None):
+    def median_plot(self, x, y, xtype, ytype, binsize, file_path_and_name, binedges=None, limits=None, title=None):
         """
         DESCRIPTION:
             Bins the x-axis quantity and plots either the mean or median, along
@@ -1008,6 +1066,7 @@ class SummaryDataPlot(SummaryDataSort):
             - xtype              : string
             - ytype              : string
             - binsize            : float or int
+            - binedges           : tuple
             - limits             : tuple of two tuples
             - title              : string
             - file_path_and_name : string
@@ -1028,14 +1087,22 @@ class SummaryDataPlot(SummaryDataSort):
             y = np.log10(y)
         #
         if 'N.' not in xtype and 'N.' not in ytype:
-            minn = binsize*np.floor(np.min(x)/binsize)
-            maxx = binsize*np.ceil(np.max(x)/binsize)
-            if minn < 0:
-                bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+            ##
+            # Testing this check for bin edges now
+            ##
+            if binedges:
+                bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+                bins = np.linspace(binedges[0], binedges[1], bin_num)
+                half_bin = (bins[1]-bins[0])/2
             else:
-                bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
-            bins = np.linspace(minn, maxx, bin_num)
-            half_bin = (bins[1]-bins[0])/2
+                minn = binsize*np.floor(np.min(x)/binsize)
+                maxx = binsize*np.ceil(np.max(x)/binsize)
+                if minn < 0:
+                    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+                else:
+                    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+                bins = np.linspace(minn, maxx, bin_num)
+                half_bin = (bins[1]-bins[0])/2
             #
             onesigp = 84.13
             onesigm = 15.87
@@ -1057,12 +1124,17 @@ class SummaryDataPlot(SummaryDataSort):
                 lowest[i] = np.nanpercentile(y[mask], twosigm)
         #
         if 'N.' in xtype and 'N.' not in ytype:
-            minn = int(binsize*np.floor(np.min(x)/binsize))-0.5
-            maxx = int(binsize*np.ceil(np.max(x)/binsize))+0.5
-            bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
-            bins = np.linspace(minn, maxx, bin_num)
-            #
-            half_bin = (bins[1]-bins[0])/2
+            if binedges:
+                bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+                bins = np.linspace(binedges[0], binedges[1], bin_num)
+                half_bin = (bins[1]-bins[0])/2
+            else:
+                minn = int(binsize*np.floor(np.min(x)/binsize))-0.5
+                maxx = int(binsize*np.ceil(np.max(x)/binsize))+0.5
+                bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
+                bins = np.linspace(minn, maxx, bin_num)
+                #
+                half_bin = (bins[1]-bins[0])/2
             onesigp = 84.13
             onesigm = 15.87
             twosigp = 100
@@ -1083,14 +1155,19 @@ class SummaryDataPlot(SummaryDataSort):
                 lowest[i] = np.nanpercentile(y[mask], twosigm)
         #
         if 'N.' not in xtype and 'N.' in ytype:
-            minn = binsize*np.floor(np.min(x)/binsize)
-            maxx = binsize*np.ceil(np.max(x)/binsize)
-            if minn < 0:
-                bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+            if binedges:
+                bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+                bins = np.linspace(binedges[0], binedges[1], bin_num)
+                half_bin = (bins[1]-bins[0])/2
             else:
-                bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
-            bins = np.linspace(minn, maxx, bin_num)
-            half_bin = (bins[1]-bins[0])/2
+                minn = binsize*np.floor(np.min(x)/binsize)
+                maxx = binsize*np.ceil(np.max(x)/binsize)
+                if minn < 0:
+                    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+                else:
+                    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+                bins = np.linspace(minn, maxx, bin_num)
+                half_bin = (bins[1]-bins[0])/2
             #
             twosigp = 100
             twosigm = 0
@@ -1112,11 +1189,16 @@ class SummaryDataPlot(SummaryDataSort):
             med = means
         #
         if 'N.' in xtype and 'N.' in ytype:
-            minn = int(binsize*np.floor(np.min(x)/binsize))-0.5
-            maxx = int(binsize*np.ceil(np.max(x)/binsize))+0.5
-            bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
-            bins = np.linspace(minn, maxx, bin_num)
-            half_bin = (bins[1]-bins[0])/2
+            if binedges:
+                bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+                bins = np.linspace(binedges[0], binedges[1], bin_num)
+                half_bin = (bins[1]-bins[0])/2
+            else:
+                minn = int(binsize*np.floor(np.min(x)/binsize))-0.5
+                maxx = int(binsize*np.ceil(np.max(x)/binsize))+0.5
+                bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
+                bins = np.linspace(minn, maxx, bin_num)
+                half_bin = (bins[1]-bins[0])/2
             #
             twosigp = 100
             twosigm = 0
@@ -1138,12 +1220,21 @@ class SummaryDataPlot(SummaryDataSort):
             med = means
         #
         f, ax = plt.subplots(figsize=(10, 8))
-        plt.plot(bins[:-1]+half_bin, med, color=self.colors[1], marker='s', markersize=10, alpha=0.5)
-        plt.fill_between(bins[:-1]+half_bin, upper, lower, color=self.colors[1], alpha=0.3)
-        plt.fill_between(bins[:-1]+half_bin, highest, lowest, color=self.colors[1], alpha=0.15)
-        if limits:
-            plt.xlim(limits[0])
-            plt.ylim(limits[1])
+        if 'M.' in xtype:
+            plt.plot(10**(bins[:-1]+half_bin), med, color=self.colors[1], markersize=10, alpha=0.5)
+            plt.fill_between(10**(bins[:-1]+half_bin), upper, lower, color=self.colors[1], alpha=0.3)
+            plt.fill_between(10**(bins[:-1]+half_bin), highest, lowest, color=self.colors[1], alpha=0.15)
+            if limits:
+                plt.xlim(10**(limits[0][0]), 10**(limits[0][1]))
+                plt.ylim(limits[1])
+            plt.xscale('log')
+        else:
+            plt.plot(bins[:-1]+half_bin, med, color=self.colors[1], markersize=10, alpha=0.5)
+            plt.fill_between(bins[:-1]+half_bin, upper, lower, color=self.colors[1], alpha=0.3)
+            plt.fill_between(bins[:-1]+half_bin, highest, lowest, color=self.colors[1], alpha=0.15)
+            if limits:
+                plt.xlim(limits[0])
+                plt.ylim(limits[1])
         plt.xlabel(self.labels[xtype], fontsize=28)
         plt.ylabel(self.labels[ytype], fontsize=28)
         if title:
@@ -1153,7 +1244,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def median_plot_mult(self, x, y, xtype, ytype, labels, binsize, file_path_and_name, limits=None, title=None):
+    def median_plot_mult(self, x, y, xtype, ytype, labels, binsize, file_path_and_name, binedges=None, limits=None, title=None):
         """
         DESCRIPTION:
             Bins the x-axis quantity and plots either the mean or median, along
@@ -1194,14 +1285,19 @@ class SummaryDataPlot(SummaryDataSort):
                 y[j] = np.log10(y[j])
             #
             if 'N.' not in xtype[j] and 'N.' not in ytype[j]:
-                minn = binsize*np.floor(np.min(x[j])/binsize)
-                maxx = binsize*np.ceil(np.max(x[j])/binsize)
-                if minn < 0:
-                    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+                if binedges:
+                    bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+                    bins = np.linspace(binedges[0], binedges[1], bin_num)
+                    half_bin = (bins[1]-bins[0])/2
                 else:
-                    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
-                bins = np.linspace(minn, maxx, bin_num)
-                half_bin = (bins[1]-bins[0])/2
+                    minn = binsize*np.floor(np.min(x[j])/binsize)
+                    maxx = binsize*np.ceil(np.max(x[j])/binsize)
+                    if minn < 0:
+                        bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+                    else:
+                        bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+                    bins = np.linspace(minn, maxx, bin_num)
+                    half_bin = (bins[1]-bins[0])/2
                 #
                 onesigp = 84.13
                 onesigm = 15.87
@@ -1223,12 +1319,17 @@ class SummaryDataPlot(SummaryDataSort):
                     lowest[i] = np.nanpercentile(y[j][mask], twosigm)
             #
             if 'N.' in xtype[j] and 'N.' not in ytype[j]:
-                minn = int(binsize*np.floor(np.min(x[j])/binsize))-0.5
-                maxx = int(binsize*np.ceil(np.max(x[j])/binsize))+0.5
-                bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
-                bins = np.linspace(minn, maxx, bin_num)
-                #
-                half_bin = (bins[1]-bins[0])/2
+                if binedges:
+                    bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+                    bins = np.linspace(binedges[0], binedges[1], bin_num)
+                    half_bin = (bins[1]-bins[0])/2
+                else:
+                    minn = int(binsize*np.floor(np.min(x[j])/binsize))-0.5
+                    maxx = int(binsize*np.ceil(np.max(x[j])/binsize))+0.5
+                    bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
+                    bins = np.linspace(minn, maxx, bin_num)
+                    #
+                    half_bin = (bins[1]-bins[0])/2
                 onesigp = 84.13
                 onesigm = 15.87
                 twosigp = 100
@@ -1249,14 +1350,19 @@ class SummaryDataPlot(SummaryDataSort):
                     lowest[i] = np.nanpercentile(y[j][mask], twosigm)
             #
             if 'N.' not in xtype[j] and 'N.' in ytype[j]:
-                minn = binsize*np.floor(np.min(x[j])/binsize)
-                maxx = binsize*np.ceil(np.max(x[j])/binsize)
-                if minn < 0:
-                    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+                if binedges:
+                    bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+                    bins = np.linspace(binedges[0], binedges[1], bin_num)
+                    half_bin = (bins[1]-bins[0])/2
                 else:
-                    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
-                bins = np.linspace(minn, maxx, bin_num)
-                half_bin = (bins[1]-bins[0])/2
+                    minn = binsize*np.floor(np.min(x[j])/binsize)
+                    maxx = binsize*np.ceil(np.max(x[j])/binsize)
+                    if minn < 0:
+                        bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+                    else:
+                        bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+                    bins = np.linspace(minn, maxx, bin_num)
+                    half_bin = (bins[1]-bins[0])/2
                 #
                 twosigp = 100
                 twosigm = 0
@@ -1278,11 +1384,16 @@ class SummaryDataPlot(SummaryDataSort):
                 med = means
             #
             if 'N.' in xtype[j] and 'N.' in ytype[j]:
-                minn = int(binsize*np.floor(np.min(x[j])/binsize))-0.5
-                maxx = int(binsize*np.ceil(np.max(x[j])/binsize))+0.5
-                bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
-                bins = np.linspace(minn, maxx, bin_num)
-                half_bin = (bins[1]-bins[0])/2
+                if binedges:
+                    bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+                    bins = np.linspace(binedges[0], binedges[1], bin_num)
+                    half_bin = (bins[1]-bins[0])/2
+                else:
+                    minn = int(binsize*np.floor(np.min(x[j])/binsize))-0.5
+                    maxx = int(binsize*np.ceil(np.max(x[j])/binsize))+0.5
+                    bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
+                    bins = np.linspace(minn, maxx, bin_num)
+                    half_bin = (bins[1]-bins[0])/2
                 #
                 twosigp = 100
                 twosigm = 0
@@ -1303,12 +1414,24 @@ class SummaryDataPlot(SummaryDataSort):
                 lower = means-scatter
                 med = means
             #
-            plt.plot(bins[:-1]+half_bin, med, color=colorss[j], marker='s', markersize=10, alpha=0.5, label=labels[j])
-            plt.fill_between(bins[:-1]+half_bin, upper, lower, color=colorss[j], alpha=0.3)
-            plt.fill_between(bins[:-1]+half_bin, highest, lowest, color=colorss[j], alpha=0.15)
+            # PLOTTING
+            if 'M.' in xtype[j]:
+                plt.plot(10**(bins[:-1]+half_bin), med, color=colorss[j], markersize=10, alpha=0.5, label=labels[j])
+                plt.fill_between(10**(bins[:-1]+half_bin), upper, lower, color=colorss[j], alpha=0.3)
+                plt.fill_between(10**(bins[:-1]+half_bin), highest, lowest, color=colorss[j], alpha=0.15)
+            else:
+                plt.plot(bins[:-1]+half_bin, med, color=colorss[j], markersize=10, alpha=0.5, label=labels[j])
+                plt.fill_between(bins[:-1]+half_bin, upper, lower, color=colorss[j], alpha=0.3)
+                plt.fill_between(bins[:-1]+half_bin, highest, lowest, color=colorss[j], alpha=0.15)
+        if 'M.' in xtype[0]:
+            plt.xscale('log')
         if limits:
-            plt.xlim(limits[0])
-            plt.ylim(limits[1])
+            if 'M.' in xtype[0]:
+                plt.xlim(10**(limits[0][0]), 10**(limits[0][1]))
+                plt.ylim(limits[1])
+            else:
+                plt.xlim(limits[0])
+                plt.ylim(limits[1])
         plt.xlabel(self.labels[xtype[0]], fontsize=28)
         plt.ylabel(self.labels[ytype[0]], fontsize=28)
         plt.legend(prop={'size': 18}, loc='best')
