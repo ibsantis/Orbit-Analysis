@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -44,6 +44,7 @@ if sim_data.num_gal == 1:
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
+    halt_dists_3d = orbits.halo_distances(tree=halt, dist_type='3d')
     halt_vels = orbits.halo_velocities(halt)
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
@@ -83,11 +84,17 @@ if sim_data.num_gal == 1:
     peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, tts)
     apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, tts)
 
+    galpy_dist_3d = np.ones((orbits.shape[0],len(ts),3))
+    galpy_dist_3d[:,:,0] = (-1)*galpy_orbits.x(ts) # x and y have values negative from the sims for some reason...
+    galpy_dist_3d[:,:,1] = (-1)*galpy_orbits.y(ts)
+    galpy_dist_3d[:,:,2] = galpy_orbits.z(ts)
+
     # Save the data to a dictionary
     data_dict = dict()
     #
     # z = 0 indices
     data_dict['indices.z0'] = orbits.sub_inds
+    data_dict['id'] = np.arange(len(orbits.sub_inds[:,0]))+1
     #
     # Stellar mass of the subhalos at z = 0 and peak stellar mass
     data_dict['Mstar.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
@@ -157,6 +164,7 @@ if sim_data.num_gal == 1:
     #
     # distance, velocity, Lz vs time
     data_dict['dtot.sim'] = halt_dists
+    data_dict['d.sim'] = halt_dists_3d
     data_dict['vtot.sim'] = halt_vels
     data_dict['L.sim'] = angs['ang.mom.vector']
     data_dict['Ltot.sim'] = angs['ang.mom.total']
@@ -166,6 +174,7 @@ if sim_data.num_gal == 1:
     data_dict['time.sim'] = snaps['time']
     #
     data_dict['dtot.galpy'] = galpy_orbits.r(ts)
+    data_dict['d.galpy'] = galpy_dist_3d
     data_dict['vtot.galpy'] = galpy_vels
     data_dict['L.galpy'] = galpy_orbits.L(ts)
     data_dict['Lz.galpy'] = galpy_orbits.Lz(ts)
