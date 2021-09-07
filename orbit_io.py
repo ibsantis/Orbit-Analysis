@@ -218,15 +218,16 @@ class OrbitAnalysis:
                     self.sub_inds = z0_inds_w_star_prog
                     self.shape = self.sub_inds.shape
 
-    def halo_distances(self, tree, host=1):
+    def halo_distances(self, tree, dist_type='total', host=1):
         """
         DESCRIPTION:
             Reads in the halo tree and subhalo indices, then returns a 2D array,
             where each row contains subhalo distances from the main host galaxy.
 
         VARIABLES:
-            tree : dictionary
-            host : int
+            tree      : dictionary
+            dist_type : string
+            host      : int
 
         NOTES:
             - Returns a 2D array:
@@ -241,28 +242,52 @@ class OrbitAnalysis:
                 - If using a LG simulation, need to specify the second host to
                   get distances from that host
         """
-        # Set up null 2D array with the same shape as the subhalo index array
-        distances = (-1)*np.ones(self.shape)
-        # Loop over the number of subhalos
-        for i in range(0, len(self.sub_inds)):
-            # Mask only the subhalos that exist (non-negative elements)
-            mask = (self.sub_inds[i] >= 0)
-            # Loop over the number of snapshots a subhalo exists
-            if host == 1:
-                for j, val in enumerate(tree.prop('host.distance.total', self.sub_inds[i][mask])):
-                    # Fill in the null array with 1D distances
-                    distances[i][j] = val
-            elif host == 2:
-                for j, val in enumerate(tree.prop('host2.distance.total', self.sub_inds[i][mask])):
-                    # Fill in the null array with 1D distances
-                    distances[i][j] = val
-            else:
-                print('Choose a valid host.')
-                sys.exit()
-            # There are cases where the subhalo progenitor existed before the host
-            # Replace these nan instances with -1s
-            nan_mask = np.isnan(distances[i])
-            distances[i][nan_mask] = -1
+        if dist_type == '3d':
+            # Set up null 2D array with the same shape as the subhalo index array
+            distances = (-1)*np.ones((self.shape[0],self.shape[1],3))
+            # Loop over the number of subhalos
+            for i in range(0, len(self.sub_inds)):
+                # Mask only the subhalos that exist (non-negative elements)
+                mask = (self.sub_inds[i] >= 0)
+                # Loop over the number of snapshots a subhalo exists
+                if host == 1:
+                    for j, val in enumerate(tree.prop('host.distance', self.sub_inds[i][mask])):
+                        # Fill in the null array with 1D distances
+                        distances[i][j] = val
+                elif host == 2:
+                    for j, val in enumerate(tree.prop('host2.distance', self.sub_inds[i][mask])):
+                        # Fill in the null array with 1D distances
+                        distances[i][j] = val
+                else:
+                    print('Choose a valid host.')
+                    sys.exit()
+                # There are cases where the subhalo progenitor existed before the host
+                # Replace these nan instances with -1s
+                nan_mask = np.isnan(distances[i])
+                distances[i][nan_mask] = -1
+        else:
+            # Set up null 2D array with the same shape as the subhalo index array
+            distances = (-1)*np.ones(self.shape)
+            # Loop over the number of subhalos
+            for i in range(0, len(self.sub_inds)):
+                # Mask only the subhalos that exist (non-negative elements)
+                mask = (self.sub_inds[i] >= 0)
+                # Loop over the number of snapshots a subhalo exists
+                if host == 1:
+                    for j, val in enumerate(tree.prop('host.distance.total', self.sub_inds[i][mask])):
+                        # Fill in the null array with 1D distances
+                        distances[i][j] = val
+                elif host == 2:
+                    for j, val in enumerate(tree.prop('host2.distance.total', self.sub_inds[i][mask])):
+                        # Fill in the null array with 1D distances
+                        distances[i][j] = val
+                else:
+                    print('Choose a valid host.')
+                    sys.exit()
+                # There are cases where the subhalo progenitor existed before the host
+                # Replace these nan instances with -1s
+                nan_mask = np.isnan(distances[i])
+                distances[i][nan_mask] = -1
         return distances
 
     def halo_distances_norm(self, distances, host_halo_radii):
