@@ -37,6 +37,9 @@ class SummaryDataSort:
         self.host_names = {'all': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', 'm12z', \
                            'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus'],
                            #
+                           'all_no_z': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', \
+                                        'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus'],
+                           #
                            'all2': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', \
                            'Romeo', 'Juliet', 'Thelma', 'Louise'],
                             #
@@ -971,7 +974,7 @@ class SummaryDataPlot(SummaryDataSort):
                        'delta.d': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$) [kpc]',\
                        'v.tan': 'v$_{\\rm tan}(z = 0)$ [km s$^{-1}$]',\
                        'v.rad': 'v$_{\\rm rad}(z = 0)$ [km s$^{-1}$]',\
-                       'v.tot': 'v$_{\\rm tot}(z = 0)$ [km s$^{-1}$]',\
+                       'v.tot': 'v$(z = 0)$ [km s$^{-1}$]',\
                        't.sim': 't$_{\\rm peri,lb,sim}$ [Gyr]',\
                        't.sim.min': 't$_{\\rm peri,min,lb,sim}$ [Gyr]',\
                        't.sim.min.recent': '(t$_{\\rm peri,min,lb,sim}$ - t$_{\\rm peri,lb,sim}$) [Gyr]',\
@@ -993,8 +996,12 @@ class SummaryDataPlot(SummaryDataSort):
                        'KE.max.sim': 'KE$_{\\rm max,sim}$ [10$^4$ km$^2$/s$^2$]',\
                        'KE.peri.sim': 'KE$_{\\rm peri,sim}$ [10$^4$ km$^2$/s$^2$]',\
                        'KE.z0.sim': 'KE$_{\\rm sim}(z = 0)$ [10$^4$ km$^2$/s$^2$]',\
-                       'E.tot.sim': 'E$_{\\rm tot,sim}$ [10$^4$ km$^2$/s$^2$]',\
-                       'L.tot': 'L$_{\\rm tot}(z = 0)$ [10$^4$ kpc km s$^{-1}$]'}
+                       'E.tot': 'E$(z = 0)$ [10$^4$ km$^2$/s$^2$]',\
+                       'E.tot.sim': 'E$_{\\rm sim}(z = 0)$ [10$^4$ km$^2$/s$^2$]',\
+                       'E.tot.model': 'E$_{\\rm model}(z = 0)$ [10$^4$ km$^2$/s$^2$]',\
+                       'L.tot': 'L$(z = 0)$ [10$^4$ kpc km s$^{-1}$]',\
+                       'L.tot.sim': 'L$_{\\rm sim}(z = 0)$ [10$^4$ kpc km s$^{-1}$]',\
+                       'L.tot.model': 'L$_{\\rm model}(z = 0)$ [10$^4$ kpc km s$^{-1}$]'}
         #
         self.titles = {'d.sim': 'Recent Minimum Distances',\
                        'd.model': 'Recent Minimum Distances',\
