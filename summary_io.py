@@ -35,13 +35,13 @@ class SummaryDataSort:
         """
         # Create a dictionary of host name arrays depending on if you want different samples
         self.host_names = {'all': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', 'm12z', \
-                           'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus'],
+                                   'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus'],
                            #
                            'all_no_z': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', \
                                         'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus'],
                            #
-                           'all2': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', \
-                           'Romeo', 'Juliet', 'Thelma', 'Louise'],
+                           'all_energy': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', \
+                                          'Romeo', 'Juliet', 'Thelma', 'Louise'],
                             #
                            'iso': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', 'm12z'],
                            #
@@ -968,6 +968,8 @@ class SummaryDataPlot(SummaryDataSort):
                        'd.sim.min.recent': '(d$_{\\rm peri,min,sim}$ - d$_{\\rm peri,sim}$) [kpc]',\
                        'd.sim.min.recent.frac': '(d$_{\\rm peri,min,sim}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$',\
                        'd.peri': 'd$_{\\rm peri}$ [kpc]',\
+                       'd.peri.recent': 'd$_{\\rm peri, recent}$ [kpc]',\
+                       'd.peri.min': 'd$_{\\rm peri, min}$ [kpc]',\
                        'd.model': 'd$_{\\rm peri,model}$ [kpc]',\
                        'd.z0': 'd(z = 0) [kpc]',\
                        'delta.d.frac': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$',\
@@ -980,7 +982,9 @@ class SummaryDataPlot(SummaryDataSort):
                        't.sim.min.recent': '(t$_{\\rm peri,min,lb,sim}$ - t$_{\\rm peri,lb,sim}$) [Gyr]',\
                        't.sim.min.recent.frac': '(t$_{\\rm peri,min,lb,sim}$ - t$_{\\rm peri,lb,sim}$)/t$_{\\rm peri,lb,sim}$',\
                        't.model': 't$_{\\rm peri,lb,model}$ [Gyr]',\
-                       't.peri': 't$_{\\rm peri}$ [Gyr]',\
+                       't.peri': 't$_{\\rm peri,lb}$ [Gyr]',\
+                       't.peri.recent': 't$_{\\rm peri,recent,lb}$ [Gyr]',\
+                       't.peri.min': 't$_{\\rm peri,min,lb}$ [Gyr]',\
                        't.infall': 't$_{\\rm infall,lb}$ [Gyr]',\
                        't.infall.any': 't$_{\\rm infall,any,lb}$ [Gyr]',\
                        't.infall.diff': '(t$_{\\rm infall,any,lb}$ - t$_{\\rm infall,lb}$) [Gyr]',\
@@ -988,6 +992,7 @@ class SummaryDataPlot(SummaryDataSort):
                        'delta.t': '(t$_{\\rm peri,model}$ - t$_{\\rm peri,sim}$) [Gyr]',\
                        'N.sim': 'N$_{\\rm peri,sim}$',\
                        'N.model': 'N$_{\\rm peri,model}$',\
+                       'N.peri': 'N$_{\\rm peri}$',\
                        'N.delta': 'N$_{\\rm model}$ - N$_{\\rm sim}$',\
                        'M.star.z0': 'M$_{\\rm star}$ [M$_{\\odot}$]',\
                        'M.star.peak': 'log$_{\\rm 10}$[M$_{\\rm star, peak}$/M$_{\\odot}$]',\
@@ -1227,7 +1232,7 @@ class SummaryDataPlot(SummaryDataSort):
             med = means
         #
         f, ax = plt.subplots(figsize=(10, 8))
-        if 'M.' in xtype:
+        if 'M.' in xtype and 'M.' not in ytype:
             plt.plot(10**(bins[:-1]+half_bin), med, color=self.colors[1], markersize=10, alpha=0.5)
             plt.fill_between(10**(bins[:-1]+half_bin), upper, lower, color=self.colors[1], alpha=0.3)
             plt.fill_between(10**(bins[:-1]+half_bin), highest, lowest, color=self.colors[1], alpha=0.15)
@@ -1235,6 +1240,15 @@ class SummaryDataPlot(SummaryDataSort):
                 plt.xlim(10**(limits[0][0]), 10**(limits[0][1]))
                 plt.ylim(limits[1])
             plt.xscale('log')
+        elif 'M.' in xtype and 'M.' in ytype:
+            plt.plot(10**(bins[:-1]+half_bin), 10**med, color=self.colors[1], markersize=10, alpha=0.5)
+            plt.fill_between(10**(bins[:-1]+half_bin), 10**upper, 10**lower, color=self.colors[1], alpha=0.3)
+            plt.fill_between(10**(bins[:-1]+half_bin), 10**highest, 10**lowest, color=self.colors[1], alpha=0.15)
+            if limits:
+                plt.xlim(10**(limits[0][0]), 10**(limits[0][1]))
+                plt.ylim(10**(limits[1][0]), 10**(limits[1][1]))
+            plt.xscale('log')
+            plt.yscale('log')
         else:
             plt.plot(bins[:-1]+half_bin, med, color=self.colors[1], markersize=10, alpha=0.5)
             plt.fill_between(bins[:-1]+half_bin, upper, lower, color=self.colors[1], alpha=0.3)
