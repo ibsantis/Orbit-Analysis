@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #SBATCH --job-name=m12i_potential_test
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
-#SBATCH --mem=480G
+##SBATCH --mem=480G
 #SBATCH --nodes=1
 #SBATCH --ntasks=1    # processes total
 #SBATCH --time=08:00:00
@@ -60,7 +60,7 @@ if sim_data.num_gal == 1:
     part_pos = part['dark']['position'][::2].astype(np.float32)
     max_dist = np.max(halt['radius'][orbits.sub_inds[:,0]])
     #
-    ptree = ut.coordinate.get_neighbors(center_positions=halo_pos, neig_positions=part_pos, neig_distance_max=max_dist, exclude_self=False)
+    ptree = ut.coordinate.get_neighbors(center_positions=halo_pos, neig_positions=part_pos, neig_distance_max=max_dist, exclude_self=False, workers=4)
     #
     data_dict = dict()
     data_dict['distances'] = ptree[0]
