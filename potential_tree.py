@@ -57,7 +57,7 @@ if sim_data.num_gal == 1:
     orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
     #
     halo_pos = halt['position'][orbits.sub_inds[:,0]]
-    part_pos = part['dark']['position'][::2].astype(np.float32)
+    part_pos = part['dark']['position'][::10000].astype(np.float32)
     max_dist = np.max(halt['radius'][orbits.sub_inds[:,0]])
     #
     ptree = ut.coordinate.get_neighbors(center_positions=halo_pos, neig_positions=part_pos, neig_distance_max=max_dist, exclude_self=False, workers=4)
