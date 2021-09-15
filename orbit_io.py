@@ -37,6 +37,7 @@ figures:
 
 import utilities as ut
 from scipy.interpolate import interp1d
+from scipy import spatial
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
@@ -1373,6 +1374,22 @@ class OrbitGalpy(OrbitAnalysis):
             if np.sum(angle < 1) or np.sum(angle > 179):
                 check[i] = True
         return check
+
+class OrbitTree(OrbitAnalysis):
+
+    def __init__(self, tree, gal1, location, host, particles, subsampling, dmo=False):
+        """
+        Need to do this to inherit the subhalo indices defined from __init__
+        in OrbitAnalysis
+        """
+        OrbitAnalysis.__init__(self, tree, gal1, location, host, dmo=dmo)
+        #
+        # Build the tree
+        self.kdtree = spatial.KDTree(data=particles['dark']['position'][::subsampling].astype(np.float32))
+
+    def neighbors(self, centers, neigh_num_max, neigh_dist_max, workerss=2):
+        pos, ind = self.kdtree.query(x=centers, k=neigh_num_max, distance_upper_bound=neigh_dist_max, workers=workerss)
+        return pos, ind
 
 class OrbitPlot(OrbitAnalysis):
 
