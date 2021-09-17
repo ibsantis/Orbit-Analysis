@@ -1386,6 +1386,7 @@ class OrbitTree(OrbitAnalysis):
         #
         # Build the tree
         self.kdtree = spatial.KDTree(data=particles['dark']['position'][::subsampling].astype(np.float32))
+        self.subsampling = subsampling
 
     def neighbors(self, centers, neigh_num_max, neigh_dist_max, workerss=2):
         pos, ind = self.kdtree.query(x=centers, k=neigh_num_max, distance_upper_bound=neigh_dist_max, workers=workerss)
