@@ -117,4 +117,4 @@ if sim_data.num_gal == 1:
         end = time.time()
         print('Done with mass bin {0} in {1} seconds'.format(i, end-start))
     #
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_1+'_potential_test', dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potential_test', dict_or_array_to_write=data_dict, verbose=True)
