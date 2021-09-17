@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=m12i_potential_test_sub50_N1e6
+#SBATCH --job-name=m12i_potential_test_sub30_N1e6
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 ##SBATCH --mem=480G
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
 #SBATCH --time=04:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/m12i_potential_test_sub50_N1e6_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/m12i_potential_test_sub30_N1e6_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -61,7 +61,7 @@ if sim_data.num_gal == 1:
     # Set up the halo inds and KDTree
     orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
     start = time.time()
-    orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, particles=part, subsampling=50)
+    orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, particles=part, subsampling=30)
     end = time.time()
     print('KDTree created in {0} seconds'.format(end-start))
     #
