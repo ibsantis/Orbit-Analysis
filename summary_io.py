@@ -13,6 +13,7 @@ import utilities as ut
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
+import matplotlib.ticker
 
 
 class SummaryDataSort:
@@ -970,6 +971,7 @@ class SummaryDataPlot(SummaryDataSort):
                        'd.peri': 'd$_{\\rm peri}$ [kpc]',\
                        'd.peri.recent': 'd$_{\\rm peri, recent}$ [kpc]',\
                        'd.peri.min': 'd$_{\\rm peri, min}$ [kpc]',\
+                       'd.peri.text': 'Pericenter d [kpc]',\
                        'd.model': 'd$_{\\rm peri,model}$ [kpc]',\
                        'd.z0': 'd(z = 0) [kpc]',\
                        'delta.d.frac': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$',\
@@ -985,14 +987,17 @@ class SummaryDataPlot(SummaryDataSort):
                        't.peri': 't$_{\\rm peri,lb}$ [Gyr]',\
                        't.peri.recent': 't$_{\\rm peri,recent,lb}$ [Gyr]',\
                        't.peri.min': 't$_{\\rm peri,min,lb}$ [Gyr]',\
+                       't.peri.text': 'Pericenter t$_{\\rm lb}$ [Gyr]',\
                        't.infall': 't$_{\\rm infall,lb}$ [Gyr]',\
                        't.infall.any': 't$_{\\rm infall,any,lb}$ [Gyr]',\
+                       't.infall.text': 'Infall t$_{\\rm lb}$ [Gyr]',\
                        't.infall.diff': '(t$_{\\rm infall,any,lb}$ - t$_{\\rm infall,lb}$) [Gyr]',\
                        'delta.t.frac': '(t$_{\\rm peri,model}$ - t$_{\\rm peri,sim}$)/t$_{\\rm peri,sim}$',\
                        'delta.t': '(t$_{\\rm peri,model}$ - t$_{\\rm peri,sim}$) [Gyr]',\
                        'N.sim': 'N$_{\\rm peri,sim}$',\
                        'N.model': 'N$_{\\rm peri,model}$',\
                        'N.peri': 'N$_{\\rm peri}$',\
+                       'N.peri.text': 'Pericenter Number',\
                        'N.delta': 'N$_{\\rm model}$ - N$_{\\rm sim}$',\
                        'M.star.z0': 'M$_{\\rm star}$ [M$_{\\odot}$]',\
                        'M.star.peak': 'log$_{\\rm 10}$[M$_{\\rm star, peak}$/M$_{\\odot}$]',\
@@ -1099,9 +1104,7 @@ class SummaryDataPlot(SummaryDataSort):
             y = np.log10(y)
         #
         if 'N.' not in xtype and 'N.' not in ytype:
-            ##
-            # Testing this check for bin edges now
-            ##
+            #
             if binedges:
                 bin_num = int((binedges[1]-binedges[0])/binsize + 1)
                 bins = np.linspace(binedges[0], binedges[1], bin_num)
@@ -1231,15 +1234,41 @@ class SummaryDataPlot(SummaryDataSort):
             lower = means-scatter
             med = means
         #
-        f, ax = plt.subplots(figsize=(10, 8))
+        f, ax = plt.subplots(figsize=(11, 8))
+        #ax.minorticks_on()
+        ax.set_xlabel(self.labels[xtype], fontsize=28)
+        ax.set_ylabel(self.labels[ytype], fontsize=28)
+        if title:
+            ax.set_title(self.titles[title], fontsize=24)
         if 'M.' in xtype and 'M.' not in ytype:
             plt.plot(10**(bins[:-1]+half_bin), med, color=self.colors[1], markersize=10, alpha=0.5)
             plt.fill_between(10**(bins[:-1]+half_bin), upper, lower, color=self.colors[1], alpha=0.3)
             plt.fill_between(10**(bins[:-1]+half_bin), highest, lowest, color=self.colors[1], alpha=0.15)
+            ax.set_xscale('log')
+            ax.set_yscale('linear')
             if limits:
                 plt.xlim(10**(limits[0][0]), 10**(limits[0][1]))
                 plt.ylim(limits[1])
-            plt.xscale('log')
+            #
+            if 't.' in ytype:
+                # Instantiate the cosmology class and run this method first to set up scalefactors
+                cc = ut.cosmology.CosmologyClass()
+                red = np.array([0, 1])
+                cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+                #
+                axis_2_label = 'redshift'
+                axis_2_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+                axis_2_tick_values = [float(v) for v in axis_2_tick_labels]
+                axis_2_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_2_tick_values)
+                ax2 = ax.twinx()
+                ax2.set_xscale('log')
+                ax2.set_yscale('linear')
+                ax2.set_yticks(axis_2_tick_locations)
+                ax2.set_yticklabels(axis_2_tick_labels, fontsize=28)
+                ax2.set_ylim(limits[1])
+                ax2.set_ylabel(axis_2_label, labelpad=9)
+                ax2.tick_params(pad=3)
+        #
         elif 'M.' in xtype and 'M.' in ytype:
             plt.plot(10**(bins[:-1]+half_bin), 10**med, color=self.colors[1], markersize=10, alpha=0.5)
             plt.fill_between(10**(bins[:-1]+half_bin), 10**upper, 10**lower, color=self.colors[1], alpha=0.3)
@@ -1247,20 +1276,57 @@ class SummaryDataPlot(SummaryDataSort):
             if limits:
                 plt.xlim(10**(limits[0][0]), 10**(limits[0][1]))
                 plt.ylim(10**(limits[1][0]), 10**(limits[1][1]))
-            plt.xscale('log')
-            plt.yscale('log')
+            ax.set_xscale('log')
+            ax.set_yscale('log')
         else:
             plt.plot(bins[:-1]+half_bin, med, color=self.colors[1], markersize=10, alpha=0.5)
             plt.fill_between(bins[:-1]+half_bin, upper, lower, color=self.colors[1], alpha=0.3)
             plt.fill_between(bins[:-1]+half_bin, highest, lowest, color=self.colors[1], alpha=0.15)
+            ax.set_xscale('linear')
+            ax.set_yscale('linear')
             if limits:
                 plt.xlim(limits[0])
                 plt.ylim(limits[1])
-        plt.xlabel(self.labels[xtype], fontsize=28)
-        plt.ylabel(self.labels[ytype], fontsize=28)
-        if title:
-            plt.title(self.titles[title], fontsize=24)
-        plt.tick_params(axis='both', which='major', labelsize=24)
+            #
+            if 't.' in xtype:
+                # Instantiate the cosmology class and run this method first to set up scalefactors
+                cc = ut.cosmology.CosmologyClass()
+                red = np.array([0, 1])
+                cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+                #
+                axis_2_label = 'redshift'
+                axis_2_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+                axis_2_tick_values = [float(v) for v in axis_2_tick_labels]
+                axis_2_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_2_tick_values)
+                ax2 = ax.twiny()
+                ax2.set_xscale('linear')
+                ax2.set_yscale('linear')
+                ax2.set_xticks(axis_2_tick_locations)
+                ax2.set_xticklabels(axis_2_tick_labels, fontsize=28)
+                ax2.set_xlim(limits[0])
+                ax2.set_xlabel(axis_2_label, labelpad=9)
+                ax2.tick_params(pad=3)
+            #
+            if 't.' in ytype:
+                # Instantiate the cosmology class and run this method first to set up scalefactors
+                cc = ut.cosmology.CosmologyClass()
+                red = np.array([0, 1])
+                cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+                #
+                axis_2_label = 'redshift'
+                axis_2_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+                axis_2_tick_values = [float(v) for v in axis_2_tick_labels]
+                axis_2_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_2_tick_values)
+                ax2 = ax.twinx()
+                ax2.set_xscale('linear')
+                ax2.set_yscale('linear')
+                ax2.set_yticks(axis_2_tick_locations)
+                ax2.set_yticklabels(axis_2_tick_labels, fontsize=28)
+                ax2.set_ylim(limits[1])
+                ax2.set_ylabel(axis_2_label, labelpad=9)
+                ax2.tick_params(pad=3)
+        #
+        ax.tick_params(axis='both', which='major', labelsize=28)
         plt.tight_layout()
         plt.savefig(file_path_and_name)
         plt.close()
@@ -1297,7 +1363,7 @@ class SummaryDataPlot(SummaryDataSort):
         else:
             colorss = self.colors
         #
-        f, ax = plt.subplots(figsize=(10, 8))
+        f, ax = plt.subplots(figsize=(11, 8))
         #
         for j in range(0, len(x)):
             if 'M.' in xtype[j]:
@@ -1440,6 +1506,7 @@ class SummaryDataPlot(SummaryDataSort):
                 plt.plot(10**(bins[:-1]+half_bin), med, color=colorss[j], markersize=10, alpha=0.5, label=labels[j])
                 plt.fill_between(10**(bins[:-1]+half_bin), upper, lower, color=colorss[j], alpha=0.3)
                 plt.fill_between(10**(bins[:-1]+half_bin), highest, lowest, color=colorss[j], alpha=0.15)
+                #
             else:
                 plt.plot(bins[:-1]+half_bin, med, color=colorss[j], markersize=10, alpha=0.5, label=labels[j])
                 plt.fill_between(bins[:-1]+half_bin, upper, lower, color=colorss[j], alpha=0.3)
@@ -1453,12 +1520,30 @@ class SummaryDataPlot(SummaryDataSort):
             else:
                 plt.xlim(limits[0])
                 plt.ylim(limits[1])
-        plt.xlabel(self.labels[xtype[0]], fontsize=28)
-        plt.ylabel(self.labels[ytype[0]], fontsize=28)
-        plt.legend(prop={'size': 18}, loc='best')
+        if 't.' in ytype[0]:
+            # Instantiate the cosmology class and run this method first to set up scalefactors
+            cc = ut.cosmology.CosmologyClass()
+            red = np.array([0, 1])
+            cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+            #
+            axis_2_label = 'redshift'
+            axis_2_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+            axis_2_tick_values = [float(v) for v in axis_2_tick_labels]
+            axis_2_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_2_tick_values)
+            ax2 = ax.twinx()
+            ax2.set_xscale('log')
+            ax2.set_yscale('linear')
+            ax2.set_yticks(axis_2_tick_locations)
+            ax2.set_yticklabels(axis_2_tick_labels, fontsize=28)
+            ax2.set_ylim(limits[1])
+            ax2.set_ylabel(axis_2_label, labelpad=9)
+            ax2.tick_params(pad=3)
+        ax.set_xlabel(self.labels[xtype[0]], fontsize=28)
+        ax.set_ylabel(self.labels[ytype[0]], fontsize=28)
+        ax.legend(prop={'size': 18}, loc='best')
         if title:
             plt.title(self.titles[title], fontsize=24)
-        plt.tick_params(axis='both', which='major', labelsize=24)
+        ax.tick_params(axis='both', which='major', labelsize=28)
         plt.tight_layout()
         plt.savefig(file_path_and_name)
         plt.close()
@@ -1719,7 +1804,7 @@ class SummaryDataPlot(SummaryDataSort):
             sigma_one_op = np.nanpercentile(x, onesigp)
             sigma_one_om = np.nanpercentile(x, onesigm)
             #
-            y_med = np.max(np.histogram(x, bin_array, normed=pdf)[0])*1.1
+            y_med = np.max(np.histogram(x, bin_array, density=pdf)[0])*1.1
             #
             plt.hist(x, bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
             plt.errorbar(np.median(x), y_med, xerr=np.array([[np.median(x)-sigma_one_om],[sigma_one_op-np.median(x)]]), color='k', lw=5, capsize=8)
@@ -1731,7 +1816,7 @@ class SummaryDataPlot(SummaryDataSort):
             bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
             bin_array = np.linspace(minn, maxx, bin_num)
             #
-            y_mean = np.max(np.histogram(x, bin_array, normed=pdf)[0])*1.1
+            y_mean = np.max(np.histogram(x, bin_array, density=pdf)[0])*1.1
             #
             plt.hist(x, bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
             plt.errorbar(np.mean(x), y_mean, xerr=np.array([[2*np.std(x)],[2*np.std(x)]]), color='k', lw=5, capsize=8, alpha=0.3)
@@ -1797,7 +1882,7 @@ class SummaryDataPlot(SummaryDataSort):
                 sigma_one_op = np.nanpercentile(x[i], onesigp)
                 sigma_one_om = np.nanpercentile(x[i], onesigm)
                 #
-                y_med = np.max(np.histogram(x[i], bin_array, normed=pdf)[0])*1.1
+                y_med = np.max(np.histogram(x[i], bin_array, density=pdf)[0])*1.1
                 #
                 plt.hist(x[i], bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=colorss[i], alpha=0.4, label=labels[i])
                 plt.errorbar(np.median(x[i]), y_med, xerr=np.array([[np.median(x[i])-sigma_one_om],[sigma_one_op-np.median(x[i])]]), c=colorss[i], lw=5, capsize=8, alpha=0.8)
@@ -1809,7 +1894,7 @@ class SummaryDataPlot(SummaryDataSort):
                 bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
                 bin_array = np.linspace(minn, maxx, bin_num)
                 #
-                y_mean = np.max(np.histogram(x[i], bin_array, normed=pdf)[0])*1.1
+                y_mean = np.max(np.histogram(x[i], bin_array, density=pdf)[0])*1.1
                 #
                 plt.hist(x[i], bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=colorss[i], alpha=0.4, label=labels[i])
                 plt.errorbar(np.mean(x[i]), y_mean, xerr=np.array([[2*np.std(x[i])],[2*np.std(x[i])]]), c=colorss[i], lw=5, capsize=8, alpha=0.3)
