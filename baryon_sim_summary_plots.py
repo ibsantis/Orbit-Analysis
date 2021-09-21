@@ -32,7 +32,7 @@ print('Set paths')
 # Initialize the classes, read in the data, and create data masks
 summary = summary_io.SummaryDataSort()
 data_total = summary.data_read(directory=sim_data.home_dir, hosts='all', sim_type='baryon')
-data_potentials = summary.data_read_potential(directory=sim_data.home_dir, hosts='all2', sim_type='baryon')
+#data_potentials = summary.data_read_potential(directory=sim_data.home_dir, hosts='all2', sim_type='baryon')
 masks_infall = summary.data_mask(data_total, peri_sim=False, peri_model=False, hosts='all')
 summary_plot = summary_io.SummaryDataPlot()
 
@@ -162,12 +162,13 @@ summary_plot.median_plot_mult(x=[Mstar_z0_tot, Mstar_z0_tot], y=[d_sim_tot, d_mi
 summary_plot.median_plot_mult(x=[Mstar_z0_tot, Mstar_z0_tot], y=[d_sim_tot, d_min_tot], xtype=['M.star.z0', 'M.star.z0'], ytype=['d.peri', 'd.peri'], labels=['Recent', 'Minimum'], binedges=(4.5,9.5), binsize=0.5, limits=((4,9.5),(0,225)), file_path_and_name=directory+'/median/d_peri_both_vs_Mstar_z0_zoom.pdf')
 
 # (d_min - d_recent) vs Mstar (z = 0)
-summary_plot.median_plot(x=Mstar_z0_tot, y=d_min_tot-d_sim_tot, xtype='M.star.z0', ytype='d.sim.min.recent', binsize=0.5, file_path_and_name=directory+'/median/delta_d_vs_Mstar_z0.pdf')
-summary_plot.median_plot(x=Mstar_z0_tot, y=d_min_tot-d_sim_tot, xtype='M.star.z0', ytype='d.sim.min.recent', binsize=0.5, limits=(None,(-40,1)), file_path_and_name=directory+'/median/delta_d_vs_Mstar_z0_zoom.pdf')
+mask_delta_d = (np.abs((d_min_tot - d_sim_tot)/d_sim_tot) > 0.05)
+summary_plot.median_plot(x=Mstar_z0_tot[mask_delta_d], y=(d_min_tot-d_sim_tot)[mask_delta_d], xtype='M.star.z0', ytype='d.sim.min.recent', binsize=0.5, file_path_and_name=directory+'/median/delta_d_vs_Mstar_z0.pdf')
+summary_plot.median_plot(x=Mstar_z0_tot[mask_delta_d], y=(d_min_tot-d_sim_tot)[mask_delta_d], xtype='M.star.z0', ytype='d.sim.min.recent', binsize=0.5, binedges=(4.5,9.5), limits=((4,9.5),(-100,1)), file_path_and_name=directory+'/median/delta_d_vs_Mstar_z0_zoom.pdf')
 
 # (d_min - d_recent)/d_recent vs Mstar (z = 0)
-summary_plot.median_plot(x=Mstar_z0_tot, y=(d_min_tot-d_sim_tot)/d_sim_tot, xtype='M.star.z0', ytype='d.sim.min.recent.frac', binsize=0.5, file_path_and_name=directory+'/median/delta_d_frac_vs_Mstar_z0.pdf')
-summary_plot.median_plot(x=Mstar_z0_tot, y=(d_min_tot-d_sim_tot)/d_sim_tot, xtype='M.star.z0', ytype='d.sim.min.recent.frac', binsize=0.5, limits=(None,(-0.5,0.01)), file_path_and_name=directory+'/median/delta_d_frac_vs_Mstar_z0_zoom.pdf')
+summary_plot.median_plot(x=Mstar_z0_tot[mask_delta_d], y=((d_min_tot-d_sim_tot)/d_sim_tot)[mask_delta_d], xtype='M.star.z0', ytype='d.sim.min.recent.frac', binsize=0.5, file_path_and_name=directory+'/median/delta_d_frac_vs_Mstar_z0.pdf')
+#summary_plot.median_plot(x=Mstar_z0_tot[mask_delta_d], y=((d_min_tot-d_sim_tot)/d_sim_tot)[mask_delta_d], xtype='M.star.z0', ytype='d.sim.min.recent.frac', binsize=0.5, limits=(None,(-0.5,0.01)), file_path_and_name=directory+'/median/delta_d_frac_vs_Mstar_z0_zoom.pdf')
 
 # d(z = 0) vs Mstar (z = 0)
 summary_plot.median_plot(x=Mstar_z0_tot, y=dz0_tot, xtype='M.star.z0', ytype='d.z0', binsize=0.5, file_path_and_name=directory+'/median/dz0_vs_Mstar_z0.pdf')
@@ -186,12 +187,13 @@ summary_plot.median_plot_mult(x=[Mstar_z0_tot, Mstar_z0_tot], y=[t_sim_tot, t_mi
 summary_plot.median_plot_mult(x=[Mstar_z0_tot, Mstar_z0_tot], y=[t_sim_tot, t_min_tot], xtype=['M.star.z0', 'M.star.z0'], ytype=['t.peri', 't.peri'], labels=['Recent', 'Minimum'], binsize=0.5, binedges=(4.5,9.5), limits=((4,9.5),(0,6)), file_path_and_name=directory+'/median/t_peri_both_vs_Mstar_z0_zoom2.pdf')
 
 # (t_min - t_recent) vs Mstar (z = 0)
-summary_plot.median_plot(x=Mstar_z0_tot, y=t_min_tot-t_sim_tot, xtype='M.star.z0', ytype='t.sim.min.recent', binsize=0.5, file_path_and_name=directory+'/median/delta_t_vs_Mstar_z0.pdf')
-summary_plot.median_plot(x=Mstar_z0_tot, y=t_min_tot-t_sim_tot, xtype='M.star.z0', ytype='t.sim.min.recent', binsize=0.5, limits=(None,(-0.5,7)), file_path_and_name=directory+'/median/delta_t_vs_Mstar_z0_zoom.pdf')
+mask_delta_t = (np.abs((t_min_tot - t_sim_tot)/t_sim_tot) > 0.05)
+summary_plot.median_plot(x=Mstar_z0_tot[mask_delta_t], y=(t_min_tot-t_sim_tot)[mask_delta_t], xtype='M.star.z0', ytype='t.sim.min.recent', binsize=0.5, file_path_and_name=directory+'/median/delta_t_vs_Mstar_z0.pdf')
+#summary_plot.median_plot(x=Mstar_z0_tot[mask_delta_t], y=(t_min_tot-t_sim_tot)[mask_delta_t], xtype='M.star.z0', ytype='t.sim.min.recent', binsize=0.5, limits=(None,(-0.5,7)), file_path_and_name=directory+'/median/delta_t_vs_Mstar_z0_zoom.pdf')
 
 # (t_min - t_recent)/t_recent vs Mstar (z = 0)
-summary_plot.median_plot(x=Mstar_z0_tot, y=(t_min_tot-t_sim_tot)/t_sim_tot, xtype='M.star.z0', ytype='t.sim.min.recent.frac', binsize=0.5, file_path_and_name=directory+'/median/delta_t_frac_vs_Mstar_z0.pdf')
-summary_plot.median_plot(x=Mstar_z0_tot, y=(t_min_tot-t_sim_tot)/t_sim_tot, xtype='M.star.z0', ytype='t.sim.min.recent.frac', binsize=0.5, limits=(None,(-5,100)), file_path_and_name=directory+'/median/delta_t_frac_vs_Mstar_z0_zoom.pdf')
+summary_plot.median_plot(x=Mstar_z0_tot[mask_delta_t], y=((t_min_tot-t_sim_tot)/t_sim_tot)[mask_delta_t], xtype='M.star.z0', ytype='t.sim.min.recent.frac', binsize=0.5, file_path_and_name=directory+'/median/delta_t_frac_vs_Mstar_z0.pdf')
+summary_plot.median_plot(x=Mstar_z0_tot[mask_delta_t], y=((t_min_tot-t_sim_tot)/t_sim_tot)[mask_delta_t], xtype='M.star.z0', ytype='t.sim.min.recent.frac', binsize=0.5, binedges=(4.5,9.5), limits=((4,9.5),(-5,100)), file_path_and_name=directory+'/median/delta_t_frac_vs_Mstar_z0_zoom.pdf')
 
 # t_infall vs Mstar (z = 0)
 summary_plot.median_plot(x=Mstar_z0_tot, y=t_in_tot, xtype='M.star.z0', ytype='t.infall', binsize=0.5, file_path_and_name=directory+'/median/t_infall_vs_Mstar_z0.pdf')
@@ -717,12 +719,13 @@ summary_plot.median_plot_mult(x=[Mhalo_peak_tot_all, Mhalo_peak_tot_all], y=[d_s
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot_all, Mhalo_peak_tot_all], y=[d_sim_tot_all, d_min_tot_all], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.peri', 'd.peri'], labels=['Recent', 'Minimum'], binedges=(8,11.5), binsize=0.5, limits=((8,11.5),(0,250)), file_path_and_name=directory+'/median/d_peri_both_vs_Mhalo_peak_baryon_all_zoom.pdf')
 
 # (d_min - d_recent) vs Mhalo (peak)
-summary_plot.median_plot(x=Mhalo_peak_tot_all, y=d_min_tot_all-d_sim_tot_all, xtype='M.halo.peak', ytype='d.sim.min.recent', binsize=0.5, file_path_and_name=directory+'/median/delta_d_vs_Mhalo_peak_baryon_all.pdf')
-summary_plot.median_plot(x=Mhalo_peak_tot_all, y=d_min_tot_all-d_sim_tot_all, xtype='M.halo.peak', ytype='d.sim.min.recent', binsize=0.5, limits=(None,(-50,5)), file_path_and_name=directory+'/median/delta_d_vs_Mhalo_peak_baryon_all_zoom.pdf')
+mask_delta_d = (np.abs((d_min_tot_all - d_sim_tot_all)/d_sim_tot_all) > 0.05)
+summary_plot.median_plot(x=Mhalo_peak_tot_all[mask_delta_d], y=(d_min_tot_all-d_sim_tot_all)[mask_delta_d], xtype='M.halo.peak', ytype='d.sim.min.recent', binsize=0.5, file_path_and_name=directory+'/median/delta_d_vs_Mhalo_peak_baryon_all.pdf')
+#summary_plot.median_plot(x=Mhalo_peak_tot_all[mask_delta_d], y=(d_min_tot_all-d_sim_tot_all)[mask_delta_d], xtype='M.halo.peak', ytype='d.sim.min.recent', binsize=0.5, limits=(None,(-50,5)), file_path_and_name=directory+'/median/delta_d_vs_Mhalo_peak_baryon_all_zoom.pdf')
 
 # (d_min - d_recent)/d_recent vs Mhalo (peak)
-summary_plot.median_plot(x=Mhalo_peak_tot_all, y=(d_min_tot_all-d_sim_tot_all)/d_sim_tot_all, xtype='M.halo.peak', ytype='d.sim.min.recent.frac', binsize=0.5, file_path_and_name=directory+'/median/delta_d_frac_vs_Mhalo_peak_baryon_all.pdf')
-summary_plot.median_plot(x=Mhalo_peak_tot_all, y=(d_min_tot_all-d_sim_tot_all)/d_sim_tot_all, xtype='M.halo.peak', ytype='d.sim.min.recent.frac', binsize=0.5, limits=(None,(-0.5,0.05)), file_path_and_name=directory+'/median/delta_d_frac_vs_Mhalo_peak_baryon_all_zoom.pdf')
+summary_plot.median_plot(x=Mhalo_peak_tot_all[mask_delta_d], y=((d_min_tot_all-d_sim_tot_all)/d_sim_tot_all)[mask_delta_d], xtype='M.halo.peak', ytype='d.sim.min.recent.frac', binsize=0.5, file_path_and_name=directory+'/median/delta_d_frac_vs_Mhalo_peak_baryon_all.pdf')
+#summary_plot.median_plot(x=Mhalo_peak_tot_all[mask_delta_d], y=((d_min_tot_all-d_sim_tot_all)/d_sim_tot_all)[mask_delta_d], xtype='M.halo.peak', ytype='d.sim.min.recent.frac', binsize=0.5, limits=(None,(-0.5,0.05)), file_path_and_name=directory+'/median/delta_d_frac_vs_Mhalo_peak_baryon_all_zoom.pdf')
 
 # d(z = 0) vs Mhalo (peak)
 summary_plot.median_plot(x=Mhalo_peak_tot_all, y=dz0_tot_all, xtype='M.halo.peak', ytype='d.z0', binsize=0.5, file_path_and_name=directory+'/median/dz0_vs_Mhalo_peak_baryon_all.pdf')
@@ -742,8 +745,9 @@ summary_plot.median_plot_mult(x=[Mhalo_peak_tot_all, Mhalo_peak_tot_all], y=[t_s
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot_all, Mhalo_peak_tot_all], y=[t_sim_tot_all, t_min_tot_all], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.peri', 't.peri'], labels=['Recent', 'Minimum'], binedges=(8,11.5), binsize=0.5, limits=((8,11.5),(0,5)), file_path_and_name=directory+'/median/t_peri_both_vs_Mhalo_peak_baryon_all_zoom2.pdf')
 
 # (t_min - t_recent) vs Mhalo (peak)
-summary_plot.median_plot(x=Mhalo_peak_tot_all, y=t_min_tot_all-t_sim_tot_all, xtype='M.halo.peak', ytype='t.sim.min.recent', binsize=0.5, file_path_and_name=directory+'/median/delta_t_vs_Mhalo_peak_baryon_all.pdf')
-summary_plot.median_plot(x=Mhalo_peak_tot_all, y=t_min_tot_all-t_sim_tot_all, xtype='M.halo.peak', ytype='t.sim.min.recent', binsize=0.5, limits=(None,(-0.1,6)), file_path_and_name=directory+'/median/delta_t_vs_Mhalo_peak_baryon_all_zoom.pdf')
+mask_delta_t = (np.abs((t_min_tot_all - t_sim_tot_all)/t_sim_tot_all) > 0.05)
+summary_plot.median_plot(x=Mhalo_peak_tot_all[mask_delta_t], y=(t_min_tot_all-t_sim_tot_all)[mask_delta_t], xtype='M.halo.peak', ytype='t.sim.min.recent', binsize=0.5, file_path_and_name=directory+'/median/delta_t_vs_Mhalo_peak_baryon_all.pdf')
+#summary_plot.median_plot(x=Mhalo_peak_tot_all[mask_delta_t], y=(t_min_tot_all-t_sim_tot_all)[mask_delta_t], xtype='M.halo.peak', ytype='t.sim.min.recent', binsize=0.5, limits=(None,(-0.1,6)), file_path_and_name=directory+'/median/delta_t_vs_Mhalo_peak_baryon_all_zoom.pdf')
 
 # (t_min - t_recent)/t_recent vs Mhalo (peak)
 summary_plot.median_plot(x=Mhalo_peak_tot_all, y=(t_min_tot_all-t_sim_tot_all)/t_sim_tot_all, xtype='M.halo.peak', ytype='d.sim.min.recent.frac', binsize=0.5, file_path_and_name=directory+'/median/delta_t_frac_vs_Mhalo_peak_baryon_all.pdf')
@@ -1259,3 +1263,123 @@ Mstar_z0_tot = summary.mstar(data_total, mask_selection, selection='z0', oversam
 summary_plot.plot_hist(x=Mhalo_peak_tot[np.where(Mhalo_peak_tot > 3.16e9)[0]], xtype='M.halo.peak', binsize=0.1, pdf=False, file_path_and_name=directory+'/histogram/Mhalo_peak_3.16e9.pdf')
 summary_plot.plot_hist(x=Mstar_z0_tot[np.where(Mhalo_peak_tot > 3.16e9)[0]], xtype='M.star.z0', binsize=0.1, pdf=False, file_path_and_name=directory+'/histogram/Mstar_z0_3.16e9.pdf')
 summary_plot.plot_hist(x=dz0_tot[np.where(Mhalo_peak_tot > 1e10)[0]], xtype='d.z0', binsize=20, pdf=False, file_path_and_name=directory+'/histogram/Mhalo_peak_3.16e9_dz0.pdf')
+
+
+
+
+
+# Testing out adding z on the other y-axis
+summary_plot.median_plot(x=Mstar_z0_tot, y=t_sim_tot, xtype='M.star.z0', ytype='t.sim', binsize=0.5, file_path_and_name=directory+'/testing_z.pdf')
+# Testing with y=TIME
+binsize=0.5
+x = np.log10(Mstar_z0_tot)
+y = t_sim_tot
+#
+minn = binsize*np.floor(np.min(x)/binsize)
+maxx = binsize*np.ceil(np.max(x)/binsize)
+if minn < 0:
+    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+else:
+    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+    bins = np.linspace(minn, maxx, bin_num)
+    half_bin = (bins[1]-bins[0])/2
+#
+onesigp = 84.13
+onesigm = 15.87
+twosigp = 100
+twosigm = 0
+#
+med = np.zeros(len(bins)-1)
+lower = np.zeros(len(bins)-1)
+upper = np.zeros(len(bins)-1)
+lowest = np.zeros(len(bins)-1)
+highest = np.zeros(len(bins)-1)
+#
+for i in range(0, len(bins)-1):
+    mask = (x >= bins[i]) & (x <= bins[i+1])
+    med[i] = np.nanmedian(y[mask])
+    upper[i] = np.nanpercentile(y[mask], onesigp)
+    lower[i] = np.nanpercentile(y[mask], onesigm)
+    highest[i] = np.nanpercentile(y[mask], twosigp)
+    lowest[i] = np.nanpercentile(y[mask], twosigm)
+#
+cc = ut.cosmology.CosmologyClass()
+med2 = np.array([0, 1])
+cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=med2)
+#
+f, ax = plt.subplots(figsize=(10, 8))
+#
+plt.plot(10**(bins[:-1]+half_bin), med, color='k', markersize=10, alpha=0.5)
+plt.fill_between(10**(bins[:-1]+half_bin), upper, lower, color='k', alpha=0.3)
+plt.fill_between(10**(bins[:-1]+half_bin), highest, lowest, color='k', alpha=0.15)
+plt.xscale('log')
+plt.xlabel('M$_{\\rm star}$ [M$_{\\odot}$]', fontsize=28)
+plt.ylabel('t$_{\\rm peri,lb,sim}$ [Gyr]', fontsize=28)
+#plt.tick_params(axis='both', which='major', labelsize=24)
+plt.ylim(0,6)
+#
+axis_2_label = 'redshift'
+axis_2_tick_labels = ['6', '4', '3', '2', '1', '0.9', '0.8', '0.7', '0.6', '0.5', '0.4', '0.3', '0.2', '0.1', '0']
+axis_2_tick_values = [float(v) for v in axis_2_tick_labels]
+axis_2_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_2_tick_values)
+axis_2_tick_locations[-1] = 0.000000001
+ax2 = ax.twinx()
+ax2.set_xscale('log')
+ax2.set_yscale('linear')
+ax2.set_yticks(axis_2_tick_locations)
+ax2.set_yticklabels(axis_2_tick_labels)
+ax2.set_ylim(0,6)
+ax2.set_ylabel(axis_2_label, labelpad=9)
+ax2.tick_params(pad=3)
+#
+plt.tight_layout()
+plt.show()
+#plt.savefig(file_path_and_name)
+#plt.close()
+
+#
+binsize=0.5
+x = np.log10(Mstar_z0_tot)
+y = vz0_tot
+#
+minn = binsize*np.floor(np.min(x)/binsize)
+maxx = binsize*np.ceil(np.max(x)/binsize)
+if minn < 0:
+    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+else:
+    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+    bins = np.linspace(minn, maxx, bin_num)
+    half_bin = (bins[1]-bins[0])/2
+#
+onesigp = 84.13
+onesigm = 15.87
+twosigp = 100
+twosigm = 0
+#
+med = np.zeros(len(bins)-1)
+lower = np.zeros(len(bins)-1)
+upper = np.zeros(len(bins)-1)
+lowest = np.zeros(len(bins)-1)
+highest = np.zeros(len(bins)-1)
+#
+for i in range(0, len(bins)-1):
+    mask = (x >= bins[i]) & (x <= bins[i+1])
+    med[i] = np.nanmedian(y[mask])
+    upper[i] = np.nanpercentile(y[mask], onesigp)
+    lower[i] = np.nanpercentile(y[mask], onesigm)
+    highest[i] = np.nanpercentile(y[mask], twosigp)
+    lowest[i] = np.nanpercentile(y[mask], twosigm)
+#
+f, ax = plt.subplots(figsize=(12, 8))
+ax.set_xlabel('M$_{\\rm star}$ [M$_{\\odot}$]', fontsize=28)
+ax.set_ylabel('v$(z = 0)$ [km s$^{-1}$]', fontsize=28)
+plt.plot(10**(bins[:-1]+half_bin), med, color='k', markersize=10, alpha=0.5)
+plt.fill_between(10**(bins[:-1]+half_bin), upper, lower, color='k', alpha=0.3)
+plt.fill_between(10**(bins[:-1]+half_bin), highest, lowest, color='k', alpha=0.15)
+#ax.set_xticks(ticks=10**bins, minor=True)
+#ax.set_xticklabels()
+ax.tick_params(axis='both', which='major', labelsize=28)
+ax.set_xscale('log')
+ax.set_yscale('linear')
+plt.tight_layout()
+plt.show(block=False)
