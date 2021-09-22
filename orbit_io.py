@@ -151,6 +151,7 @@ class OrbitAnalysis:
                 # Select the subhalo indices at z = 0
                 z0_inds = ut.array.get_indices(tree['snapshot'], 600)
                 z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
+                z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
                 # Select subhalos based on their halo mass
                 self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega_matter']
                 z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds)*(1-self.baryon_frac), [1e8,np.inf])]
@@ -164,6 +165,7 @@ class OrbitAnalysis:
                     # Select the subhalo indices at z = 0
                     z0_inds = ut.array.get_indices(tree['snapshot'], 600)
                     z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
+                    z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
                     # Select subhalos based on their halo mass
                     self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega_matter']
                     z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds)*(1-self.baryon_frac), [1e8,np.inf])]
@@ -176,6 +178,7 @@ class OrbitAnalysis:
                     # Select the subhalo indices at z = 0
                     z0_inds = ut.array.get_indices(tree['snapshot'], 600)
                     z0_inds = z0_inds[z0_inds != tree['host2.index'][0]]
+                    z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
                     # Select subhalos based on their halo mass
                     self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega_matter']
                     z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds)*(1-self.baryon_frac), [1e8,np.inf])]
@@ -189,6 +192,7 @@ class OrbitAnalysis:
                 # Select the subhalo indices at z = 0
                 z0_inds = ut.array.get_indices(tree['snapshot'], 600)
                 z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
+                z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
                 # Select luminous subhalos at z = 0 and find their progenitor indices
                 z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [3e4, np.inf], z0_inds)
                 z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
@@ -201,6 +205,7 @@ class OrbitAnalysis:
                     # Select the subhalo indices at z = 0
                     z0_inds = ut.array.get_indices(tree['snapshot'], 600)
                     z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
+                    z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
                     # Select luminous subhalos at z = 0 and find their progenitor indices
                     z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [3e4, np.inf], z0_inds)
                     z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
@@ -212,6 +217,7 @@ class OrbitAnalysis:
                     # Select the subhalo indices at z = 0
                     z0_inds = ut.array.get_indices(tree['snapshot'], 600)
                     z0_inds = z0_inds[z0_inds != tree['host2.index'][0]]
+                    z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
                     # Select luminous subhalos at z = 0 and find their progenitor indices
                     z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [3e4, np.inf], z0_inds)
                     z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
