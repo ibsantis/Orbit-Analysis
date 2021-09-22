@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -195,6 +195,7 @@ if sim_data.num_gal == 2:
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
+    halt_dists_3d = orbits.halo_distances(tree=halt, dist_type='3d')
     halt_vels = orbits.halo_velocities(halt)
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
@@ -239,6 +240,7 @@ if sim_data.num_gal == 2:
     #
     # z = 0 indices
     data_dict['indices.z0'] = orbits.sub_inds
+    data_dict['id'] = np.arange(len(orbits.sub_inds[:,0]))+1
     #
     # Stellar mass of the subhalos at z = 0 and peak stellar mass
     data_dict['Mstar.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
@@ -308,6 +310,7 @@ if sim_data.num_gal == 2:
     #
     # distance, velocity, Lz vs time
     data_dict['dtot.sim'] = halt_dists
+    data_dict['d.sim'] = halt_dists_3d
     data_dict['vtot.sim'] = halt_vels
     data_dict['L.sim'] = angs['ang.mom.vector']
     data_dict['Ltot.sim'] = angs['ang.mom.total']
@@ -336,6 +339,7 @@ if sim_data.num_gal == 2:
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt, host=2) # set host=1 for the first host, host=2 for the other
+    halt_dists_3d = orbits.halo_distances(tree=halt, host=2, dist_type='3d')
     halt_vels = orbits.halo_velocities(halt, host=2)
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host2.index'][0])]
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
@@ -380,6 +384,7 @@ if sim_data.num_gal == 2:
     #
     # z = 0 indices
     data_dict['indices.z0'] = orbits.sub_inds
+    data_dict['id'] = np.arange(len(orbits.sub_inds[:,0]))+1
     #
     # Stellar mass of the subhalos at z = 0 and peak stellar mass
     data_dict['Mstar.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
@@ -449,6 +454,7 @@ if sim_data.num_gal == 2:
     #
     # distance, velocity, Lz vs time
     data_dict['dtot.sim'] = halt_dists
+    data_dict['d.sim'] = halt_dists_3d
     data_dict['vtot.sim'] = halt_vels
     data_dict['L.sim'] = angs['ang.mom.vector']
     data_dict['Ltot.sim'] = angs['ang.mom.total']
