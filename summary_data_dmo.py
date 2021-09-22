@@ -20,7 +20,8 @@ import h5py
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m1b', location='peloton', dmo=True)
+sim_data = orbit_io.OrbitRead(gal1='m12w', location='peloton', dmo=True)
+#sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
