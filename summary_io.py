@@ -122,12 +122,12 @@ class SummaryDataSort:
                 data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/'+name+'_potentials', verbose=True)
                 data_dict[name] = data
         #
-        ######## UPDATE THE TWO OPTIONS BELOW WHEN I ACTUALLY GET DATA FOR THESE SELECTIONS
         elif sim_type == 'all_baryon':
             for name in self.host_names[hosts]:
-                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/'+name+'_potentials', verbose=True)
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/'+name+'_potentials_all_subs', verbose=True)
                 data_dict[name] = data
         #
+        ######## UPDATE THE OPTION BELOW WHEN I ACTUALLY GET DATA FOR THESE SELECTIONS
         elif sim_type == 'dmo':
             for name in self.host_names[hosts]:
                 data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/'+name+'_potentials', verbose=True)
@@ -971,7 +971,7 @@ class SummaryDataPlot(SummaryDataSort):
                        'd.peri': 'd$_{\\rm peri}$ [kpc]',\
                        'd.peri.recent': 'd$_{\\rm peri, recent}$ [kpc]',\
                        'd.peri.min': 'd$_{\\rm peri, min}$ [kpc]',\
-                       'd.peri.text': 'Pericenter d [kpc]',\
+                       'd.peri.text': 'Pericenter distance [kpc]',\
                        'd.model': 'd$_{\\rm peri,model}$ [kpc]',\
                        'd.z0': 'd(z = 0) [kpc]',\
                        'delta.d.frac': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$',\
@@ -987,10 +987,10 @@ class SummaryDataPlot(SummaryDataSort):
                        't.peri': 't$_{\\rm peri,lb}$ [Gyr]',\
                        't.peri.recent': 't$_{\\rm peri,recent,lb}$ [Gyr]',\
                        't.peri.min': 't$_{\\rm peri,min,lb}$ [Gyr]',\
-                       't.peri.text': 'Pericenter t$_{\\rm lb}$ [Gyr]',\
+                       't.peri.text': 'Pericenter lookback time [Gyr]',\
                        't.infall': 't$_{\\rm infall,lb}$ [Gyr]',\
                        't.infall.any': 't$_{\\rm infall,any,lb}$ [Gyr]',\
-                       't.infall.text': 'Infall t$_{\\rm lb}$ [Gyr]',\
+                       't.infall.text': 'Infall lookback time [Gyr]',\
                        't.infall.diff': '(t$_{\\rm infall,any,lb}$ - t$_{\\rm infall,lb}$) [Gyr]',\
                        'delta.t.frac': '(t$_{\\rm peri,model}$ - t$_{\\rm peri,sim}$)/t$_{\\rm peri,sim}$',\
                        'delta.t': '(t$_{\\rm peri,model}$ - t$_{\\rm peri,sim}$) [Gyr]',\
@@ -1531,7 +1531,10 @@ class SummaryDataPlot(SummaryDataSort):
             axis_2_tick_values = [float(v) for v in axis_2_tick_labels]
             axis_2_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_2_tick_values)
             ax2 = ax.twinx()
-            ax2.set_xscale('log')
+            if 'M.' in xtype[0]:
+                ax2.set_xscale('log')
+            else:
+                ax2.set_xscale('linear')
             ax2.set_yscale('linear')
             ax2.set_yticks(axis_2_tick_locations)
             ax2.set_yticklabels(axis_2_tick_labels, fontsize=28)
