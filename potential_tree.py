@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=TL_potentials_all_subs
+#SBATCH --job-name=m12b_potentials_all_subs
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 ##SBATCH --mem=480G
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
-#SBATCH --time=01:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/TL_potentials_all_subs_%j.txt
+#SBATCH --time=00:30:00
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/m12b_potentials_all_subs_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -45,7 +45,7 @@ import time
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Thelma', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
 print('Set paths')
 
 if sim_data.num_gal == 1:
@@ -80,9 +80,15 @@ if sim_data.num_gal == 1:
     data_dict = dict()
     data_dict['mass.bin'] = halo_mass_bins
     data_dict['halo.inds'] = (-1)*np.ones(len(orbits.sub_inds[:,0]), dtype=int)
-    data_dict['potential'] = (-1)*np.ones(len(orbits.sub_inds[:,0]))
+    data_dict['subhalo.potential'] = (-1)*np.ones(len(orbits.sub_inds[:,0]))
     data_dict['particle.num'] = (-1)*np.ones(len(orbits.sub_inds[:,0]), dtype=int)
     temp = np.arange(len(orbits.sub_inds[:,0]))
+    #
+    # Find the potential of the host within R200
+    ndist, nind = orbit_tree.neighbors(centers=halt['position'][halt['host.index'][0]], neigh_num_max=1e8, neigh_dist_max=halt['radius'][halt['host.index'][0]], workerss=4)
+    part_mask = (ndist[np.isfinite(ndist)] < (halt['radius'][halt['host.index'][0]]+5))*(ndist[np.isfinite(ndist)] > (halt['radius'][halt['host.index'][0]]-5))
+    data_dict['host.potential.R200m'] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
+    data_dict['host.particle.num'] = np.sum(part_mask)
     #
     # Loop over each mass bin
     for i in range(0, len(halo_mass_bins)-1):
@@ -104,7 +110,7 @@ if sim_data.num_gal == 1:
             for j in range(0, len(halo_pos)):
                 # Find the particles within +/- 5 kpc of the halo radius, then save the potential and particle number
                 part_mask = (ndist[j][np.isfinite(ndist[j])] < (halt['radius'][orbits.sub_inds[:,0][mass_mask]][j]+5))*(ndist[j][np.isfinite(ndist[j])] > (halt['radius'][orbits.sub_inds[:,0][mass_mask]][j]-5))
-                data_dict['potential'][temp[mass_mask][j]] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[j][np.isfinite(ndist[j])][part_mask]])
+                data_dict['subhalo.potential'][temp[mass_mask][j]] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[j][np.isfinite(ndist[j])][part_mask]])
                 data_dict['particle.num'][temp[mass_mask][j]] = np.sum(part_mask)
         #
         # If no halos, say so
@@ -148,9 +154,15 @@ if sim_data.num_gal == 2:
     data_dict = dict()
     data_dict['mass.bin'] = halo_mass_bins
     data_dict['halo.inds'] = (-1)*np.ones(len(orbits.sub_inds[:,0]), dtype=int)
-    data_dict['potential'] = (-1)*np.ones(len(orbits.sub_inds[:,0]))
+    data_dict['subhalo.potential'] = (-1)*np.ones(len(orbits.sub_inds[:,0]))
     data_dict['particle.num'] = (-1)*np.ones(len(orbits.sub_inds[:,0]), dtype=int)
     temp = np.arange(len(orbits.sub_inds[:,0]))
+    #
+    # Find the potential of the host within R200
+    ndist, nind = orbit_tree.neighbors(centers=halt['position'][halt['host.index'][0]], neigh_num_max=1e8, neigh_dist_max=halt['radius'][halt['host.index'][0]], workerss=4)
+    part_mask = (ndist[np.isfinite(ndist)] < (halt['radius'][halt['host.index'][0]]+5))*(ndist[np.isfinite(ndist)] > (halt['radius'][halt['host.index'][0]]-5))
+    data_dict['host.potential.R200m'] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
+    data_dict['host.particle.num'] = np.sum(part_mask)
     #
     # Loop over each mass bin
     for i in range(0, len(halo_mass_bins)-1):
@@ -172,7 +184,7 @@ if sim_data.num_gal == 2:
             for j in range(0, len(halo_pos)):
                 # Find the particles within +/- 5 kpc of the halo radius, then save the potential and particle number
                 part_mask = (ndist[j][np.isfinite(ndist[j])] < (halt['radius'][orbits.sub_inds[:,0][mass_mask]][j]+5))*(ndist[j][np.isfinite(ndist[j])] > (halt['radius'][orbits.sub_inds[:,0][mass_mask]][j]-5))
-                data_dict['potential'][temp[mass_mask][j]] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[j][np.isfinite(ndist[j])][part_mask]])
+                data_dict['subhalo.potential'][temp[mass_mask][j]] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[j][np.isfinite(ndist[j])][part_mask]])
                 data_dict['particle.num'][temp[mass_mask][j]] = np.sum(part_mask)
         #
         # If no halos, say so
@@ -195,9 +207,15 @@ if sim_data.num_gal == 2:
     data_dict = dict()
     data_dict['mass.bin'] = halo_mass_bins
     data_dict['halo.inds'] = (-1)*np.ones(len(orbits.sub_inds[:,0]), dtype=int)
-    data_dict['potential'] = (-1)*np.ones(len(orbits.sub_inds[:,0]))
+    data_dict['subhalo.potential'] = (-1)*np.ones(len(orbits.sub_inds[:,0]))
     data_dict['particle.num'] = (-1)*np.ones(len(orbits.sub_inds[:,0]), dtype=int)
     temp = np.arange(len(orbits.sub_inds[:,0]))
+    #
+    # Find the potential of the host within R200
+    ndist, nind = orbit_tree.neighbors(centers=halt['position'][halt['host2.index'][0]], neigh_num_max=1e8, neigh_dist_max=halt['radius'][halt['host2.index'][0]], workerss=4)
+    part_mask = (ndist[np.isfinite(ndist)] < (halt['radius'][halt['host2.index'][0]]+5))*(ndist[np.isfinite(ndist)] > (halt['radius'][halt['host2.index'][0]]-5))
+    data_dict['host.potential.R200m'] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
+    data_dict['host.particle.num'] = np.sum(part_mask)
     #
     # Loop over each mass bin
     for i in range(0, len(halo_mass_bins)-1):
@@ -219,7 +237,7 @@ if sim_data.num_gal == 2:
             for j in range(0, len(halo_pos)):
                 # Find the particles within +/- 5 kpc of the halo radius, then save the potential and particle number
                 part_mask = (ndist[j][np.isfinite(ndist[j])] < (halt['radius'][orbits.sub_inds[:,0][mass_mask]][j]+5))*(ndist[j][np.isfinite(ndist[j])] > (halt['radius'][orbits.sub_inds[:,0][mass_mask]][j]-5))
-                data_dict['potential'][temp[mass_mask][j]] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[j][np.isfinite(ndist[j])][part_mask]])
+                data_dict['subhalo.potential'][temp[mass_mask][j]] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[j][np.isfinite(ndist[j])][part_mask]])
                 data_dict['particle.num'][temp[mass_mask][j]] = np.sum(part_mask)
         #
         # If no halos, say so
