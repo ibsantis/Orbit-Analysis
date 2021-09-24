@@ -4,7 +4,7 @@
 #SBATCH --mem=480G
 #SBATCH --nodes=1
 #SBATCH --ntasks=1    # processes total
-#SBATCH --time=01:00:00
+#SBATCH --time=03:00:00
 #SBATCH --output=/home/ibsantis/scripts/jobs/potentials/RJ_potential_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
