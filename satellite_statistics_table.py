@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
 """
-    =================================
-    = Recent vs Minimum Pericenters =
-    =================================
+    ==============================
+    = Satellite Statistics Table =
+    ==============================
 
     Find the number of cases where:
         - Satellite has more than 1 pericenter
@@ -35,13 +35,25 @@ print('Set paths')
 
 # Initialize the classes, read in the data, and create data masks
 summary = summary_io.SummaryDataSort()
-data_total = summary.data_read(directory=sim_data.home_dir)
-masks_1 = summary.data_mask(data_total) # for cases where there are pericenters in sim, but not required in model
+data_total = summary.data_read(directory=sim_data.home_dir, hosts='all', sim_type='baryon')
+masks_infall = summary.data_mask(data_total, peri_sim=False, peri_model=False, hosts='all')
 summary_plot = summary_io.SummaryDataPlot()
 
+# Count the number of satellites that have ever passed within R200
+for name in summary.host_names['all']:
+    print(np.sum(masks_infall[name]))
+
+# Count the number of satellites that have ever experienced pericenter
+for name in summary.host_names['all']:
+    print(np.sum(data_total[name]['pericenter.check.sim']))
+
+# Count the number of satellites within R200, but not experienced peri
+for name in summary.host_names['all']:
+    print(np.sum(~data_total[name]['pericenter.check.sim']*masks_infall[name]))
+    print(data_total[name]['dtot.sim'][~data_total[name]['pericenter.check.sim']*masks_infall[name]][:,0])
 
 # Counting the number of satellites with more than 1 pericenter
-for name in summary.host_names:
+for name in summary.host_names['all']:
     count = 0
     for n in range(0, len(data_total[name]['pericenter.dist.sim'])):
         mask = (data_total[name]['pericenter.dist.sim'][n] != -1)
@@ -49,9 +61,8 @@ for name in summary.host_names:
             count += 1
     print(name, count)
 
-
 # Count how many satellites have the recent pericenter as the minimum
-for name in summary.host_names:
+for name in summary.host_names['all']:
     count = 0
     for n in range(0, len(data_total[name]['pericenter.dist.sim'])):
         mask = (data_total[name]['pericenter.dist.sim'][n] != -1)
@@ -60,42 +71,32 @@ for name in summary.host_names:
                 count += 1
     print(name, count)
 
-
 # Count how many satellites have peris in sims but not model
-for name in summary.host_names:
+for name in summary.host_names['all']:
     count = np.sum(data_total[name]['infall.check']*data_total[name]['pericenter.check.sim']*~data_total[name]['pericenter.check.galpy'])
     print(name, count)
 
-
 # Count how many satellites have peris in model but not sim
-for name in summary.host_names:
+for name in summary.host_names['all']:
     count = np.sum(data_total[name]['infall.check']*~data_total[name]['pericenter.check.sim']*data_total[name]['pericenter.check.galpy'])
     print(name, count)
 
-
-
-
-
-
-
-
-for name in summary.host_names:
-    galaxy = name
+# For the satellites that have multiple pericenters, count how many have fractional differences > 10% (between recent and minimum)
+for name in summary.host_names['all']:
     data_recent = []
     data_min = []
-    for i in range(0, len(data_total[galaxy]['pericenter.dist.sim'][masks_1[galaxy]])):
-        mask = (data_total[galaxy]['pericenter.dist.sim'][masks_1[galaxy]][i] != -1)
-        if np.sum(mask) != 1:
-            data_recent.append(data_total[galaxy]['pericenter.dist.sim'][masks_1[galaxy]][i][mask][0])
-            data_min.append(np.min(data_total[galaxy]['pericenter.dist.sim'][masks_1[galaxy]][i][mask]))
+    for i in range(0, len(data_total[name]['pericenter.dist.sim'][masks_infall[name]])):
+        mask = (data_total[name]['pericenter.dist.sim'][masks_infall[name]][i] != -1)
+        if np.sum(mask) > 1:
+            data_recent.append(data_total[name]['pericenter.dist.sim'][masks_infall[name]][i][mask][0])
+            data_min.append(np.min(data_total[name]['pericenter.dist.sim'][masks_infall[name]][i][mask]))
     d_peri_recent = np.hstack(data_recent)
     d_peri_min = np.hstack(data_min)
-
-
+    #
     print(np.sum((d_peri_recent-d_peri_min)/d_peri_recent > 0.1))
 
 
-
+# Same thing, but saving all data for plotting
 data_recent = []
 data_min = []
 for name in summary.host_names:
