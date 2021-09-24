@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=RR_potential
+#SBATCH --job-name=m12b_potential
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=480G
 #SBATCH --nodes=1
 #SBATCH --ntasks=1    # processes total
-#SBATCH --time=04:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/RR_potential_%j.txt
+#SBATCH --time=01:00:00
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/m12b_potential_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -43,7 +43,7 @@ from matplotlib import pyplot as plt
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
 print('Set paths')
 #
 if sim_data.num_gal == 1:
@@ -59,8 +59,6 @@ if sim_data.num_gal == 1:
     gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [95, 105])
     dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [95, 105])
     potential_host_100 = np.mean(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
-    #potential_median = np.median(np.concatenate((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
-    #potential_mean_dark = np.mean(part['dark']['potential'][dark_inds])
     #
     # Get the mean potential at R_200
     host_R200 = halt['radius'][halt['host.index'][0]]
@@ -81,48 +79,6 @@ if sim_data.num_gal == 1:
         sub_potentials[i] = np.mean(part['dark']['potential'][inds])
     end = time.time()
     print('Done with {0} subhalo potentials in {1} seconds'.format(orbits.shape[0], end-start))
-    #
-    # Make plots showing the difference of the subhalo potential with the host at the two checks
-    plt.figure(figsize=(10,8))
-    plt.scatter(sub_potentials/10000, (potential_host_100-sub_potentials)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
-    plt.xlabel('$\Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, 100\ kpc} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.title(sim_data.galaxy, fontsize=28)
-    plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.galaxy+'_potential_100kpc.pdf')
-    plt.close()
-    #
-    plt.figure(figsize=(10,8))
-    plt.scatter(sub_potentials/10000, (potential_host_R200-sub_potentials)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
-    plt.xlabel('$\Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, R200} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.title(sim_data.galaxy, fontsize=28)
-    plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.galaxy+'_potential_R200.pdf')
-    plt.close()
-    #
-    # Make plots of the difference vs distance
-    plt.figure(figsize=(10,8))
-    ax = plt.subplot(111)
-    plt.scatter(halt.prop('host.distance.total', orbits.sub_inds[:,0]), (potential_host_100-sub_potentials)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
-    ax.axvspan(95,105, color='k', alpha=0.3)
-    plt.xlabel('$d_{\\rm host}$ [kpc]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, 100\ kpc} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.title(sim_data.galaxy, fontsize=28)
-    plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.galaxy+'_potential_vs_d_100kpc.pdf')
-    plt.close()
-    #
-    plt.figure(figsize=(10,8))
-    ax = plt.subplot(111)
-    plt.scatter(halt.prop('host.distance.total', orbits.sub_inds[:,0]), (potential_host_R200-sub_potentials)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
-    ax.axvspan(95,105, color='k', alpha=0.3)
-    plt.xlabel('$d_{\\rm host}$ [kpc]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, R200} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.title(sim_data.galaxy, fontsize=28)
-    plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.galaxy+'_potential_vs_d_R200.pdf')
-    plt.close()
     #
     # Save the data to a file
     data_dict = dict()
@@ -167,48 +123,6 @@ if sim_data.num_gal == 2:
     end = time.time()
     print('Done with {0} subhalo potentials in {1} seconds'.format(orbits.shape[0], end-start))
     #
-    # Make plots showing the difference of the subhalo potential with the host at the two checks
-    plt.figure(figsize=(10,8))
-    plt.scatter(sub_potentials_1/10000, (potential_host_1_100-sub_potentials_1)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
-    plt.xlabel('$\Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, 100\ kpc} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.title(sim_data.gal_1, fontsize=28)
-    plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_1+'_potential_100kpc.pdf')
-    plt.close()
-    #
-    plt.figure(figsize=(10,8))
-    plt.scatter(sub_potentials_1/10000, (potential_host_1_R200-sub_potentials_1)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
-    plt.xlabel('$\Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, R200} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.title(sim_data.gal_1, fontsize=28)
-    plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_1+'_potential_R200.pdf')
-    plt.close()
-    #
-    # Make plots of the difference vs distance
-    plt.figure(figsize=(10,8))
-    ax = plt.subplot(111)
-    plt.scatter(halt.prop('host.distance.total', orbits.sub_inds[:,0]), (potential_host_1_100-sub_potentials_1)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
-    ax.axvspan(95,105, color='k', alpha=0.3)
-    plt.xlabel('$d_{\\rm host}$ [kpc]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, 100\ kpc} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.title(sim_data.gal_1, fontsize=28)
-    plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_1+'_potential_vs_d_100kpc.pdf')
-    plt.close()
-    #
-    plt.figure(figsize=(10,8))
-    ax = plt.subplot(111)
-    plt.scatter(halt.prop('host.distance.total', orbits.sub_inds[:,0]), (potential_host_1_R200-sub_potentials_1)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
-    ax.axvspan(95,105, color='k', alpha=0.3)
-    plt.xlabel('$d_{\\rm host}$ [kpc]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, R200} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.title(sim_data.gal_1, fontsize=28)
-    plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_1+'_potential_vs_d_R200.pdf')
-    plt.close()
-    #
     # Save the data to a file
     data_dict = dict()
     data_dict['host.potential.100kpc'] = potential_host_1_100
@@ -243,48 +157,6 @@ if sim_data.num_gal == 2:
         sub_potentials_2[i] = np.mean(part['dark']['potential'][inds])
     end = time.time()
     print('Done with {0} subhalo potentials in {1} seconds'.format(orbits.shape[0], end-start))
-    #
-    # Make plots showing the difference of the subhalo potential with the host at the two checks
-    plt.figure(figsize=(10,8))
-    plt.scatter(sub_potentials_2/10000, (potential_host_2_100-sub_potentials_2)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
-    plt.xlabel('$\Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, 100\ kpc} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.title(sim_data.gal_2, fontsize=28)
-    plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_2+'_potential_100kpc.pdf')
-    plt.close()
-    #
-    plt.figure(figsize=(10,8))
-    plt.scatter(sub_potentials_2/10000, (potential_host_2_R200-sub_potentials_2)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
-    plt.xlabel('$\Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, R200} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.title(sim_data.gal_2, fontsize=28)
-    plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_2+'_potential_R200.pdf')
-    plt.close()
-    #
-    # Make plots of the difference vs distance
-    plt.figure(figsize=(10,8))
-    ax = plt.subplot(111)
-    plt.scatter(halt.prop('host2.distance.total', orbits.sub_inds[:,0]), (potential_host_2_100-sub_potentials_2)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
-    ax.axvspan(95,105, color='k', alpha=0.3)
-    plt.xlabel('$d_{\\rm host}$ [kpc]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, 100\ kpc} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.title(sim_data.gal_2, fontsize=28)
-    plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_2+'_potential_vs_d_100kpc.pdf')
-    plt.close()
-    #
-    plt.figure(figsize=(10,8))
-    ax = plt.subplot(111)
-    plt.scatter(halt.prop('host2.distance.total', orbits.sub_inds[:,0]), (potential_host_2_R200-sub_potentials_2)/10000, s=30, facecolors='None', edgecolors='k', marker='o', alpha=0.6)
-    ax.axvspan(95,105, color='k', alpha=0.3)
-    plt.xlabel('$d_{\\rm host}$ [kpc]', fontsize=28)
-    plt.ylabel('$\Phi_{\\rm host, R200} - \Phi_{\\rm sub}$ [$10^4$ km$^2$ s$^{-2}$]', fontsize=28)
-    plt.title(sim_data.gal_2, fontsize=28)
-    plt.tight_layout()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/potential/'+sim_data.gal_2+'_potential_vs_d_R200.pdf')
-    plt.close()
     #
     # Save the data to a file
     data_dict = dict()
