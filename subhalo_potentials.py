@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=RJ_potential
+#SBATCH --job-name=TL_potential
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=480G
 #SBATCH --nodes=1
 #SBATCH --ntasks=1    # processes total
 #SBATCH --time=03:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/RJ_potential_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/TL_potential_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -43,7 +43,7 @@ from matplotlib import pyplot as plt
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romeo', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='Thelma', location='peloton')
 print('Set paths')
 #
 if sim_data.num_gal == 1:
