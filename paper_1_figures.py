@@ -203,11 +203,11 @@ dz0_tot_all = summary.d_z0(data_total_all, mask_selection, oversample=True, host
 
 # E_tot vs Mhalo (peak)
 summary_plot.median_plot(x=Mhalo_peak_tot_all, y=(ke_z0_tot_all+potential_tot_all)/1e4, xtype='M.halo.peak', ytype='E.tot', binsize=0.5, file_path_and_name=directory+'/Etot_vs_Mhalo_peak_baryon_all.pdf')
-#summary_plot.median_plot(x=Mhalo_peak_tot_all, y=(ke_z0_tot_all+potential_tot_all)/1e4, xtype='M.halo.peak', ytype='E.tot', binsize=0.5, limits=((8,11.5),(-4,1)), file_path_and_name=directory+'/Etot_vs_Mhalo_peak_baryon_all_zoom.pdf')
+summary_plot.median_plot(x=Mhalo_peak_tot_all, y=(ke_z0_tot_all+potential_tot_all)/1e4, xtype='M.halo.peak', ytype='E.tot', binsize=0.5, limits=((8,11.5),(-4,2)), file_path_and_name=directory+'/Etot_vs_Mhalo_peak_baryon_all_zoom.pdf')
 
 # E_tot vs d(z = 0)
 summary_plot.median_plot(x=dz0_tot_all, y=(ke_z0_tot_all+potential_tot_all)/1e4, xtype='d.z0', ytype='E.tot', binsize=50, file_path_and_name=directory+'/Etot_vs_dz0_baryon_all.pdf')
-summary_plot.median_plot(x=dz0_tot_all, y=(ke_z0_tot_all+potential_tot_all)/1e4, xtype='d.z0', ytype='E.tot', binsize=50, limits=((0,400),(-4,3)), file_path_and_name=directory+'/Etot_vs_dz0_baryon_all_zoom.pdf')
+summary_plot.median_plot(x=dz0_tot_all, y=(ke_z0_tot_all+potential_tot_all)/1e4, xtype='d.z0', ytype='E.tot', binsize=50, limits=((0,400),(-4,2)), file_path_and_name=directory+'/Etot_vs_dz0_baryon_all_zoom.pdf')
 
 
 
@@ -219,41 +219,43 @@ summary_plot.median_plot(x=dz0_tot_all, y=(ke_z0_tot_all+potential_tot_all)/1e4,
 
 ### Generate all of the data for the plots below
 data_total_iso = summary.data_read(directory=sim_data.home_dir, hosts='iso_no_z', sim_type='baryon')
+data_potentials_iso = summary.data_read_potential(directory=sim_data.home_dir, hosts='iso_no_z', sim_type='baryon')
 masks_infall = summary.data_mask(data_total_iso, peri_sim=False, peri_model=False, hosts='iso_no_z')
-mask_selection = masks_infall
+mask_selection_iso = masks_infall
 #
-N_sim_iso = summary.nperi(data_total_iso, mask_selection, oversample=True, selection='sim', hosts='iso_no_z', sim_type='baryon')
-d_sim_iso = summary.dperi_recent(data_total_iso, mask_selection, selection='sim', oversample=True, hosts='iso_no_z', sim_type='baryon')
-d_min_iso = summary.dperi_min(data_total_iso, mask_selection, oversample=True, hosts='iso_no_z', sim_type='baryon')
-dz0_iso = summary.d_z0(data_total_iso, mask_selection, oversample=True, hosts='iso_no_z', sim_type='baryon')
-t_sim_iso = summary.tperi_recent(data_total_iso, mask_selection, selection='sim', oversample=True, hosts='iso_no_z', sim_type='baryon')
-t_min_iso = summary.tperi_min(data_total_iso, mask_selection, oversample=True, hosts='iso_no_z', sim_type='baryon')
-t_in_iso = summary.first_infall(data_total_iso, mask_selection, oversample=True, hosts='iso_no_z', sim_type='baryon')
-t_in_any_iso = summary.first_infall_any(data_total_iso, mask_selection, oversample=True, hosts='iso_no_z', sim_type='baryon')
-Mstar_z0_iso = summary.mstar(data_total_iso, mask_selection, selection='z0', oversample=True, hosts='iso_no_z', sim_type='baryon')
-Mhalo_peak_iso = summary.mhalo(data_total_iso, mask_selection, selection='peak', oversample=True, hosts='iso_no_z', sim_type='baryon')
-vtan_iso = summary.velocities(data_total_iso, mask_selection, selection='tan', oversample=True, hosts='iso_no_z', sim_type='baryon')
-vz0_iso = summary.v_z0(data_total_iso, mask_selection, oversample=True, hosts='iso_no_z', sim_type='baryon')
-L_iso = summary.L_z0(data_total_iso, mask_selection, selection='sim', oversample=True, hosts='iso_no_z', sim_type='baryon')
+N_sim_iso = summary.nperi(data_total_iso, mask_selection_iso, oversample=True, selection='sim', hosts='iso_no_z', sim_type='baryon')
+d_sim_iso = summary.dperi_recent(data_total_iso, mask_selection_iso, selection='sim', oversample=True, hosts='iso_no_z', sim_type='baryon')
+d_min_iso = summary.dperi_min(data_total_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon')
+dz0_iso = summary.d_z0(data_total_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon')
+t_sim_iso = summary.tperi_recent(data_total_iso, mask_selection_iso, selection='sim', oversample=True, hosts='iso_no_z', sim_type='baryon')
+t_min_iso = summary.tperi_min(data_total_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon')
+t_in_iso = summary.first_infall(data_total_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon')
+t_in_any_iso = summary.first_infall_any(data_total_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon')
+Mstar_z0_iso = summary.mstar(data_total_iso, mask_selection_iso, selection='z0', oversample=True, hosts='iso_no_z', sim_type='baryon')
+Mhalo_peak_iso = summary.mhalo(data_total_iso, mask_selection_iso, selection='peak', oversample=True, hosts='iso_no_z', sim_type='baryon')
+vtan_iso = summary.velocities(data_total_iso, mask_selection_iso, selection='tan', oversample=True, hosts='iso_no_z', sim_type='baryon')
+vz0_iso = summary.v_z0(data_total_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon')
+L_iso = summary.L_z0(data_total_iso, mask_selection_iso, selection='sim', oversample=True, hosts='iso_no_z', sim_type='baryon')
 #
 data_total_lg = summary.data_read(directory=sim_data.home_dir, hosts='lg', sim_type='baryon')
+data_potentials_lg = summary.data_read_potential(directory=sim_data.home_dir, hosts='lg_no_RR', sim_type='baryon')
 masks_infall = summary.data_mask(data_total_lg, peri_sim=False, peri_model=False, hosts='lg')
-mask_selection = masks_infall
+mask_selection_lg = masks_infall
 #
-N_sim_lg = summary.nperi(data_total_lg, mask_selection, oversample=True, selection='sim', hosts='lg', sim_type='baryon')
-d_sim_lg = summary.dperi_recent(data_total_lg, mask_selection, selection='sim', oversample=True, hosts='lg', sim_type='baryon')
-d_min_lg = summary.dperi_min(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon')
-dz0_lg = summary.d_z0(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon')
-t_sim_lg = summary.tperi_recent(data_total_lg, mask_selection, selection='sim', oversample=True, hosts='lg', sim_type='baryon')
-t_min_lg = summary.tperi_min(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon')
-t_in_lg = summary.first_infall(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon')
-t_in_any_lg = summary.first_infall_any(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon')
-Mstar_z0_lg = summary.mstar(data_total_lg, mask_selection, selection='z0', oversample=True, hosts='lg', sim_type='baryon')
-Mhalo_peak_lg = summary.mhalo(data_total_lg, mask_selection, selection='peak', oversample=True, hosts='lg', sim_type='baryon')
-vtan_lg = summary.velocities(data_total_lg, mask_selection, selection='tan', oversample=True, hosts='lg', sim_type='baryon')
-vrad_lg = summary.velocities(data_total_lg, mask_selection, selection='rad', oversample=True, hosts='lg', sim_type='baryon')
-vz0_lg = summary.v_z0(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon')
-L_lg = summary.L_z0(data_total_lg, mask_selection, selection='sim', oversample=True, hosts='lg', sim_type='baryon')
+N_sim_lg = summary.nperi(data_total_lg, mask_selection_lg, oversample=True, selection='sim', hosts='lg', sim_type='baryon')
+d_sim_lg = summary.dperi_recent(data_total_lg, mask_selection_lg, selection='sim', oversample=True, hosts='lg', sim_type='baryon')
+d_min_lg = summary.dperi_min(data_total_lg, mask_selection_lg, oversample=True, hosts='lg', sim_type='baryon')
+dz0_lg = summary.d_z0(data_total_lg, mask_selection_lg, oversample=True, hosts='lg', sim_type='baryon')
+t_sim_lg = summary.tperi_recent(data_total_lg, mask_selection_lg, selection='sim', oversample=True, hosts='lg', sim_type='baryon')
+t_min_lg = summary.tperi_min(data_total_lg, mask_selection_lg, oversample=True, hosts='lg', sim_type='baryon')
+t_in_lg = summary.first_infall(data_total_lg, mask_selection_lg, oversample=True, hosts='lg', sim_type='baryon')
+t_in_any_lg = summary.first_infall_any(data_total_lg, mask_selection_lg, oversample=True, hosts='lg', sim_type='baryon')
+Mstar_z0_lg = summary.mstar(data_total_lg, mask_selection_lg, selection='z0', oversample=True, hosts='lg', sim_type='baryon')
+Mhalo_peak_lg = summary.mhalo(data_total_lg, mask_selection_lg, selection='peak', oversample=True, hosts='lg', sim_type='baryon')
+vtan_lg = summary.velocities(data_total_lg, mask_selection_lg, selection='tan', oversample=True, hosts='lg', sim_type='baryon')
+vrad_lg = summary.velocities(data_total_lg, mask_selection_lg, selection='rad', oversample=True, hosts='lg', sim_type='baryon')
+vz0_lg = summary.v_z0(data_total_lg, mask_selection_lg, oversample=True, hosts='lg', sim_type='baryon')
+L_lg = summary.L_z0(data_total_lg, mask_selection_lg, selection='sim', oversample=True, hosts='lg', sim_type='baryon')
 
 
 ### Median plots
@@ -332,6 +334,26 @@ summary_plot.median_plot_mult(x=[dz0_iso, dz0_lg], y=[vz0_iso, vz0_lg], xtype=['
 summary_plot.median_plot_mult(x=[dz0_iso, dz0_lg], y=[L_iso/1e4, L_lg/1e4], xtype=['d.z0', 'd.z0'], ytype=['L.tot', 'L.tot'], labels=['Isolated', 'Paired'], binsize=50, file_path_and_name=directory+'/Ltot_vs_dz0_iso_vs_lg.pdf')
 summary_plot.median_plot_mult(x=[dz0_iso, dz0_lg], y=[L_iso/1e4, L_lg/1e4], xtype=['d.z0', 'd.z0'], ytype=['L.tot', 'L.tot'], labels=['Isolated', 'Paired'], binsize=50, limits=((0,400),(0,4)), file_path_and_name=directory+'/Ltot_vs_dz0_iso_vs_lg_zoom.pdf')
 
+"""
+    Energy plots
+"""
+potential_tot_iso = summary.potential(data_potentials_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon')
+potential_tot_lg = summary.potential(data_potentials_lg, mask_selection_lg, oversample=True, hosts='lg_no_RR', sim_type='baryon')
+ke_z0_tot_iso = summary.kinetic_energy(data_total_iso, mask_selection_iso, ke_type='z0', oversample=True, hosts='iso_no_z', sim_type='baryon')
+ke_z0_tot_lg = summary.kinetic_energy(data_total_lg, mask_selection_lg, ke_type='z0', oversample=True, hosts='lg_no_RR', sim_type='baryon')
+#
+Mstar_z0_tot_iso = summary.mstar(data_total_iso, mask_selection_iso, selection='z0', oversample=True, hosts='iso_no_z', sim_type='baryon')
+Mstar_z0_tot_lg = summary.mstar(data_total_lg, mask_selection_lg, selection='z0', oversample=True, hosts='lg_no_RR', sim_type='baryon')
+dz0_tot_iso = summary.d_z0(data_total_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon')
+dz0_tot_lg = summary.d_z0(data_total_lg, mask_selection_lg, oversample=True, hosts='lg_no_RR', sim_type='baryon')
+
+# E_tot vs Mstar (z = 0)
+summary_plot.median_plot_mult(x=[Mstar_z0_tot_iso, Mstar_z0_tot_lg], y=[(ke_z0_tot_iso+potential_tot_iso)/1e4, (ke_z0_tot_lg+potential_tot_lg)/1e4], xtype=['M.star.z0', 'M.star.z0'], ytype=['E.tot', 'E.tot'], labels=['Isolated', 'Paired'], binsize=1, file_path_and_name=directory+'/Etot_vs_Mstar_z0_iso_vs_lg.pdf')
+
+# E_tot vs d(z = 0)
+summary_plot.median_plot_mult(x=[dz0_tot_iso, dz0_tot_lg], y=[(ke_z0_tot_iso+potential_tot_iso)/1e4, (ke_z0_tot_lg+potential_tot_lg)/1e4], xtype=['d.z0', 'd.z0'], ytype=['E.tot', 'E.tot'], labels=['Isolated', 'Paired'], binsize=50, file_path_and_name=directory+'/Etot_vs_dz0_iso_vs_lg.pdf')
+summary_plot.median_plot_mult(x=[dz0_tot_iso, dz0_tot_lg], y=[(ke_z0_tot_iso+potential_tot_iso)/1e4, (ke_z0_tot_lg+potential_tot_lg)/1e4], xtype=['d.z0', 'd.z0'], ytype=['E.tot', 'E.tot'], labels=['Isolated', 'Paired'], binsize=50, limits=((0,400),(-5,2)), file_path_and_name=directory+'/Etot_vs_dz0_iso_vs_lg_zoom.pdf')
+
 
 
 """
@@ -344,40 +366,42 @@ summary_plot.median_plot_mult(x=[dz0_iso, dz0_lg], y=[L_iso/1e4, L_lg/1e4], xtyp
 
 ### Generate all of the data for the plots below
 data_total_iso = summary.data_read(directory=sim_data.home_dir, hosts='iso_no_z', sim_type='all_baryon')
+data_potentials_iso = summary.data_read_potential(directory=sim_data.home_dir, hosts='iso_no_z', sim_type='all_baryon')
 masks_infall = summary.data_mask(data_total_iso, peri_sim=False, peri_model=False, hosts='iso_no_z')
-mask_selection = masks_infall
+mask_selection_iso = masks_infall
 #
-N_sim_iso = summary.nperi(data_total_iso, mask_selection, oversample=True, selection='sim', hosts='iso_no_z', sim_type='baryon_all')
-d_sim_iso = summary.dperi_recent(data_total_iso, mask_selection, selection='sim', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
-d_min_iso = summary.dperi_min(data_total_iso, mask_selection, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
-dz0_iso = summary.d_z0(data_total_iso, mask_selection, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
-t_sim_iso = summary.tperi_recent(data_total_iso, mask_selection, selection='sim', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
-t_min_iso = summary.tperi_min(data_total_iso, mask_selection, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
-t_in_iso = summary.first_infall(data_total_iso, mask_selection, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
-t_in_any_iso = summary.first_infall_any(data_total_iso, mask_selection, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
-Mhalo_peak_iso = summary.mhalo(data_total_iso, mask_selection, selection='peak', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
-vtan_iso = summary.velocities(data_total_iso, mask_selection, selection='tan', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
-vrad_iso = summary.velocities(data_total_iso, mask_selection, selection='rad', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
-vz0_iso = summary.v_z0(data_total_iso, mask_selection, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
-L_iso = summary.L_z0(data_total_iso, mask_selection, selection='sim', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+N_sim_iso = summary.nperi(data_total_iso, mask_selection_iso, oversample=True, selection='sim', hosts='iso_no_z', sim_type='baryon_all')
+d_sim_iso = summary.dperi_recent(data_total_iso, mask_selection_iso, selection='sim', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+d_min_iso = summary.dperi_min(data_total_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+dz0_iso = summary.d_z0(data_total_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+t_sim_iso = summary.tperi_recent(data_total_iso, mask_selection_iso, selection='sim', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+t_min_iso = summary.tperi_min(data_total_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+t_in_iso = summary.first_infall(data_total_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+t_in_any_iso = summary.first_infall_any(data_total_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+Mhalo_peak_iso = summary.mhalo(data_total_iso, mask_selection_iso, selection='peak', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+vtan_iso = summary.velocities(data_total_iso, mask_selection_iso, selection='tan', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+vrad_iso = summary.velocities(data_total_iso, mask_selection_iso, selection='rad', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+vz0_iso = summary.v_z0(data_total_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+L_iso = summary.L_z0(data_total_iso, mask_selection_iso, selection='sim', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
 #
 data_total_lg = summary.data_read(directory=sim_data.home_dir, hosts='lg', sim_type='all_baryon')
+data_potentials_lg = summary.data_read_potential(directory=sim_data.home_dir, hosts='lg_no_RR', sim_type='all_baryon')
 masks_infall = summary.data_mask(data_total_lg, peri_sim=False, peri_model=False, hosts='lg')
-mask_selection = masks_infall
+mask_selection_lg = masks_infall
 #
-N_sim_lg = summary.nperi(data_total_lg, mask_selection, oversample=True, selection='sim', hosts='lg', sim_type='baryon_all')
-d_sim_lg = summary.dperi_recent(data_total_lg, mask_selection, selection='sim', oversample=True, hosts='lg', sim_type='baryon_all')
-d_min_lg = summary.dperi_min(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon_all')
-dz0_lg = summary.d_z0(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon_all')
-t_sim_lg = summary.tperi_recent(data_total_lg, mask_selection, selection='sim', oversample=True, hosts='lg', sim_type='baryon_all')
-t_min_lg = summary.tperi_min(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon_all')
-t_in_lg = summary.first_infall(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon_all')
-t_in_any_lg = summary.first_infall_any(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon_all')
-Mhalo_peak_lg = summary.mhalo(data_total_lg, mask_selection, selection='peak', oversample=True, hosts='lg', sim_type='baryon_all')
-vtan_lg = summary.velocities(data_total_lg, mask_selection, selection='tan', oversample=True, hosts='lg', sim_type='baryon_all')
-vrad_lg = summary.velocities(data_total_lg, mask_selection, selection='rad', oversample=True, hosts='lg', sim_type='baryon_all')
-vz0_lg = summary.v_z0(data_total_lg, mask_selection, oversample=True, hosts='lg', sim_type='baryon_all')
-L_lg = summary.L_z0(data_total_lg, mask_selection, selection='sim', oversample=True, hosts='lg', sim_type='baryon_all')
+N_sim_lg = summary.nperi(data_total_lg, mask_selection_lg, oversample=True, selection='sim', hosts='lg', sim_type='baryon_all')
+d_sim_lg = summary.dperi_recent(data_total_lg, mask_selection_lg, selection='sim', oversample=True, hosts='lg', sim_type='baryon_all')
+d_min_lg = summary.dperi_min(data_total_lg, mask_selection_lg, oversample=True, hosts='lg', sim_type='baryon_all')
+dz0_lg = summary.d_z0(data_total_lg, mask_selection_lg, oversample=True, hosts='lg', sim_type='baryon_all')
+t_sim_lg = summary.tperi_recent(data_total_lg, mask_selection_lg, selection='sim', oversample=True, hosts='lg', sim_type='baryon_all')
+t_min_lg = summary.tperi_min(data_total_lg, mask_selection_lg, oversample=True, hosts='lg', sim_type='baryon_all')
+t_in_lg = summary.first_infall(data_total_lg, mask_selection_lg, oversample=True, hosts='lg', sim_type='baryon_all')
+t_in_any_lg = summary.first_infall_any(data_total_lg, mask_selection_lg, oversample=True, hosts='lg', sim_type='baryon_all')
+Mhalo_peak_lg = summary.mhalo(data_total_lg, mask_selection_lg, selection='peak', oversample=True, hosts='lg', sim_type='baryon_all')
+vtan_lg = summary.velocities(data_total_lg, mask_selection_lg, selection='tan', oversample=True, hosts='lg', sim_type='baryon_all')
+vrad_lg = summary.velocities(data_total_lg, mask_selection_lg, selection='rad', oversample=True, hosts='lg', sim_type='baryon_all')
+vz0_lg = summary.v_z0(data_total_lg, mask_selection_lg, oversample=True, hosts='lg', sim_type='baryon_all')
+L_lg = summary.L_z0(data_total_lg, mask_selection_lg, selection='sim', oversample=True, hosts='lg', sim_type='baryon_all')
 
 
 ## Median plots
@@ -417,12 +441,31 @@ summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[vz0_iso, vz0
 summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[L_iso/1e4, L_lg/1e4], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['L.tot', 'L.tot'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/Ltot_vs_Mhalo_peak_iso_vs_lg_all.pdf')
 summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[L_iso/1e4, L_lg/1e4], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['L.tot', 'L.tot'], labels=['Isolated', 'Paired'], binsize=0.5, limits=((8,11.5), (0,3.5)), file_path_and_name=directory+'/Ltot_vs_Mhalo_peak_iso_vs_lg_all_zoom.pdf')
 
+"""
+    Energy plots
+"""
+potential_tot_iso = summary.potential(data_potentials_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+potential_tot_lg = summary.potential(data_potentials_lg, mask_selection_lg, oversample=True, hosts='lg_no_RR', sim_type='baryon_all')
+ke_z0_tot_iso = summary.kinetic_energy(data_total_iso, mask_selection_iso, ke_type='z0', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+ke_z0_tot_lg = summary.kinetic_energy(data_total_lg, mask_selection_lg, ke_type='z0', oversample=True, hosts='lg_no_RR', sim_type='baryon_all')
+#
+Mhalo_peak_tot_iso = summary.mhalo(data_total_iso, mask_selection_iso, selection='peak', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+Mhalo_peak_tot_lg = summary.mhalo(data_total_lg, mask_selection_lg, selection='peak', oversample=True, hosts='lg_no_RR', sim_type='baryon_all')
+dz0_tot_iso = summary.d_z0(data_total_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+dz0_tot_lg = summary.d_z0(data_total_lg, mask_selection_lg, oversample=True, hosts='lg_no_RR', sim_type='baryon_all')
+
+# E_tot vs Mhalo (peak)
+summary_plot.median_plot_mult(x=[Mhalo_peak_tot_iso, Mhalo_peak_tot_lg], y=[(ke_z0_tot_iso+potential_tot_iso)/1e4, (ke_z0_tot_lg+potential_tot_lg)/1e4], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['E.tot', 'E.tot'], labels=['Isolated', 'Paired'], binsize=0.5, file_path_and_name=directory+'/Etot_vs_Mhalo_peak_baryon_all_iso_vs_lg.pdf')
+
+# E_tot vs d(z = 0)
+summary_plot.median_plot_mult(x=[dz0_tot_iso, dz0_tot_lg], y=[(ke_z0_tot_iso+potential_tot_iso)/1e4, (ke_z0_tot_lg+potential_tot_lg)/1e4], xtype=['d.z0', 'd.z0'], ytype=['E.tot', 'E.tot'], labels=['Isolated', 'Paired'], binsize=50, file_path_and_name=directory+'/Etot_vs_dz0_baryon_all_iso_vs_lg.pdf')
+summary_plot.median_plot_mult(x=[dz0_tot_iso, dz0_tot_lg], y=[(ke_z0_tot_iso+potential_tot_iso)/1e4, (ke_z0_tot_lg+potential_tot_lg)/1e4], xtype=['d.z0', 'd.z0'], ytype=['E.tot', 'E.tot'], labels=['Isolated', 'Paired'], binsize=50, limits=((0,400),(-5,2)), file_path_and_name=directory+'/Etot_vs_dz0_baryon_all_iso_vs_lg_zoom.pdf')
+
 
 
 """
     DMO comparison
 """
-
 
 data_total = summary.data_read(directory=sim_data.home_dir, hosts='iso_no_z', sim_type='all_baryon')
 data_total_dmo = summary.data_read(directory=sim_data.home_dir, hosts='iso_no_z', sim_type='dmo')
