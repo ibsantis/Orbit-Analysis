@@ -44,13 +44,16 @@ class SummaryDataSort:
                            'all_energy': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', \
                                           'Romeo', 'Juliet', 'Thelma', 'Louise'],
                             #
-                           'iso': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', 'm12z'],
+                           'iso': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', 'm12z'], \
                            #
-                           'iso_no_z': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w'],
+                           'iso_no_z': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w'], \
                            #
-                           'iso_dmo': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w'],
+                           # Don't really need this selection anymore
+                           'iso_dmo': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w'], \
                            #
-                           'lg': ['Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus']}
+                           'lg': ['Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus'], \
+                           #
+                           'lg_no_RR': ['Romeo', 'Juliet', 'Thelma', 'Louise']}
         #
         # Oversampling factors
         self.oversample = {'baryon': {'m12b': 16, 'm12c': 14, 'm12f': 13, 'm12i': 22, 'm12m': 12,\
