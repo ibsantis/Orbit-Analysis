@@ -153,7 +153,7 @@ class SummaryDataSort:
 
             outliers    : boolean
                           Outliers are defined as the subhalos that have pericenters
-                          in the simulations, but not in the data.
+                          in the simulations, but not in the model.
 
             peri_sim    : boolean
                           Set to True if you want subhalos that have expericenced
@@ -245,6 +245,35 @@ class SummaryDataSort:
         elif outliers == True:
             for name in self.host_names[hosts]:
                 mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*(~dictionary[name]['pericenter.check.galpy'])
+        #
+        return mask_dict
+
+    def data_mask_nperi(self, dictionary, nperi, hosts='all'):
+        """
+        [Mask out the subhalos that have experienced 0, 1, or > 1 pericenters]
+        """
+        # Set up a dictionary to save the masks to
+        mask_dict = dict()
+        #
+        if nperi == 0:
+            for name in self.host_names[hosts]:
+                mask_dict[name] = dictionary[name]['infall.check']*(~dictionary[name]['pericenter.check.sim'])
+        #
+        if nperi == 1:
+            for name in self.host_names[hosts]:
+                mask_dict[name] = np.zeros(len(dictionary[name]['infall.check']), bool)
+                for i in range(0, len(mask_dict[name])):
+                    peri_mask = (dictionary[name]['pericenter.dist.sim'][i] != -1)
+                    if (dictionary[name]['infall.check'][i]) and (np.sum(peri_mask) == 1):
+                        mask_dict[name][i] = True
+        #
+        if nperi > 1:
+            for name in self.host_names[hosts]:
+                mask_dict[name] = np.zeros(len(dictionary[name]['infall.check']), bool)
+                for i in range(0, len(mask_dict[name])):
+                    peri_mask = (dictionary[name]['pericenter.dist.sim'][i] != -1)
+                    if (dictionary[name]['infall.check'][i]) and (np.sum(peri_mask) > 1):
+                        mask_dict[name][i] = True
         #
         return mask_dict
 
@@ -969,8 +998,8 @@ class SummaryDataPlot(SummaryDataSort):
         #
         self.labels = {'d.sim': 'd$_{\\rm peri,sim}$ [kpc]',\
                        'd.sim.min': 'd$_{\\rm peri,min,sim}$ [kpc]',\
-                       'd.sim.min.recent': '(d$_{\\rm peri,min,sim}$ - d$_{\\rm peri,sim}$) [kpc]',\
-                       'd.sim.min.recent.frac': '(d$_{\\rm peri,min,sim}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$',\
+                       'delta_d': '(d$_{\\rm peri,min}$ - d$_{\\rm peri,recent}$) [kpc]',\
+                       'delta_d_frac': '(d$_{\\rm peri,min}$ - d$_{\\rm peri,recent}$)/d$_{\\rm peri,recent}$',\
                        'd.peri': 'd$_{\\rm peri}$ [kpc]',\
                        'd.peri.recent': 'd$_{\\rm peri, recent}$ [kpc]',\
                        'd.peri.min': 'd$_{\\rm peri, min}$ [kpc]',\
@@ -984,8 +1013,8 @@ class SummaryDataPlot(SummaryDataSort):
                        'v.tot': 'v$(z = 0)$ [km s$^{-1}$]',\
                        't.sim': 't$_{\\rm peri,lb,sim}$ [Gyr]',\
                        't.sim.min': 't$_{\\rm peri,min,lb,sim}$ [Gyr]',\
-                       't.sim.min.recent': '(t$_{\\rm peri,min,lb,sim}$ - t$_{\\rm peri,lb,sim}$) [Gyr]',\
-                       't.sim.min.recent.frac': '(t$_{\\rm peri,min,lb,sim}$ - t$_{\\rm peri,lb,sim}$)/t$_{\\rm peri,lb,sim}$',\
+                       'delta_t': '(t$_{\\rm peri,lb,min}$ - t$_{\\rm peri,lb,recent}$) [Gyr]',\
+                       'delta_t_frac': '(t$_{\\rm peri,lb,min}$ - t$_{\\rm peri,lb,recent}$)/t$_{\\rm peri,lb,recent}$',\
                        't.model': 't$_{\\rm peri,lb,model}$ [Gyr]',\
                        't.peri': 't$_{\\rm peri,lb}$ [Gyr]',\
                        't.peri.recent': 't$_{\\rm peri,recent,lb}$ [Gyr]',\
