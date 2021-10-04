@@ -42,8 +42,8 @@ if sim_data.num_gal == 1:
     orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='stampede', host=1, dmo=False)
     #
     # Now get the distances from the particle catalog and from the halo tree
-    host_positions = np.flip(part.hostz['position'], axis=0)
-    host_velocities = np.flip(part.hostz['velocity'], axis=0)
+    host_positions = np.flip(part.hostz['position'][:,0,:], axis=0)
+    host_velocities = np.flip(part.hostz['velocity'][:,0,:], axis=0)
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
     #
     # These are the distances that I'm currently using
@@ -56,23 +56,20 @@ if sim_data.num_gal == 1:
     #
     # Loop over each halo
     for i in range(0, orbits.shape[0]):
-        hi = snaps['index'][np.isnan(host_positions[:,0,:][:,0])][0]
+        hi = snaps['index'][np.isnan(host_positions[:,0])][0]
         si = len(orbits.sub_inds[i][orbits.sub_inds[i] >= 0])
-        if si < hi:
-            halo_pos[i][:si] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:si]] - host_positions[:orbits.shape[1]][:si][:,0,:], axis=1)*np.flip(snaps['scalefactor'][:orbits.shape[1]][:si])
-            halo_vel[i][:si] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:si]] - host_velocities[:orbits.shape[1]][:si][:,0,:], axis=1)*np.flip(snaps['scalefactor'][:orbits.shape[1]][:si])
-        if si > hi:
-            halo_pos[i][:hi] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:hi]] - host_positions[:orbits.shape[1]][:hi][:,0,:], axis=1)*np.flip(snaps['scalefactor'][:orbits.shape[1]][:hi])
-            halo_vel[i][:hi] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:hi]] - host_velocities[:orbits.shape[1]][:hi][:,0,:], axis=1)*np.flip(snaps['scalefactor'][:orbits.shape[1]][:hi])
+        min_ind = np.min([hi,si])
+        #
+        halo_pos[i][:min_ind] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:min_ind]] - host_positions[:min_ind], axis=1)*np.flip(snaps['scalefactor'][:min_ind])
+        halo_vel[i][:min_ind] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:min_ind]] - host_velocities[:min_ind], axis=1)*np.flip(snaps['scalefactor'][:min_ind])
     #
     halo_pos_norm = (-1)*np.ones(orbits.shape)
     for i in range(0, len(halo_pos_norm)):
         hi = len(host_radii)
         si = len(halo_pos[i][halo_pos[i] != -1])
-        if si < hi:
-            halo_pos_norm[i][:si] = halo_pos[i][:si]/host_radii[:si]
-        if si > hi:
-            halo_pos_norm[i][:hi] = halo_pos[i][:hi]/host_radii[:hi]
+        min_ind = np.min([hi,si])
+        #
+        halo_pos_norm[i][:min_ind] = halo_pos[i][:min_ind]/host_radii[:min_ind]
     #
     peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps)
     peris_new = orbits.pericenter_interp(distances=halo_pos, velocities=halo_vel, virial_radii=host_radii, time_array=snaps)
@@ -120,21 +117,18 @@ if sim_data.num_gal == 2:
     for i in range(0, orbits.shape[0]):
         hi = snaps['index'][np.isnan(host_positions[:,0])][0]
         si = len(orbits.sub_inds[i][orbits.sub_inds[i] >= 0])
-        if si < hi:
-            halo_pos[i][:si] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:si]] - host_positions[:orbits.shape[1]][:si], axis=1)*np.flip(snaps['scalefactor'][:orbits.shape[1]][:si])
-            halo_vel[i][:si] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:si]] - host_velocities[:orbits.shape[1]][:si], axis=1)*np.flip(snaps['scalefactor'][:orbits.shape[1]][:si])
-        if si > hi:
-            halo_pos[i][:hi] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:hi]] - host_positions[:orbits.shape[1]][:hi], axis=1)*np.flip(snaps['scalefactor'][:orbits.shape[1]][:hi])
-            halo_vel[i][:hi] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:hi]] - host_velocities[:orbits.shape[1]][:hi], axis=1)*np.flip(snaps['scalefactor'][:orbits.shape[1]][:hi])
+        min_ind = np.min([hi,si])
+        #
+        halo_pos[i][:min_ind] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:min_ind]] - host_positions[:min_ind], axis=1)*np.flip(snaps['scalefactor'][:min_ind])
+        halo_vel[i][:min_ind] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:min_ind]] - host_velocities[:min_ind], axis=1)*np.flip(snaps['scalefactor'][:min_ind])
     #
     halo_pos_norm = (-1)*np.ones(orbits.shape)
     for i in range(0, len(halo_pos_norm)):
         hi = len(host_radii)
         si = len(halo_pos[i][halo_pos[i] != -1])
-        if si < hi:
-            halo_pos_norm[i][:si] = halo_pos[i][:si]/host_radii[:si]
-        if si > hi:
-            halo_pos_norm[i][:hi] = halo_pos[i][:hi]/host_radii[:hi]
+        min_ind = np.min([hi,si])
+        #
+        halo_pos_norm[i][:min_ind] = halo_pos[i][:min_ind]/host_radii[:min_ind]
     #
     peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps)
     peris_new = orbits.pericenter_interp(distances=halo_pos, velocities=halo_vel, virial_radii=host_radii, time_array=snaps)
@@ -175,21 +169,18 @@ if sim_data.num_gal == 2:
     for i in range(0, orbits.shape[0]):
         hi = snaps['index'][np.isnan(host_positions[:,0])][0]
         si = len(orbits.sub_inds[i][orbits.sub_inds[i] >= 0])
-        if si < hi:
-            halo_pos[i][:si] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:si]] - host_positions[:orbits.shape[1]][:si], axis=1)*np.flip(snaps['scalefactor'][:orbits.shape[1]][:si])
-            halo_vel[i][:si] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:si]] - host_velocities[:orbits.shape[1]][:si], axis=1)*np.flip(snaps['scalefactor'][:orbits.shape[1]][:si])
-        if si > hi:
-            halo_pos[i][:hi] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:hi]] - host_positions[:orbits.shape[1]][:hi], axis=1)*np.flip(snaps['scalefactor'][:orbits.shape[1]][:hi])
-            halo_vel[i][:hi] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:hi]] - host_velocities[:orbits.shape[1]][:hi], axis=1)*np.flip(snaps['scalefactor'][:orbits.shape[1]][:hi])
+        min_ind = np.min([si,hi])
+        #
+        halo_pos[i][:min_ind] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:min_ind]] - host_positions[:min_ind], axis=1)*np.flip(snaps['scalefactor'][:min_ind])
+        halo_vel[i][:min_ind] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:min_ind]] - host_velocities[:min_ind], axis=1)*np.flip(snaps['scalefactor'][:min_ind])
     #
     halo_pos_norm = (-1)*np.ones(orbits.shape)
     for i in range(0, len(halo_pos_norm)):
         hi = len(host_radii)
         si = len(halo_pos[i][halo_pos[i] != -1])
-        if si < hi:
-            halo_pos_norm[i][:si] = halo_pos[i][:si]/host_radii[:si]
-        if si > hi:
-            halo_pos_norm[i][:hi] = halo_pos[i][:hi]/host_radii[:hi]
+        min_ind = np.min([si,hi])
+        #
+        halo_pos_norm[i][:min_ind] = halo_pos[i][:min_ind]/host_radii[:min_ind]
     #
     peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps)
     peris_new = orbits.pericenter_interp(distances=halo_pos, velocities=halo_vel, virial_radii=host_radii, time_array=snaps)
