@@ -1890,7 +1890,11 @@ class SummaryDataPlot(SummaryDataSort):
             - Plots either a PDF or regular histogram depending on what 'pdf'
               is set to.
         """
-        colorss = ['#006400', '#000080']
+        if len(x) == 2:
+            colorss = ['#006400', '#000080']
+        else:
+            colorss = self.colors
+        #
         if pdf:
             y_label = 'PDF'
         else:
