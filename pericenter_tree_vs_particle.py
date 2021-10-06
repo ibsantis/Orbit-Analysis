@@ -28,7 +28,7 @@ import time
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location='stampede')
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
 print('Set paths')
 
 if sim_data.num_gal == 1:
@@ -39,7 +39,7 @@ if sim_data.num_gal == 1:
     part = gizmo.io.Read.read_snapshots('star', 'redshift', 0, properties=['position', 'potential'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
     #
     # Set up the halo inds and KDTree
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='stampede', host=1, dmo=False)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=False)
     #
     # Now get the distances from the particle catalog and from the halo tree
     host_positions = np.flip(part.hostz['position'][:,0,:], axis=0)
@@ -56,12 +56,12 @@ if sim_data.num_gal == 1:
     #
     # Loop over each halo
     for i in range(0, orbits.shape[0]):
-        hi = snaps['index'][np.isnan(host_positions[:,0])][0]
+        hi = 600-np.flip(snaps['index'])[np.isnan(host_positions[:,0])][0]
         si = len(orbits.sub_inds[i][orbits.sub_inds[i] >= 0])
         min_ind = np.min([hi,si])
         #
-        halo_pos[i][:min_ind] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:min_ind]] - host_positions[:min_ind], axis=1)*np.flip(snaps['scalefactor'][:min_ind])
-        halo_vel[i][:min_ind] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:min_ind]] - host_velocities[:min_ind], axis=1)*np.flip(snaps['scalefactor'][:min_ind])
+        halo_pos[i][:min_ind] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:min_ind]] - host_positions[:min_ind], axis=1)*np.flip(snaps['scalefactor'])[:min_ind]
+        halo_vel[i][:min_ind] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:min_ind]] - host_velocities[:min_ind], axis=1)*np.flip(snaps['scalefactor'])[:min_ind]
     #
     halo_pos_norm = (-1)*np.ones(orbits.shape)
     for i in range(0, len(halo_pos_norm)):
@@ -98,7 +98,7 @@ if sim_data.num_gal == 2:
     #
     ### GALAXY 1
     # Set up the halo inds and KDTree
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='stampede', host=1, dmo=False)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=False)
     #
     # Now get the distances from the particle catalog and from the halo tree
     host_positions = np.flip(part.hostz['position'][:,0,:], axis=0)
@@ -115,12 +115,12 @@ if sim_data.num_gal == 2:
     #
     # Loop over each halo
     for i in range(0, orbits.shape[0]):
-        hi = snaps['index'][np.isnan(host_positions[:,0])][0]
+        hi = 600-np.flip(snaps['index'])[np.isnan(host_positions[:,0])][0]
         si = len(orbits.sub_inds[i][orbits.sub_inds[i] >= 0])
         min_ind = np.min([hi,si])
         #
-        halo_pos[i][:min_ind] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:min_ind]] - host_positions[:min_ind], axis=1)*np.flip(snaps['scalefactor'][:min_ind])
-        halo_vel[i][:min_ind] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:min_ind]] - host_velocities[:min_ind], axis=1)*np.flip(snaps['scalefactor'][:min_ind])
+        halo_pos[i][:min_ind] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:min_ind]] - host_positions[:min_ind], axis=1)*np.flip(snaps['scalefactor'])[:min_ind]
+        halo_vel[i][:min_ind] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:min_ind]] - host_velocities[:min_ind], axis=1)*np.flip(snaps['scalefactor'])[:min_ind]
     #
     halo_pos_norm = (-1)*np.ones(orbits.shape)
     for i in range(0, len(halo_pos_norm)):
@@ -150,7 +150,7 @@ if sim_data.num_gal == 2:
     #
     ### GALAXY 2
     # Set up the halo inds and KDTree
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='stampede', host=2, dmo=False)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=False)
     #
     # Now get the distances from the particle catalog and from the halo tree
     host_positions = np.flip(part.hostz['position'][:,1,:], axis=0)
@@ -167,12 +167,12 @@ if sim_data.num_gal == 2:
     #
     # Loop over each halo
     for i in range(0, orbits.shape[0]):
-        hi = snaps['index'][np.isnan(host_positions[:,0])][0]
+        hi = 600-np.flip(snaps['index'])[np.isnan(host_positions[:,0])][0]
         si = len(orbits.sub_inds[i][orbits.sub_inds[i] >= 0])
         min_ind = np.min([si,hi])
         #
-        halo_pos[i][:min_ind] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:min_ind]] - host_positions[:min_ind], axis=1)*np.flip(snaps['scalefactor'][:min_ind])
-        halo_vel[i][:min_ind] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:min_ind]] - host_velocities[:min_ind], axis=1)*np.flip(snaps['scalefactor'][:min_ind])
+        halo_pos[i][:min_ind] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:min_ind]] - host_positions[:min_ind], axis=1)*np.flip(snaps['scalefactor'])[:min_ind]
+        halo_vel[i][:min_ind] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:min_ind]] - host_velocities[:min_ind], axis=1)*np.flip(snaps['scalefactor'])[:min_ind]
     #
     halo_pos_norm = (-1)*np.ones(orbits.shape)
     for i in range(0, len(halo_pos_norm)):
