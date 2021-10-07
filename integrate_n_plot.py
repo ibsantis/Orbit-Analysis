@@ -107,12 +107,16 @@ if sim_data.num_gal == 1:
             #
             # Check to see if there were infall, pericenter, or apocenter events
             infall = infall_info['check'][i]
+            peri = peris['pericenter.check'][i]
             #
             # If there were, plot when they occurred
-            if infall == True:
+            if infall:
                 infall_time = infall_info['first.infall.time.lb'][i]
                 ax1.axvline(x=infall_time, ymin=0, ymax=1, color='k', linestyle=':')
             #
+            if peri:
+                for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
+                    ax1.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
             # Set the labels and save the figure
             ax1.set_ylim(top=np.nanmax(d_data)+100)
             ax1.label_outer()
@@ -127,6 +131,9 @@ if sim_data.num_gal == 1:
             if infall == True:
                 infall_time = infall_info['first.infall.time.lb'][i]
                 ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+            if peri:
+                for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
+                    ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
             #
             ax2.set_ylabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=32)
             #
@@ -138,6 +145,9 @@ if sim_data.num_gal == 1:
             if infall == True:
                 infall_time = infall_info['first.infall.time.lb'][i]
                 ax3.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+            if peri:
+                for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
+                    ax3.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
             #
             ax3.set_xlabel('lookback time [Gyr]', fontsize=32)
             plt.tight_layout()
@@ -217,11 +227,15 @@ if sim_data.num_gal == 2:
             #
             # Check to see if there were infall, pericenter, or apocenter events
             infall = infall_info['check'][i]
+            peri = peris['pericenter.check'][i]
             #
             # If there were, plot when they occurred
             if infall == True:
                 infall_time = infall_info['first.infall.time.lb'][i]
                 ax1.axvline(x=infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+            if peri:
+                for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
+                    ax1.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
             #
             # Set the labels and save the figure
             ax1.set_ylim(top=np.nanmax(d_data)+100)
@@ -237,6 +251,9 @@ if sim_data.num_gal == 2:
             if infall == True:
                 infall_time = infall_info['first.infall.time.lb'][i]
                 ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+            if peri:
+                for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
+                    ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
             #
             ax2.set_ylabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=32)
             #
@@ -248,6 +265,9 @@ if sim_data.num_gal == 2:
             if infall == True:
                 infall_time = infall_info['first.infall.time.lb'][i]
                 ax3.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+            if peri:
+                for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
+                    ax3.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
             #
             ax3.set_xlabel('lookback time [Gyr]', fontsize=32)
             plt.tight_layout()
@@ -325,11 +345,15 @@ if sim_data.num_gal == 2:
             #
             # Check to see if there were infall, pericenter, or apocenter events
             infall = infall_info['check'][i]
+            peri = peris['pericenter.check'][i]
             #
             # If there were, plot when they occurred
             if infall == True:
                 infall_time = infall_info['first.infall.time.lb'][i]
                 ax1.axvline(x=infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+            if peri:
+                for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
+                    ax1.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
             #
             # Set the labels and save the figure
             ax1.set_ylim(top=np.nanmax(d_data)+100)
@@ -345,6 +369,9 @@ if sim_data.num_gal == 2:
             if infall == True:
                 infall_time = infall_info['first.infall.time.lb'][i]
                 ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+            if peri:
+                for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
+                    ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
             #
             ax2.set_ylabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=32)
             #
@@ -356,6 +383,9 @@ if sim_data.num_gal == 2:
             if infall == True:
                 infall_time = infall_info['first.infall.time.lb'][i]
                 ax3.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+            if peri:
+                for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
+                    ax3.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
             #
             ax3.set_xlabel('lookback time [Gyr]', fontsize=32)
             plt.tight_layout()
