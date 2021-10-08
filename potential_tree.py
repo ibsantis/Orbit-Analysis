@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=TL_potentials_all_subhalos
+#SBATCH --job-name=m12b_potentials_all_subhalos
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=500G
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
 #SBATCH --time=02:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/TL_potentials_all_subhalos_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/m12b_potentials_all_subhalos_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -45,7 +45,7 @@ import time
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Thelma', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
 print('Set paths')
 
 if sim_data.num_gal == 1:
@@ -91,7 +91,7 @@ if sim_data.num_gal == 1:
     part_mask = (ndist[np.isfinite(ndist)] < (halt['radius'][halt['host.index'][0]]+5))*(ndist[np.isfinite(ndist)] > (halt['radius'][halt['host.index'][0]]-5))
     data_dict['host.potential.R200m'] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
     data_dict['host.particle.num'] = np.sum(part_mask)
-    G = 6.67*10**(-11)*(1.988*10**(30))/(3.086*10**(19))
+    G = 6.67*10**(-11)*(1.988*10**(30))/((1000**2)*(3.086*10**(19)))
     data_dict['KE.at.Rvir'] = 0.5*G*halt['mass'][halt['host.index'][0]]/halt['radius'][halt['host.index'][0]]
     #
     # Loop over each mass bin
@@ -170,7 +170,7 @@ if sim_data.num_gal == 2:
     part_mask = (ndist[np.isfinite(ndist)] < (halt['radius'][halt['host.index'][0]]+5))*(ndist[np.isfinite(ndist)] > (halt['radius'][halt['host.index'][0]]-5))
     data_dict['host.potential.R200m'] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
     data_dict['host.particle.num'] = np.sum(part_mask)
-    G = 6.67*10**(-11)*(1.988*10**(30))/(3.086*10**(19))
+    G = 6.67*10**(-11)*(1.988*10**(30))/((1000**2)*(3.086*10**(19)))
     data_dict['KE.at.Rvir'] = 0.5*G*halt['mass'][halt['host.index'][0]]/halt['radius'][halt['host.index'][0]]
     #
     # Loop over each mass bin
@@ -228,7 +228,7 @@ if sim_data.num_gal == 2:
     part_mask = (ndist[np.isfinite(ndist)] < (halt['radius'][halt['host2.index'][0]]+5))*(ndist[np.isfinite(ndist)] > (halt['radius'][halt['host2.index'][0]]-5))
     data_dict['host.potential.R200m'] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
     data_dict['host.particle.num'] = np.sum(part_mask)
-    G = 6.67*10**(-11)*(1.988*10**(30))/(3.086*10**(19))
+    G = 6.67*10**(-11)*(1.988*10**(30))/((1000**2)*(3.086*10**(19)))
     data_dict['KE.at.Rvir'] = 0.5*G*halt['mass'][halt['host2.index'][0]]/halt['radius'][halt['host2.index'][0]]
     #
     # Loop over each mass bin
