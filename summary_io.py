@@ -844,19 +844,23 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    def potential(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
+    def potential(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon', norm='potential'):
         """
         TBD
         """
+        if norm == 'potential':
+            key = 'host.potential.R200m'
+        if norm == 'kinetic':
+            key = 'KE.at.Rvir'
         data = []
         #
         if oversample == False:
             for name in self.host_names[hosts]:
-                data.append(data_dict[name]['subhalo.potential'][mask_dict[name]]-data_dict[name]['host.potential.R200m'])
+                data.append(data_dict[name]['subhalo.potential'][mask_dict[name]]-data_dict[name][key])
         #
         elif oversample == True:
             for name in self.host_names[hosts]:
-                data.append(np.repeat(data_dict[name]['subhalo.potential'][mask_dict[name]]-data_dict[name]['host.potential.R200m'], self.oversample[sim_type][name]))
+                data.append(np.repeat(data_dict[name]['subhalo.potential'][mask_dict[name]]-data_dict[name][key], self.oversample[sim_type][name]))
         #
         return np.hstack(data)
 
