@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=TL_potentials
+#SBATCH --job-name=m12b_potentials
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=500G
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
 #SBATCH --time=02:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/TL_potentials_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/m12b_potentials_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -45,7 +45,7 @@ import time
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Thelma', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
 print('Set paths')
 
 if sim_data.num_gal == 1:
@@ -76,7 +76,7 @@ if sim_data.num_gal == 1:
         #
         return mask
     #
-    halo_mass_bins = np.array([8., 8.5, 9., 9.5, 10., 10.5, 11., 11.5, 12.])
+    halo_mass_bins = np.array([7., 7.5, 8., 8.5, 9., 9.5, 10., 10.5, 11., 11.5, 12.])
     #
     # Create a dictionary to save the data to
     data_dict = dict()
@@ -145,7 +145,7 @@ if sim_data.num_gal == 2:
         #
         return mask
     #
-    halo_mass_bins = np.array([8., 8.5, 9., 9.5, 10., 10.5, 11., 11.5, 12.])
+    halo_mass_bins = np.array([7., 7.5, 8., 8.5, 9., 9.5, 10., 10.5, 11., 11.5, 12.])
     #
     ## GALAXY 1
     # Set up the halo inds and KDTree
