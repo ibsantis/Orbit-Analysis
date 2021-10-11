@@ -497,7 +497,7 @@ class OrbitAnalysis:
         #
         return d
 
-    def pericenter_interp(self, distances, velocities, virial_radii, time_array):
+    def pericenter_interp(self, distances, velocities, virial_radii, time_array, reach=6):
         """
         DESCRIPTION:
             Reads in subhalo distances, velocites, host virial radii across time,
@@ -557,8 +557,6 @@ class OrbitAnalysis:
         peri_vel_spl = []
         time_spl = []
         #
-        # Define how many snapshots you want to 'reach' out to find a local min
-        reach = 4
         # Loop over the number of subhalos
         for k in range(0, len(distances)):
             temp_halo_d = distances[k] # Now goes from z = 0 to z_form (un-normalized)
