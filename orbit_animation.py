@@ -19,7 +19,7 @@ print('Read in the tools')
 sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
 print('Set paths')
 
-data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_m12i')
+data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_Louise')
 
 colors = ['#2f4f4f', '#006400', '#8b0000', '#000080', '#00ced1',\
           '#ff8c00', '#c71585', '#7fff00', '#00fa9a', '#0000ff',\
@@ -161,3 +161,61 @@ plt.tight_layout()
 
 #anim.save('/Users/isaiahsantistevan/Desktop/test.gif')
 plt.show()
+
+
+
+
+
+# EXAMPLE 3 Plotting two subhalos orbiting each other in Louise
+# Multiple halos
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+mask6 = (data['d.sim'][6][:,0] != -1)
+mask116 = (data['d.sim'][116][:,0] != -1)
+#
+ax.set_xlim(np.min(np.concatenate((data['d.sim'][6][:,0][mask6],data['d.sim'][116][:,0][mask116]))), np.max(np.concatenate((data['d.sim'][6][:,0][mask6],data['d.sim'][116][:,0][mask116]))))
+ax.set_ylim(np.min(np.concatenate((data['d.sim'][6][:,1][mask6],data['d.sim'][116][:,1][mask116]))), np.max(np.concatenate((data['d.sim'][6][:,1][mask6],data['d.sim'][116][:,1][mask116]))))
+ax.set_zlim(np.min(np.concatenate((data['d.sim'][6][:,2][mask6],data['d.sim'][116][:,2][mask116]))), np.max(np.concatenate((data['d.sim'][6][:,2][mask6],data['d.sim'][116][:,2][mask116]))))
+#
+ax.set_xlabel('X [kpc]', labelpad=15.)
+ax.set_ylabel('Y [kpc]', labelpad=15.)
+ax.set_zlabel('Z [kpc]', labelpad=15.)
+#
+line6, = ax.plot3D(np.array([]),np.array([]),np.array([]), colors[0])
+line116, = ax.plot3D(np.array([]),np.array([]),np.array([]), colors[1])
+ax.scatter(0,0,0,color='black')
+
+def init():
+    line6.set_data(np.array([]),np.array([]))
+    line6.set_3d_properties(np.array([]))
+    line116.set_data(np.array([]),np.array([]))
+    line116.set_3d_properties(np.array([]))
+    return line6, line116,
+
+def animate(i):
+    x6 = data['d.sim'][6][:,0][mask6][:i]
+    y6 = data['d.sim'][6][:,1][mask6][:i]
+    z6 = data['d.sim'][6][:,2][mask6][:i]
+    #
+    x116 = data['d.sim'][116][:,0][mask116][:i]
+    y116 = data['d.sim'][116][:,1][mask116][:i]
+    z116 = data['d.sim'][116][:,2][mask116][:i]
+    #
+    line6.set_data(x6,y6)
+    line6.set_3d_properties(z6)
+    #
+    line116.set_data(x116,y116)
+    line116.set_3d_properties(z116)
+    #
+    ax.view_init(elev=30, azim=0.6*i)
+    #
+    return line6, line116,
+
+anim = animation.FuncAnimation(fig, animate, init_func=init, frames=len(data['d.sim'][6][:,0][mask6])-10, interval=0.1, blit=False)
+plt.tight_layout()
+
+writergif = animation.PillowWriter(fps=30)
+anim.save('/Users/isaiahsantistevan/Desktop/test.gif',writer=writergif)
+
+anim.save('/Users/isaiahsantistevan/Desktop/duo.gif')
+#plt.show()
