@@ -848,19 +848,23 @@ class SummaryDataSort:
         """
         TBD
         """
-        if norm == 'potential':
-            key = 'host.potential.R200m'
-        if norm == 'kinetic':
-            key = 'KE.at.Rvir'
         data = []
         #
         if oversample == False:
             for name in self.host_names[hosts]:
-                data.append(data_dict[name]['subhalo.potential'][mask_dict[name]]-data_dict[name][key])
+                if norm == 'potential':
+                    data.append(data_dict[name]['subhalo.potential'][mask_dict[name]]-data_dict[name]['host.potential.R200m'])
+                elif norm == 'kinetic':
+                    k = (-1)*data_dict[name]['host.potential.R200m']-data_dict[name]['KE.at.Rvir']
+                    data.append(data_dict[name]['subhalo.potential'][mask_dict[name]]+k)
         #
         elif oversample == True:
             for name in self.host_names[hosts]:
-                data.append(np.repeat(data_dict[name]['subhalo.potential'][mask_dict[name]]-data_dict[name][key], self.oversample[sim_type][name]))
+                if norm == 'potential':
+                    data.append(np.repeat(data_dict[name]['subhalo.potential'][mask_dict[name]]-data_dict[name]['host.potential.R200m'], self.oversample[sim_type][name]))
+                elif norm == 'kinetic':
+                    k = (-1)*data_dict[name]['host.potential.R200m']-data_dict[name]['KE.at.Rvir']
+                    data.append(np.repeat(data_dict[name]['subhalo.potential'][mask_dict[name]]+k, self.oversample[sim_type][name]))
         #
         return np.hstack(data)
 
