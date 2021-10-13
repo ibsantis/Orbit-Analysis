@@ -1065,7 +1065,10 @@ class OrbitGalpy(OrbitAnalysis):
         """
         return np.sqrt(vrad**2 + vtan**2)
 
-    def galpy_pericenter_interp(self, distances, velocities, time_array):
+    # NEED TO FIX THE PERICENTER FUNCTION BELOW (AND APO) TO BE MORE IN LINE WITH THE SIMULATION ONE
+    #
+    #
+    def galpy_pericenter_interp(self, distances, velocities, time_array, reach=10):
         """
         DESCRIPTION:
             Reads in integrated subhalo distances and velocites across time,
@@ -1115,8 +1118,6 @@ class OrbitGalpy(OrbitAnalysis):
         peri_vel_spl = []
         time_spl = []
         #
-        # Define how many snapshots you want to 'reach' out to find a local min
-        reach = 4
         # Loop over the number of subhalos
         for k in range(0, len(distances)):
             temp_halo_d = distances[k] # Now goes from z = 0 to z_form (un-normalized)
@@ -1135,7 +1136,7 @@ class OrbitGalpy(OrbitAnalysis):
                     temp_check[i] = 1
                     temp_peri_spl.append(temp_halo_d[i-reach:i+reach])
                     temp_peri_vel_spl.append(temp_halo_v[i-reach:i+reach])
-                    temp_time_spl.append(time_array[len(time_array)-1-i-reach:len(time_array)-1-i+reach])
+                    temp_time_spl.append(time_array[len(time_array)-1-i-reach:len(time_array)-1-i+reach]) # FIX THIS!!!
                     temp_peri = temp_halo_d[i+1]
                 else:
                     temp_peri = temp_halo_d[i+1]
