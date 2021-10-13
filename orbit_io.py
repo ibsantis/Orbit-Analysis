@@ -754,7 +754,8 @@ class OrbitAnalysis:
             #
             # Want initial element to be this because we check +- 10 neighbors on each side
             temp_apo = temp_halo_d[reach]
-            temp_apo_time = time_array['time'][600-reach]
+            #temp_apo_time = time_array['time'][600-reach]
+            temp_apo_time = np.flip(time_array['time'])[reach]
             temp_check = np.zeros(len(temp_halo_d))
             temp_apo_spl = []
             temp_apo_vel_spl = []
@@ -767,12 +768,15 @@ class OrbitAnalysis:
                     temp_check[i] = 1
                     temp_apo_spl.append(temp_halo_d[i-reach:i+reach])
                     temp_apo_vel_spl.append(temp_halo_v[i-reach:i+reach])
-                    temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
+                    #temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
+                    temp_time_spl.append(np.flip(time_array['time'])i-reach:i+reach])
                     temp_apo = temp_halo_d[i+1]
-                    temp_apo_time = time_array['time'][600-(i+1)]
+                    #temp_apo_time = time_array['time'][600-(i+1)]
+                    temp_apo_time = np.flip(time_array['time'])[i+1]
                 else:
                     temp_apo = temp_halo_d[i+1]
-                    temp_apo_time = time_array['time'][600-(i+1)]
+                    #temp_apo_time = time_array['time'][600-(i+1)]
+                    temp_apo_time = np.flip(time_array['time'])[i+1]
             check.append(temp_check)
             apo_spl.append(temp_apo_spl)
             apo_vel_spl.append(temp_apo_vel_spl)
