@@ -497,7 +497,7 @@ class OrbitAnalysis:
         #
         return d
 
-    def pericenter_interp(self, distances, velocities, virial_radii, time_array, reach=6):
+    def pericenter_interp(self, distances, velocities, virial_radii, time_array, reach=10):
         """
         DESCRIPTION:
             Reads in subhalo distances, velocites, host virial radii across time,
@@ -577,7 +577,8 @@ class OrbitAnalysis:
                     peri_rad_list.append(virial_radii[i])
                     temp_peri_spl.append(temp_halo_d[i-reach:i+reach])
                     temp_peri_vel_spl.append(temp_halo_v[i-reach:i+reach])
-                    temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
+                    #temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
+                    temp_time_spl.append(np.flip(time_array['time'])[i-reach:i+reach])
                     temp_peri = temp_halo_d[i+1]
                 else:
                     temp_peri = temp_halo_d[i+1]
