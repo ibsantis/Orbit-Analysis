@@ -108,9 +108,11 @@ class OrbitRead:
         elif location == 'stampede' and self.num_gal == 1:
             self.home_dir = '/home1/05400/ibsantis/scripts'
             self.simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+self.galaxy+resolution
+            self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
         elif location == 'stampede' and self.num_gal == 2:
             self.home_dir = '/home1/05400/ibsantis/scripts'
             self.simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+self.galaxy+resolution
+            self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
             self.gal_1 = gal1
             self.gal_2 = gal2
         #
@@ -769,7 +771,7 @@ class OrbitAnalysis:
                     temp_apo_spl.append(temp_halo_d[i-reach:i+reach])
                     temp_apo_vel_spl.append(temp_halo_v[i-reach:i+reach])
                     #temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
-                    temp_time_spl.append(np.flip(time_array['time'])i-reach:i+reach])
+                    temp_time_spl.append(np.flip(time_array['time'])[i-reach:i+reach])
                     temp_apo = temp_halo_d[i+1]
                     #temp_apo_time = time_array['time'][600-(i+1)]
                     temp_apo_time = np.flip(time_array['time'])[i+1]
