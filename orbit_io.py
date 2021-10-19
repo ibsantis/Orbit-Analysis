@@ -1146,7 +1146,8 @@ class OrbitGalpy(OrbitAnalysis):
                     #temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
                     #temp_time_spl.append(np.flip(time_array['time'])[left_ind:i+reach])
                     #temp_time_spl.append(time_array[len(time_array)-1-i-reach:len(time_array)-1-i+reach]) # FIX THIS!!!
-                    temp_time_spl.append(time_array[left_ind:i+reach])
+                    #temp_time_spl.append(time_array[left_ind:i+reach])
+                    temp_time_spl.append(np.flip(time_array['time'])[left_ind:i+reach])
                     temp_peri = temp_halo_d[i+1]
                 else:
                     temp_peri = temp_halo_d[i+1]
@@ -1225,7 +1226,7 @@ class OrbitGalpy(OrbitAnalysis):
         # Find lookback time and save to 2D array
         time_lb_spline_array = (-1)*np.ones((len(distances), N))
         mask = (time_spline_array > 0)
-        time_lb_spline_array[mask] = (time_array[-1] - time_spline_array[mask])
+        time_lb_spline_array[mask] = (time_array['time'][-1] - time_spline_array[mask])
         #
         d['pericenter.time.lb'] = time_lb_spline_array
         #
@@ -1308,7 +1309,7 @@ class OrbitGalpy(OrbitAnalysis):
                     temp_check[i] = 1
                     temp_apo_spl.append(temp_halo_d[left_ind:i+reach])
                     temp_apo_vel_spl.append(temp_halo_v[left_ind:i+reach])
-                    temp_time_spl.append(time_array[left_ind:i+reach])
+                    temp_time_spl.append(np.flip(time_array['time'])[left_ind:i+reach])
                     temp_apo = temp_halo_d[i+1]
                 else:
                     temp_apo = temp_halo_d[i+1]
@@ -1375,7 +1376,7 @@ class OrbitGalpy(OrbitAnalysis):
         # Find lookback time and save to 2D array
         time_lb_spline_array = (-1)*np.ones((len(distances), N))
         mask = (time_spline_array > 0)
-        time_lb_spline_array[mask] = (time_array[-1] - time_spline_array[mask])
+        time_lb_spline_array[mask] = (time_array['time'][-1] - time_spline_array[mask])
         #
         # Save everything to a dictionary
         d['apocenter.dist'] = apocenter_spline_array
