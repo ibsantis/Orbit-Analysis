@@ -499,7 +499,7 @@ class OrbitAnalysis:
         #
         return d
 
-    def pericenter_interp(self, distances, velocities, virial_radii, time_array, reach=10):
+    def pericenter_interp(self, distances, velocities, virial_radii, time_array, reach=20):
         """
         DESCRIPTION:
             Reads in subhalo distances, velocites, host virial radii across time,
@@ -683,7 +683,7 @@ class OrbitAnalysis:
         #
         return d
 
-    def apocenter_interp(self, distances, velocities, time_array, infall_array):
+    def apocenter_interp(self, distances, velocities, time_array, infall_array, reach=20):
         """
         DESCRIPTION:
             Reads in a list of subhalo distances and velocities, as well as
@@ -747,8 +747,6 @@ class OrbitAnalysis:
         max_dist_time = np.zeros(len(distances))
         max_dist_time_lb = np.zeros(len(distances))
         #
-        # Define how many snapshots you want to 'reach' out to find a local min
-        reach = 10
         # Loop through the number of subhalos
         for k in range(0, len(distances)):
             #
@@ -762,8 +760,6 @@ class OrbitAnalysis:
             #
             # Want initial element to be this because we check +- 10 neighbors on each side
             temp_apo = temp_halo_d[reach]
-            #temp_apo_time = time_array['time'][600-reach]
-            temp_apo_time = np.flip(time_array['time'])[reach]
             temp_check = np.zeros(len(temp_halo_d))
             temp_apo_spl = []
             temp_apo_vel_spl = []
@@ -784,12 +780,8 @@ class OrbitAnalysis:
                     #temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
                     temp_time_spl.append(np.flip(time_array['time'])[left_ind:i+reach])
                     temp_apo = temp_halo_d[i+1]
-                    #temp_apo_time = time_array['time'][600-(i+1)]
-                    temp_apo_time = np.flip(time_array['time'])[i+1]
                 else:
                     temp_apo = temp_halo_d[i+1]
-                    #temp_apo_time = time_array['time'][600-(i+1)]
-                    temp_apo_time = np.flip(time_array['time'])[i+1]
             check.append(temp_check)
             apo_spl.append(temp_apo_spl)
             apo_vel_spl.append(temp_apo_vel_spl)
@@ -1078,10 +1070,7 @@ class OrbitGalpy(OrbitAnalysis):
         """
         return np.sqrt(vrad**2 + vtan**2)
 
-    # NEED TO FIX THE PERICENTER FUNCTION BELOW (AND APO) TO BE MORE IN LINE WITH THE SIMULATION ONE
-    #
-    #
-    def galpy_pericenter_interp(self, distances, velocities, time_array, reach=10):
+    def galpy_pericenter_interp(self, distances, velocities, time_array, reach=20):
         """
         DESCRIPTION:
             Reads in integrated subhalo distances and velocites across time,
@@ -1143,13 +1132,21 @@ class OrbitGalpy(OrbitAnalysis):
             temp_time_spl = []
             #
             # Loop through each subhalo
-            for i in range(reach, len(temp_halo_d)-reach):
+            start_ind = 4
+            for i in range(start_ind, len(temp_halo_d)-reach):
+                if (i-reach < 0):
+                    left_ind = 0
+                else:
+                    left_ind = i-reach
                 # Check its neighbors and if it is within virial radius
-                if (all(temp_peri < temp_halo_d[i-reach:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])):
+                if (all(temp_peri < temp_halo_d[left_ind:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])):
                     temp_check[i] = 1
-                    temp_peri_spl.append(temp_halo_d[i-reach:i+reach])
-                    temp_peri_vel_spl.append(temp_halo_v[i-reach:i+reach])
-                    temp_time_spl.append(time_array[len(time_array)-1-i-reach:len(time_array)-1-i+reach]) # FIX THIS!!!
+                    temp_peri_spl.append(temp_halo_d[left_ind:i+reach])
+                    temp_peri_vel_spl.append(temp_halo_v[left_ind:i+reach])
+                    #temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
+                    #temp_time_spl.append(np.flip(time_array['time'])[left_ind:i+reach])
+                    #temp_time_spl.append(time_array[len(time_array)-1-i-reach:len(time_array)-1-i+reach]) # FIX THIS!!!
+                    temp_time_spl.append(time_array[left_ind:i+reach])
                     temp_peri = temp_halo_d[i+1]
                 else:
                     temp_peri = temp_halo_d[i+1]
@@ -1234,7 +1231,7 @@ class OrbitGalpy(OrbitAnalysis):
         #
         return d
 
-    def galpy_apocenter_interp(self, distances, velocities, time_array):
+    def galpy_apocenter_interp(self, distances, velocities, time_array, reach=20):
         """
         DESCRIPTION:
             Reads in a list of integrated subhalo distances and velocities, and
@@ -1286,8 +1283,6 @@ class OrbitGalpy(OrbitAnalysis):
         apo_vel_spl = []
         time_spl = []
         #
-        # Define how many snapshots you want to 'reach' out to find a local min
-        reach = 10
         # Loop through the number of subhalos
         for k in range(0, len(distances)):
             #
@@ -1296,25 +1291,27 @@ class OrbitGalpy(OrbitAnalysis):
             #
             # Want initial element to be this because we check +- 10 neighbors on each side
             temp_apo = temp_halo_d[reach]
-            temp_apo_time = time_array[len(time_array)-reach]
             temp_check = np.zeros(len(temp_halo_d))
             temp_apo_spl = []
             temp_apo_vel_spl = []
             temp_time_spl = []
             #
             # Loop through each subhalo
-            for i in range(reach, len(temp_halo_d)-reach):
+            start_ind = 4
+            for i in range(start_ind, len(temp_halo_d)-reach):
+                if (i-reach < 0):
+                    left_ind = 0
+                else:
+                    left_ind = i-reach
                 # Check to make sure that this is the local maximum
-                if (all(temp_apo > temp_halo_d[i-reach:i])) and (all(temp_apo > temp_halo_d[i+1:i+1+reach])):
+                if (all(temp_apo > temp_halo_d[left_ind:i])) and (all(temp_apo > temp_halo_d[i+1:i+1+reach])):
                     temp_check[i] = 1
-                    temp_apo_spl.append(temp_halo_d[i-reach:i+reach])
-                    temp_apo_vel_spl.append(temp_halo_v[i-reach:i+reach])
-                    temp_time_spl.append(time_array[len(time_array)-i-reach:len(time_array)-i+reach])
+                    temp_apo_spl.append(temp_halo_d[left_ind:i+reach])
+                    temp_apo_vel_spl.append(temp_halo_v[left_ind:i+reach])
+                    temp_time_spl.append(time_array[left_ind:i+reach])
                     temp_apo = temp_halo_d[i+1]
-                    temp_apo_time = time_array[len(time_array)-(i+1)]
                 else:
                     temp_apo = temp_halo_d[i+1]
-                    temp_apo_time = time_array[len(time_array)-(i+1)]
             check.append(temp_check)
             apo_spl.append(temp_apo_spl)
             apo_vel_spl.append(temp_apo_vel_spl)
