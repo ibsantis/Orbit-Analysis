@@ -572,15 +572,21 @@ class OrbitAnalysis:
             temp_time_spl = []
             #
             # Loop through each subhalo
-            for i in range(reach, len(temp_halo_d)-reach):
+            start_ind = 4
+            for i in range(start_ind, len(temp_halo_d)-reach):
+                if (i-reach < 0):
+                    left_ind = 0
+                else:
+                    left_ind = i-reach
                 # Check its neighbors and if it is within virial radius
-                if (all(temp_peri < temp_halo_d[i-reach:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
+                #if (all(temp_peri < temp_halo_d[i-reach:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
+                if (all(temp_peri < temp_halo_d[left_ind:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
                     temp_check[i] = 1
                     peri_rad_list.append(virial_radii[i])
-                    temp_peri_spl.append(temp_halo_d[i-reach:i+reach])
-                    temp_peri_vel_spl.append(temp_halo_v[i-reach:i+reach])
+                    temp_peri_spl.append(temp_halo_d[left_ind:i+reach])
+                    temp_peri_vel_spl.append(temp_halo_v[left_ind:i+reach])
                     #temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
-                    temp_time_spl.append(np.flip(time_array['time'])[i-reach:i+reach])
+                    temp_time_spl.append(np.flip(time_array['time'])[left_ind:i+reach])
                     temp_peri = temp_halo_d[i+1]
                 else:
                     temp_peri = temp_halo_d[i+1]
@@ -764,14 +770,19 @@ class OrbitAnalysis:
             temp_time_spl = []
             #
             # Loop through each subhalo
-            for i in range(reach, len(temp_halo_d)-reach):
+            start_ind = 4
+            for i in range(start_ind, len(temp_halo_d)-reach):
+                if (i-reach < 0):
+                    left_ind = 0
+                else:
+                    left_ind = i-reach
                 # Check to make sure that this is the local maximum
-                if (infall_array['first.infall.time'][k] != -1) and (all(temp_apo > temp_halo_d[i-reach:i])) and (all(temp_apo > temp_halo_d[i+1:i+1+reach])) and (temp_apo_time > infall_array['first.infall.time'][k]):
+                if (infall_array['first.infall.time'][k] != -1) and (all(temp_apo > temp_halo_d[left_ind:i])) and (all(temp_apo > temp_halo_d[i+1:i+1+reach])) and (temp_apo_time > infall_array['first.infall.time'][k]):
                     temp_check[i] = 1
-                    temp_apo_spl.append(temp_halo_d[i-reach:i+reach])
-                    temp_apo_vel_spl.append(temp_halo_v[i-reach:i+reach])
+                    temp_apo_spl.append(temp_halo_d[left_ind:i+reach])
+                    temp_apo_vel_spl.append(temp_halo_v[left_ind:i+reach])
                     #temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
-                    temp_time_spl.append(np.flip(time_array['time'])[i-reach:i+reach])
+                    temp_time_spl.append(np.flip(time_array['time'])[left_ind:i+reach])
                     temp_apo = temp_halo_d[i+1]
                     #temp_apo_time = time_array['time'][600-(i+1)]
                     temp_apo_time = np.flip(time_array['time'])[i+1]
