@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -38,9 +38,9 @@ halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_k
 
 if sim_data.num_gal == 1:
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
@@ -81,8 +81,8 @@ if sim_data.num_gal == 1:
 
     galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vR(ts), galpy_orbits.vT(ts))
     tts = (-1)*np.flip(snaps['time'] - snaps['time'][-1])
-    peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, tts)
-    apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, tts)
+    peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
+    apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
 
     galpy_dist_3d = np.ones((orbits.shape[0],len(ts),3))
     galpy_dist_3d[:,:,0] = (-1)*galpy_orbits.x(ts) # x and y have values negative from the sims for some reason...
@@ -183,15 +183,15 @@ if sim_data.num_gal == 1:
     # Save the host radius
     data_dict['host.radius'] = host_radii
 
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
 
 if sim_data.num_gal == 2:
     #
     ### GALAXY 1
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1)
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=True)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=True)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=True)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
@@ -232,8 +232,8 @@ if sim_data.num_gal == 2:
 
     galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vR(ts), galpy_orbits.vT(ts))
     tts = (-1)*np.flip(snaps['time'] - snaps['time'][-1])
-    peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, tts)
-    apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, tts)
+    peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
+    apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
 
     # Save the data to a dictionary
     data_dict = dict()
@@ -328,14 +328,15 @@ if sim_data.num_gal == 2:
     # Save the host radius
     data_dict['host.radius'] = host_radii
     #
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1, dict_or_array_to_write=data_dict, verbose=True)
+    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1, dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
     #
     #
     ### GALAXY 2
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2)
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=True)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=True)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=True)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt, host=2) # set host=1 for the first host, host=2 for the other
@@ -376,8 +377,8 @@ if sim_data.num_gal == 2:
 
     galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vR(ts), galpy_orbits.vT(ts))
     tts = (-1)*np.flip(snaps['time'] - snaps['time'][-1])
-    peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, tts)
-    apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, tts)
+    peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
+    apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
 
     # Save the data to a dictionary
     data_dict = dict()
@@ -472,4 +473,5 @@ if sim_data.num_gal == 2:
     # Save the host radius
     data_dict['host.radius'] = host_radii
 
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2, dict_or_array_to_write=data_dict, verbose=True)
+    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2, dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
