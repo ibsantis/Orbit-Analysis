@@ -27,7 +27,7 @@ import time
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location='stampede')
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
 print('Set paths')
 
 if sim_data.num_gal == 1:
@@ -36,8 +36,8 @@ if sim_data.num_gal == 1:
     snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
     halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal)
     #
-    # Set up the halo inds and KDTree
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='stampede', host=1, dmo=False)
+    # Set up the halo inds
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=False)
     #
     # Now get the distances from the stars and from the DM in the halo tree
     host_inds = halt.prop('progenitor.main.indices', halt['host.index'][0]) # starts at z = 0 and goes back in time
@@ -52,24 +52,19 @@ if sim_data.num_gal == 1:
     #
     halo_pos = (-1)*np.ones(orbits.shape)
     halo_vel = (-1)*np.ones(orbits.shape)
+    halo_pos_norm = (-1)*np.ones(orbits.shape)
     #
     # Loop over each halo
     for i in range(0, orbits.shape[0]):
         if np.sum(np.isnan(host_positions[:,0])) != 0:
             hi = 600-np.flip(snaps['index'])[:len(host_inds)][np.isnan(host_positions[:,0])][0]
         else:
-            hi = 600
+            hi = len(host_inds)
         si = len(orbits.sub_inds[i][orbits.sub_inds[i] >= 0])
         min_ind = np.min([hi,si])
         #
         halo_pos[i][:min_ind] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:min_ind]] - host_positions[:min_ind], axis=1)*np.flip(snaps['scalefactor'])[:min_ind]
         halo_vel[i][:min_ind] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:min_ind]] - host_velocities[:min_ind], axis=1)*np.flip(snaps['scalefactor'])[:min_ind]
-    #
-    halo_pos_norm = (-1)*np.ones(orbits.shape)
-    for i in range(0, len(halo_pos_norm)):
-        hi = len(host_inds)
-        si = len(halo_pos[i][halo_pos[i] != -1])
-        min_ind = np.min([hi,si])
         #
         halo_pos_norm[i][:min_ind] = halo_pos[i][:min_ind]/host_radii[:min_ind]
     #
@@ -99,7 +94,7 @@ if sim_data.num_gal == 2:
     #
     ### GALAXY 1
     # Set up the halo inds and KDTree
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='stampede', host=1, dmo=False)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=False)
     #
     # Now get the distances from the stars and from the DM in the halo tree
     host_inds = halt.prop('progenitor.main.indices', halt['host.index'][0])
@@ -114,24 +109,19 @@ if sim_data.num_gal == 2:
     #
     halo_pos = (-1)*np.ones(orbits.shape)
     halo_vel = (-1)*np.ones(orbits.shape)
+    halo_pos_norm = (-1)*np.ones(orbits.shape)
     #
     # Loop over each halo
     for i in range(0, orbits.shape[0]):
         if np.sum(np.isnan(host_positions[:,0])) != 0:
             hi = 600-np.flip(snaps['index'])[:len(host_inds)][np.isnan(host_positions[:,0])][0]
         else:
-            hi = 600
+            hi = len(host_inds)
         si = len(orbits.sub_inds[i][orbits.sub_inds[i] >= 0])
         min_ind = np.min([hi,si])
         #
         halo_pos[i][:min_ind] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:min_ind]] - host_positions[:min_ind], axis=1)*np.flip(snaps['scalefactor'])[:min_ind]
         halo_vel[i][:min_ind] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:min_ind]] - host_velocities[:min_ind], axis=1)*np.flip(snaps['scalefactor'])[:min_ind]
-    #
-    halo_pos_norm = (-1)*np.ones(orbits.shape)
-    for i in range(0, len(halo_pos_norm)):
-        hi = len(host_inds)
-        si = len(halo_pos[i][halo_pos[i] != -1])
-        min_ind = np.min([hi,si])
         #
         halo_pos_norm[i][:min_ind] = halo_pos[i][:min_ind]/host_radii[:min_ind]
     #
@@ -155,7 +145,7 @@ if sim_data.num_gal == 2:
     #
     ### GALAXY 2
     # Set up the halo inds and KDTree
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='stampede', host=2, dmo=False)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=False)
     #
     # Now get the distances from the stars and from the DM in the halo tree
     host_inds = halt.prop('progenitor.main.indices', halt['host2.index'][0])
@@ -170,24 +160,19 @@ if sim_data.num_gal == 2:
     #
     halo_pos = (-1)*np.ones(orbits.shape)
     halo_vel = (-1)*np.ones(orbits.shape)
+    halo_pos_norm = (-1)*np.ones(orbits.shape)
     #
     # Loop over each halo
     for i in range(0, orbits.shape[0]):
         if np.sum(np.isnan(host_positions[:,0])) != 0:
             hi = 600-np.flip(snaps['index'])[:len(host_inds)][np.isnan(host_positions[:,0])][0]
         else:
-            hi = 600
+            hi = len(host_inds)
         si = len(orbits.sub_inds[i][orbits.sub_inds[i] >= 0])
         min_ind = np.min([si,hi])
         #
         halo_pos[i][:min_ind] = np.linalg.norm(halt['position'][orbits.sub_inds[i][:min_ind]] - host_positions[:min_ind], axis=1)*np.flip(snaps['scalefactor'])[:min_ind]
         halo_vel[i][:min_ind] = np.linalg.norm(halt['velocity'][orbits.sub_inds[i][:min_ind]] - host_velocities[:min_ind], axis=1)*np.flip(snaps['scalefactor'])[:min_ind]
-    #
-    halo_pos_norm = (-1)*np.ones(orbits.shape)
-    for i in range(0, len(halo_pos_norm)):
-        hi = len(host_inds)
-        si = len(halo_pos[i][halo_pos[i] != -1])
-        min_ind = np.min([si,hi])
         #
         halo_pos_norm[i][:min_ind] = halo_pos[i][:min_ind]/host_radii[:min_ind]
     #
