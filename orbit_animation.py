@@ -19,7 +19,7 @@ print('Read in the tools')
 sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
 print('Set paths')
 
-data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_m12z')
+data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_Romulus')
 
 colors = ['#2f4f4f', '#006400', '#8b0000', '#000080', '#00ced1',\
           '#ff8c00', '#c71585', '#7fff00', '#00fa9a', '#0000ff',\
@@ -329,4 +329,61 @@ anim = animation.FuncAnimation(fig, animate, init_func=init, frames=len(data['d.
 plt.tight_layout()
 writergif = animation.PillowWriter(fps=30)
 anim.save('/Users/isaiahsantistevan/Desktop/duo_m12z.gif',writer=writergif)
+#plt.show()
+
+
+
+
+
+
+# EXAMPLE 5 Plotting two subhalos orbiting each other in Romulus
+# Mstar[13] = 6.2e8, Mstar[111] = 4.3e4
+# Multiple halos
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+mask13 = (data['d.sim'][13][:,0] != -1)
+mask111 = (data['d.sim'][111][:,0] != -1)
+#
+ax.set_xlim(np.min(np.concatenate((data['d.sim'][13][:,0][mask13],data['d.sim'][111][:,0][mask111]))), np.max(np.concatenate((data['d.sim'][13][:,0][mask13],data['d.sim'][111][:,0][mask111]))))
+ax.set_ylim(np.min(np.concatenate((data['d.sim'][13][:,1][mask13],data['d.sim'][111][:,1][mask111]))), np.max(np.concatenate((data['d.sim'][13][:,1][mask13],data['d.sim'][111][:,1][mask111]))))
+ax.set_zlim(np.min(np.concatenate((data['d.sim'][13][:,2][mask13],data['d.sim'][111][:,2][mask111]))), np.max(np.concatenate((data['d.sim'][13][:,2][mask13],data['d.sim'][111][:,2][mask111]))))
+#
+ax.set_xlabel('X [kpc]', labelpad=15.)
+ax.set_ylabel('Y [kpc]', labelpad=15.)
+ax.set_zlabel('Z [kpc]', labelpad=15.)
+#
+line13, = ax.plot3D(np.array([]),np.array([]),np.array([]), colors[0])
+line111, = ax.plot3D(np.array([]),np.array([]),np.array([]), colors[1])
+ax.scatter(0,0,0,color='black')
+
+def init():
+    line13.set_data(np.array([]),np.array([]))
+    line13.set_3d_properties(np.array([]))
+    line111.set_data(np.array([]),np.array([]))
+    line111.set_3d_properties(np.array([]))
+    return line13, line111,
+
+def animate(i):
+    x13 = data['d.sim'][13][:,0][mask13][:i]
+    y13 = data['d.sim'][13][:,1][mask13][:i]
+    z13 = data['d.sim'][13][:,2][mask13][:i]
+    #
+    x111 = data['d.sim'][111][:,0][mask111][:i]
+    y111 = data['d.sim'][111][:,1][mask111][:i]
+    z111 = data['d.sim'][111][:,2][mask111][:i]
+    #
+    line13.set_data(x13,y13)
+    line13.set_3d_properties(z13)
+    #
+    line111.set_data(x111,y111)
+    line111.set_3d_properties(z111)
+    #
+    ax.view_init(elev=30, azim=0.9*i)
+    #
+    return line13, line111,
+
+anim = animation.FuncAnimation(fig, animate, init_func=init, frames=len(data['d.sim'][13][:,0][mask13]), interval=0.1, blit=False)
+plt.tight_layout()
+writergif = animation.PillowWriter(fps=30)
+anim.save('/Users/isaiahsantistevan/Desktop/duo_Romulus.gif',writer=writergif)
 #plt.show()
