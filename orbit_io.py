@@ -584,7 +584,7 @@ class OrbitAnalysis:
                 else:
                     right_ind = i+1+reach
                 #
-                if (right_ind-left_ind > 8):
+                if (right_ind-left_ind > 10):
                     # Check its neighbors and if it is within virial radius
                     #if (all(temp_peri < temp_halo_d[i-reach:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
                     #if (all(temp_peri < temp_halo_d[left_ind:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
