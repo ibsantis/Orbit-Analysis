@@ -499,7 +499,7 @@ class OrbitAnalysis:
         #
         return d
 
-    def pericenter_interp(self, distances, velocities, virial_radii, time_array, reach=20):
+    def pericenter_interp(self, distances, velocities, virial_radii, time_array, infall_array, reach=20):
         """
         DESCRIPTION:
             Reads in subhalo distances, velocites, host virial radii across time,
@@ -578,18 +578,28 @@ class OrbitAnalysis:
                     left_ind = 0
                 else:
                     left_ind = i-reach
-                # Check its neighbors and if it is within virial radius
-                #if (all(temp_peri < temp_halo_d[i-reach:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
-                if (all(temp_peri < temp_halo_d[left_ind:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
-                    temp_check[i] = 1
-                    peri_rad_list.append(virial_radii[i])
-                    temp_peri_spl.append(temp_halo_d[left_ind:i+reach])
-                    temp_peri_vel_spl.append(temp_halo_v[left_ind:i+reach])
-                    #temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
-                    temp_time_spl.append(np.flip(time_array['time'])[left_ind:i+reach])
-                    temp_peri = temp_halo_d[i+1]
+                #
+                if (i+1+reach > (600-infall_array['first.infall.snap'][k])):
+                    right_ind = 600-infall_array['first.infall.snap'][k]
                 else:
-                    temp_peri = temp_halo_d[i+1]
+                    right_ind = i+1+reach
+                #
+                if (right_ind-left_ind > 8):
+                    # Check its neighbors and if it is within virial radius
+                    #if (all(temp_peri < temp_halo_d[i-reach:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
+                    #if (all(temp_peri < temp_halo_d[left_ind:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
+                    if (all(temp_peri < temp_halo_d[left_ind:i])) and (all(temp_peri < temp_halo_d[i+1:right_ind])) and (temp_peri/virial_radii[i] < 1):
+                        temp_check[i] = 1
+                        peri_rad_list.append(virial_radii[i])
+                        #temp_peri_spl.append(temp_halo_d[left_ind:i+reach])
+                        #temp_peri_vel_spl.append(temp_halo_v[left_ind:i+reach])
+                        #temp_time_spl.append(np.flip(time_array['time'])[left_ind:i+reach])
+                        temp_peri_spl.append(temp_halo_d[left_ind:right_ind])
+                        temp_peri_vel_spl.append(temp_halo_v[left_ind:right_ind])
+                        temp_time_spl.append(np.flip(time_array['time'])[left_ind:right_ind])
+                        temp_peri = temp_halo_d[i+1]
+                    else:
+                        temp_peri = temp_halo_d[i+1]
             host_peri_rad.append(peri_rad_list)
             check.append(temp_check)
             peri_spl.append(temp_peri_spl)
