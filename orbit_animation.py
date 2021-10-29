@@ -19,7 +19,7 @@ print('Read in the tools')
 sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
 print('Set paths')
 
-data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_Juliet')
+data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_m12z')
 
 colors = ['#2f4f4f', '#006400', '#8b0000', '#000080', '#00ced1',\
           '#ff8c00', '#c71585', '#7fff00', '#00fa9a', '#0000ff',\
@@ -275,4 +275,58 @@ anim = animation.FuncAnimation(fig, animate, init_func=init, frames=len(data['d.
 plt.tight_layout()
 writergif = animation.PillowWriter(fps=30)
 anim.save('/Users/isaiahsantistevan/Desktop/duo_juliet.gif',writer=writergif)
+#plt.show()
+
+
+
+# EXAMPLE 4 Plotting two subhalos orbiting each other in m12z
+# Mstar[1] = 6.2e8, Mstar[60] = 4.3e4
+# Multiple halos
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+mask1 = (data['d.sim'][1][:,0] != -1)
+mask60 = (data['d.sim'][60][:,0] != -1)
+#
+ax.set_xlim(np.min(np.concatenate((data['d.sim'][1][:,0][mask1],data['d.sim'][60][:,0][mask60]))), np.max(np.concatenate((data['d.sim'][1][:,0][mask1],data['d.sim'][60][:,0][mask60]))))
+ax.set_ylim(np.min(np.concatenate((data['d.sim'][1][:,1][mask1],data['d.sim'][60][:,1][mask60]))), np.max(np.concatenate((data['d.sim'][1][:,1][mask1],data['d.sim'][60][:,1][mask60]))))
+ax.set_zlim(np.min(np.concatenate((data['d.sim'][1][:,2][mask1],data['d.sim'][60][:,2][mask60]))), np.max(np.concatenate((data['d.sim'][1][:,2][mask1],data['d.sim'][60][:,2][mask60]))))
+#
+ax.set_xlabel('X [kpc]', labelpad=15.)
+ax.set_ylabel('Y [kpc]', labelpad=15.)
+ax.set_zlabel('Z [kpc]', labelpad=15.)
+#
+line1, = ax.plot3D(np.array([]),np.array([]),np.array([]), colors[0])
+line60, = ax.plot3D(np.array([]),np.array([]),np.array([]), colors[1])
+ax.scatter(0,0,0,color='black')
+
+def init():
+    line1.set_data(np.array([]),np.array([]))
+    line1.set_3d_properties(np.array([]))
+    line60.set_data(np.array([]),np.array([]))
+    line60.set_3d_properties(np.array([]))
+    return line1, line60,
+
+def animate(i):
+    x1 = data['d.sim'][1][:,0][mask1][:i]
+    y1 = data['d.sim'][1][:,1][mask1][:i]
+    z1 = data['d.sim'][1][:,2][mask1][:i]
+    #
+    x60 = data['d.sim'][60][:,0][mask60][:i]
+    y60 = data['d.sim'][60][:,1][mask60][:i]
+    z60 = data['d.sim'][60][:,2][mask60][:i]
+    #
+    line1.set_data(x1,y1)
+    line1.set_3d_properties(z1)
+    #
+    line60.set_data(x60,y60)
+    line60.set_3d_properties(z60)
+    #
+    ax.view_init(elev=30, azim=-0.9*i)
+    #
+    return line1, line60,
+
+anim = animation.FuncAnimation(fig, animate, init_func=init, frames=len(data['d.sim'][1][:,0][mask1]), interval=0.1, blit=False)
+plt.tight_layout()
+writergif = animation.PillowWriter(fps=30)
+anim.save('/Users/isaiahsantistevan/Desktop/duo_m12z.gif',writer=writergif)
 #plt.show()
