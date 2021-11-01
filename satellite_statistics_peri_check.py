@@ -181,8 +181,9 @@ plt.close()
 
 
 
-
-
+################################################################
+#################################################################
+################################################################
 
 
 
@@ -282,11 +283,6 @@ for name in summary.host_names['all']:
 
 #### Plot all three checks...
 
-data_total = dict()
-for name in summary.host_names['all']:
-    data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/peri_check/data_'+name, verbose=True)
-    data_total[name] = data
-#
 data_total2 = dict()
 for name in summary.host_names['all']:
     data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/peri_check/data_'+name+'_host_star_position', verbose=True)
@@ -296,43 +292,24 @@ for name in summary.host_names['all']:
 data_recent_halt = []
 data_min_halt = []
 #
-data_recent_part = []
-data_min_part = []
-#
 data_recent_star = []
 data_min_star = []
 #
 for name in summary.host_names['all_no_z']:
-    mask_infall = data_total[name]['check.halt']
-    temp_array = data_total[name]['pericenter.dist.halt'][mask_infall][:,0]
+    mask_infall = data_total2[name]['check.halt']
+    temp_array = data_total2[name]['pericenter.dist.halt'][mask_infall][:,0]
     mask_temp = (temp_array == -1)
-    temp_array[mask_temp] = data_total[name]['dtot.halt'][mask_infall][:,0][mask_temp]
+    temp_array[mask_temp] = data_total2[name]['dtot.halt'][mask_infall][:,0][mask_temp]
     data_recent_halt.append(np.repeat(temp_array, summary.oversample['baryon'][name]))
 #
 for name in summary.host_names['all_no_z']:
-    mask_infall = data_total[name]['check.halt']
-    for i in range(0, len(data_total[name]['pericenter.dist.halt'][mask_infall])):
-        mask = (data_total[name]['pericenter.dist.halt'][mask_infall][i] != -1)
+    mask_infall = data_total2[name]['check.halt']
+    for i in range(0, len(data_total2[name]['pericenter.dist.halt'][mask_infall])):
+        mask = (data_total2[name]['pericenter.dist.halt'][mask_infall][i] != -1)
         if np.sum(mask) > 0:
-            data_min_halt.append(np.repeat(np.min(data_total[name]['pericenter.dist.halt'][mask_infall][i][mask]), summary.oversample['baryon'][name]))
+            data_min_halt.append(np.repeat(np.min(data_total2[name]['pericenter.dist.halt'][mask_infall][i][mask]), summary.oversample['baryon'][name]))
         else:
-            data_min_halt.append(np.repeat(data_total[name]['dtot.halt'][mask_infall][i][0], summary.oversample['baryon'][name]))
-#
-for name in summary.host_names['all_no_z']:
-    mask_infall = data_total[name]['check.halt']
-    temp_array = data_total[name]['pericenter.dist.part'][mask_infall][:,0]
-    mask_temp = (temp_array == -1)
-    temp_array[mask_temp] = data_total[name]['dtot.part'][mask_infall][:,0][mask_temp]
-    data_recent_part.append(np.repeat(temp_array, summary.oversample['baryon'][name]))
-#
-for name in summary.host_names['all_no_z']:
-    mask_infall = data_total[name]['check.halt']
-    for i in range(0, len(data_total[name]['pericenter.dist.part'][mask_infall])):
-        mask = (data_total[name]['pericenter.dist.part'][mask_infall][i] != -1)
-        if np.sum(mask) > 0:
-            data_min_part.append(np.repeat(np.min(data_total[name]['pericenter.dist.part'][mask_infall][i][mask]), summary.oversample['baryon'][name]))
-        else:
-            data_min_part.append(np.repeat(data_total[name]['dtot.part'][mask_infall][i][0], summary.oversample['baryon'][name]))
+            data_min_halt.append(np.repeat(data_total2[name]['dtot.halt'][mask_infall][i][0], summary.oversample['baryon'][name]))
 #
 for name in summary.host_names['all_no_z']:
     mask_infall = data_total2[name]['check.halt']
@@ -353,11 +330,99 @@ for name in summary.host_names['all_no_z']:
 d_peri_recent_halt = np.hstack(data_recent_halt)
 d_peri_min_halt = np.hstack(data_min_halt)
 #
-d_peri_recent_part = np.hstack(data_recent_part)
-d_peri_min_part = np.hstack(data_min_part)
-#
 d_peri_recent_star = np.hstack(data_recent_star)
 d_peri_min_star = np.hstack(data_min_star)
+
+
+
+
+summary_plot = summary_io.SummaryDataPlot()
+summary_plot.median_plot(x=d_peri_min_halt, y=(d_peri_min_halt-d_peri_min_star), xtype='d_min_dm', ytype='delta_dmin_dm_v_star', binsize=20, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/d_min_dm_vs_star.pdf')
+summary_plot.scatter_plot(x=d_peri_min_halt, y=(d_peri_min_halt-d_peri_min_star), xtype='d_min_dm', ytype='delta_dmin_dm_v_star', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/d_min_dm_vs_star_scatter.pdf')
+summary_plot.median_plot(x=d_peri_min_halt, y=(d_peri_min_halt-d_peri_min_star), xtype='d_min_dm', ytype='delta_dmin_dm_v_star', binsize=20, limits=((0,400),(-0.5, 0.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/d_min_dm_vs_star_zoom.pdf')
+#
+summary_plot.median_plot(x=d_peri_recent_halt, y=(d_peri_recent_halt-d_peri_recent_star), xtype='d_recent_dm', ytype='delta_drec_dm_v_star', binsize=20, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/d_rec_dm_vs_star.pdf')
+summary_plot.scatter_plot(x=d_peri_recent_halt, y=(d_peri_recent_halt-d_peri_recent_star), xtype='d_recent_dm', ytype='delta_drec_dm_v_star', file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/d_rec_dm_vs_star_scatter.pdf')
+summary_plot.median_plot(x=d_peri_recent_halt, y=(d_peri_recent_halt-d_peri_recent_star), xtype='d_recent_dm', ytype='delta_drec_dm_v_star', binsize=20, limits=((0,400),(-0.5, 0.5)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/d_rec_dm_vs_star_zoom.pdf')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
+    Need to plot the minimum pericenters from the DM particles relative to the
+    star particles
+"""
+
+for name in summary.host_names['all_no_z']:
+    #
+    #name = 'm12c'
+    mask_infall = data_total2[name]['check.halt']
+    d_min_halt = np.zeros(len(data_total2[name]['pericenter.dist.halt'][mask_infall]))
+    for i in range(0, len(d_min_halt)):
+        mask = (data_total2[name]['pericenter.dist.halt'][mask_infall][i] != -1)
+        if np.sum(mask) > 0:
+            d_min_halt[i] = np.min(data_total2[name]['pericenter.dist.halt'][mask_infall][i][mask])
+        else:
+            d_min_halt[i] = data_total2[name]['dtot.halt'][mask_infall][i][0]
+    #
+    mask_infall = data_total2[name]['check.star']
+    d_min_star = np.zeros(len(data_total2[name]['pericenter.dist.star'][mask_infall]))
+    for i in range(0, len(d_min_star)):
+        mask = (data_total2[name]['pericenter.dist.star'][mask_infall][i] != -1)
+        if np.sum(mask) > 0:
+            d_min_star[i] = np.min(data_total2[name]['pericenter.dist.star'][mask_infall][i][mask])
+        else:
+            d_min_star[i] = data_total2[name]['dtot.star'][mask_infall][i][0]
+
+    print(name, d_min_halt - d_min_star, np.min(d_min_halt - d_min_star), np.max(d_min_halt - d_min_star))
+
+
+for name in summary.host_names['all_no_z']:
+    #
+    #name = 'm12r'
+    mask_infall = data_total2[name]['check.halt']
+    d_rec_halt = data_total2[name]['pericenter.dist.halt'][mask_infall][:,0]
+    mask_temp = (d_rec_halt == -1)
+    d_rec_halt[mask_temp] = data_total2[name]['dtot.halt'][mask_infall][:,0][mask_temp]
+    #
+    mask_infall = data_total2[name]['check.star']
+    d_rec_star = data_total2[name]['pericenter.dist.star'][mask_infall][:,0]
+    mask_temp = (d_rec_star == -1)
+    d_rec_star[mask_temp] = data_total2[name]['dtot.star'][mask_infall][:,0][mask_temp]
+
+    print(name, d_rec_halt - d_rec_star, np.min(d_rec_halt - d_rec_star), np.max(d_rec_halt - d_rec_star))
+
+
+
+
+
+
+# Sub 100 for m12c is outlier in min
+# Sub 46 for m12r is outlier in recent
+
+
+
+
+
+
+
+
+
+
 
 
 summary_plot = summary_io.SummaryDataPlot()
