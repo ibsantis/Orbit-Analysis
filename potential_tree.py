@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=TL_potentials_all_subs
+#SBATCH --job-name=m12b_potentials_dmo
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=500G
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
 #SBATCH --time=01:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/TL_potentials_all_subs_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/m12b_potentials_dmo_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -45,7 +45,8 @@ import time
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Thelma', location='peloton')
+#sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton', dmo=True)
 print('Set paths')
 
 if sim_data.num_gal == 1:
@@ -57,9 +58,14 @@ if sim_data.num_gal == 1:
     # For the luminous subhalos
     #halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal)
     # For ALL subhalos
-    halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', species_snapshot_indices=600, host_number=sim_data.num_gal)
+    #halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', species_snapshot_indices=600, host_number=sim_data.num_gal)
+    # For DMO subhalos
+    halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, host_number=sim_data.num_gal)
     #
-    part = gizmo.io.Read.read_snapshots('dark', 'redshift', 0, properties=['position', 'potential'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
+    # For luminous & ALL subhalos
+    #part = gizmo.io.Read.read_snapshots('dark', 'redshift', 0, properties=['position', 'potential'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
+    # For DMO subhalos
+    part = gizmo.io.Read.read_snapshots('dark', 'redshift', 0, properties=['position', 'potential'], simulation_directory=sim_data.simulation_dir)
     end = time.time()
     print('Tree and particles at z = 0 read in in {0} seconds'.format(end-start))
     #
@@ -128,7 +134,8 @@ if sim_data.num_gal == 1:
         print('Done with mass bin {0} in {1} seconds'.format(i, end-start))
     #
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials_all_subs', dict_or_array_to_write=data_dict, verbose=True)
+    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials_all_subs', dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials_dmo', dict_or_array_to_write=data_dict, verbose=True)
 
 if sim_data.num_gal == 2:
     #
@@ -139,9 +146,15 @@ if sim_data.num_gal == 2:
     # For the luminous subhalos
     #halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal)
     # For ALL subhalos
-    halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', species_snapshot_indices=600, host_number=sim_data.num_gal)
+    #halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', species_snapshot_indices=600, host_number=sim_data.num_gal)
+    # For DMO subhalos
+    halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, host_number=sim_data.num_gal)
     #
-    part = gizmo.io.Read.read_snapshots('dark', 'redshift', 0, properties=['position', 'potential'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
+    # For luminous and ALL subhalos
+    #part = gizmo.io.Read.read_snapshots('dark', 'redshift', 0, properties=['position', 'potential'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
+    # For luminous and ALL subhalos
+    part = gizmo.io.Read.read_snapshots('dark', 'redshift', 0, properties=['position', 'potential'], simulation_directory=sim_data.simulation_dir)
+    #
     end = time.time()
     print('Tree and particles at z = 0 read in in {0} seconds'.format(end-start))
     #
@@ -211,7 +224,8 @@ if sim_data.num_gal == 2:
         print('Done with mass bin {0} in {1} seconds'.format(i, end-start))
     #
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_1+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_1+'_potentials_all_subs', dict_or_array_to_write=data_dict, verbose=True)
+    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_1+'_potentials_all_subs', dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_1+'_potentials_dmo', dict_or_array_to_write=data_dict, verbose=True)
     #
     ## GALAXY 2
     # Set up the halo inds and KDTree
@@ -269,4 +283,5 @@ if sim_data.num_gal == 2:
         print('Done with mass bin {0} in {1} seconds'.format(i, end-start))
     #
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_2+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_2+'_potentials_all_subs', dict_or_array_to_write=data_dict, verbose=True)
+    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_2+'_potentials_all_subs', dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_2+'_potentials_dmo', dict_or_array_to_write=data_dict, verbose=True)
