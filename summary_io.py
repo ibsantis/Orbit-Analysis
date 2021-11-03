@@ -1007,8 +1007,12 @@ class SummaryDataPlot(SummaryDataSort):
         self.labels = {'d.sim': 'd$_{\\rm peri,sim}$ [kpc]',\
                        'd.sim.min': 'd$_{\\rm peri,min,sim}$ [kpc]',\
                        'delta_d': '(d$_{\\rm peri,min}$ - d$_{\\rm peri,recent}$) [kpc]',\
+                       'delta_dmin_dm_v_star': '(d$_{\\rm min,dm}$ - d$_{\\rm min,star}$) [kpc]',\
+                       'delta_drec_dm_v_star': '(d$_{\\rm recent,dm}$ - d$_{\\rm recent,star}$) [kpc]',\
                        'delta_d_frac': '(d$_{\\rm peri,min}$ - d$_{\\rm peri,recent}$)/d$_{\\rm peri,recent}$',\
                        'd.peri': 'd$_{\\rm peri}$ [kpc]',\
+                       'd_min_dm': 'd$_{\\rm min,dm}$ [kpc]',\
+                       'd_recent_dm': 'd$_{\\rm recent,dm}$ [kpc]',\
                        'd.peri.recent': 'd$_{\\rm peri, recent}$ [kpc]',\
                        'd.peri.min': 'd$_{\\rm peri, min}$ [kpc]',\
                        'd.peri.text': 'Pericenter distance [kpc]',\
