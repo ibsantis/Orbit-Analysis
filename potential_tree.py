@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=TL_potentials_all_subs
+#SBATCH --job-name=m12b_potentials_all_subs
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=500G
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
-#SBATCH --time=02:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/TL_potentials_all_subs_%j.txt
+#SBATCH --time=01:00:00
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/m12b_potentials_all_subs_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -45,7 +45,7 @@ import time
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Thelma', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
 print('Set paths')
 
 if sim_data.num_gal == 1:
@@ -53,8 +53,12 @@ if sim_data.num_gal == 1:
     # Read in the snapshot dictionary, halo tree, and z = 0 snapshot
     start = time.time()
     snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
+    #
+    # For the luminous subhalos
     #halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal)
-    halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, host_number=sim_data.num_gal)
+    # For ALL subhalos
+    halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', species_snapshot_indices=600, host_number=sim_data.num_gal)
+    #
     part = gizmo.io.Read.read_snapshots('dark', 'redshift', 0, properties=['position', 'potential'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
     end = time.time()
     print('Tree and particles at z = 0 read in in {0} seconds'.format(end-start))
