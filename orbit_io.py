@@ -5,34 +5,36 @@ Intended for use with the FIRE-2 simulations
 
 @author: Isaiah Santistevan <ibsantistevan@ucdavis.edu>
 
-[Talk about the new OrbitRead class...]
+This package contains multiple classes designed to ultimately calculate orbit
+parameters of simulated satellite galaxies. Below is a brief description of the
+various classes included:
 
-This package is written to help compute the following subhalo orbital parameters
-with the OrbitAnalysis class:
-    - Infall times of subhalos around a host halo
-    - Pericenter distances, velocities, and times
-    - Apocenter distances, velocities, and times
-    - Orbit angular momentum
-    - Orbit energy
+OrbitRead:
+    - Defines the home and simulation directories, sets the number of host galaxies,
+      and reads in the potential profile fitting data for Galpy.
+        [Need to adopt this into my actual code...]
 
-[Talk about the OrbitGalpy class...]
+OrbitAnalysis:
+    - Applies a selection function to the satellites. Satellites at z = 0 must
+      have:
+        - low-resolution DM mass fractions < 2%
+        - Mstar > 3e4 (if working with luminous satellites)
+        - Mpeak > 1e8 (if working with any satellite)
+        - Mpeak * (1-f_baryon) > 1e8 (if working with DMO simulations)
+      Saves their indices across all time
+    - Methods included in this class calculate a variety of orbital properties
 
-There is also a class named OrbitPlot which can generate the following kinds of
-figures:
-    - Distance of subhalo vs time
-        - r, phi, and z components
-        - total distance magnitude
-    - Velocity of subhalo vs time
-        - r, phi, and z components
-        - radial or tangential components
-        - total velocity magnitude
-    - Angular momentum of subhalo vs time
-        - r, phi, and z components
-        - total angular momentum magnitude
-    - Orbit energy vs time
-        - potential
-        - kinetic
-        - total energy (potential + kinetic)
+OrbitGalpy:
+    - Similar to OrbitAnalysis, includes methods to calculate orbtial properties
+      of satellites integrated with Galpy.
+    - Selects 6D ICs from a simulation for the satellites of interest, creates
+      orbit instances to be used in Galpy.
+    - Finally, does a check to see whether or not a satellite nears a "pole",
+      which could cause numerical problems in Galpy.
+
+OrbitPlot:
+    - Includes methods to plot different orbital properties.
+      [I don't really use this anymore, but this could be improved and useful later.]
 """
 
 import utilities as ut
@@ -56,6 +58,7 @@ class OrbitRead:
         VARIABLES:
             - gal1     : string
             - location : string
+            - dmo      : boolean
 
         NOTES:
             - Depending on the variables you enter, sets the number of galaxies,
@@ -129,7 +132,11 @@ class OrbitAnalysis:
             indices.
 
         VARIABLES:
-            tree : dictionary
+            tree     : dictionary
+            gal1     : string
+            location : string
+            host     : integer (1 or 2)
+            dmo      : boolean
 
         NOTES:
             - Returns a 2D array:
@@ -148,6 +155,7 @@ class OrbitAnalysis:
         # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
         OrbitRead.__init__(self, gal1, location, dmo=dmo)
         #
+        # Selection criteria for the DMO simulations or for non-luminous satellites in the baryonic simulations
         if dmo:
             if self.num_gal == 1:
                 # Select the subhalo indices at z = 0
@@ -189,6 +197,7 @@ class OrbitAnalysis:
                     self.sub_inds = z0_inds_w_prog
                     self.shape = self.sub_inds.shape
         #
+        # Selection criteria for the baryonic simulations
         else:
             if self.num_gal == 1:
                 # Select the subhalo indices at z = 0
@@ -236,12 +245,12 @@ class OrbitAnalysis:
         VARIABLES:
             tree      : dictionary
             dist_type : string
-            host      : int
+            host      : integer (1 or 2)
 
         NOTES:
-            - Returns a 2D array:
+            - Returns a 2D (or 3D) array:
                 - Each row corresponds to a different subhalo
-                - Each element in a row contains the 1D distance from the host
+                - Each element in a row contains the 1D (or 3D) distance from the host
                   galaxy for the subhalo
                 - Each row starts at z = 0, and goes back in time
                 - Negative elements correspond to times when the subhalo
@@ -251,8 +260,9 @@ class OrbitAnalysis:
                 - If using a LG simulation, need to specify the second host to
                   get distances from that host
         """
+        # If you want to save the full 3D distance
         if dist_type == '3d':
-            # Set up null 2D array with the same shape as the subhalo index array
+            # Set up null 3D array with the same shape as the subhalo index array in the first two dimensions
             distances = (-1)*np.ones((self.shape[0],self.shape[1],3))
             # Loop over the number of subhalos
             for i in range(0, len(self.sub_inds)):
@@ -261,11 +271,11 @@ class OrbitAnalysis:
                 # Loop over the number of snapshots a subhalo exists
                 if host == 1:
                     for j, val in enumerate(tree.prop('host.distance', self.sub_inds[i][mask])):
-                        # Fill in the null array with 1D distances
+                        # Fill in the null array with 3D distances
                         distances[i][j] = val
                 elif host == 2:
                     for j, val in enumerate(tree.prop('host2.distance', self.sub_inds[i][mask])):
-                        # Fill in the null array with 1D distances
+                        # Fill in the null array with 3D distances
                         distances[i][j] = val
                 else:
                     print('Choose a valid host.')
@@ -320,10 +330,16 @@ class OrbitAnalysis:
                   did not exist
             - Lists are ordered however the subhalo indices are ordered
         """
+        # Set up an empty array to save to
         distances_norm = (-1)*np.ones(distances.shape)
+        #
+        # Loop over the number of subhalos
         for i in range(0, len(distances_norm)):
+            # Mask out snapshots that it didn't exist in
             mask = (distances[i] >= 0)
+            # Divide the distances by the host radius at each snapshot
             temp = distances[i][mask]/host_halo_radii[:len(distances[i][mask])]
+            # Save values to the empty array
             for j, val in enumerate(temp):
                 distances_norm[i][j] = val
         return distances_norm
@@ -380,11 +396,11 @@ class OrbitAnalysis:
 
         VARIABLES:
             distances_norm : 2D array (given in kpc physical)
-            time_array     : dictionary (given in Gyr)
+            time_array     : dictionary
 
         NOTES:
             - Returns a dictionary
-                - d['check'] is a boolean array that tells you if the halo has
+                - d['check'] is a boolean array that tells you if the subhalo has
                   fallen into the host
                 - d['first.infall.snap'] is a 1D array that gives the snapshot at infall
                 - d['first.infall.time'] is a 1D array that gives the age of the Universe when
@@ -420,10 +436,10 @@ class OrbitAnalysis:
         # Loop over subhalos (normalized distance arrays)
         for i in range(0, len(distances_norm)):
             temp = []
-            inds = np.where(np.abs(distances_norm[i]) < 1)[0]
             # Check to see if the subhalo is within the virial radius of the host
+            inds = np.where(np.abs(distances_norm[i]) < 1)[0]
+            # If it is, save all indices of when it fell into the host
             if len(inds) != 0:
-                # If it is, save all indices of when it fell into the host
                 for j in range(0, len(inds)-1):
                     if (inds[j+1] > inds[j]+1):
                         temp.append(inds[j])
@@ -447,9 +463,12 @@ class OrbitAnalysis:
         #
         # Find the maximum number of infalls any of the satellites experienced
         N = np.max([len(infall_snaps[i]) for i in range(0, len(infall_snaps))])
+        #
+        # Set up empty arrays to save all instances of infall
         all_infall_snaps = (-1)*np.ones((len(distances_norm), N))
         all_infall_times = (-1)*np.ones((len(distances_norm), N))
         all_infall_times_lookback = (-1)*np.ones((len(distances_norm), N))
+        # Fill in the data
         for i in range(0, len(distances_norm)):
             for j in range(0, len(infall_snaps[i])):
                 all_infall_snaps[i,j] = infall_snaps[i][j]
@@ -468,7 +487,25 @@ class OrbitAnalysis:
 
     def first_infall_any(self, tree, time_array):
         """
-        TBD
+        DESCRIPTION:
+            Reads in subhalo indices and halo tree, then finds the first instance
+            of when a subhalo fell into any other more massive halo.
+
+        VARIABLES:
+            tree           : dictionary
+            time_array     : dictionary
+
+        NOTES:
+            - Returns a dictionary
+                - d['first.infall.snap.any'] is a 1D array that gives the snapshot at infall
+                - d['first.infall.time.any'] is a 1D array that gives the age of the Universe when
+                  a subhalo first fell into the host galaxy
+                - d['first.infall.time.lb.any'] is a 1D array that gives the lookback time when
+                  a subhalo first fell into the host galaxy
+                - d['infall.check.any'] is a 2D array that gives the snapshots at infall
+                - The size of these arrays is (number of subhalos) x (max number of infalls)
+            - Negative elements correspond to subhalos that have not fallen into
+              the host galaxy
         """
         # Set up a dictionary to store the information you want
         d = dict();
@@ -484,14 +521,18 @@ class OrbitAnalysis:
         #
         # Loop over subhalos
         for i in range(0, self.shape[0]):
+            # For each subhalo, selects the indices that it existed at
             mask = (self.sub_inds[i] >= 0)
+            # Gets the central halo's index for each subhalo
             central_inds = tree.prop('central.index', self.sub_inds[i][mask])
+            # If there was a central halo, save some properties to the empty arrays
             if (len(central_inds[central_inds >= 0]) != 0):
                 first_infall_snap[i] = tree.prop('snapshot', central_inds[central_inds >= 0][-1])
                 first_infall_times[i] = time_array['time'][first_infall_snap[i]]
                 first_infall_times_lookback[i] = lookback[first_infall_snap[i]]
                 infall_check[i] = True
         #
+        # Save arrays to a dictionary
         d['first.infall.snap.any'] = first_infall_snap
         d['first.infall.time.any'] = first_infall_times
         d['first.infall.time.lb.any'] = first_infall_times_lookback
@@ -499,7 +540,7 @@ class OrbitAnalysis:
         #
         return d
 
-    def pericenter_interp(self, distances, velocities, virial_radii, time_array, infall_array, reach=20):
+    def pericenter_interp(self, distances, velocities, virial_radii, time_array, infall_array=None, reach=20):
         """
         DESCRIPTION:
             Reads in subhalo distances, velocites, host virial radii across time,
@@ -511,12 +552,14 @@ class OrbitAnalysis:
             velocites    : 2D array (km / s)
             virial radii : 1D array (given in kpc physical)
             time_array   : dictionary
+            infall array : dictionary (not used at this time, but will be later)
+            reach        : integer
 
         NOTES:
             - Loops through an array and checks to see if a value is smaller than
-              4 of its neighbors on either side. If True, also checks to see if this
-              distance is within the virial radius of the host. If True, saves some
-              values.
+              N (defined by 'reach') of its neighbors on either side.
+              If True, also checks to see if this distance is within the virial
+              radius of the host. If True, saves some values.
             - If a subhalo does not experience pericenter, the distances, velocities,
               times, and host radii values are set to -1
             - Returns a dictionary
@@ -549,7 +592,9 @@ class OrbitAnalysis:
                                                        any halo experienced)
                   Each row of the array corresponds to a different subhalo
                   Each element in a row gives the lookback time when the
-                    subhalo experienced a pericenter
+                  subhalo experienced a pericenter
+            **[Want to add more to this to have the sliding window on the other
+               side of the distance array]**
         """
         # Set up a dictionary and lists to save values to
         d = dict();
@@ -574,29 +619,28 @@ class OrbitAnalysis:
             # Loop through each subhalo
             start_ind = 4
             for i in range(start_ind, len(temp_halo_d)-reach):
+                # These if-else statements allow for a "sliding", non-symmetric window to look for pericenters
                 if (i-reach < 0):
                     left_ind = 0
                 else:
                     left_ind = i-reach
                 #
+                # NEEDS WORK HERE. This would also allow for a non-symmetric window on the other side of the array...
                 #if (i+1+reach > (600-infall_array['first.infall.snap'][k])):
                 #    right_ind = 600-infall_array['first.infall.snap'][k]
                 #else:
                 #    right_ind = i+1+reach
                 ##
                 #if (right_ind-left_ind > 10):
+                #...
+                #
                 # Check its neighbors and if it is within virial radius
-                #if (all(temp_peri < temp_halo_d[i-reach:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
                 if (all(temp_peri < temp_halo_d[left_ind:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
-                #if (all(temp_peri < temp_halo_d[left_ind:i])) and (all(temp_peri < temp_halo_d[i+1:right_ind])) and (temp_peri/virial_radii[i] < 1):
                     temp_check[i] = 1
                     peri_rad_list.append(virial_radii[i])
                     temp_peri_spl.append(temp_halo_d[left_ind:i+reach])
                     temp_peri_vel_spl.append(temp_halo_v[left_ind:i+reach])
                     temp_time_spl.append(np.flip(time_array['time'])[left_ind:i+reach])
-                    #temp_peri_spl.append(temp_halo_d[left_ind:right_ind])
-                    #temp_peri_vel_spl.append(temp_halo_v[left_ind:right_ind])
-                    #temp_time_spl.append(np.flip(time_array['time'])[left_ind:right_ind])
                     temp_peri = temp_halo_d[i+1]
                 else:
                     temp_peri = temp_halo_d[i+1]
@@ -606,7 +650,7 @@ class OrbitAnalysis:
             peri_vel_spl.append(temp_peri_vel_spl)
             time_spl.append(temp_time_spl)
         #
-        # Create a mask that tells you whether or not halo experienced pericenter
+        # Create a mask that tells you whether or not a subhalo experienced a pericenter
         peri_bool = np.zeros(len(check), bool)
         for i in range(0, len(check)):
             if (np.sum(check[i]) > 0):
@@ -706,6 +750,7 @@ class OrbitAnalysis:
             velocites    : 2D array (km / s)
             time_array   : dictionary
             infall_array : dictionary
+            reach        : integer
 
         NOTES:
             - Loops through an array and checks to see:
@@ -778,6 +823,8 @@ class OrbitAnalysis:
             # Loop through each subhalo
             start_ind = 4
             for i in range(start_ind, len(temp_halo_d)-reach):
+                #
+                # These if-else statements allow for a "sliding", non-symmetric window to look for pericenters
                 if (i-reach < 0):
                     left_ind = 0
                 else:
@@ -788,7 +835,6 @@ class OrbitAnalysis:
                     temp_check[i] = 1
                     temp_apo_spl.append(temp_halo_d[left_ind:i+reach])
                     temp_apo_vel_spl.append(temp_halo_v[left_ind:i+reach])
-                    #temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
                     temp_time_spl.append(np.flip(time_array['time'])[left_ind:i+reach])
                     temp_apo = temp_halo_d[i+1]
                     temp_apo_time = np.flip(time_array['time'])[i+1]
@@ -799,7 +845,7 @@ class OrbitAnalysis:
             apo_spl.append(temp_apo_spl)
             apo_vel_spl.append(temp_apo_vel_spl)
             time_spl.append(temp_time_spl)
-            #
+        #
         # Create a mask that tells you whether or not halo experienced apocenter
         apo_bool = np.zeros(len(check), bool)
         for i in range(0, len(check)):
@@ -807,7 +853,7 @@ class OrbitAnalysis:
                 apo_bool[i] = True
         d['apocenter.check'] = apo_bool
         #
-        # Do the spline fitting
+        # Set up empty lists to save to during the spline fitting
         apocenter_spline = []
         apocenter_vel_spline = []
         time_spline = []
@@ -945,97 +991,6 @@ class OrbitAnalysis:
         d['ang.mom.total'] = angular_momentum_1d
         return d
 
-    def potential_norm(self, tree, potential):
-        """
-        DESCRIPTION:
-            Normalize the subhalo potentials so that their values at z = 0 are
-            equal to -2*KE(z = 0), and apply normalization to all other snapshots
-
-        VARIABLES:
-            tree      : dictionary
-            potential : dictionary
-
-        NOTES:
-            - Returns a 2D array:
-                - Array shape: same as self.sub_inds
-                             (number of subhalos) x (total number snapshots)
-                - Each row corresponds to a different subhalo
-                - Each element gives the subhalo potential at a different snapshot
-            - !!! HAVE NOT CREATED FILES FOR THE LG PAIRS !!!
-                - This function will then not work on ELVIS sims yet...
-        """
-        # Set up arrays to save the normalized potentials to
-        halo_potential_norm_z0 = (-1)*np.ones((self.shape))
-        #
-        # Create a mask for the host potential
-        mask_host = (self.sub_inds[0] >= 0)
-        host_potential = potential['halo.potentials'][self.sub_inds[0][mask_host]]
-        # Find the kinetic energy, and what you need to multiply the potential to be virialized (for the host; this is zero...)
-        kin_host = (0.5*tree.prop('host.velocity.total', self.sub_inds[0][mask_host])**2)[0]
-        multiplier = (-2)*kin_host/potential['halo.potentials'][self.sub_inds[0][mask_host]][0]
-        # Set the normalized potential for the host
-        halo_potential_norm_z0[0][mask_host] = multiplier*potential['halo.potentials'][self.sub_inds[0][mask_host]]
-        #
-        # Loop through the number of subhalos
-        for i in range(1, len(self.sub_inds)):
-            # Create a mask for the snapshots the subhalo existed
-            mask = (self.sub_inds[i] >= 0)
-            #
-            # Check to see if the host existed longer
-            if len(self.sub_inds[0][mask_host]) >= len(self.sub_inds[i][mask]):
-                # Subtract the host potential from the subhalo potential
-                temp = potential['halo.potentials'][self.sub_inds[i][mask]] - host_potential[:len(self.sub_inds[i][mask])]
-            if len(self.sub_inds[0][mask_host]) < len(self.sub_inds[i][mask]):
-                # Only get instances where subhalo and host existed
-                mask = mask & mask_host
-                # Subtract the host potential from the subhalo potential
-                temp = potential['halo.potentials'][self.sub_inds[i][mask]] - host_potential
-            #
-            # Find the kinetic energy at z = 0
-            kin_z0 = (0.5*tree.prop('host.velocity.total', self.sub_inds[i][mask])**2)[0]
-            #
-            # Calculate the multiplier to normalize all of the potentials
-            multiplier = (-2)*kin_z0/temp[0]
-            #
-            # Apply the multiplier to the halo potentials and save to the new array
-            halo_potential_norm_z0[i][mask] = multiplier*temp
-        return halo_potential_norm_z0
-
-    def orbit_energy(self, tree, potential_norm):
-        """
-        DESCRIPTION:
-            Reads in the tree, an array of subhalo gravitational potentials,
-            and a subhalo's index and progenitor indices and calculates the total
-            orbital energy for a subhalo and it's progenitor subhalos
-            (i.e., the energy across time).
-
-        VARIABLES:
-            tree           : dictionary
-            potential_norm : 2D array
-
-        NOTES:
-            - Energy is defined as E = (1/2)*velocity**2 + potential
-            - Returns a dictionary:
-                - d['energy.norm.sub'] is a 2D array
-                  Array shape: same as self.sub_inds
-                               (number of subhalos) x (total number snapshots)
-                  Each row corresponds to a different subhalo
-                  Each element is the total energy of the halo at that snapshot
-            - !!! HAVE NOT CREATED POTENTIAL FILES FOR LG PAIRS !!!
-                - This function will then not work for those hosts... yet.
-        """
-        # Set up an empty array to save to
-        energy = (-1)*np.ones((self.shape))
-        #
-        # Loop through each subhalo
-        for i in range(0, len(self.sub_inds)):
-            # Create a mask to only select subhalos that exist
-            mask = (self.sub_inds[i] >= 0)
-            #
-            # Calculate the total energy and save it to the array
-            energy[i][mask] = 0.5*tree.prop('host.velocity.total', self.sub_inds[i][mask])**2 + potential_norm[i][mask]
-        return energy
-
 class OrbitGalpy(OrbitAnalysis):
 
     def __init__(self, tree, gal1, location, host, dmo=False):
@@ -1046,6 +1001,26 @@ class OrbitGalpy(OrbitAnalysis):
         OrbitAnalysis.__init__(self, tree, gal1, location, host, dmo=dmo)
 
     def galpy_orbit_init(self, tree, host=1):
+        """
+        DESCRIPTION:
+            Reads in the halo tree and subhalo indices, then returns a list of
+            orbit instances in Galpy where each element in the list corresponds
+            to the initial conditions for a specific subhalo.
+
+        VARIABLES:
+            tree      : dictionary
+            host      : integer (1 or 2)
+
+        NOTES:
+            - Returns a list:
+                - Each element in the list is an "Orbit" initialization, based
+                  on a subhalo's 6D initial conditions specified at z = 0
+            - Initial conditions are specified at z = 0 and include:
+                - Cylindrical R, Z, Phi
+                - Cylindrical vR, vz
+                - Tangential velocity
+            - These are then integrated in Galpy to get model orbits.
+        """
         sub_orbits = []
         if host == 1:
             for i in range(0, len(self.sub_inds)):
@@ -1073,13 +1048,28 @@ class OrbitGalpy(OrbitAnalysis):
 
     def galpy_potential(self):
         """
-        Have some function that defines the potential?
+        Have some function that defines the potential? This would be pretty cool.
+        Have it use the fitting data that is defined inside of OrbitRead.
         """
         pass
 
     def galpy_velocities(self, vrad, vtan):
         """
-        asf
+        DESCRIPTION:
+            Takes the radial and tangential velocities given by galpy and computes
+            the total scalar velocity.
+
+        VARIABLES:
+            vrad : 2D array
+            vtan : 2D array
+
+        NOTES:
+            - Returns a 2D array
+                - Each element in the array corresponds to a given subhalo
+                - For each subhalo, the array is the total scalar velocity from
+                  Galpy.
+            - These are used in galpy_pericenter_interp & galpy_apocenter_interp
+              to return pericenter and apocenter velocities.
         """
         return np.sqrt(vrad**2 + vtan**2)
 
@@ -1147,19 +1137,16 @@ class OrbitGalpy(OrbitAnalysis):
             # Loop through each subhalo
             start_ind = 4
             for i in range(start_ind, len(temp_halo_d)-reach):
+                # These if-else statements allow for a "sliding", non-symmetric window to look for pericenters
                 if (i-reach < 0):
                     left_ind = 0
                 else:
                     left_ind = i-reach
-                # Check its neighbors and if it is within virial radius
+                # Check its neighbors
                 if (all(temp_peri < temp_halo_d[left_ind:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])):
                     temp_check[i] = 1
                     temp_peri_spl.append(temp_halo_d[left_ind:i+reach])
                     temp_peri_vel_spl.append(temp_halo_v[left_ind:i+reach])
-                    #temp_time_spl.append(time_array['time'][600-i-reach:600-i+reach])
-                    #temp_time_spl.append(np.flip(time_array['time'])[left_ind:i+reach])
-                    #temp_time_spl.append(time_array[len(time_array)-1-i-reach:len(time_array)-1-i+reach]) # FIX THIS!!!
-                    #temp_time_spl.append(time_array[left_ind:i+reach])
                     temp_time_spl.append(np.flip(time_array['time'])[left_ind:i+reach])
                     temp_peri = temp_halo_d[i+1]
                 else:
@@ -1313,6 +1300,7 @@ class OrbitGalpy(OrbitAnalysis):
             # Loop through each subhalo
             start_ind = 4
             for i in range(start_ind, len(temp_halo_d)-reach):
+                # These if-else statements allow for a "sliding", non-symmetric window to look for pericenters
                 if (i-reach < 0):
                     left_ind = 0
                 else:
@@ -1400,7 +1388,24 @@ class OrbitGalpy(OrbitAnalysis):
 
     def galpy_pole_check(self, orbits_int, times):
         """
-            asdfasdfasdf
+        DESCRIPTION:
+            Reads in the integrates orbits from Galpy, along with the time array
+            used in integrating them, and checks if any part of the orbit is
+            within 1 degree of the orbital poles. This is important because we
+            might not want to trust orbits that were near poles because there
+            could be numerical issues in the integration method.
+
+        VARIABLES:
+            orbits_int : list of orbit instances
+            times      : 1D array
+
+        NOTES:
+            - Returns a 1D array
+                - Each element in the array corresponds to a given subhalo
+                - For each subhalo, returns a True/False value of whether or
+                  not the subhalo was within 1 degree of either orbital pole.
+                - Checks of circular polar orbits  were strange which is why we
+                  include this flag.
         """
         check = np.zeros(len(orbits_int), bool)
         for i in range(1, len(orbits_int)):
@@ -1413,8 +1418,23 @@ class OrbitTree(OrbitAnalysis):
 
     def __init__(self, tree, gal1, location, host, particles, subsampling, dmo=False):
         """
-        Need to do this to inherit the subhalo indices defined from __init__
-        in OrbitAnalysis
+        DESCRIPTION:
+            Creates a "tree" structure to efficiently select particles within
+            the subhalos. Makes use of the KDTree method.
+
+        VARIABLES:
+            tree        : dictionary
+            gal1        : string
+            location    : string
+            host        : integer
+            particles   : dictionary
+            subsampling : integer
+            dmo         : boolean
+
+        NOTES:
+            - Creates the tree via scipy's method which uses the KDTree method.
+            - This is used in conjunction with the "neighbors" method to select
+              particles within certain subhalos.
         """
         OrbitAnalysis.__init__(self, tree, gal1, location, host, dmo=dmo)
         #
@@ -1423,6 +1443,30 @@ class OrbitTree(OrbitAnalysis):
         self.subsampling = subsampling
 
     def neighbors(self, centers, neigh_num_max, neigh_dist_max, workerss=2):
+        """
+        DESCRIPTION:
+            Find the particles within certain subhalos and return their distances
+            and indices.
+
+        VARIABLES:
+            centers        : 2D array
+            neigh_num_max  : int
+            neigh_dist_max : int or float
+            workerss       : int
+
+        NOTES:
+            - centers: the 3D positions of the subhalos you want particles in
+            - neigh_num_max : the maximum number of neighbors you want to select
+                              in a given halo
+            - neigh_dist_max : the maximum distance you want to search for neighbors
+            - workerss: the number of threads you can parallelize with
+            - Returns a tuple:
+                - pos : the 1D scalar distances for each particle from the subhalos
+                - ind : the indices of the particles in the particle array you use
+                        to generate the tree
+            - This is used to select particles to then calculate the potential of
+              a given subhalo.
+        """
         pos, ind = self.kdtree.query(x=centers, k=neigh_num_max, distance_upper_bound=neigh_dist_max, workers=workerss)
         return pos, ind
 
