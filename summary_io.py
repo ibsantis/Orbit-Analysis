@@ -130,10 +130,9 @@ class SummaryDataSort:
                 data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/'+name+'_potentials_all_subs', verbose=True)
                 data_dict[name] = data
         #
-        ######## UPDATE THE OPTION BELOW WHEN I ACTUALLY GET DATA FOR THESE SELECTIONS
         elif sim_type == 'dmo':
             for name in self.host_names[hosts]:
-                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/'+name+'_potentials', verbose=True)
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/'+name+'_potentials_dmo', verbose=True)
                 data_dict[name] = data
         #
         return data_dict
@@ -1090,14 +1089,17 @@ class SummaryDataPlot(SummaryDataSort):
         """
         if 'M.' in xtype:
             x = np.log10(x)
-            x_out = np.log10(x_out)
+            if x_out:
+                x_out = np.log10(x_out)
         if 'M.' in ytype:
             y = np.log10(y)
-            y_out = np.log10(y_out)
+            if y_out:
+                y_out = np.log10(y_out)
         #
         f, ax = plt.subplots(figsize=(10, 8))
         ax.scatter(x, y, color='k', s=50, marker='x', alpha=0.5)
-        ax.scatter(x_out, y_out, color='r', s=50, marker='x', alpha=0.5)
+        if x_out:
+            ax.scatter(x_out, y_out, color='r', s=50, marker='x', alpha=0.5)
         if ('.sim' in xtype) & ('.sim' in ytype or '.model' in ytype):
             ax.set_xlim(left=limits[0], right=limits[1])
             ax.set_ylim(bottom=limits[0], top=limits[1])
