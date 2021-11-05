@@ -66,7 +66,7 @@ L_tot = summary.L_z0(data_total, mask_selection, selection='sim', oversample=Tru
 summary_plot.median_plot(x=Mhalo_peak_tot, y=Mstar_z0_tot, xtype='M.halo.peak', ytype='M.star.z0', binsize=0.5, file_path_and_name=directory+'/mstar_z0_vs_mhalo_peak.pdf')
 
 # d_peri vs d_min
-summary_plot.median_plot(x=d_sim_tot, y=d_min_tot, xtype='d.peri.recent', ytype='d.peri.min', binsize=50, file_path_and_name=directory+'/d_sim_vs_d_min.pdf')
+summary_plot.median_plot(x=d_sim_tot, y=d_min_tot, xtype='d.peri.recent', ytype='d.peri.min', binsize=50, limits=((0,350),(0,350)), file_path_and_name=directory+'/d_sim_vs_d_min.pdf')
 
 # t_peri vs t_min
 summary_plot.median_plot(x=t_sim_tot, y=t_min_tot, xtype='t.peri.recent', ytype='t.peri.min', binsize=1, limits=((0,11),(0,13.8)), file_path_and_name=directory+'/t_sim_vs_t_min.pdf')
@@ -127,7 +127,7 @@ summary_plot.median_plot(x=dz0_tot, y=L_tot/1e4, xtype='d.z0', ytype='L.tot', bi
 """
     Energy plots
 """
-potential_tot = summary.potential(data_potentials, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon')
+potential_tot = summary.potential(data_potentials, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
 ke_z0_tot = summary.kinetic_energy(data_total, mask_selection, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
 #
 Mstar_z0_tot = summary.mstar(data_total, mask_selection, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
@@ -195,7 +195,10 @@ summary_plot.median_plot(x=Mhalo_peak_tot_all, y=L_tot_all/1e4, xtype='M.halo.pe
 summary_plot.median_plot(x=Mhalo_peak_tot_all, y=L_tot_all/1e4, xtype='M.halo.peak', ytype='L.tot', binsize=0.5, limits=((8,11.5),(0,3.5)), file_path_and_name=directory+'/Ltot_vs_Mhalo_peak_baryon_all_zoom.pdf')
 
 #### Energy plots
-potential_tot_all = summary.potential(data_potentials_all, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon_all')
+#masks_infall = summary.data_mask(data_total_all, peri_sim=False, peri_model=False, hosts='all_energy')
+#mask_selection = masks_infall
+#
+potential_tot_all = summary.potential(data_potentials_all, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon_all', norm='kinetic')
 ke_z0_tot_all = summary.kinetic_energy(data_total_all, mask_selection, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon_all')
 #
 Mhalo_peak_tot_all = summary.mhalo(data_total_all, mask_selection, selection='peak', oversample=True, hosts='all_energy', sim_type='baryon_all')
@@ -203,7 +206,7 @@ dz0_tot_all = summary.d_z0(data_total_all, mask_selection, oversample=True, host
 
 # E_tot vs Mhalo (peak)
 summary_plot.median_plot(x=Mhalo_peak_tot_all, y=(ke_z0_tot_all+potential_tot_all)/1e4, xtype='M.halo.peak', ytype='E.tot', binsize=0.5, file_path_and_name=directory+'/Etot_vs_Mhalo_peak_baryon_all.pdf')
-summary_plot.median_plot(x=Mhalo_peak_tot_all, y=(ke_z0_tot_all+potential_tot_all)/1e4, xtype='M.halo.peak', ytype='E.tot', binsize=0.5, limits=((8,11.5),(-4,2)), file_path_and_name=directory+'/Etot_vs_Mhalo_peak_baryon_all_zoom.pdf')
+summary_plot.median_plot(x=Mhalo_peak_tot_all, y=(ke_z0_tot_all+potential_tot_all)/1e4, xtype='M.halo.peak', ytype='E.tot', binsize=0.5, limits=((8,11.5),(-5,1)), file_path_and_name=directory+'/Etot_vs_Mhalo_peak_baryon_all_zoom.pdf')
 
 # E_tot vs d(z = 0)
 summary_plot.median_plot(x=dz0_tot_all, y=(ke_z0_tot_all+potential_tot_all)/1e4, xtype='d.z0', ytype='E.tot', binsize=50, file_path_and_name=directory+'/Etot_vs_dz0_baryon_all.pdf')
@@ -334,11 +337,12 @@ summary_plot.median_plot_mult(x=[dz0_iso, dz0_lg], y=[vz0_iso, vz0_lg], xtype=['
 summary_plot.median_plot_mult(x=[dz0_iso, dz0_lg], y=[L_iso/1e4, L_lg/1e4], xtype=['d.z0', 'd.z0'], ytype=['L.tot', 'L.tot'], labels=['Isolated', 'Paired'], binsize=50, file_path_and_name=directory+'/Ltot_vs_dz0_iso_vs_lg.pdf')
 summary_plot.median_plot_mult(x=[dz0_iso, dz0_lg], y=[L_iso/1e4, L_lg/1e4], xtype=['d.z0', 'd.z0'], ytype=['L.tot', 'L.tot'], labels=['Isolated', 'Paired'], binsize=50, limits=((0,400),(0,4)), file_path_and_name=directory+'/Ltot_vs_dz0_iso_vs_lg_zoom.pdf')
 
+
 """
     Energy plots
 """
-potential_tot_iso = summary.potential(data_potentials_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon')
-potential_tot_lg = summary.potential(data_potentials_lg, mask_selection_lg, oversample=True, hosts='lg_no_RR', sim_type='baryon')
+potential_tot_iso = summary.potential(data_potentials_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon', norm='kinetic')
+potential_tot_lg = summary.potential(data_potentials_lg, mask_selection_lg, oversample=True, hosts='lg_no_RR', sim_type='baryon', norm='kinetic')
 ke_z0_tot_iso = summary.kinetic_energy(data_total_iso, mask_selection_iso, ke_type='z0', oversample=True, hosts='iso_no_z', sim_type='baryon')
 ke_z0_tot_lg = summary.kinetic_energy(data_total_lg, mask_selection_lg, ke_type='z0', oversample=True, hosts='lg_no_RR', sim_type='baryon')
 #
@@ -444,8 +448,8 @@ summary_plot.median_plot_mult(x=[Mhalo_peak_iso, Mhalo_peak_lg], y=[L_iso/1e4, L
 """
     Energy plots
 """
-potential_tot_iso = summary.potential(data_potentials_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
-potential_tot_lg = summary.potential(data_potentials_lg, mask_selection_lg, oversample=True, hosts='lg_no_RR', sim_type='baryon_all')
+potential_tot_iso = summary.potential(data_potentials_iso, mask_selection_iso, oversample=True, hosts='iso_no_z', sim_type='baryon_all', norm='kinetic')
+potential_tot_lg = summary.potential(data_potentials_lg, mask_selection_lg, oversample=True, hosts='lg_no_RR', sim_type='baryon_all', norm='kinetic')
 ke_z0_tot_iso = summary.kinetic_energy(data_total_iso, mask_selection_iso, ke_type='z0', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
 ke_z0_tot_lg = summary.kinetic_energy(data_total_lg, mask_selection_lg, ke_type='z0', oversample=True, hosts='lg_no_RR', sim_type='baryon_all')
 #
@@ -580,3 +584,154 @@ summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[vz0_tot
 # L_tot(z = 0) vs Mhalo (peak)
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[L_tot/1e4, L_tot_dmo/1e4], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['L.tot', 'L.tot'], labels=['Baryon', 'DMO'], binsize=0.5, file_path_and_name=directory+'/Ltot_vs_Mhalo_peak_compare_dmo.pdf')
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[L_tot/1e4, L_tot_dmo/1e4], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['L.tot', 'L.tot'], labels=['Baryon', 'DMO'], binsize=0.5, limits=((8,11.5),(0,3)), file_path_and_name=directory+'/Ltot_vs_Mhalo_peak_compare_dmo_zoom.pdf')
+
+
+
+
+
+
+"""
+Everything below here is only temporary, delete if we dont include in the paper
+"""
+# dperi fraction plots
+mask_delta_d = (np.abs((d_min_tot - d_sim_tot)/d_sim_tot) > 0.05)
+summary_plot.plot_hist(x=((d_min_tot-d_sim_tot)/d_sim_tot)[mask_delta_d], xtype='delta_d_frac', binsize=0.05, pdf=True, xlimits=(-1,0), file_path_and_name=directory+'/delta_d_frac_histogram.pdf')
+summary_plot.median_plot(x=Mstar_z0_tot[mask_delta_d], y=((d_min_tot-d_sim_tot)/d_sim_tot)[mask_delta_d], xtype='M.star.z0', ytype='delta_d_frac', binedges=(4.5,9.5), binsize=0.5, limits=((4,9.5),(-1,0)), file_path_and_name=directory+'/delta_d_frac_vs_Mstar_z0.pdf')
+summary_plot.median_plot(x=dz0_tot[mask_delta_d], y=((d_min_tot-d_sim_tot)/d_sim_tot)[mask_delta_d], xtype='d.z0', ytype='delta_d_frac', binsize=50, limits=(None,(-1,0)), file_path_and_name=directory+'/delta_d_frac_vs_dz0.pdf')
+summary_plot.median_plot(x=d_sim_tot[mask_delta_d], y=((d_min_tot-d_sim_tot)/d_sim_tot)[mask_delta_d], xtype='d.peri.recent', ytype='delta_d_frac', binsize=50, limits=(None,(-1,0)), file_path_and_name=directory+'/delta_d_frac_vs_d_sim.pdf')
+#
+mask_delta_d_all = (np.abs((d_min_tot_all - d_sim_tot_all)/d_sim_tot_all) > 0.05)
+summary_plot.median_plot(x=Mhalo_peak_tot_all[mask_delta_d_all], y=((d_min_tot_all-d_sim_tot_all)/d_sim_tot_all)[mask_delta_d_all], xtype='M.halo.peak', ytype='delta_d_frac', binedges=(8,11.5), binsize=0.5, limits=((8,11.5),(-1,0)), file_path_and_name=directory+'/delta_d_frac_vs_Mhalo_peak.pdf')
+
+
+
+
+# delta tperi plots
+mask_delta_t = (np.abs((t_min_tot - t_sim_tot)/t_sim_tot) > 0.05)
+summary_plot.plot_hist(x=(t_min_tot-t_sim_tot)[mask_delta_t], xtype='delta_t', binsize=0.5, pdf=True, file_path_and_name=directory+'/delta_t_histogram.pdf')
+summary_plot.median_plot(x=Mstar_z0_tot[mask_delta_t], y=(t_min_tot-t_sim_tot)[mask_delta_t], xtype='M.star.z0', ytype='delta_t', binedges=(4.5,9.5), binsize=0.5, limits=((4,9.5),None), file_path_and_name=directory+'/delta_t_vs_Mstar_z0.pdf')
+summary_plot.median_plot(x=dz0_tot[mask_delta_t], y=(t_min_tot-t_sim_tot)[mask_delta_t], xtype='d.z0', ytype='delta_t', binsize=50, file_path_and_name=directory+'/delta_t_vs_dz0.pdf')
+summary_plot.median_plot(x=t_sim_tot[mask_delta_t], y=(t_min_tot-t_sim_tot)[mask_delta_t], xtype='t.peri.recent', ytype='delta_t', binsize=0.5, limits=((0,6),(0,13.8)), file_path_and_name=directory+'/delta_t_vs_t_sim.pdf')
+#
+mask_delta_t_all = (np.abs((t_min_tot_all - t_sim_tot_all)/t_sim_tot_all) > 0.05)
+summary_plot.median_plot(x=Mhalo_peak_tot_all[mask_delta_t_all], y=(t_min_tot_all-t_sim_tot_all)[mask_delta_t_all], xtype='M.halo.peak', ytype='delta_t', binedges=(8,11.5), binsize=0.5, limits=((8,11.5),(0,13.8)), file_path_and_name=directory+'/delta_t_vs_Mhalo_peak.pdf')
+
+
+
+
+### Plot the energy histogram for the outlier population
+potential_tot = summary.potential(data_potentials, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
+ke_z0_tot = summary.kinetic_energy(data_total, mask_selection, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, mask_selection, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+dz0_tot = summary.d_z0(data_total, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon')
+#
+d_sim_tot = summary.dperi_recent(data_total, mask_selection, selection='sim', oversample=True, hosts='all_energy', sim_type='baryon')
+d_min_tot = summary.dperi_min(data_total, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon')
+mask_delta_d = (np.abs((d_min_tot - d_sim_tot)/d_sim_tot) > 0.05)
+#
+summary_plot.plot_hist(x=((ke_z0_tot+potential_tot)/1e4)[mask_delta_d], xtype='E.tot', binsize=0.1, pdf=True, file_path_and_name=directory+'/Etot_outlier_histogram.pdf')
+summary_plot.plot_hist_mult(x=[((ke_z0_tot+potential_tot)/1e4)[mask_delta_d], ((ke_z0_tot+potential_tot)/1e4)], xtype=['E.tot','E.tot'], labels=['Outliers','Total'], binsize=0.1, pdf=True, file_path_and_name=directory+'/Etot_outlier_comparison_histogram.pdf')
+#
+# Plot the energy vs Mstar (z = 0)
+summary_plot.median_plot(x=Mstar_z0_tot[mask_delta_d], y=((ke_z0_tot+potential_tot)/1e4)[mask_delta_d], xtype='M.star.z0', ytype='E.tot', binedges=(4.5,9.5), binsize=0.5, file_path_and_name=directory+'/Etot_outliers_vs_Mstar_z0.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_tot[mask_delta_d], Mstar_z0_tot], y=[((ke_z0_tot+potential_tot)/1e4)[mask_delta_d], ((ke_z0_tot+potential_tot)/1e4)], xtype=['M.star.z0', 'M.star.z0'], ytype=['E.tot', 'E.tot'], labels=['Outliers', 'Total'], binsize=0.5, file_path_and_name=directory+'/Etot_outliers_vs_Mstar_z0_comparison.pdf')
+
+
+
+
+#### Plot the angular momentum histogram for the outlier population
+d_sim_tot = summary.dperi_recent(data_total, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+d_min_tot = summary.dperi_min(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
+mask_delta_d = (np.abs((d_min_tot - d_sim_tot)/d_sim_tot) > 0.05)
+#
+Mstar_z0_tot = summary.mstar(data_total, mask_selection, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+L_tot = summary.L_z0(data_total, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+summary_plot.plot_hist(x=L_tot[mask_delta_d]/1e4, xtype='L.tot', binsize=0.1, pdf=True, file_path_and_name=directory+'/Ltot_outlier_histogram.pdf')
+summary_plot.plot_hist_mult(x=[L_tot[mask_delta_d]/1e4, L_tot/1e4], xtype=['L.tot','L.tot'], labels=['Outliers','Total'], binsize=0.1, pdf=True, xlimits=(0,5), file_path_and_name=directory+'/Ltot_outlier_comparison_histogram.pdf')
+#
+# Plot the angular momentum vs Mstar (z = 0)
+summary_plot.median_plot(x=Mstar_z0_tot[mask_delta_d], y=L_tot[mask_delta_d]/1e4, xtype='M.star.z0', ytype='L.tot', binedges=(4.5,9.5), binsize=0.5, file_path_and_name=directory+'/Ltot_outliers_vs_Mstar_z0.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_tot[mask_delta_d], Mstar_z0_tot], y=[L_tot[mask_delta_d]/1e4, L_tot/1e4], xtype=['M.star.z0', 'M.star.z0'], ytype=['L.tot', 'L.tot'], labels=['Outliers', 'Total'], binedges=(4.5,9.5), binsize=0.5, limits=((4,9.5),(0,4)), file_path_and_name=directory+'/Ltot_outliers_vs_Mstar_z0_comparison.pdf')
+
+
+
+
+#### Plot the total velocity histogram for the outlier population
+d_sim_tot = summary.dperi_recent(data_total, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+d_min_tot = summary.dperi_min(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
+mask_delta_d = (np.abs((d_min_tot - d_sim_tot)/d_sim_tot) > 0.05)
+#
+Mstar_z0_tot = summary.mstar(data_total, mask_selection, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+vz0_tot = summary.v_z0(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+summary_plot.plot_hist(x=vz0_tot[mask_delta_d], xtype='v.tot', binsize=10, pdf=True, file_path_and_name=directory+'/vtot_outlier_histogram.pdf')
+summary_plot.plot_hist_mult(x=[vz0_tot[mask_delta_d], vz0_tot], xtype=['v.tot','v.tot'], labels=['Outliers','Total'], binsize=10, pdf=True, file_path_and_name=directory+'/vtot_outlier_comparison_histogram.pdf')
+#
+# Plot the total velocity vs Mstar (z = 0)
+summary_plot.median_plot(x=Mstar_z0_tot[mask_delta_d], y=vz0_tot[mask_delta_d], xtype='M.star.z0', ytype='v.tot', binedges=(4.5,9.5), binsize=0.5, file_path_and_name=directory+'/vtot_outliers_vs_Mstar_z0.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_tot[mask_delta_d], Mstar_z0_tot], y=[vz0_tot[mask_delta_d], vz0_tot], xtype=['M.star.z0', 'M.star.z0'], ytype=['v.tot', 'v.tot'], labels=['Outliers', 'Total'], binedges=(4.5,9.5), binsize=0.5, limits=((4,9.5),(0,400)), file_path_and_name=directory+'/vtot_outliers_vs_Mstar_z0_comparison.pdf')
+
+
+
+
+# Look at histograms between satellites on their first infall, sats with one peri, and sats with more than one peri
+nperi_0_mask = summary.data_mask_nperi(data_total, nperi=0, hosts='all_no_z')
+nperi_1_mask = summary.data_mask_nperi(data_total, nperi=1, hosts='all_no_z')
+nperi_2_mask = summary.data_mask_nperi(data_total, nperi=2, hosts='all_no_z')
+
+# Energy plot
+potential_tot_0 = summary.potential(data_potentials, nperi_0_mask, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
+ke_z0_tot_0 = summary.kinetic_energy(data_total, nperi_0_mask, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+Mstar_z0_tot_0 = summary.mstar(data_total, nperi_0_mask, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+potential_tot_1 = summary.potential(data_potentials, nperi_1_mask, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
+ke_z0_tot_1 = summary.kinetic_energy(data_total, nperi_1_mask, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+Mstar_z0_tot_1 = summary.mstar(data_total, nperi_1_mask, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+potential_tot_2 = summary.potential(data_potentials, nperi_2_mask, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
+ke_z0_tot_2 = summary.kinetic_energy(data_total, nperi_2_mask, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+Mstar_z0_tot_2 = summary.mstar(data_total, nperi_2_mask, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+#
+summary_plot.plot_hist_mult(x=[(potential_tot_0+ke_z0_tot_0)/1e4, (potential_tot_1+ke_z0_tot_1)/1e4, (potential_tot_2+ke_z0_tot_2)/1e4], xtype=['E.tot','E.tot','E.tot'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=0.1, pdf=True, file_path_and_name=directory+'/Etot_comparison_nperis_histogram.pdf')
+#
+summary_plot.median_plot_mult(x=[Mstar_z0_tot_0, Mstar_z0_tot_1, Mstar_z0_tot_2], y=[(potential_tot_0+ke_z0_tot_0)/1e4, (potential_tot_1+ke_z0_tot_1)/1e4, (potential_tot_2+ke_z0_tot_2)/1e4], xtype=['M.star.z0', 'M.star.z0', 'M.star.z0'], ytype=['E.tot', 'E.tot', 'E.tot'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=0.5, file_path_and_name=directory+'/Etot_vs_Mstar_z0_nperi_pops.pdf')
+
+
+
+
+
+
+
+
+
+# Angular momentum plot
+L_tot_0 = summary.L_z0(data_total, nperi_0_mask, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+L_tot_1 = summary.L_z0(data_total, nperi_1_mask, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+L_tot_2 = summary.L_z0(data_total, nperi_2_mask, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot_0 = summary.mstar(data_total, nperi_0_mask, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot_1 = summary.mstar(data_total, nperi_1_mask, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot_2 = summary.mstar(data_total, nperi_2_mask, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+summary_plot.plot_hist_mult(x=[L_tot_0/1e4, L_tot_1/1e4, L_tot_2/1e4], xtype=['L.tot','L.tot','L.tot'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=0.1, pdf=True, xlimits=(0,7), file_path_and_name=directory+'/Ltot_comparison_nperis_histogram.pdf')
+#
+summary_plot.median_plot_mult(x=[Mstar_z0_tot_0, Mstar_z0_tot_1, Mstar_z0_tot_2], y=[L_tot_0/1e4, L_tot_1/1e4, L_tot_2/1e4], xtype=['M.star.z0', 'M.star.z0', 'M.star.z0'], ytype=['L.tot', 'L.tot', 'L.tot'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=0.5, file_path_and_name=directory+'/Ltot_vs_Mstar_z0_nperi_pops.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_tot_0, Mstar_z0_tot_1, Mstar_z0_tot_2], y=[L_tot_0/1e4, L_tot_1/1e4, L_tot_2/1e4], xtype=['M.star.z0', 'M.star.z0', 'M.star.z0'], ytype=['L.tot', 'L.tot', 'L.tot'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=0.5, limits=((4,9.5),(0,5)), file_path_and_name=directory+'/Ltot_vs_Mstar_z0_nperi_pops_zoom.pdf')
+
+# vtot plot
+vz0_tot_0 = summary.v_z0(data_total, nperi_0_mask, oversample=True, hosts='all_no_z', sim_type='baryon')
+vz0_tot_1 = summary.v_z0(data_total, nperi_1_mask, oversample=True, hosts='all_no_z', sim_type='baryon')
+vz0_tot_2 = summary.v_z0(data_total, nperi_2_mask, oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+summary_plot.plot_hist_mult(x=[vz0_tot_0, vz0_tot_1, vz0_tot_2], xtype=['v.tot','v.tot','v.tot'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=10, pdf=True, file_path_and_name=directory+'/vtot_comparison_nperis_histogram.pdf')
+
+# d(z = 0) plot
+dz0_tot_0 = summary.d_z0(data_total, nperi_0_mask, oversample=True, hosts='all_no_z', sim_type='baryon')
+dz0_tot_1 = summary.d_z0(data_total, nperi_1_mask, oversample=True, hosts='all_no_z', sim_type='baryon')
+dz0_tot_2 = summary.d_z0(data_total, nperi_2_mask, oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot_0 = summary.mstar(data_total, nperi_0_mask, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot_1 = summary.mstar(data_total, nperi_1_mask, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot_2 = summary.mstar(data_total, nperi_2_mask, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+summary_plot.plot_hist_mult(x=[dz0_tot_0, dz0_tot_1, dz0_tot_2], xtype=['d.z0','d.z0','d.z0'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=10, pdf=True, xlimits=(0,500), file_path_and_name=directory+'/dz0_comparison_nperis_histogram.pdf')
+#
+summary_plot.median_plot_mult(x=[Mstar_z0_tot_0, Mstar_z0_tot_1, Mstar_z0_tot_2], y=[dz0_tot_0, dz0_tot_1, dz0_tot_2], xtype=['M.star.z0', 'M.star.z0', 'M.star.z0'], ytype=['d.z0','d.z0','d.z0'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=0.5, file_path_and_name=directory+'/dz0_vs_Mstar_z0_nperi_pops.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_tot_0, Mstar_z0_tot_1, Mstar_z0_tot_2], y=[dz0_tot_0, dz0_tot_1, dz0_tot_2], xtype=['M.star.z0', 'M.star.z0', 'M.star.z0'], ytype=['d.z0','d.z0','d.z0'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=0.5, limits=((4,9.5),(0,400)), file_path_and_name=directory+'/dz0_vs_Mstar_z0_nperi_pops_zoom.pdf')
