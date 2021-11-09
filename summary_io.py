@@ -1405,7 +1405,7 @@ class SummaryDataPlot(SummaryDataSort):
               calculates the median and 68% scatter.
         """
         if len(x) == 2:
-            colorss = ['#006400', '#000080']
+            colorss = ['#000080', '#006400']
         else:
             colorss = self.colors
         #
@@ -1560,9 +1560,12 @@ class SummaryDataPlot(SummaryDataSort):
         if 'M.' in xtype[0]:
             plt.xscale('log')
         if limits:
-            if 'M.' in xtype[0]:
+            if 'M.' in xtype[0] and 'M.' not in ytype[0]:
                 plt.xlim(10**(limits[0][0]), 10**(limits[0][1]))
                 plt.ylim(limits[1])
+            elif 'M.' in xtype[0] and 'M.' in ytype[0]:
+                plt.xlim(10**(limits[0][0]), 10**(limits[0][1]))
+                plt.ylim(10**(limits[1][0]), 10**(limits[1][1]))
             else:
                 plt.xlim(limits[0])
                 plt.ylim(limits[1])
