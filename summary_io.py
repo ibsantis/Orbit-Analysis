@@ -1434,6 +1434,8 @@ class SummaryDataPlot(SummaryDataSort):
                 #
                 onesigp = 84.13
                 onesigm = 15.87
+                #twosigp = 97.72
+                #twosigm = 2.28 # play around with this more...
                 twosigp = 100
                 twosigm = 0
                 #
@@ -1548,10 +1550,14 @@ class SummaryDataPlot(SummaryDataSort):
                 med = means
             #
             # PLOTTING
-            if 'M.' in xtype[j]:
+            if 'M.' in xtype[j] and 'M.' not in ytype[j]:
                 plt.plot(10**(bins[:-1]+half_bin), med, color=colorss[j], markersize=10, alpha=0.5, label=labels[j])
                 plt.fill_between(10**(bins[:-1]+half_bin), upper, lower, color=colorss[j], alpha=0.3)
                 plt.fill_between(10**(bins[:-1]+half_bin), highest, lowest, color=colorss[j], alpha=0.15)
+            elif 'M.' in xtype[j] and 'M.' in ytype[j]:
+                plt.plot(10**(bins[:-1]+half_bin), 10**med, color=colorss[j], markersize=10, alpha=0.5, label=labels[j])
+                plt.fill_between(10**(bins[:-1]+half_bin), 10**upper, 10**lower, color=colorss[j], alpha=0.3)
+                plt.fill_between(10**(bins[:-1]+half_bin), 10**highest, 10**lowest, color=colorss[j], alpha=0.15)
                 #
             else:
                 plt.plot(bins[:-1]+half_bin, med, color=colorss[j], markersize=10, alpha=0.5, label=labels[j])
@@ -1559,6 +1565,8 @@ class SummaryDataPlot(SummaryDataSort):
                 plt.fill_between(bins[:-1]+half_bin, highest, lowest, color=colorss[j], alpha=0.15)
         if 'M.' in xtype[0]:
             plt.xscale('log')
+        if 'M.' in ytype[0]:
+            plt.yscale('log')
         if limits:
             if 'M.' in xtype[0] and 'M.' not in ytype[0]:
                 plt.xlim(10**(limits[0][0]), 10**(limits[0][1]))
@@ -1592,7 +1600,7 @@ class SummaryDataPlot(SummaryDataSort):
             ax2.tick_params(pad=3)
         ax.set_xlabel(self.labels[xtype[0]], fontsize=28)
         ax.set_ylabel(self.labels[ytype[0]], fontsize=28)
-        ax.legend(prop={'size': 18}, loc='best')
+        ax.legend(prop={'size': 20}, loc='best')
         if title:
             plt.title(self.titles[title], fontsize=24)
         ax.tick_params(axis='both', which='major', labelsize=28)
@@ -1885,7 +1893,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def plot_hist_mult(self, x, xtype, labels, binsize, file_path_and_name, pdf=False, xlimits=None, title=None):
+    def plot_hist_mult(self, x, xtype, labels, binsize, file_path_and_name, med_location=None, pdf=False, xlimits=None, title=None, legend_on=True):
         """
         DESCRIPTION:
             Plots a histogram of a given property.
@@ -1938,10 +1946,13 @@ class SummaryDataPlot(SummaryDataSort):
                 sigma_one_op = np.nanpercentile(x[i], onesigp)
                 sigma_one_om = np.nanpercentile(x[i], onesigm)
                 #
-                y_med = np.max(np.histogram(x[i], bin_array, density=pdf)[0])*1.1
+                if med_location:
+                    y_med = med_location[i]
+                else:
+                    y_med = np.max(np.histogram(x[i], bin_array, density=pdf)[0])*1.1
                 #
                 plt.hist(x[i], bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=colorss[i], alpha=0.4, label=labels[i])
-                plt.errorbar(np.median(x[i]), y_med, xerr=np.array([[np.median(x[i])-sigma_one_om],[sigma_one_op-np.median(x[i])]]), c=colorss[i], lw=5, capsize=8, alpha=0.8)
+                plt.errorbar(np.median(x[i]), y_med, xerr=np.array([[np.median(x[i])-sigma_one_om],[sigma_one_op-np.median(x[i])]]), c=colorss[i], lw=5, capsize=0, alpha=0.8)
                 plt.scatter(np.median(x[i]), y_med, s=250, marker='s', c=colorss[i], alpha=0.8)
             #
             elif 'N.' in xtype[i]:
@@ -1950,17 +1961,21 @@ class SummaryDataPlot(SummaryDataSort):
                 bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
                 bin_array = np.linspace(minn, maxx, bin_num)
                 #
-                y_mean = np.max(np.histogram(x[i], bin_array, density=pdf)[0])*1.1
+                if med_location:
+                    y_mean = med_location[i]
+                else:
+                    y_mean = np.max(np.histogram(x[i], bin_array, density=pdf)[0])*1.1
                 #
                 plt.hist(x[i], bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=colorss[i], alpha=0.4, label=labels[i])
-                plt.errorbar(np.mean(x[i]), y_mean, xerr=np.array([[2*np.std(x[i])],[2*np.std(x[i])]]), c=colorss[i], lw=5, capsize=8, alpha=0.3)
-                plt.errorbar(np.mean(x[i]), y_mean, xerr=np.array([[np.std(x[i])],[np.std(x[i])]]), c=colorss[i], lw=5, capsize=8, alpha=0.8)
+                plt.errorbar(np.mean(x[i]), y_mean, xerr=np.array([[2*np.std(x[i])],[2*np.std(x[i])]]), c=colorss[i], lw=5, capsize=0, alpha=0.3)
+                plt.errorbar(np.mean(x[i]), y_mean, xerr=np.array([[np.std(x[i])],[np.std(x[i])]]), c=colorss[i], lw=5, capsize=0, alpha=0.8)
                 plt.scatter(np.mean(x[i]), y_mean, s=250, marker='s', c=colorss[i])
         #
         plt.xlim(xlimits)
         plt.xlabel(self.labels[xtype[0]], fontsize=28)
         plt.ylabel(y_label, fontsize=28)
-        plt.legend(prop={'size': 18}, loc='best')
+        if legend_on:
+            plt.legend(prop={'size': 18}, loc='best')
         if title:
             plt.title(self.titles[title], fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
