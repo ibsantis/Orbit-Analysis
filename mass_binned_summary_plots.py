@@ -13,22 +13,23 @@ f, ax = plt.subplots(figsize=(11, 8))
 colorss = ['#000080', '#006400']
 binedges = None
 binsize = 50
-limits = ((0,400),(0,13))
+limits = ((0,400),(0,350))
 #
-x = [dz0_tot, dz0_tot, dz0_tot[mass_low], dz0_tot[mass_high], dz0_tot[mass_low], dz0_tot[mass_high]]
-#x = [dz0_tot, dz0_tot[mass_low], dz0_tot[mass_high]]
+#x = [dz0_tot, dz0_tot, dz0_tot[mass_low], dz0_tot[mass_high], dz0_tot[mass_low], dz0_tot[mass_high]]
+x = [dz0_tot, dz0_tot[mass_low], dz0_tot[mass_high]]
+#x = [t_in_tot, t_in_tot[mass_low], t_in_tot[mass_high]]
 #y = [d_sim_tot, d_min_tot, d_sim_tot[mass_low], d_sim_tot[mass_high], d_min_tot[mass_low], d_min_tot[mass_high]]
 #y = [t_sim_tot, t_min_tot, t_sim_tot[mass_low], t_sim_tot[mass_high], t_min_tot[mass_low], t_min_tot[mass_high]]
-y = [t_in_tot, t_in_any_tot, t_in_tot[mass_low], t_in_tot[mass_high], t_in_any_tot[mass_low], t_in_any_tot[mass_high]]
+#y = [t_in_tot, t_in_any_tot, t_in_tot[mass_low], t_in_tot[mass_high], t_in_any_tot[mass_low], t_in_any_tot[mass_high]]
 #y = [N_sim_tot, N_sim_tot[mass_low], N_sim_tot[mass_high]]
 #y = [vz0_tot, vz0_tot[mass_low], vz0_tot[mass_high]]
 #y = [L_tot/1e4, (L_tot/1e4)[mass_low], (L_tot/1e4)[mass_high]]
-#y = [vtan_tot, vtan_tot[mass_low], vtan_tot[mass_high]]
+y = [vtan_tot, vtan_tot[mass_low], vtan_tot[mass_high]]
 #
-xtype = ['d.z0', 'd.z0', 'd.z0', 'd.z0', 'd.z0', 'd.z0']
-ytype = ['t.infall.text','t.infall.text','t.infall.text','t.infall.text','t.infall.text','t.infall.text']
-#xtype = ['d.z0', 'd.z0', 'd.z0']
-#ytype = ['N.peri.text', 'N.peri.text', 'N.peri.text']
+#xtype = ['d.z0', 'd.z0', 'd.z0', 'd.z0', 'd.z0', 'd.z0']
+#ytype = ['t.infall.text','t.infall.text','t.infall.text','t.infall.text','t.infall.text','t.infall.text']
+xtype = ['d.z0', 'd.z0', 'd.z0']
+ytype = ['v.tan', 'v.tan', 'v.tan']
 #
 medians = []
 lowers = []
@@ -72,19 +73,19 @@ for j in range(0, len(x)):
     #
     for i in range(0, len(bins)-1):
         mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
-        med[i] = np.nanmedian(y[j][mask])
-        #med[i] = np.nanmean(y[j][mask])
+        #med[i] = np.nanmedian(y[j][mask])
+        med[i] = np.nanmean(y[j][mask])
         scatter[i] = np.nanstd(y[j][mask])
-        upper[i] = np.nanpercentile(y[j][mask], onesigp)
-        lower[i] = np.nanpercentile(y[j][mask], onesigm)
+        #upper[i] = np.nanpercentile(y[j][mask], onesigp)
+        #lower[i] = np.nanpercentile(y[j][mask], onesigm)
         highest[i] = np.nanpercentile(y[j][mask], twosigp)
         lowest[i] = np.nanpercentile(y[j][mask], twosigm)
-        #upper[i] = med[i]+scatter[i]
-        #lower[i] = med[i]-scatter[i]
-        #if (upper[i] > highest[i]):
-        #    upper[i] = highest[i]
-        #if (lower[i] < lowest[i]):
-        #    lower[i] = lowest[i]
+        upper[i] = med[i]+scatter[i]
+        lower[i] = med[i]-scatter[i]
+        if (upper[i] > highest[i]):
+            upper[i] = highest[i]
+        if (lower[i] < lowest[i]):
+            lower[i] = lowest[i]
     medians.append(med)
     lowers.append(lower)
     uppers.append(upper)
@@ -94,24 +95,23 @@ for j in range(0, len(x)):
     half_bins.append(half_bin)
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-plt.fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color=colorss[1], alpha=0.3)
-plt.fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color=colorss[1], alpha=0.15)
-plt.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[0], alpha=0.3)
-plt.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[0], alpha=0.15)
-#
-# Plot the medians for the two mass bins (low-mass)
-plt.plot(binss[4][:-1]+half_bins[4], medians[4], color=colorss[1], markersize=10, alpha=0.5, label='Any halo') # minimim, M < 1e7
-plt.plot(binss[5][:-1]+half_bins[5], medians[5], color=colorss[1], markersize=10, linestyle='--', alpha=0.5) #, label='Any host ($M_{\\rm star} > 10^{7} M_{\\odot}$)') # Minimum M > 1e7
-plt.plot(binss[2][:-1]+half_bins[2], medians[2], color=colorss[0], markersize=10, alpha=0.5, label='MW/M31-mass halo') # Recent, M < 1e7
-plt.plot(binss[3][:-1]+half_bins[3], medians[3], color=colorss[0], markersize=10, linestyle='--', alpha=0.5) #, label='MW/M31-mass host ($M_{\\rm star} > 10^{7} M_{\\odot}$)') # Recent M > 1e7
-#
 #plt.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.3)
 #plt.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.15)
+#plt.fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color=colorss[0], alpha=0.3)
+#plt.fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color=colorss[0], alpha=0.15)
 #
 # Plot the medians for the two mass bins (low-mass)
-#plt.plot(binss[1][:-1]+half_bins[1], medians[1], color=colorss[1], markersize=10, alpha=0.5, label='$M_{\\rm star} < 10^{7} M_{\\odot}$')
-#plt.plot(binss[2][:-1]+half_bins[2], medians[2], color=colorss[1], markersize=10, linestyle='--', alpha=0.5, label='$M_{\\rm star} > 10^{7} M_{\\odot}$')
-
+#plt.plot(binss[2][:-1]+half_bins[2], medians[2], color=colorss[1], markersize=10, alpha=0.5, label='MW/M31-mass halo') # Recent, M < 1e7
+#plt.plot(binss[3][:-1]+half_bins[3], medians[3], color=colorss[1], markersize=10, linestyle='--', alpha=0.5) #, label='MW/M31-mass host ($M_{\\rm star} > 10^{7} M_{\\odot}$)') # Recent M > 1e7
+#plt.plot(binss[4][:-1]+half_bins[4], medians[4], color=colorss[0], markersize=10, alpha=0.5, label='Any halo') # minimim, M < 1e7
+#plt.plot(binss[5][:-1]+half_bins[5], medians[5], color=colorss[0], markersize=10, linestyle='--', alpha=0.5) #, label='Any host ($M_{\\rm star} > 10^{7} M_{\\odot}$)') # Minimum M > 1e7
+#
+plt.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.3)
+plt.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.15)
+#
+# Plot the medians for the two mass bins (low-mass)
+plt.plot(binss[1][:-1]+half_bins[1], medians[1], color=colorss[1], markersize=10, alpha=0.5, label='$M_{\\rm star} < 10^{7} M_{\\odot}$')
+plt.plot(binss[2][:-1]+half_bins[2], medians[2], color=colorss[1], markersize=10, linestyle='--', alpha=0.5, label='$M_{\\rm star} > 10^{7} M_{\\odot}$')
 #
 plt.xlim(limits[0])
 plt.ylim(limits[1])
@@ -133,15 +133,34 @@ if 't.' in ytype[0]:
     ax2.set_ylim(limits[1])
     ax2.set_ylabel(axis_2_label, labelpad=9)
     ax2.tick_params(pad=3)
-ax.set_xlabel('d(z = 0) [kpc]', fontsize=28)
+if 't.' in xtype:
+    # Instantiate the cosmology class and run this method first to set up scalefactors
+    cc = ut.cosmology.CosmologyClass()
+    red = np.array([0, 1])
+    cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+    #
+    axis_2_label = 'redshift'
+    axis_2_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+    axis_2_tick_values = [float(v) for v in axis_2_tick_labels]
+    axis_2_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_2_tick_values)
+    ax2 = ax.twiny()
+    ax2.set_xscale('linear')
+    ax2.set_yscale('linear')
+    ax2.set_xticks(axis_2_tick_locations)
+    ax2.set_xticklabels(axis_2_tick_labels, fontsize=28)
+    ax2.set_xlim(limits[0])
+    ax2.set_xlabel(axis_2_label, labelpad=9)
+    ax2.tick_params(pad=3)
+ax.set_xlabel('Host distance $d$ [kpc]', fontsize=28)
+#ax.set_xlabel('Infall Lookback Time [Gyr]', fontsize=28)
 #ax.set_ylabel('Pericenter Distance [kpc]', fontsize=28)
 #ax.set_ylabel('Pericenter Lookback Time [Gyr]', fontsize=28)
-ax.set_ylabel('Infall Lookback Time [Gyr]', fontsize=28)
+#ax.set_ylabel('Infall Lookback Time [Gyr]', fontsize=28)
 #ax.set_ylabel('Pericenter Number', fontsize=28)
-#ax.set_ylabel('$v(z = 0)$ [km s$^{-1}$]', fontsize=28)
-#ax.set_ylabel('$L(z = 0)$ [10$^4$ kpc km s$^{-1}$]', fontsize=28)
-#ax.set_ylabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=28)
-ax.legend(prop={'size': 20}, loc='best')
+#ax.set_ylabel('Total velocity [km s$^{-1}$]', fontsize=28)
+#ax.set_ylabel('$\\ell$ [10$^4$ kpc km s$^{-1}$]', fontsize=28)
+ax.set_ylabel('Tangential velocity [km s$^{-1}$]', fontsize=28)
+#ax.legend(prop={'size': 20}, loc='best')
 ax.tick_params(axis='both', which='major', labelsize=28)
 plt.tight_layout()
 plt.show()
@@ -239,8 +258,8 @@ plt.plot(binss[2][:-1]+half_bins[2], medians[2], color=colorss[1], markersize=10
 #
 plt.xlim(0, 400)
 plt.ylim(-6, 1)
-ax.set_xlabel('d(z = 0) [kpc]', fontsize=28)
-ax.set_ylabel('$E(z = 0)$ [10$^4$ km$^{2}$ s$^{-2}$]', fontsize=28)
+ax.set_xlabel('Host distance $d$ [kpc]', fontsize=28)
+ax.set_ylabel('$E$ [10$^4$ km$^{2}$ s$^{-2}$]', fontsize=28)
 #ax.legend(prop={'size': 20}, loc='lower right')
 ax.tick_params(axis='both', which='major', labelsize=28)
 plt.tight_layout()

@@ -562,38 +562,38 @@ summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[L_tot/1e4, L_tot_dmo/
 summary_plot.median_plot_mult(x=[dz0_tot, dz0_tot_dmo], y=[L_tot/1e4, L_tot_dmo/1e4], xtype=['d.z0', 'd.z0'], ytype=['L.tot', 'L.tot'], labels=['Baryon', 'DMO'], binsize=50, limits=((0,400),(0,4)), file_path_and_name=directory+'/Ltot_vs_dz0_compare_dmo_zoom.pdf')
 
 # N_sim vs Mhalo (peak)
-summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[N_sim_tot, N_sim_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['N.peri.text', 'N.peri.text'], labels=['Baryon', 'DMO'], binsize=0.5, file_path_and_name=directory+'/N_sim_vs_Mhalo_peak_compare_dmo.pdf')
-summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[N_sim_tot, N_sim_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['N.peri.text', 'N.peri.text'], labels=['Baryon', 'DMO'], binsize=0.5, limits=((8,11.5),(0,8)), file_path_and_name=directory+'/N_sim_vs_Mhalo_peak_compare_dmo_zoom.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_tot_dmo, Mhalo_peak_tot], y=[N_sim_tot_dmo, N_sim_tot], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['N.peri.text', 'N.peri.text'], labels=['DMO', 'Baryon'], binsize=0.5, legend_on=False, file_path_and_name=directory+'/N_sim_vs_Mhalo_peak_compare_dmo.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_tot_dmo, Mhalo_peak_tot], y=[N_sim_tot_dmo, N_sim_tot], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['N.peri.text', 'N.peri.text'], labels=['DMO', 'Baryon'], binsize=0.5, legend_on=False, limits=((8,11.5),(0,8)), file_path_and_name=directory+'/N_sim_vs_Mhalo_peak_compare_dmo_zoom.pdf')
 
 # d_sim vs Mhalo (peak)
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[d_sim_tot, d_sim_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.peri.recent', 'd.peri.recent'], labels=['Baryon', 'DMO'], binsize=0.5, file_path_and_name=directory+'/d_sim_vs_Mhalo_peak_compare_dmo.pdf')
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[d_sim_tot, d_sim_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.peri.recent', 'd.peri.recent'], labels=['Baryon', 'DMO'], binsize=0.5, limits=((8,11.5),(0,300)), file_path_and_name=directory+'/d_sim_vs_Mhalo_peak_compare_dmo_zoom.pdf')
 
 # d_min vs Mhalo (peak)
-summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[d_min_tot, d_min_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.peri.min', 'd.peri.min'], labels=['Baryon', 'DMO'], binsize=0.5, file_path_and_name=directory+'/d_min_vs_Mhalo_peak_compare_dmo.pdf')
-summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[d_min_tot, d_min_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.peri.min', 'd.peri.min'], labels=['Baryon', 'DMO'], binsize=0.5, limits=((8,11.5),(0,175)), file_path_and_name=directory+'/d_min_vs_Mhalo_peak_compare_dmo_zoom.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_tot_dmo, Mhalo_peak_tot], y=[d_min_tot_dmo, d_min_tot], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.peri.min', 'd.peri.min'], labels=['DMO', 'Baryon'], binsize=0.5, file_path_and_name=directory+'/d_min_vs_Mhalo_peak_compare_dmo.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_tot_dmo, Mhalo_peak_tot], y=[d_min_tot_dmo, d_min_tot], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['d.peri.min', 'd.peri.min'], labels=['DMO', 'Baryon'], binsize=0.5, limits=((8,11.5),(0,175)), file_path_and_name=directory+'/d_min_vs_Mhalo_peak_compare_dmo_zoom.pdf')
 
 # t_sim vs Mhalo (peak)
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[t_sim_tot, t_sim_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.peri.recent', 't.peri.recent'], labels=['Baryon', 'DMO'], binsize=0.5, limits=((8,11.5),(0,13.8)), file_path_and_name=directory+'/t_sim_vs_Mhalo_peak_compare_dmo.pdf')
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[t_sim_tot, t_sim_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.peri.recent', 't.peri.recent'], labels=['Baryon', 'DMO'], binsize=0.5, limits=((8,11.5),(0,5)), file_path_and_name=directory+'/t_sim_vs_Mhalo_peak_compare_dmo_zoom.pdf')
 
 # t_min vs Mhalo (peak)
-summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[t_min_tot, t_min_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.peri.min', 't.peri.min'], labels=['Baryon', 'DMO'], binsize=0.5, limits=((8,11.5),(0,13.8)), file_path_and_name=directory+'/t_min_vs_Mhalo_peak_compare_dmo.pdf')
-summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[t_min_tot, t_min_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.peri.min', 't.peri.min'], labels=['Baryon', 'DMO'], binsize=0.5, limits=((8,11.5),(0,9)), file_path_and_name=directory+'/t_min_vs_Mhalo_peak_compare_dmo_zoom.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_tot_dmo, Mhalo_peak_tot], y=[t_min_tot_dmo, t_min_tot], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.peri.min', 't.peri.min'], labels=['DMO', 'Baryon'], legend_on=False, binsize=0.5, limits=((8,11.5),(0,13.8)), file_path_and_name=directory+'/t_min_vs_Mhalo_peak_compare_dmo.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_tot_dmo, Mhalo_peak_tot], y=[t_min_tot_dmo, t_min_tot], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.peri.min', 't.peri.min'], labels=['DMO', 'Baryon'], legend_on=False, binsize=0.5, limits=((8,11.5),(0,9)), file_path_and_name=directory+'/t_min_vs_Mhalo_peak_compare_dmo_zoom.pdf')
 
 # t_infall vs Mhalo (peak)
-summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[t_in_tot, t_in_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.infall.text', 't.infall.text'], labels=['Baryon', 'DMO'], binsize=0.5, limits=((8,11.5),(0,13.8)), file_path_and_name=directory+'/t_infall_vs_Mhalo_peak_compare_dmo.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_tot_dmo, Mhalo_peak_tot], y=[t_in_tot_dmo, t_in_tot], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.infall.text', 't.infall.text'], labels=['DMO', 'Baryon'], binsize=0.5, limits=((8,11.5),(0,13.8)), legend_on=False, file_path_and_name=directory+'/t_infall_vs_Mhalo_peak_compare_dmo.pdf')
 
 # t_infall (any) vs Mhalo (peak)
-summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[t_in_any_tot, t_in_any_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.infall.any', 't.infall.any'], labels=['Baryon', 'DMO'], binsize=0.5, limits=((8,11.5),(0,13.8)), file_path_and_name=directory+'/t_infall_any_vs_Mhalo_peak_compare_dmo.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_tot_dmo, Mhalo_peak_tot], y=[t_in_any_tot_dmo, t_in_any_tot], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['t.infall.any', 't.infall.any'], labels=['DMO', 'Baryon'], binsize=0.5, limits=((8,11.5),(0,13.8)), legend_on=False, file_path_and_name=directory+'/t_infall_any_vs_Mhalo_peak_compare_dmo.pdf')
 
 # v_tot(z = 0) vs Mhalo (peak)
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[vz0_tot, vz0_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['v.tot', 'v.tot'], labels=['Baryon', 'DMO'], binsize=0.5, file_path_and_name=directory+'/vtot_z0_vs_Mhalo_peak_compare_dmo.pdf')
 summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[vz0_tot, vz0_tot_dmo], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['v.tot', 'v.tot'], labels=['Baryon', 'DMO'], binsize=0.5, limits=((8,11.5),(0,250)), file_path_and_name=directory+'/vtot_z0_vs_Mhalo_peak_compare_dmo_zoom.pdf')
 
 # L_tot(z = 0) vs Mhalo (peak)
-summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[L_tot/1e4, L_tot_dmo/1e4], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['L.tot', 'L.tot'], labels=['Baryon', 'DMO'], binsize=0.5, file_path_and_name=directory+'/Ltot_vs_Mhalo_peak_compare_dmo.pdf')
-summary_plot.median_plot_mult(x=[Mhalo_peak_tot, Mhalo_peak_tot_dmo], y=[L_tot/1e4, L_tot_dmo/1e4], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['L.tot', 'L.tot'], labels=['Baryon', 'DMO'], binsize=0.5, limits=((8,11.5),(0,3)), file_path_and_name=directory+'/Ltot_vs_Mhalo_peak_compare_dmo_zoom.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_tot_dmo, Mhalo_peak_tot], y=[L_tot_dmo/1e4, L_tot/1e4], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['L.tot', 'L.tot'], labels=['DMO', 'Baryon'], binsize=0.5, legend_on=False, file_path_and_name=directory+'/Ltot_vs_Mhalo_peak_compare_dmo.pdf')
+summary_plot.median_plot_mult(x=[Mhalo_peak_tot_dmo, Mhalo_peak_tot], y=[L_tot_dmo/1e4, L_tot/1e4], xtype=['M.halo.peak', 'M.halo.peak'], ytype=['L.tot', 'L.tot'], labels=['DMO', 'Baryon'], binsize=0.5, legend_on=False, limits=((8,11.5),(0,3)), file_path_and_name=directory+'/Ltot_vs_Mhalo_peak_compare_dmo_zoom.pdf')
 
 
 
@@ -662,7 +662,7 @@ summary_plot.plot_hist_mult(x=[L_tot[mask_delta_d]/1e4, L_tot/1e4], xtype=['L.to
 #
 # Plot the angular momentum vs Mstar (z = 0)
 summary_plot.median_plot(x=Mstar_z0_tot[mask_delta_d], y=L_tot[mask_delta_d]/1e4, xtype='M.star.z0', ytype='L.tot', binedges=(4.5,9.5), binsize=0.5, file_path_and_name=directory+'/Ltot_outliers_vs_Mstar_z0.pdf')
-summary_plot.median_plot_mult(x=[Mstar_z0_tot[mask_delta_d], Mstar_z0_tot], y=[L_tot[mask_delta_d]/1e4, L_tot/1e4], xtype=['M.star.z0', 'M.star.z0'], ytype=['L.tot', 'L.tot'], labels=['Outliers', 'Total'], binedges=(4.5,9.5), binsize=0.5, limits=((4,9.5),(0,4)), file_path_and_name=directory+'/Ltot_outliers_vs_Mstar_z0_comparison.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_tot[mask_delta_d], Mstar_z0_tot], y=[L_tot[mask_delta_d]/1e4, L_tot/1e4], xtype=['M.star.z0', 'M.star.z0'], ytype=['L.tot', 'L.tot'], labels=['Outliers', 'Total'], binedges=(4.5,9.5), binsize=0.5, legend_on=False, limits=((4,9.5),(0,4)), file_path_and_name=directory+'/Ltot_outliers_vs_Mstar_z0_comparison.pdf')
 
 
 
@@ -701,7 +701,7 @@ potential_tot_2 = summary.potential(data_potentials, nperi_2_mask, oversample=Tr
 ke_z0_tot_2 = summary.kinetic_energy(data_total, nperi_2_mask, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
 Mstar_z0_tot_2 = summary.mstar(data_total, nperi_2_mask, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
 #
-summary_plot.plot_hist_mult(x=[(potential_tot_0+ke_z0_tot_0)/1e4, (potential_tot_1+ke_z0_tot_1)/1e4, (potential_tot_2+ke_z0_tot_2)/1e4], xtype=['E.tot','E.tot','E.tot'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], med_location=[1.3, 1.25, 1.225], binsize=0.2, legend_on=False, pdf=True, file_path_and_name=directory+'/Etot_comparison_nperis_histogram.pdf')
+summary_plot.plot_hist_mult(x=[(potential_tot_0+ke_z0_tot_0)/1e4, (potential_tot_1+ke_z0_tot_1)/1e4, (potential_tot_2+ke_z0_tot_2)/1e4], xtype=['E.tot','E.tot','E.tot'], labels=['$N_{\\rm peri}$ = 0','$N_{\\rm peri}$ = 1','$N_{\\rm peri}$ > 1'], med_location=[1.3, 1.25, 1.225], binsize=0.2, legend_on=False, pdf=True, file_path_and_name=directory+'/Etot_comparison_nperis_histogram.pdf')
 #
 summary_plot.median_plot_mult(x=[Mstar_z0_tot_0, Mstar_z0_tot_1, Mstar_z0_tot_2], y=[(potential_tot_0+ke_z0_tot_0)/1e4, (potential_tot_1+ke_z0_tot_1)/1e4, (potential_tot_2+ke_z0_tot_2)/1e4], xtype=['M.star.z0', 'M.star.z0', 'M.star.z0'], ytype=['E.tot', 'E.tot', 'E.tot'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=0.5, file_path_and_name=directory+'/Etot_vs_Mstar_z0_nperi_pops.pdf')
 
@@ -715,7 +715,7 @@ Mstar_z0_tot_0 = summary.mstar(data_total, nperi_0_mask, selection='z0', oversam
 Mstar_z0_tot_1 = summary.mstar(data_total, nperi_1_mask, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
 Mstar_z0_tot_2 = summary.mstar(data_total, nperi_2_mask, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
 #
-summary_plot.plot_hist_mult(x=[L_tot_0/1e4, L_tot_1/1e4, L_tot_2/1e4], xtype=['L.tot','L.tot','L.tot'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=0.2, pdf=True, xlimits=(0,7), med_location=[1.025, 0.975, 1.05,], legend_on=False, file_path_and_name=directory+'/Ltot_comparison_nperis_histogram.pdf')
+summary_plot.plot_hist_mult(x=[L_tot_0/1e4, L_tot_1/1e4, L_tot_2/1e4], xtype=['L.tot','L.tot','L.tot'], labels=['$N_{\\rm peri}$ = 0','$N_{\\rm peri}$ = 1','$N_{\\rm peri}$ > 1'], binsize=0.2, pdf=True, xlimits=(0,7), med_location=[1.025, 0.975, 1.05,], legend_on=False, file_path_and_name=directory+'/Ltot_comparison_nperis_histogram.pdf')
 #
 summary_plot.median_plot_mult(x=[Mstar_z0_tot_0, Mstar_z0_tot_1, Mstar_z0_tot_2], y=[L_tot_0/1e4, L_tot_1/1e4, L_tot_2/1e4], xtype=['M.star.z0', 'M.star.z0', 'M.star.z0'], ytype=['L.tot', 'L.tot', 'L.tot'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=0.5, file_path_and_name=directory+'/Ltot_vs_Mstar_z0_nperi_pops.pdf')
 summary_plot.median_plot_mult(x=[Mstar_z0_tot_0, Mstar_z0_tot_1, Mstar_z0_tot_2], y=[L_tot_0/1e4, L_tot_1/1e4, L_tot_2/1e4], xtype=['M.star.z0', 'M.star.z0', 'M.star.z0'], ytype=['L.tot', 'L.tot', 'L.tot'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=0.5, limits=((4,9.5),(0,5)), file_path_and_name=directory+'/Ltot_vs_Mstar_z0_nperi_pops_zoom.pdf')
@@ -735,7 +735,7 @@ Mstar_z0_tot_0 = summary.mstar(data_total, nperi_0_mask, selection='z0', oversam
 Mstar_z0_tot_1 = summary.mstar(data_total, nperi_1_mask, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
 Mstar_z0_tot_2 = summary.mstar(data_total, nperi_2_mask, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
 #
-summary_plot.plot_hist_mult(x=[dz0_tot_0, dz0_tot_1, dz0_tot_2], xtype=['d.z0','d.z0','d.z0'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=20, pdf=True, xlimits=(0,500), med_location=[0.00925, 0.00875, 0.009], legend_on=True, file_path_and_name=directory+'/dz0_comparison_nperis_histogram.pdf')
+summary_plot.plot_hist_mult(x=[dz0_tot_0, dz0_tot_1, dz0_tot_2], xtype=['d.z0','d.z0','d.z0'], labels=['$N_{\\rm peri}$ = 0','$N_{\\rm peri}$ = 1','$N_{\\rm peri}$ > 1'], binsize=20, pdf=True, xlimits=(0,500), med_location=[0.00925, 0.00875, 0.009], legend_on=True, file_path_and_name=directory+'/dz0_comparison_nperis_histogram.pdf')
 #
 summary_plot.median_plot_mult(x=[Mstar_z0_tot_0, Mstar_z0_tot_1, Mstar_z0_tot_2], y=[dz0_tot_0, dz0_tot_1, dz0_tot_2], xtype=['M.star.z0', 'M.star.z0', 'M.star.z0'], ytype=['d.z0','d.z0','d.z0'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=0.5, file_path_and_name=directory+'/dz0_vs_Mstar_z0_nperi_pops.pdf')
 summary_plot.median_plot_mult(x=[Mstar_z0_tot_0, Mstar_z0_tot_1, Mstar_z0_tot_2], y=[dz0_tot_0, dz0_tot_1, dz0_tot_2], xtype=['M.star.z0', 'M.star.z0', 'M.star.z0'], ytype=['d.z0','d.z0','d.z0'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=0.5, limits=((4,9.5),(0,400)), file_path_and_name=directory+'/dz0_vs_Mstar_z0_nperi_pops_zoom.pdf')

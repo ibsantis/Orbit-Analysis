@@ -1006,13 +1006,13 @@ class SummaryDataPlot(SummaryDataSort):
         self.labels = {'d.sim': 'd$_{\\rm peri,sim}$ [kpc]',\
                        'd.sim.min': 'd$_{\\rm peri,min,sim}$ [kpc]',\
                        'delta_d': '(d$_{\\rm peri,min}$ - d$_{\\rm peri,recent}$) [kpc]',\
-                       'delta_d_frac': '(d$_{\\rm peri,min}$ - d$_{\\rm peri,recent}$)/d$_{\\rm peri,recent}$',\
+                       'delta_d_frac': '($d_{\\rm peri,min}$ - $d_{\\rm peri,recent}$)/$d_{\\rm peri,recent}$',\
                        'd.peri': 'd$_{\\rm peri}$ [kpc]',\
                        'd.peri.recent': 'd$_{\\rm peri, recent}$ [kpc]',\
                        'd.peri.min': 'd$_{\\rm peri, min}$ [kpc]',\
                        'd.peri.text': 'Pericenter distance [kpc]',\
                        'd.model': 'd$_{\\rm peri,model}$ [kpc]',\
-                       'd.z0': 'Host distance, d [kpc]',\
+                       'd.z0': 'Host distance $d$ [kpc]',\
                        'delta.d.frac': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$',\
                        'delta.d': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$) [kpc]',\
                        'v.tan': 'Tangential velocity [km s$^{-1}$]',\
@@ -1020,7 +1020,7 @@ class SummaryDataPlot(SummaryDataSort):
                        'v.tot': 'Total velocity [km s$^{-1}$]',\
                        't.sim': 't$_{\\rm peri,lb,sim}$ [Gyr]',\
                        't.sim.min': 't$_{\\rm peri,min,lb,sim}$ [Gyr]',\
-                       'delta_t': '(t$_{\\rm peri,lb,min}$ - t$_{\\rm peri,lb,recent}$) [Gyr]',\
+                       'delta_t': '$t_{\\rm peri,lb,min}$ - $t_{\\rm peri,lb,recent}$) [Gyr]',\
                        'delta_t_frac': '(t$_{\\rm peri,lb,min}$ - t$_{\\rm peri,lb,recent}$)/t$_{\\rm peri,lb,recent}$',\
                        't.model': 't$_{\\rm peri,lb,model}$ [Gyr]',\
                        't.peri': 't$_{\\rm peri,lb}$ [Gyr]',\
@@ -1045,7 +1045,7 @@ class SummaryDataPlot(SummaryDataSort):
                        'KE.max.sim': 'KE$_{\\rm max,sim}$ [10$^4$ km$^2$/s$^2$]',\
                        'KE.peri.sim': 'KE$_{\\rm peri,sim}$ [10$^4$ km$^2$/s$^2$]',\
                        'KE.z0.sim': 'KE$_{\\rm sim}(z = 0)$ [10$^4$ km$^2$/s$^2$]',\
-                       'E.tot': 'E [10$^4$ km$^2$/s$^2$]',\
+                       'E.tot': '$E$ [10$^4$ km$^2$/s$^2$]',\
                        'E.tot.sim': 'E$_{\\rm sim}(z = 0)$ [10$^4$ km$^2$/s$^2$]',\
                        'E.tot.model': 'E$_{\\rm model}(z = 0)$ [10$^4$ km$^2$/s$^2$]',\
                        'L.tot': '$\\ell$ [10$^4$ kpc km s$^{-1}$]',\
@@ -1415,7 +1415,7 @@ class SummaryDataPlot(SummaryDataSort):
               calculates the median and 68% scatter.
         """
         if len(x) == 2:
-            colorss = ['#000080', '#006400']
+            colorss = ['#006400', '#000080']
         else:
             colorss = self.colors
         #
