@@ -1006,22 +1006,18 @@ class SummaryDataPlot(SummaryDataSort):
         self.labels = {'d.sim': 'd$_{\\rm peri,sim}$ [kpc]',\
                        'd.sim.min': 'd$_{\\rm peri,min,sim}$ [kpc]',\
                        'delta_d': '(d$_{\\rm peri,min}$ - d$_{\\rm peri,recent}$) [kpc]',\
-                       'delta_dmin_dm_v_star': '(d$_{\\rm min,dm}$ - d$_{\\rm min,star}$) [kpc]',\
-                       'delta_drec_dm_v_star': '(d$_{\\rm recent,dm}$ - d$_{\\rm recent,star}$) [kpc]',\
                        'delta_d_frac': '(d$_{\\rm peri,min}$ - d$_{\\rm peri,recent}$)/d$_{\\rm peri,recent}$',\
                        'd.peri': 'd$_{\\rm peri}$ [kpc]',\
-                       'd_min_dm': 'd$_{\\rm min,dm}$ [kpc]',\
-                       'd_recent_dm': 'd$_{\\rm recent,dm}$ [kpc]',\
                        'd.peri.recent': 'd$_{\\rm peri, recent}$ [kpc]',\
                        'd.peri.min': 'd$_{\\rm peri, min}$ [kpc]',\
                        'd.peri.text': 'Pericenter distance [kpc]',\
                        'd.model': 'd$_{\\rm peri,model}$ [kpc]',\
-                       'd.z0': 'd(z = 0) [kpc]',\
+                       'd.z0': 'Host distance, d [kpc]',\
                        'delta.d.frac': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$',\
                        'delta.d': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$) [kpc]',\
-                       'v.tan': 'v$_{\\rm tan}(z = 0)$ [km s$^{-1}$]',\
+                       'v.tan': 'Tangential velocity [km s$^{-1}$]',\
                        'v.rad': 'v$_{\\rm rad}(z = 0)$ [km s$^{-1}$]',\
-                       'v.tot': 'v$(z = 0)$ [km s$^{-1}$]',\
+                       'v.tot': 'Total velocity [km s$^{-1}$]',\
                        't.sim': 't$_{\\rm peri,lb,sim}$ [Gyr]',\
                        't.sim.min': 't$_{\\rm peri,min,lb,sim}$ [Gyr]',\
                        'delta_t': '(t$_{\\rm peri,lb,min}$ - t$_{\\rm peri,lb,recent}$) [Gyr]',\
@@ -1042,20 +1038,27 @@ class SummaryDataPlot(SummaryDataSort):
                        'N.peri': 'N$_{\\rm peri}$',\
                        'N.peri.text': 'Pericenter Number',\
                        'N.delta': 'N$_{\\rm model}$ - N$_{\\rm sim}$',\
-                       'M.star.z0': 'M$_{\\rm star}$ [M$_{\\odot}$]',\
-                       'M.star.peak': 'log$_{\\rm 10}$[M$_{\\rm star, peak}$/M$_{\\odot}$]',\
-                       'M.halo.z0': 'log$_{\\rm 10}$[M$_{\\rm halo}(z = 0)$/M$_{\\odot}$]',\
-                       'M.halo.peak': 'M$_{\\rm halo, peak}$ [M$_{\\odot}$]',\
+                       'M.star.z0': '$M_{\\rm star}$ [$M_{\\odot}$]',\
+                       'M.star.peak': 'log$_{\\rm 10}$[$M_{\\rm star, peak}$/$M_{\\odot}$]',\
+                       'M.halo.z0': 'log$_{\\rm 10}$[$M_{\\rm halo}(z = 0)$/$M_{\\odot}$]',\
+                       'M.halo.peak': '$M_{\\rm halo, peak}$ [$M_{\\odot}$]',\
                        'KE.max.sim': 'KE$_{\\rm max,sim}$ [10$^4$ km$^2$/s$^2$]',\
                        'KE.peri.sim': 'KE$_{\\rm peri,sim}$ [10$^4$ km$^2$/s$^2$]',\
                        'KE.z0.sim': 'KE$_{\\rm sim}(z = 0)$ [10$^4$ km$^2$/s$^2$]',\
-                       'E.tot': 'E$(z = 0)$ [10$^4$ km$^2$/s$^2$]',\
+                       'E.tot': 'E [10$^4$ km$^2$/s$^2$]',\
                        'E.tot.sim': 'E$_{\\rm sim}(z = 0)$ [10$^4$ km$^2$/s$^2$]',\
                        'E.tot.model': 'E$_{\\rm model}(z = 0)$ [10$^4$ km$^2$/s$^2$]',\
-                       'L.tot': 'L$(z = 0)$ [10$^4$ kpc km s$^{-1}$]',\
+                       'L.tot': '$\\ell$ [10$^4$ kpc km s$^{-1}$]',\
                        'L.tot.sim': 'L$_{\\rm sim}(z = 0)$ [10$^4$ kpc km s$^{-1}$]',\
-                       'L.tot.model': 'L$_{\\rm model}(z = 0)$ [10$^4$ kpc km s$^{-1}$]'}
+                       'L.tot.model': 'L$_{\\rm model}(z = 0)$ [10$^4$ kpc km s$^{-1}$]',\
+                       #
+                       # I don't really use the ones below here...
+                       'delta_dmin_dm_v_star': '(d$_{\\rm min,dm}$ - d$_{\\rm min,star}$) [kpc]',\
+                       'delta_drec_dm_v_star': '(d$_{\\rm recent,dm}$ - d$_{\\rm recent,star}$) [kpc]',\
+                       'd_min_dm': 'd$_{\\rm min,dm}$ [kpc]',\
+                       'd_recent_dm': 'd$_{\\rm recent,dm}$ [kpc]'}
         #
+        # I don't really make use of a lot of these titles, but I like the idea of using them someday.
         self.titles = {'d.sim': 'Recent Minimum Distances',\
                        'd.model': 'Recent Minimum Distances',\
                        'd.z0': 'Present-day Distances',\
@@ -1237,6 +1240,8 @@ class SummaryDataPlot(SummaryDataSort):
             scatter = np.zeros(len(bins)-1)
             highest = np.zeros(len(bins)-1)
             lowest = np.zeros(len(bins)-1)
+            upper = np.zeros(len(bins)-1)
+            lower = np.zeros(len(bins)-1)
             #
             for i in range(0, len(bins)-1):
                 mask = (x >= bins[i]) & (x <= bins[i+1])
@@ -1244,9 +1249,13 @@ class SummaryDataPlot(SummaryDataSort):
                 scatter[i] = np.nanstd(y[mask])
                 highest[i] = np.nanpercentile(y[mask], twosigp)
                 lowest[i] = np.nanpercentile(y[mask], twosigm)
+                upper[i] = means[i]+scatter[i]
+                lower[i] = means[i]-scatter[i]
+                if (upper[i] > highest[i]):
+                    upper[i] = highest[i]
+                if (lower[i] < lowest[i]):
+                    lower[i] = lowest[i]
             #
-            upper = means+scatter
-            lower = means-scatter
             med = means
         #
         if 'N.' in xtype and 'N.' in ytype:
@@ -1319,6 +1328,7 @@ class SummaryDataPlot(SummaryDataSort):
             plt.plot(10**(bins[:-1]+half_bin), 10**med, color=self.colors[1], markersize=10, alpha=0.5)
             plt.fill_between(10**(bins[:-1]+half_bin), 10**upper, 10**lower, color=self.colors[1], alpha=0.3)
             plt.fill_between(10**(bins[:-1]+half_bin), 10**highest, 10**lowest, color=self.colors[1], alpha=0.15)
+            plt.hlines(y=3*10**4, xmin=10**(limits[0][0]), xmax=10**(limits[0][1]), colors='k', linestyles='dotted', alpha=0.5)
             if limits:
                 plt.xlim(10**(limits[0][0]), 10**(limits[0][1]))
                 plt.ylim(10**(limits[1][0]), 10**(limits[1][1]))
@@ -1377,7 +1387,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def median_plot_mult(self, x, y, xtype, ytype, labels, binsize, file_path_and_name, binedges=None, limits=None, title=None):
+    def median_plot_mult(self, x, y, xtype, ytype, labels, binsize, file_path_and_name, binedges=None, limits=None, title=None, legend_on=True):
         """
         DESCRIPTION:
             Bins the x-axis quantity and plots either the mean or median, along
@@ -1506,6 +1516,8 @@ class SummaryDataPlot(SummaryDataSort):
                 scatter = np.zeros(len(bins)-1)
                 lowest = np.zeros(len(bins)-1)
                 highest = np.zeros(len(bins)-1)
+                upper = np.zeros(len(bins)-1)
+                lower = np.zeros(len(bins)-1)
                 #
                 for i in range(0, len(bins)-1):
                     mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
@@ -1513,9 +1525,13 @@ class SummaryDataPlot(SummaryDataSort):
                     scatter[i] = np.nanstd(y[j][mask])
                     highest[i] = np.nanpercentile(y[j][mask], twosigp)
                     lowest[i] = np.nanpercentile(y[j][mask], twosigm)
+                    upper[i] = means[i]+scatter[i]
+                    lower[i] = means[i]-scatter[i]
+                    if (upper[i] > highest[i]):
+                        upper[i] = highest[i]
+                    if (lower[i] < lowest[i]):
+                        lower[i] = lowest[i]
                 #
-                upper = means+scatter
-                lower = means-scatter
                 med = means
             #
             if 'N.' in xtype[j] and 'N.' in ytype[j]:
@@ -1558,6 +1574,7 @@ class SummaryDataPlot(SummaryDataSort):
                 plt.plot(10**(bins[:-1]+half_bin), 10**med, color=colorss[j], markersize=10, alpha=0.5, label=labels[j])
                 plt.fill_between(10**(bins[:-1]+half_bin), 10**upper, 10**lower, color=colorss[j], alpha=0.3)
                 plt.fill_between(10**(bins[:-1]+half_bin), 10**highest, 10**lowest, color=colorss[j], alpha=0.15)
+                ax.axhline(y=3*10**7, xmin=10**(8), xmax=10**(9), color='k', linestyle=':')
                 #
             else:
                 plt.plot(bins[:-1]+half_bin, med, color=colorss[j], markersize=10, alpha=0.5, label=labels[j])
@@ -1600,7 +1617,8 @@ class SummaryDataPlot(SummaryDataSort):
             ax2.tick_params(pad=3)
         ax.set_xlabel(self.labels[xtype[0]], fontsize=28)
         ax.set_ylabel(self.labels[ytype[0]], fontsize=28)
-        ax.legend(prop={'size': 20}, loc='best')
+        if legend_on:
+            ax.legend(prop={'size': 20}, loc='best')
         if title:
             plt.title(self.titles[title], fontsize=24)
         ax.tick_params(axis='both', which='major', labelsize=28)
