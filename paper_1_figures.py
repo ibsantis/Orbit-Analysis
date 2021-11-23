@@ -644,7 +644,7 @@ summary_plot.plot_hist_mult(x=[((ke_z0_tot+potential_tot)/1e4)[mask_delta_d], ((
 #
 # Plot the energy vs Mstar (z = 0)
 summary_plot.median_plot(x=Mstar_z0_tot[mask_delta_d], y=((ke_z0_tot+potential_tot)/1e4)[mask_delta_d], xtype='M.star.z0', ytype='E.tot', binedges=(4.5,9.5), binsize=0.5, file_path_and_name=directory+'/Etot_outliers_vs_Mstar_z0.pdf')
-summary_plot.median_plot_mult(x=[Mstar_z0_tot[mask_delta_d], Mstar_z0_tot], y=[((ke_z0_tot+potential_tot)/1e4)[mask_delta_d], ((ke_z0_tot+potential_tot)/1e4)], xtype=['M.star.z0', 'M.star.z0'], ytype=['E.tot', 'E.tot'], labels=['Outliers', 'Total'], binsize=0.5, file_path_and_name=directory+'/Etot_outliers_vs_Mstar_z0_comparison.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_tot, Mstar_z0_tot[mask_delta_d]], y=[((ke_z0_tot+potential_tot)/1e4), ((ke_z0_tot+potential_tot)/1e4)[mask_delta_d]], xtype=['M.star.z0', 'M.star.z0'], ytype=['E.tot', 'E.tot'], labels=['Total', 'Outliers'], binsize=0.5, file_path_and_name=directory+'/Etot_outliers_vs_Mstar_z0_comparison.pdf')
 
 
 
@@ -662,7 +662,7 @@ summary_plot.plot_hist_mult(x=[L_tot[mask_delta_d]/1e4, L_tot/1e4], xtype=['L.to
 #
 # Plot the angular momentum vs Mstar (z = 0)
 summary_plot.median_plot(x=Mstar_z0_tot[mask_delta_d], y=L_tot[mask_delta_d]/1e4, xtype='M.star.z0', ytype='L.tot', binedges=(4.5,9.5), binsize=0.5, file_path_and_name=directory+'/Ltot_outliers_vs_Mstar_z0.pdf')
-summary_plot.median_plot_mult(x=[Mstar_z0_tot[mask_delta_d], Mstar_z0_tot], y=[L_tot[mask_delta_d]/1e4, L_tot/1e4], xtype=['M.star.z0', 'M.star.z0'], ytype=['L.tot', 'L.tot'], labels=['Outliers', 'Total'], binedges=(4.5,9.5), binsize=0.5, legend_on=False, limits=((4,9.5),(0,4)), file_path_and_name=directory+'/Ltot_outliers_vs_Mstar_z0_comparison.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_tot, Mstar_z0_tot[mask_delta_d]], y=[L_tot/1e4, L_tot[mask_delta_d]/1e4], xtype=['M.star.z0', 'M.star.z0'], ytype=['L.tot', 'L.tot'], labels=['Total', 'Outliers'], binedges=(4.5,9.5), binsize=0.5, legend_on=False, limits=((4,9.5),(0,4)), file_path_and_name=directory+'/Ltot_outliers_vs_Mstar_z0_comparison.pdf')
 
 
 
