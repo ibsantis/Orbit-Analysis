@@ -40,7 +40,7 @@ directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs'
 ### Generate all of the data for the plots below
 mask_selection = masks_infall
 # Fix for the outlier in the Mstar-Mhalo relation
-mask_selection['m12f'][57] = False
+#mask_selection['m12f'][57] = False
 #
 N_sim_tot = summary.nperi(data_total, mask_selection, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon')
 d_sim_tot = summary.dperi_recent(data_total, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
@@ -167,6 +167,7 @@ masks_infall = summary.data_mask(data_total_all, peri_sim=False, peri_model=Fals
 mask_selection = masks_infall
 #
 N_sim_tot_all = summary.nperi(data_total_all, mask_selection, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon_all')
+dz0_tot_all = summary.d_z0(data_total_all, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon_all')
 d_sim_tot_all = summary.dperi_recent(data_total_all, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon_all')
 d_min_tot_all = summary.dperi_min(data_total_all, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon_all')
 t_sim_tot_all = summary.tperi_recent(data_total_all, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon_all')
