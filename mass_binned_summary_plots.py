@@ -13,21 +13,21 @@ f, ax = plt.subplots(figsize=(11, 8))
 colorss = ['#000080', '#006400']
 binedges = None
 binsize = 50
-limits = ((0,400),(0,13))
+limits = ((0,400),(0,300))
 #
 x = [dz0_tot, dz0_tot, dz0_tot[mass_low], dz0_tot[mass_high], dz0_tot[mass_low], dz0_tot[mass_high]]
 #x = [dz0_tot, dz0_tot[mass_low], dz0_tot[mass_high]]
 #x = [t_in_tot, t_in_tot[mass_low], t_in_tot[mass_high]]
-#y = [d_sim_tot, d_min_tot, d_sim_tot[mass_low], d_sim_tot[mass_high], d_min_tot[mass_low], d_min_tot[mass_high]]
+y = [d_sim_tot, d_min_tot, d_sim_tot[mass_low], d_sim_tot[mass_high], d_min_tot[mass_low], d_min_tot[mass_high]]
 #y = [t_sim_tot, t_min_tot, t_sim_tot[mass_low], t_sim_tot[mass_high], t_min_tot[mass_low], t_min_tot[mass_high]]
-y = [t_in_tot, t_in_any_tot, t_in_tot[mass_low], t_in_tot[mass_high], t_in_any_tot[mass_low], t_in_any_tot[mass_high]]
+#y = [t_in_tot, t_in_any_tot, t_in_tot[mass_low], t_in_tot[mass_high], t_in_any_tot[mass_low], t_in_any_tot[mass_high]]
 #y = [N_sim_tot, N_sim_tot[mass_low], N_sim_tot[mass_high]]
 #y = [vz0_tot, vz0_tot[mass_low], vz0_tot[mass_high]]
 #y = [L_tot/1e4, (L_tot/1e4)[mass_low], (L_tot/1e4)[mass_high]]
 #y = [vtan_tot, vtan_tot[mass_low], vtan_tot[mass_high]]
 #
 xtype = ['d.z0', 'd.z0', 'd.z0', 'd.z0', 'd.z0', 'd.z0']
-ytype = ['t.infall.text','t.infall.text','t.infall.text','t.infall.text','t.infall.text','t.infall.text']
+ytype = ['d.peri.text','d.peri.text','d.peri.text','d.peri.text','d.peri.text','d.peri.text']
 #xtype = ['d.z0', 'd.z0', 'd.z0']
 #ytype = ['v.tan', 'v.tan', 'v.tan']
 #
@@ -73,15 +73,15 @@ for j in range(0, len(x)):
     #
     for i in range(0, len(bins)-1):
         mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
-        #med[i] = np.nanmedian(y[j][mask])
-        med[i] = np.nanmean(y[j][mask])
-        scatter[i] = np.nanstd(y[j][mask])
-        #upper[i] = np.nanpercentile(y[j][mask], onesigp)
-        #lower[i] = np.nanpercentile(y[j][mask], onesigm)
+        med[i] = np.nanmedian(y[j][mask])
+        #med[i] = np.nanmean(y[j][mask])
+        #scatter[i] = np.nanstd(y[j][mask])
+        upper[i] = np.nanpercentile(y[j][mask], onesigp)
+        lower[i] = np.nanpercentile(y[j][mask], onesigm)
         highest[i] = np.nanpercentile(y[j][mask], twosigp)
         lowest[i] = np.nanpercentile(y[j][mask], twosigm)
-        upper[i] = med[i]+scatter[i]
-        lower[i] = med[i]-scatter[i]
+        #upper[i] = med[i]+scatter[i]
+        #lower[i] = med[i]-scatter[i]
         if (upper[i] > highest[i]):
             upper[i] = highest[i]
         if (lower[i] < lowest[i]):
@@ -153,9 +153,9 @@ if 't.' in xtype:
     ax2.tick_params(pad=3)
 ax.set_xlabel('Host distance $d$ [kpc]', fontsize=28)
 #ax.set_xlabel('Infall Lookback Time [Gyr]', fontsize=28)
-#ax.set_ylabel('Pericenter Distance [kpc]', fontsize=28)
+ax.set_ylabel('Pericenter Distance [kpc]', fontsize=28)
 #ax.set_ylabel('Pericenter Lookback Time [Gyr]', fontsize=28)
-ax.set_ylabel('Infall Lookback Time [Gyr]', fontsize=28)
+#ax.set_ylabel('Infall Lookback Time [Gyr]', fontsize=28)
 #ax.set_ylabel('Pericenter Number', fontsize=28)
 #ax.set_ylabel('Total velocity [km s$^{-1}$]', fontsize=28)
 #ax.set_ylabel('$\\ell$ [10$^4$ kpc km s$^{-1}$]', fontsize=28)
