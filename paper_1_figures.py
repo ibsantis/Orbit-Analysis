@@ -40,7 +40,7 @@ directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs'
 ### Generate all of the data for the plots below
 mask_selection = masks_infall
 # Fix for the outlier in the Mstar-Mhalo relation
-#mask_selection['m12f'][57] = False
+mask_selection['m12f'][57] = False
 #
 N_sim_tot = summary.nperi(data_total, mask_selection, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon')
 d_sim_tot = summary.dperi_recent(data_total, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
@@ -236,6 +236,7 @@ data_total_iso = summary.data_read(directory=sim_data.home_dir, hosts='iso_no_z'
 data_potentials_iso = summary.data_read_potential(directory=sim_data.home_dir, hosts='iso_no_z', sim_type='baryon')
 masks_infall = summary.data_mask(data_total_iso, peri_sim=False, peri_model=False, hosts='iso_no_z')
 mask_selection_iso = masks_infall
+mask_selection_iso['m12f'][57] = False
 #
 N_sim_iso = summary.nperi(data_total_iso, mask_selection_iso, oversample=True, selection='sim', hosts='iso_no_z', sim_type='baryon')
 d_sim_iso = summary.dperi_recent(data_total_iso, mask_selection_iso, selection='sim', oversample=True, hosts='iso_no_z', sim_type='baryon')
