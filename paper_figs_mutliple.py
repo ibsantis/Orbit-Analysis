@@ -51,7 +51,7 @@ L_tot = summary.L_z0(data_total, mask_selection, selection='sim', oversample=Tru
 
 
 """
-    Plotting Figure 2 in Paper I: Pericenter distance and number.
+    Pericenter distance and number.
 """
 f, (ax1, ax2) = plt.subplots(2, 1, figsize=(10.5,12))
 colorss = ['#000080', '#006400']
@@ -214,7 +214,9 @@ ax2.set_ylim(0, 5.5)
 #
 ax2.set_xlabel('$M_{\\rm star} [M_{\\odot}]$', fontsize=28)
 ax1.set_ylabel('Pericenter distance [kpc]', fontsize=28)
+ax1.get_yaxis().set_label_coords(-0.09,0.5)
 ax2.set_ylabel('Pericenter Number', fontsize=28)
+ax2.get_yaxis().set_label_coords(-0.09,0.5)
 ax1.legend(prop={'size': 20}, loc='best')
 ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=False)
 ax1.xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
@@ -232,108 +234,14 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/fina
 
 
 """
-    Plotting Figure 3 in Paper I: Pericenter time and Infall time
+    Pericenter time and Infall time
 """
 f, (ax1, ax2) = plt.subplots(2, 1, figsize=(10.5,12))
 colorss = ['#000080', '#006400']
 binedges = (4.5, 9.5)
 binsize = 0.5
-limits_1 = ((4,9.5),(0,9))
-limits_2 = ((4,9.5),(0,13.8))
-#
-x = [Mstar_z0_tot, Mstar_z0_tot]
-y = [t_sim_tot, t_min_tot]
-#
-xtype = ['M.star.z0', 'M.star.z0']
-ytype = ['t.peri.text','t.peri.text']
-#
-medians = []
-lowers = []
-uppers = []
-lowests = []
-highests = []
-binss = []
-half_bins = []
-#
-for j in range(0, len(x)):
-    if 'M.' in xtype[j]:
-        x[j] = np.log10(x[j])
-    if 'M.' in ytype[j]:
-        y[j] = np.log10(y[j])
-    #
-    if binedges:
-        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
-        bins = np.linspace(binedges[0], binedges[1], bin_num)
-        half_bin = (bins[1]-bins[0])/2
-    else:
-        minn = binsize*np.floor(np.min(x[j])/binsize)
-        maxx = binsize*np.ceil(np.max(x[j])/binsize)
-        if minn < 0:
-            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
-        else:
-            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
-        bins = np.linspace(minn, maxx, bin_num)
-        half_bin = (bins[1]-bins[0])/2
-    #
-    onesigp = 84.13
-    onesigm = 15.87
-    twosigp = 100
-    twosigm = 0
-    #
-    med = np.zeros(len(bins)-1)
-    lower = np.zeros(len(bins)-1)
-    upper = np.zeros(len(bins)-1)
-    lowest = np.zeros(len(bins)-1)
-    highest = np.zeros(len(bins)-1)
-    #
-    for i in range(0, len(bins)-1):
-        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
-        med[i] = np.nanmedian(y[j][mask])
-        upper[i] = np.nanpercentile(y[j][mask], onesigp)
-        lower[i] = np.nanpercentile(y[j][mask], onesigm)
-        highest[i] = np.nanpercentile(y[j][mask], twosigp)
-        lowest[i] = np.nanpercentile(y[j][mask], twosigm)
-    medians.append(med)
-    lowers.append(lower)
-    uppers.append(upper)
-    lowests.append(lowest)
-    highests.append(highest)
-    binss.append(bins)
-    half_bins.append(half_bin)
-#
-# PLOTTING
-# Plot the scatter for the recent and minimum pericenters
-ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
-ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.3)
-ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.15)
-#
-# Plot the medians for the two mass bins (low-mass)
-ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='Recent') # Recent, M < 1e7
-ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='Minimum') #, label='MW/M31-mass host ($M_{\\rm star} > 10^{7} M_{\\odot}$)') # Recent M > 1e7
-#
-ax1.set_xscale('log')
-ax1.set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
-ax1.set_ylim(limits_1[1])
-#
-if 't.' in ytype[0]:
-    # Instantiate the cosmology class and run this method first to set up scalefactors
-    cc = ut.cosmology.CosmologyClass()
-    red = np.array([0, 1])
-    cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
-    #
-    axis_3_label = 'redshift'
-    axis_3_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
-    axis_3_tick_values = [float(v) for v in axis_3_tick_labels]
-    axis_3_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_3_tick_values)
-    ax3 = ax1.twinx()
-    ax3.set_xscale('log')
-    ax3.set_yscale('linear')
-    ax3.set_yticks(axis_3_tick_locations)
-    ax3.set_yticklabels(axis_3_tick_labels, fontsize=24)
-    ax3.set_ylim(limits_1[1])
-    ax3.set_ylabel(axis_3_label, labelpad=9)
-    ax3.tick_params(pad=3)
+limits_1 = ((4,9.5),(0,13.8))
+limits_2 = ((4,9.5),(0,9))
 #
 x = [Mstar_z0_tot, Mstar_z0_tot]
 y = [t_in_tot, t_in_any_tot]
@@ -397,14 +305,108 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
+ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.3)
+ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.15)
+#
+# Plot the medians for the two mass bins (low-mass)
+ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='MW/M31-mass halo') # Recent, M < 1e7
+ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='Any halo') # Recent, M < 1e7
+#
+ax1.set_xscale('log')
+ax1.set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
+ax1.set_ylim(limits_1[1])
+#
+if 't.' in ytype[0]:
+    # Instantiate the cosmology class and run this method first to set up scalefactors
+    cc = ut.cosmology.CosmologyClass()
+    red = np.array([0, 1])
+    cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+    #
+    axis_3_label = 'redshift'
+    axis_3_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+    axis_3_tick_values = [float(v) for v in axis_3_tick_labels]
+    axis_3_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_3_tick_values)
+    ax3 = ax1.twinx()
+    ax3.set_xscale('log')
+    ax3.set_yscale('linear')
+    ax3.set_yticks(axis_3_tick_locations)
+    ax3.set_yticklabels(axis_3_tick_labels, fontsize=28)
+    ax3.set_ylim(limits_1[1])
+    ax3.set_ylabel(axis_3_label, labelpad=9)
+    ax3.tick_params(pad=3)
+#
+x = [Mstar_z0_tot, Mstar_z0_tot]
+y = [t_sim_tot, t_min_tot]
+#
+xtype = ['M.star.z0', 'M.star.z0']
+ytype = ['t.peri.text','t.peri.text']
+#
+medians = []
+lowers = []
+uppers = []
+lowests = []
+highests = []
+binss = []
+half_bins = []
+#
+for j in range(0, len(x)):
+    if 'M.' in xtype[j]:
+        x[j] = np.log10(x[j])
+    if 'M.' in ytype[j]:
+        y[j] = np.log10(y[j])
+    #
+    if binedges:
+        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+        bins = np.linspace(binedges[0], binedges[1], bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    else:
+        minn = binsize*np.floor(np.min(x[j])/binsize)
+        maxx = binsize*np.ceil(np.max(x[j])/binsize)
+        if minn < 0:
+            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+        else:
+            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+        bins = np.linspace(minn, maxx, bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    #
+    onesigp = 84.13
+    onesigm = 15.87
+    twosigp = 100
+    twosigm = 0
+    #
+    med = np.zeros(len(bins)-1)
+    lower = np.zeros(len(bins)-1)
+    upper = np.zeros(len(bins)-1)
+    lowest = np.zeros(len(bins)-1)
+    highest = np.zeros(len(bins)-1)
+    #
+    for i in range(0, len(bins)-1):
+        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+        med[i] = np.nanmedian(y[j][mask])
+        upper[i] = np.nanpercentile(y[j][mask], onesigp)
+        lower[i] = np.nanpercentile(y[j][mask], onesigm)
+        highest[i] = np.nanpercentile(y[j][mask], twosigp)
+        lowest[i] = np.nanpercentile(y[j][mask], twosigm)
+    medians.append(med)
+    lowers.append(lower)
+    uppers.append(upper)
+    lowests.append(lowest)
+    highests.append(highest)
+    binss.append(bins)
+    half_bins.append(half_bin)
+#
+# PLOTTING
+# Plot the scatter for the recent and minimum pericenters
 ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
 ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
 ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.3)
 ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.15)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax2.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='MW/M31-mass halo') # Recent, M < 1e7
-ax2.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='Any halo') # Recent, M < 1e7
+ax2.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='Recent') # Recent, M < 1e7
+ax2.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='Minimum') #, label='MW/M31-mass host ($M_{\\rm star} > 10^{7} M_{\\odot}$)') # Recent M > 1e7
 #
 ax2.set_xscale('log')
 ax2.set_xlim(10**(limits_2[0][0]), 10**(limits_2[0][1]))
@@ -424,21 +426,24 @@ if 't.' in ytype[0]:
     ax4.set_xscale('log')
     ax4.set_yscale('linear')
     ax4.set_yticks(axis_4_tick_locations)
-    ax4.set_yticklabels(axis_4_tick_labels, fontsize=28)
+    ax4.set_yticklabels(axis_4_tick_labels, fontsize=24)
     ax4.set_ylim(limits_2[1])
     ax4.set_ylabel(axis_4_label, labelpad=9)
     ax4.tick_params(pad=3)
+#
 ax2.set_xlabel('$M_{\\rm star} [M_{\\odot}]$', fontsize=28)
-ax1.set_ylabel('Pericenter Lookback Time [Gyr]', fontsize=24)
-ax2.set_ylabel('Infall Lookback Time [Gyr]', fontsize=24)
-ax1.legend(prop={'size': 20}, loc='best')
+ax1.set_ylabel('Infall Lookback Time [Gyr]', fontsize=24)
+ax1.get_yaxis().set_label_coords(-0.075,0.5)
+ax2.set_ylabel('Pericenter Lookback Time [Gyr]', fontsize=24)
+ax2.get_yaxis().set_label_coords(-0.075,0.5)
 ax2.legend(prop={'size': 20}, loc='best')
-ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=False)
-ax1.xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
-ax2.xaxis.set_major_locator(LogLocator(base=10))
-ax2.xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
-ax2.set_xticks([1e4, 1e5, 1e6, 1e7, 1e8, 1e9])
+ax1.legend(prop={'size': 20}, loc='best')
 ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
+ax2.xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
+ax1.xaxis.set_major_locator(LogLocator(base=10))
+ax1.xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
+ax1.set_xticks([1e4, 1e5, 1e6, 1e7, 1e8, 1e9])
+ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=False)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #plt.show()
@@ -687,8 +692,11 @@ ax3.set_ylim(limits_3[1])
 #
 ax3.set_xlabel('$M_{\\rm star} [M_{\\odot}]$', fontsize=28)
 ax1.set_ylabel('Total velocity [km s$^{-1}$]', fontsize=24)
+ax1.get_yaxis().set_label_coords(-0.09,0.5)
 ax2.set_ylabel('$\\ell$ [10$^4$ kpc km s$^{-1}$]', fontsize=24)
+ax2.get_yaxis().set_label_coords(-0.09,0.5)
 ax3.set_ylabel('$E$ [10$^4$ km$^2$ s$^{-2}$]', fontsize=24)
+ax3.get_yaxis().set_label_coords(-0.09,0.5)
 ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=False)
 ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=False)
 ax1.xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
@@ -874,7 +882,9 @@ ax2.set_ylim(0, 6.5)
 #
 ax2.set_xlabel('Host distance $d$ [kpc]', fontsize=28)
 ax1.set_ylabel('Pericenter distance [kpc]', fontsize=28)
+ax1.get_yaxis().set_label_coords(-0.09,0.5)
 ax2.set_ylabel('Pericenter Number', fontsize=28)
+ax2.get_yaxis().set_label_coords(-0.09,0.5)
 ax1.legend(prop={'size': 20}, loc='best')
 ax2.legend(prop={'size': 20}, loc='best')
 ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=False)
@@ -898,105 +908,8 @@ f, (ax1, ax2) = plt.subplots(2, 1, figsize=(10.5,12))
 colorss = ['#000080', '#006400']
 binedges=None
 binsize = 50
-limits_1 = ((0, 400),(0,10))
-limits_2 = ((0, 400),(0,13.5))
-
-#
-x = [dz0_tot, dz0_tot, dz0_tot[mass_low], dz0_tot[mass_high], dz0_tot[mass_low], dz0_tot[mass_high]]
-y = [t_sim_tot, t_min_tot, t_sim_tot[mass_low], t_sim_tot[mass_high], t_min_tot[mass_low], t_min_tot[mass_high]]
-#
-xtype = ['d.z0', 'd.z0', 'd.z0', 'd.z0', 'd.z0', 'd.z0']
-ytype = ['t.peri.text','t.peri.text','t.peri.text','t.peri.text','t.peri.text','t.peri.text']
-#
-medians = []
-lowers = []
-uppers = []
-lowests = []
-highests = []
-binss = []
-half_bins = []
-#
-for j in range(0, len(x)):
-    if 'M.' in xtype[j]:
-        x[j] = np.log10(x[j])
-    if 'M.' in ytype[j]:
-        y[j] = np.log10(y[j])
-    #
-    if binedges:
-        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
-        bins = np.linspace(binedges[0], binedges[1], bin_num)
-        half_bin = (bins[1]-bins[0])/2
-    else:
-        minn = binsize*np.floor(np.min(x[j])/binsize)
-        maxx = binsize*np.ceil(np.max(x[j])/binsize)
-        if minn < 0:
-            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
-        else:
-            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
-        bins = np.linspace(minn, maxx, bin_num)
-        half_bin = (bins[1]-bins[0])/2
-    #
-    onesigp = 84.13
-    onesigm = 15.87
-    twosigp = 100
-    twosigm = 0
-    #
-    med = np.zeros(len(bins)-1)
-    lower = np.zeros(len(bins)-1)
-    upper = np.zeros(len(bins)-1)
-    lowest = np.zeros(len(bins)-1)
-    highest = np.zeros(len(bins)-1)
-    #
-    for i in range(0, len(bins)-1):
-        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
-        med[i] = np.nanmedian(y[j][mask])
-        upper[i] = np.nanpercentile(y[j][mask], onesigp)
-        lower[i] = np.nanpercentile(y[j][mask], onesigm)
-        highest[i] = np.nanpercentile(y[j][mask], twosigp)
-        lowest[i] = np.nanpercentile(y[j][mask], twosigm)
-    medians.append(med)
-    lowers.append(lower)
-    uppers.append(upper)
-    lowests.append(lowest)
-    highests.append(highest)
-    binss.append(bins)
-    half_bins.append(half_bin)
-#
-# PLOTTING
-# Plot the scatter for the recent and minimum pericenters
-ax1.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-ax1.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.15)
-ax1.fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color=colorss[0], alpha=0.3)
-ax1.fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color=colorss[0], alpha=0.15)
-#
-# Plot the medians for the two mass bins (low-mass)
-ax1.plot(binss[2][:-1]+half_bins[2], medians[2], color=colorss[1], markersize=10, alpha=0.5, label='Recent')
-ax1.plot(binss[3][:-1]+half_bins[3], medians[3], color=colorss[1], linestyle='--', markersize=10, alpha=0.5)
-ax1.plot(binss[4][:-1]+half_bins[4], medians[4], color=colorss[0], markersize=10, alpha=0.5, label='Minimum')
-ax1.plot(binss[5][:-1]+half_bins[5], medians[5], color=colorss[0], linestyle='--', markersize=10, alpha=0.5)
-#
-ax1.set_xscale('linear')
-ax1.set_xlim(limits_1[0][0], limits_1[0][1])
-ax1.set_ylim(limits_1[1])
-#
-if 't.' in ytype[0]:
-    # Instantiate the cosmology class and run this method first to set up scalefactors
-    cc = ut.cosmology.CosmologyClass()
-    red = np.array([0, 1])
-    cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
-    #
-    axis_3_label = 'redshift'
-    axis_3_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
-    axis_3_tick_values = [float(v) for v in axis_3_tick_labels]
-    axis_3_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_3_tick_values)
-    ax3 = ax1.twinx()
-    ax3.set_xscale('linear')
-    ax3.set_yscale('linear')
-    ax3.set_yticks(axis_3_tick_locations)
-    ax3.set_yticklabels(axis_3_tick_labels, fontsize=24)
-    ax3.set_ylim(limits_1[1])
-    ax3.set_ylabel(axis_3_label, labelpad=9)
-    ax3.tick_params(pad=3)
+limits_1 = ((0, 400),(0,13.5))
+limits_2 = ((0, 400),(0,10))
 #
 x = [dz0_tot, dz0_tot, dz0_tot[mass_low], dz0_tot[mass_high], dz0_tot[mass_low], dz0_tot[mass_high]]
 y = [t_in_tot, t_in_any_tot, t_in_tot[mass_low], t_in_tot[mass_high], t_in_any_tot[mass_low], t_in_any_tot[mass_high]]
@@ -1060,16 +973,112 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
+ax1.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.3)
+ax1.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.15)
+ax1.fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color=colorss[0], alpha=0.3)
+ax1.fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color=colorss[0], alpha=0.15)
+#
+# Plot the medians for the two mass bins (low-mass)
+ax1.plot(binss[2][:-1]+half_bins[2], medians[2], color=colorss[1], markersize=10, alpha=0.5, label='MW/M31-mass halo') # Recent, M < 1e7
+ax1.plot(binss[3][:-1]+half_bins[3], medians[3], color=colorss[1], linestyle='--', markersize=10, alpha=0.5) # Recent, M < 1e7
+ax1.plot(binss[4][:-1]+half_bins[4], medians[4], color=colorss[0], markersize=10, alpha=0.5, label='Any halo') # Recent, M < 1e7
+ax1.plot(binss[5][:-1]+half_bins[5], medians[5], color=colorss[0], linestyle='--', markersize=10, alpha=0.5) # Recent, M < 1e7
+#
+ax1.set_xscale('linear')
+ax1.set_xlim(limits_1[0][0], limits_1[0][1])
+ax1.set_ylim(limits_1[1])
+#
+if 't.' in ytype[0]:
+    # Instantiate the cosmology class and run this method first to set up scalefactors
+    cc = ut.cosmology.CosmologyClass()
+    red = np.array([0, 1])
+    cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+    #
+    axis_3_label = 'redshift'
+    axis_3_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+    axis_3_tick_values = [float(v) for v in axis_3_tick_labels]
+    axis_3_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_3_tick_values)
+    ax3 = ax1.twinx()
+    ax3.set_xscale('linear')
+    ax3.set_yscale('linear')
+    ax3.set_yticks(axis_3_tick_locations)
+    ax3.set_yticklabels(axis_3_tick_labels, fontsize=24)
+    ax3.set_ylim(limits_1[1])
+    ax3.set_ylabel(axis_3_label, labelpad=9)
+    ax3.tick_params(pad=3)
+#
+x = [dz0_tot, dz0_tot, dz0_tot[mass_low], dz0_tot[mass_high], dz0_tot[mass_low], dz0_tot[mass_high]]
+y = [t_sim_tot, t_min_tot, t_sim_tot[mass_low], t_sim_tot[mass_high], t_min_tot[mass_low], t_min_tot[mass_high]]
+#
+xtype = ['d.z0', 'd.z0', 'd.z0', 'd.z0', 'd.z0', 'd.z0']
+ytype = ['t.peri.text','t.peri.text','t.peri.text','t.peri.text','t.peri.text','t.peri.text']
+#
+medians = []
+lowers = []
+uppers = []
+lowests = []
+highests = []
+binss = []
+half_bins = []
+#
+for j in range(0, len(x)):
+    if 'M.' in xtype[j]:
+        x[j] = np.log10(x[j])
+    if 'M.' in ytype[j]:
+        y[j] = np.log10(y[j])
+    #
+    if binedges:
+        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+        bins = np.linspace(binedges[0], binedges[1], bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    else:
+        minn = binsize*np.floor(np.min(x[j])/binsize)
+        maxx = binsize*np.ceil(np.max(x[j])/binsize)
+        if minn < 0:
+            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+        else:
+            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+        bins = np.linspace(minn, maxx, bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    #
+    onesigp = 84.13
+    onesigm = 15.87
+    twosigp = 100
+    twosigm = 0
+    #
+    med = np.zeros(len(bins)-1)
+    lower = np.zeros(len(bins)-1)
+    upper = np.zeros(len(bins)-1)
+    lowest = np.zeros(len(bins)-1)
+    highest = np.zeros(len(bins)-1)
+    #
+    for i in range(0, len(bins)-1):
+        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+        med[i] = np.nanmedian(y[j][mask])
+        upper[i] = np.nanpercentile(y[j][mask], onesigp)
+        lower[i] = np.nanpercentile(y[j][mask], onesigm)
+        highest[i] = np.nanpercentile(y[j][mask], twosigp)
+        lowest[i] = np.nanpercentile(y[j][mask], twosigm)
+    medians.append(med)
+    lowers.append(lower)
+    uppers.append(upper)
+    lowests.append(lowest)
+    highests.append(highest)
+    binss.append(bins)
+    half_bins.append(half_bin)
+#
+# PLOTTING
+# Plot the scatter for the recent and minimum pericenters
 ax2.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.3)
 ax2.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.15)
 ax2.fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color=colorss[0], alpha=0.3)
 ax2.fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color=colorss[0], alpha=0.15)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax2.plot(binss[2][:-1]+half_bins[2], medians[2], color=colorss[1], markersize=10, alpha=0.5, label='MW/M31-mass halo') # Recent, M < 1e7
-ax2.plot(binss[3][:-1]+half_bins[3], medians[3], color=colorss[1], linestyle='--', markersize=10, alpha=0.5) # Recent, M < 1e7
-ax2.plot(binss[4][:-1]+half_bins[4], medians[4], color=colorss[0], markersize=10, alpha=0.5, label='Any halo') # Recent, M < 1e7
-ax2.plot(binss[5][:-1]+half_bins[5], medians[5], color=colorss[0], linestyle='--', markersize=10, alpha=0.5) # Recent, M < 1e7
+ax2.plot(binss[2][:-1]+half_bins[2], medians[2], color=colorss[1], markersize=10, alpha=0.5, label='Recent')
+ax2.plot(binss[3][:-1]+half_bins[3], medians[3], color=colorss[1], linestyle='--', markersize=10, alpha=0.5)
+ax2.plot(binss[4][:-1]+half_bins[4], medians[4], color=colorss[0], markersize=10, alpha=0.5, label='Minimum')
+ax2.plot(binss[5][:-1]+half_bins[5], medians[5], color=colorss[0], linestyle='--', markersize=10, alpha=0.5)
 #
 ax2.set_xscale('linear')
 ax2.set_xlim(limits_2[0][0], limits_2[0][1])
@@ -1093,9 +1102,12 @@ if 't.' in ytype[0]:
     ax4.set_ylim(limits_2[1])
     ax4.set_ylabel(axis_4_label, labelpad=9)
     ax4.tick_params(pad=3)
+#
 ax2.set_xlabel('Host distance $d$ [kpc]', fontsize=28)
-ax1.set_ylabel('Pericenter Lookback Time [Gyr]', fontsize=24)
-ax2.set_ylabel('Infall Lookback Time [Gyr]', fontsize=24)
+ax1.set_ylabel('Infall Lookback Time [Gyr]', fontsize=24)
+ax1.get_yaxis().set_label_coords(-0.075,0.5)
+ax2.set_ylabel('Pericenter Lookback Time [Gyr]', fontsize=24)
+ax2.get_yaxis().set_label_coords(-0.075,0.5)
 ax1.legend(prop={'size': 20}, loc='best')
 ax2.legend(prop={'size': 20}, loc='best')
 ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=False)
@@ -1268,7 +1280,9 @@ ax2.set_ylim(limits_2[1])
 #
 ax2.set_xlabel('Host distance $d$ [kpc]', fontsize=28)
 ax1.set_ylabel('Total velocity [km s$^{-1}$]', fontsize=28)
+ax1.get_yaxis().set_label_coords(-0.09,0.5)
 ax2.set_ylabel('Tangential velocity [km s$^{-1}$]', fontsize=28)
+ax2.get_yaxis().set_label_coords(-0.09,0.5)
 ax1.legend(prop={'size': 24}, loc='best')
 ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=False)
 ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
@@ -1447,7 +1461,9 @@ ax2.set_ylim(limits_2[1])
 #
 ax2.set_xlabel('Host distance $d$ [kpc]', fontsize=28)
 ax1.set_ylabel('$\\ell$ [10$^4$ kpc km s$^{-1}$]', fontsize=28)
+ax1.get_yaxis().set_label_coords(-0.075,0.5)
 ax2.set_ylabel('$E$ [10$^4$ kpc km s$^{-1}$]', fontsize=28)
+ax2.get_yaxis().set_label_coords(-0.075,0.5)
 ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=False)
 ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
@@ -2049,7 +2065,9 @@ ax2.set_ylim(limits_2[1])
 #
 ax2.set_xlabel('$M_{\\rm halo,peak} [M_{\\odot}]$', fontsize=28)
 ax1.set_ylabel('Pericenter distance [kpc]', fontsize=28)
+ax1.get_yaxis().set_label_coords(-0.09,0.5)
 ax2.set_ylabel('Pericenter Number', fontsize=28)
+ax2.get_yaxis().set_label_coords(-0.09,0.5)
 ax1.legend(prop={'size': 20}, loc='best')
 ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=False)
 ax1.xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
@@ -2071,102 +2089,8 @@ f, (ax1, ax2) = plt.subplots(2, 1, figsize=(10.5,12))
 colorss = ['#000080', '#006400']
 binedges = (8,11.5)
 binsize = 0.5
-limits_1 = ((8,11.5),(0,9))
-limits_2 = ((8,11.5),(0,11.5))
-#
-x = [Mhalo_peak_tot_all, Mhalo_peak_tot_all]
-y = [t_sim_tot_all, t_min_tot_all]
-#
-xtype = ['M.halo.peak', 'M.halo.peak']
-ytype = ['t.peri.text','t.peri.text']
-#
-medians = []
-lowers = []
-uppers = []
-lowests = []
-highests = []
-binss = []
-half_bins = []
-#
-for j in range(0, len(x)):
-    if 'M.' in xtype[j]:
-        x[j] = np.log10(x[j])
-    if 'M.' in ytype[j]:
-        y[j] = np.log10(y[j])
-    #
-    if binedges:
-        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
-        bins = np.linspace(binedges[0], binedges[1], bin_num)
-        half_bin = (bins[1]-bins[0])/2
-    else:
-        minn = binsize*np.floor(np.min(x[j])/binsize)
-        maxx = binsize*np.ceil(np.max(x[j])/binsize)
-        if minn < 0:
-            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
-        else:
-            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
-        bins = np.linspace(minn, maxx, bin_num)
-        half_bin = (bins[1]-bins[0])/2
-    #
-    onesigp = 84.13
-    onesigm = 15.87
-    twosigp = 100
-    twosigm = 0
-    #
-    med = np.zeros(len(bins)-1)
-    lower = np.zeros(len(bins)-1)
-    upper = np.zeros(len(bins)-1)
-    lowest = np.zeros(len(bins)-1)
-    highest = np.zeros(len(bins)-1)
-    #
-    for i in range(0, len(bins)-1):
-        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
-        med[i] = np.nanmedian(y[j][mask])
-        upper[i] = np.nanpercentile(y[j][mask], onesigp)
-        lower[i] = np.nanpercentile(y[j][mask], onesigm)
-        highest[i] = np.nanpercentile(y[j][mask], twosigp)
-        lowest[i] = np.nanpercentile(y[j][mask], twosigm)
-    medians.append(med)
-    lowers.append(lower)
-    uppers.append(upper)
-    lowests.append(lowest)
-    highests.append(highest)
-    binss.append(bins)
-    half_bins.append(half_bin)
-#
-# PLOTTING
-# Plot the scatter for the recent and minimum pericenters
-ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
-ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.3)
-ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.15)
-#
-# Plot the medians for the two mass bins (low-mass)
-ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='Recent') # Recent, M < 1e7
-ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='Minimum') #, label='MW/M31-mass host ($M_{\\rm star} > 10^{7} M_{\\odot}$)') # Recent M > 1e7
-#
-ax1.set_xscale('log')
-ax1.set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
-ax1.set_ylim(limits_1[1])
-#
-if 't.' in ytype[0]:
-    # Instantiate the cosmology class and run this method first to set up scalefactors
-    cc = ut.cosmology.CosmologyClass()
-    red = np.array([0, 1])
-    cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
-    #
-    axis_3_label = 'redshift'
-    axis_3_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
-    axis_3_tick_values = [float(v) for v in axis_3_tick_labels]
-    axis_3_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_3_tick_values)
-    ax3 = ax1.twinx()
-    ax3.set_xscale('log')
-    ax3.set_yscale('linear')
-    ax3.set_yticks(axis_3_tick_locations)
-    ax3.set_yticklabels(axis_3_tick_labels, fontsize=24)
-    ax3.set_ylim(limits_1[1])
-    ax3.set_ylabel(axis_3_label, labelpad=9)
-    ax3.tick_params(pad=3)
+limits_1 = ((8,11.5),(0,11.5))
+limits_2 = ((8,11.5),(0,9))
 #
 x = [Mhalo_peak_tot_all, Mhalo_peak_tot_all]
 y = [t_in_tot_all, t_in_any_tot_all]
@@ -2230,14 +2154,108 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
+ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.3)
+ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.15)
+#
+# Plot the medians for the two mass bins (low-mass)
+ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='MW/M31-mass halo') # Recent, M < 1e7
+ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='Any halo') # Recent, M < 1e7
+#
+ax1.set_xscale('log')
+ax1.set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
+ax1.set_ylim(limits_1[1])
+#
+if 't.' in ytype[0]:
+    # Instantiate the cosmology class and run this method first to set up scalefactors
+    cc = ut.cosmology.CosmologyClass()
+    red = np.array([0, 1])
+    cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+    #
+    axis_3_label = 'redshift'
+    axis_3_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+    axis_3_tick_values = [float(v) for v in axis_3_tick_labels]
+    axis_3_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_3_tick_values)
+    ax3 = ax1.twinx()
+    ax3.set_xscale('log')
+    ax3.set_yscale('linear')
+    ax3.set_yticks(axis_3_tick_locations)
+    ax3.set_yticklabels(axis_3_tick_labels, fontsize=24)
+    ax3.set_ylim(limits_1[1])
+    ax3.set_ylabel(axis_3_label, labelpad=9)
+    ax3.tick_params(pad=3)
+#
+x = [Mhalo_peak_tot_all, Mhalo_peak_tot_all]
+y = [t_sim_tot_all, t_min_tot_all]
+#
+xtype = ['M.halo.peak', 'M.halo.peak']
+ytype = ['t.peri.text','t.peri.text']
+#
+medians = []
+lowers = []
+uppers = []
+lowests = []
+highests = []
+binss = []
+half_bins = []
+#
+for j in range(0, len(x)):
+    if 'M.' in xtype[j]:
+        x[j] = np.log10(x[j])
+    if 'M.' in ytype[j]:
+        y[j] = np.log10(y[j])
+    #
+    if binedges:
+        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+        bins = np.linspace(binedges[0], binedges[1], bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    else:
+        minn = binsize*np.floor(np.min(x[j])/binsize)
+        maxx = binsize*np.ceil(np.max(x[j])/binsize)
+        if minn < 0:
+            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+        else:
+            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+        bins = np.linspace(minn, maxx, bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    #
+    onesigp = 84.13
+    onesigm = 15.87
+    twosigp = 100
+    twosigm = 0
+    #
+    med = np.zeros(len(bins)-1)
+    lower = np.zeros(len(bins)-1)
+    upper = np.zeros(len(bins)-1)
+    lowest = np.zeros(len(bins)-1)
+    highest = np.zeros(len(bins)-1)
+    #
+    for i in range(0, len(bins)-1):
+        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+        med[i] = np.nanmedian(y[j][mask])
+        upper[i] = np.nanpercentile(y[j][mask], onesigp)
+        lower[i] = np.nanpercentile(y[j][mask], onesigm)
+        highest[i] = np.nanpercentile(y[j][mask], twosigp)
+        lowest[i] = np.nanpercentile(y[j][mask], twosigm)
+    medians.append(med)
+    lowers.append(lower)
+    uppers.append(upper)
+    lowests.append(lowest)
+    highests.append(highest)
+    binss.append(bins)
+    half_bins.append(half_bin)
+#
+# PLOTTING
+# Plot the scatter for the recent and minimum pericenters
 ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
 ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
 ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.3)
 ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.15)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax2.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='MW/M31-mass halo') # Recent, M < 1e7
-ax2.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='Any halo') # Recent, M < 1e7
+ax2.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='Recent') # Recent, M < 1e7
+ax2.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='Minimum') #, label='MW/M31-mass host ($M_{\\rm star} > 10^{7} M_{\\odot}$)') # Recent M > 1e7
 #
 ax2.set_xscale('log')
 ax2.set_xlim(10**(limits_2[0][0]), 10**(limits_2[0][1]))
@@ -2261,9 +2279,12 @@ if 't.' in ytype[0]:
     ax4.set_ylim(limits_2[1])
     ax4.set_ylabel(axis_4_label, labelpad=9)
     ax4.tick_params(pad=3)
+#
 ax2.set_xlabel('$M_{\\rm halo,peak} [M_{\\odot}]$', fontsize=28)
-ax1.set_ylabel('Pericenter Lookback Time [Gyr]', fontsize=24)
-ax2.set_ylabel('Infall Lookback Time [Gyr]', fontsize=24)
+ax1.set_ylabel('Infall Lookback Time [Gyr]', fontsize=24)
+ax1.get_yaxis().set_label_coords(-0.075,0.5)
+ax2.set_ylabel('Pericenter Lookback Time [Gyr]', fontsize=24)
+ax2.get_yaxis().set_label_coords(-0.075,0.5)
 ax1.legend(prop={'size': 20}, loc='best')
 ax2.legend(prop={'size': 20}, loc='best')
 ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=False)
@@ -2519,8 +2540,11 @@ ax3.set_ylim(limits_3[1])
 #
 ax3.set_xlabel('$M_{\\rm halo,peak} [M_{\\odot}]$', fontsize=28)
 ax1.set_ylabel('Total velocity [km s$^{-1}$]', fontsize=24)
+ax1.get_yaxis().set_label_coords(-0.09,0.5)
 ax2.set_ylabel('$\\ell$ [10$^4$ kpc km s$^{-1}$]', fontsize=24)
+ax2.get_yaxis().set_label_coords(-0.09,0.5)
 ax3.set_ylabel('$E$ [10$^4$ km$^2$ s$^{-2}$]', fontsize=24)
+ax3.get_yaxis().set_label_coords(-0.09,0.5)
 ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=False)
 ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=False)
 ax1.xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
