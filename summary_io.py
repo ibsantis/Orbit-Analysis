@@ -1618,7 +1618,7 @@ class SummaryDataPlot(SummaryDataSort):
         ax.set_xlabel(self.labels[xtype[0]], fontsize=28)
         ax.set_ylabel(self.labels[ytype[0]], fontsize=28)
         if legend_on:
-            ax.legend(prop={'size': 20}, loc='best')
+            ax.legend(prop={'size': 24}, loc='best')
         if title:
             plt.title(self.titles[title], fontsize=24)
         ax.tick_params(axis='both', which='major', labelsize=28)
@@ -1885,7 +1885,7 @@ class SummaryDataPlot(SummaryDataSort):
             y_med = np.max(np.histogram(x, bin_array, density=pdf)[0])*1.1
             #
             plt.hist(x, bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
-            plt.errorbar(np.median(x), y_med, xerr=np.array([[np.median(x)-sigma_one_om],[sigma_one_op-np.median(x)]]), color='k', lw=5, capsize=8)
+            plt.errorbar(np.median(x), y_med, xerr=np.array([[np.median(x)-sigma_one_om],[sigma_one_op-np.median(x)]]), color='k', lw=5, capsize=0)
             plt.scatter(np.median(x), y_med, s=250, marker='s', c='k')
         #
         elif 'N.' in xtype:
@@ -1897,8 +1897,8 @@ class SummaryDataPlot(SummaryDataSort):
             y_mean = np.max(np.histogram(x, bin_array, density=pdf)[0])*1.1
             #
             plt.hist(x, bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
-            plt.errorbar(np.mean(x), y_mean, xerr=np.array([[2*np.std(x)],[2*np.std(x)]]), color='k', lw=5, capsize=8, alpha=0.3)
-            plt.errorbar(np.mean(x), y_mean, xerr=np.array([[np.std(x)],[np.std(x)]]), color='k', lw=5, capsize=8)
+            plt.errorbar(np.mean(x), y_mean, xerr=np.array([[2*np.std(x)],[2*np.std(x)]]), color='k', lw=5, capsize=0, alpha=0.3)
+            plt.errorbar(np.mean(x), y_mean, xerr=np.array([[np.std(x)],[np.std(x)]]), color='k', lw=5, capsize=0)
             plt.scatter(np.mean(x), y_mean, s=250, marker='s', c='k')
         #
         plt.xlim(xlimits)
@@ -1993,7 +1993,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.xlabel(self.labels[xtype[0]], fontsize=28)
         plt.ylabel(y_label, fontsize=28)
         if legend_on:
-            plt.legend(prop={'size': 18}, loc='best')
+            plt.legend(prop={'size': 18}, loc='center right')
         if title:
             plt.title(self.titles[title], fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
