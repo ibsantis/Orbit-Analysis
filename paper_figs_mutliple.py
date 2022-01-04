@@ -2557,3 +2557,176 @@ plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/figure_a3.pdf')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""
+    Making Nperi population plots
+"""
+
+nperi_0_mask = summary.data_mask_nperi(data_total, nperi=0, hosts='all_no_z')
+nperi_1_mask = summary.data_mask_nperi(data_total, nperi=1, hosts='all_no_z')
+nperi_2_mask = summary.data_mask_nperi(data_total, nperi=2, hosts='all_no_z')
+
+# d(z = 0) plot
+dz0_tot_0 = summary.d_z0(data_total, nperi_0_mask, oversample=True, hosts='all_no_z', sim_type='baryon')
+dz0_tot_1 = summary.d_z0(data_total, nperi_1_mask, oversample=True, hosts='all_no_z', sim_type='baryon')
+dz0_tot_2 = summary.d_z0(data_total, nperi_2_mask, oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+colorss = ['#2f4f4f', '#006400', '#8b0000', '#000080', '#00ced1',\
+           '#ff8c00', '#c71585', '#7fff00', '#00fa9a', '#0000ff',\
+           '#ff00ff', '#1e90ff', '#f0e68c', '#ffc0cb']
+x=[dz0_tot_0, dz0_tot_1, dz0_tot_2]
+xtype=['d.z0','d.z0','d.z0']
+labels=['$N_{\\rm peri}$ = 0','$N_{\\rm peri}$ = 1','$N_{\\rm peri}$ > 1']
+binsize=20
+xlimits=(0,500)
+med_location=[0.00925, 0.00875, 0.009]
+#
+# Plot the data
+plt.figure(figsize=(10, 8))
+#
+for i in range(0, len(x)):
+    minn = binsize*np.floor(np.min(x[i])/binsize)
+    maxx = binsize*np.ceil(np.max(x[i])/binsize)
+    if minn < 0:
+        bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+    else:
+        bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+    bin_array = np.linspace(minn, maxx, bin_num)
+    #
+    # Calculate the scatter
+    onesigp = 84.13
+    onesigm = 15.87
+    sigma_one_op = np.nanpercentile(x[i], onesigp)
+    sigma_one_om = np.nanpercentile(x[i], onesigm)
+    #
+    if med_location:
+        y_med = med_location[i]
+    else:
+        y_med = np.max(np.histogram(x[i], bin_array, density=pdf)[0])*1.1
+    #
+    plt.hist(x[i], bin_array, density=True, linestyle='solid', linewidth=2, histtype='stepfilled', color=colorss[i], alpha=0.4, label=labels[i])
+    plt.errorbar(np.median(x[i]), y_med, xerr=np.array([[np.median(x[i])-sigma_one_om],[sigma_one_op-np.median(x[i])]]), c=colorss[i], lw=5, capsize=0, alpha=0.8)
+    plt.scatter(np.median(x[i]), y_med, s=250, marker='s', c=colorss[i], alpha=0.8)
+#
+plt.xlim(xlimits)
+plt.xlabel('Host distance $d$ [kpc]', fontsize=36)
+plt.ylabel('PDF', fontsize=36)
+plt.legend(prop={'size': 24}, loc='center right')
+plt.tick_params(axis='both', which='major', labelsize=30)
+plt.tight_layout()
+#plt.show()
+plt.savefig(directory+'/final/figure_9a.pdf')
+plt.close()
+
+
+
+# Energy plot
+potential_tot_0 = summary.potential(data_potentials, nperi_0_mask, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
+ke_z0_tot_0 = summary.kinetic_energy(data_total, nperi_0_mask, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+Mstar_z0_tot_0 = summary.mstar(data_total, nperi_0_mask, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+potential_tot_1 = summary.potential(data_potentials, nperi_1_mask, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
+ke_z0_tot_1 = summary.kinetic_energy(data_total, nperi_1_mask, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+Mstar_z0_tot_1 = summary.mstar(data_total, nperi_1_mask, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+potential_tot_2 = summary.potential(data_potentials, nperi_2_mask, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
+ke_z0_tot_2 = summary.kinetic_energy(data_total, nperi_2_mask, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+Mstar_z0_tot_2 = summary.mstar(data_total, nperi_2_mask, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+#
+x=[(potential_tot_0+ke_z0_tot_0)/1e4, (potential_tot_1+ke_z0_tot_1)/1e4, (potential_tot_2+ke_z0_tot_2)/1e4]
+xtype=['E.tot','E.tot','E.tot']
+labels=['$N_{\\rm peri}$ = 0','$N_{\\rm peri}$ = 1','$N_{\\rm peri}$ > 1']
+med_location=[1.3, 1.25, 1.225]
+binsize=0.2
+xlimits=(-6,2)
+#
+# Plot the data
+plt.figure(figsize=(10, 8))
+#
+for i in range(0, len(x)):
+    minn = binsize*np.floor(np.min(x[i])/binsize)
+    maxx = binsize*np.ceil(np.max(x[i])/binsize)
+    if minn < 0:
+        bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+    else:
+        bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+    bin_array = np.linspace(minn, maxx, bin_num)
+    #
+    # Calculate the scatter
+    onesigp = 84.13
+    onesigm = 15.87
+    sigma_one_op = np.nanpercentile(x[i], onesigp)
+    sigma_one_om = np.nanpercentile(x[i], onesigm)
+    #
+    y_med = med_location[i]
+    plt.hist(x[i], bin_array, density=True, linestyle='solid', linewidth=2, histtype='stepfilled', color=colorss[i], alpha=0.4, label=labels[i])
+    plt.errorbar(np.median(x[i]), y_med, xerr=np.array([[np.median(x[i])-sigma_one_om],[sigma_one_op-np.median(x[i])]]), c=colorss[i], lw=5, capsize=0, alpha=0.8)
+    plt.scatter(np.median(x[i]), y_med, s=250, marker='s', c=colorss[i], alpha=0.8)
+#
+plt.xlim(xlimits)
+plt.xlabel('$E$ [10$^4$ km$^2$ s$^{-2}$]', fontsize=36)
+plt.ylabel('PDF', fontsize=36)
+plt.tick_params(axis='both', which='major', labelsize=30)
+plt.tight_layout()
+#plt.show()
+plt.savefig(directory+'/final/figure_9b.pdf')
+plt.close()
+
+
+
+# Angular momentum plot
+L_tot_0 = summary.L_z0(data_total, nperi_0_mask, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+L_tot_1 = summary.L_z0(data_total, nperi_1_mask, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+L_tot_2 = summary.L_z0(data_total, nperi_2_mask, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+summary_plot.plot_hist_mult(x=[L_tot_0/1e4, L_tot_1/1e4, L_tot_2/1e4], xtype=['L.tot','L.tot','L.tot'], labels=['$N_{\\rm peri}$ = 0','$N_{\\rm peri}$ = 1','$N_{\\rm peri}$ > 1'], binsize=0.2, pdf=True, xlimits=(0,7), med_location=[1.025, 0.975, 1.05,], legend_on=False, file_path_and_name=directory+'/Ltot_comparison_nperis_histogram.pdf')
+#
+x=[L_tot_0/1e4, L_tot_1/1e4, L_tot_2/1e4]
+xtype=['L.tot','L.tot','L.tot']
+labels=['$N_{\\rm peri}$ = 0','$N_{\\rm peri}$ = 1','$N_{\\rm peri}$ > 1']
+binsize=0.2
+xlimits=(0,6)
+med_location=[1.025, 0.975, 1.05]
+#
+# Plot the data
+plt.figure(figsize=(10, 8))
+#
+for i in range(0, len(x)):
+    minn = binsize*np.floor(np.min(x[i])/binsize)
+    maxx = binsize*np.ceil(np.max(x[i])/binsize)
+    if minn < 0:
+        bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+    else:
+        bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+    bin_array = np.linspace(minn, maxx, bin_num)
+    #
+    # Calculate the scatter
+    onesigp = 84.13
+    onesigm = 15.87
+    sigma_one_op = np.nanpercentile(x[i], onesigp)
+    sigma_one_om = np.nanpercentile(x[i], onesigm)
+    #
+    y_med = med_location[i]
+    plt.hist(x[i], bin_array, density=True, linestyle='solid', linewidth=2, histtype='stepfilled', color=colorss[i], alpha=0.4, label=labels[i])
+    plt.errorbar(np.median(x[i]), y_med, xerr=np.array([[np.median(x[i])-sigma_one_om],[sigma_one_op-np.median(x[i])]]), c=colorss[i], lw=5, capsize=0, alpha=0.8)
+    plt.scatter(np.median(x[i]), y_med, s=250, marker='s', c=colorss[i], alpha=0.8)
+#
+plt.xlim(xlimits)
+plt.xlabel('$\\ell$ [10$^4$ kpc km s$^{-1}$]', fontsize=36)
+plt.ylabel('PDF', fontsize=36)
+plt.tick_params(axis='both', which='major', labelsize=30)
+plt.tight_layout()
+#plt.show()
+plt.savefig(directory+'/final/figure_9c.pdf')
+plt.close()
