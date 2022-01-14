@@ -533,6 +533,39 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    def dperi_first(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
+        """
+        DESCRIPTION:
+            first peris
+        """
+        # Set up an empty list to save values to
+        data = []
+        #
+        # Determines whether oversampling or not, then
+        if oversample == False:
+            for name in self.host_names[hosts]:
+                for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
+                    mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
+                    #
+                    if np.sum(mask_temp) == 0:
+                        data.append(data_dict[name]['dtot.sim'][mask_dict[name]][i][0])
+                    #
+                    else:
+                        data.append(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp][-1])
+        #
+        elif oversample == True:
+            for name in self.host_names[hosts]:
+                for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
+                    mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
+                    #
+                    if np.sum(mask_temp) == 0:
+                        data.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][i][0], self.oversample[sim_type][name]))
+                    #
+                    else:
+                        data.append(np.repeat(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp][-1], self.oversample[sim_type][name]))
+        #
+        return np.hstack(data)
+
     def delta_dperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all', sim_type='baryon'):
         """
         TBD
