@@ -21,7 +21,7 @@ OrbitAnalysis:
         - Mstar > 3e4 (if working with luminous satellites)
         - Mpeak > 1e8 (if working with any satellite)
         - Mpeak * (1-f_baryon) > 1e8 (if working with DMO simulations)
-      Saves their indices across all time
+      Then, saves their indices across all time
     - Methods included in this class calculate a variety of orbital properties
 
 OrbitGalpy:
@@ -433,6 +433,7 @@ class OrbitAnalysis:
         #
         # Set up lookback time array
         lookback = time_array['time'][-1] - time_array['time']
+        #
         # Loop over subhalos (normalized distance arrays)
         for i in range(0, len(distances_norm)):
             temp = []
@@ -453,6 +454,7 @@ class OrbitAnalysis:
                 first_infall_snap[i] = time_array['index'][-1]-np.max(np.where(np.abs(distances_norm[i]) < 1)[0])
                 first_infall_times[i] = time_array['time'][first_infall_snap[i]]
                 first_infall_times_lookback[i] = lookback[first_infall_snap[i]]
+                #
                 # Save whether or not subhalo fell into host
                 if first_infall_snap[i] >= 0:
                     infall_check[i] = True
@@ -468,21 +470,23 @@ class OrbitAnalysis:
         all_infall_snaps = (-1)*np.ones((len(distances_norm), N))
         all_infall_times = (-1)*np.ones((len(distances_norm), N))
         all_infall_times_lookback = (-1)*np.ones((len(distances_norm), N))
+        #
         # Fill in the data
         for i in range(0, len(distances_norm)):
             for j in range(0, len(infall_snaps[i])):
                 all_infall_snaps[i,j] = infall_snaps[i][j]
                 all_infall_times[i,j] = infall_times[i][j]
                 all_infall_times_lookback[i,j] = infall_times_lookback[i][j]
+        #
         # Assign arrays to dictionary elements
         d['check'] = infall_check
         d['first.infall.snap'] = first_infall_snap
         d['first.infall.time'] = first_infall_times
         d['first.infall.time.lb'] = first_infall_times_lookback
-        #
         d['all.infall.snap'] = all_infall_snaps
         d['all.infall.time'] = all_infall_times
         d['all.infall.time.lb'] = all_infall_times_lookback
+        #
         return d
 
     def first_infall_any(self, tree, time_array):
@@ -644,6 +648,7 @@ class OrbitAnalysis:
                     temp_peri = temp_halo_d[i+1]
                 else:
                     temp_peri = temp_halo_d[i+1]
+            #
             host_peri_rad.append(peri_rad_list)
             check.append(temp_check)
             peri_spl.append(temp_peri_spl)
@@ -675,6 +680,7 @@ class OrbitAnalysis:
         pericenter_spline = []
         pericenter_vel_spline = []
         time_spline = []
+        #
         # Loop over all of the subhalos
         for i in range(0, len(peri_spl)):
             # Check if subhalo experienced pericenter. If so, continue.
@@ -732,7 +738,6 @@ class OrbitAnalysis:
         time_lb_spline_array = (-1)*np.ones((len(distances), N))
         mask = (time_spline_array > 0)
         time_lb_spline_array[mask] = (time_array['time'][-1] - time_spline_array[mask])
-        #
         d['pericenter.time.lb'] = time_lb_spline_array
         #
         return d
@@ -804,16 +809,15 @@ class OrbitAnalysis:
         #
         # Loop through the number of subhalos
         for k in range(0, len(distances)):
-            #
             temp_halo_d = distances[k] # Now goes from z = 0 to z_form (un-normalized)
             temp_halo_v = velocities[k] # Same as above
             #
-            # Save the max distance a subhalo ever experienced and the times this happens at
+            # Save the max distance a subhalo ever experienced and the times this occurred
             max_dist[k] = np.nanmax(distances[k])
             max_dist_time[k] = np.flip(time_array['time'])[np.where(distances[k] == np.nanmax(distances[k]))[0][0]]
             max_dist_time_lb[k] = (time_array['time'][-1] - max_dist_time[k])
             #
-            # Want initial element to be this because we check +- 10 neighbors on each side
+            # Want initial element to be this because we check neighbors on each side
             temp_apo = temp_halo_d[reach]
             temp_check = np.zeros(len(temp_halo_d))
             temp_apo_spl = []
@@ -823,14 +827,14 @@ class OrbitAnalysis:
             # Loop through each subhalo
             start_ind = 4
             for i in range(start_ind, len(temp_halo_d)-reach):
-                #
-                # These if-else statements allow for a "sliding", non-symmetric window to look for pericenters
+                # These if-else statements allow for a "sliding", non-symmetric window to look for apocenters
                 if (i-reach < 0):
                     left_ind = 0
                 else:
                     left_ind = i-reach
+                #
                 temp_apo_time = np.flip(time_array['time'])[i]
-                # Check to make sure that this is the local maximum
+                # Check to make sure that this is the local maximum and post-infall
                 if (infall_array['first.infall.time'][k] != -1) and (all(temp_apo > temp_halo_d[left_ind:i])) and (all(temp_apo > temp_halo_d[i+1:i+1+reach])) and (temp_apo_time > infall_array['first.infall.time'][k]):
                     temp_check[i] = 1
                     temp_apo_spl.append(temp_halo_d[left_ind:i+reach])
@@ -841,6 +845,7 @@ class OrbitAnalysis:
                 else:
                     temp_apo = temp_halo_d[i+1]
                     temp_apo_time = np.flip(time_array['time'])[i+1]
+            #
             check.append(temp_check)
             apo_spl.append(temp_apo_spl)
             apo_vel_spl.append(temp_apo_vel_spl)
@@ -857,6 +862,7 @@ class OrbitAnalysis:
         apocenter_spline = []
         apocenter_vel_spline = []
         time_spline = []
+        #
         # Loop over all of the subhalos
         for i in range(0, len(apo_spl)):
             # Check if subhalo experienced apocenter. If so, continue.
@@ -914,13 +920,14 @@ class OrbitAnalysis:
         d['max.dist'] = max_dist
         d['max.dist.time'] = max_dist_time
         d['max.dist.time.lb'] = max_dist_time_lb
+        #
         return d
 
     def angular_momentum(self, tree, host=1):
         """
         DESCRIPTION:
             Reads in the tree and subhalo indices and returns a dictionary that contains
-            the angular momentum vectors and their magnitudes.
+            the cylindrical components of the angular momentum vectors and their magnitudes.
 
         VARIABLES:
             tree : dictionary
@@ -989,14 +996,15 @@ class OrbitAnalysis:
         # Save arrays to dictionary
         d['ang.mom.vector'] = angular_momentum_3d
         d['ang.mom.total'] = angular_momentum_1d
+        #
         return d
 
 class OrbitGalpy(OrbitAnalysis):
 
     def __init__(self, tree, gal1, location, host, dmo=False):
         """
-        Need to do this to inherit the subhalo indices defined from __init__
-        in OrbitAnalysis
+        This is required to inherit the subhalo indices defined from
+        OrbitAnalysis.__init__()
         """
         OrbitAnalysis.__init__(self, tree, gal1, location, host, dmo=dmo)
 
@@ -1021,7 +1029,10 @@ class OrbitGalpy(OrbitAnalysis):
                 - Tangential velocity
             - These are then integrated in Galpy to get model orbits.
         """
+        # Initialize an empty array to save the Orbit instances to
         sub_orbits = []
+        #
+        # Loop through each subhalo and save the 6D initial conditions
         if host == 1:
             for i in range(0, len(self.sub_inds)):
                 R = tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][0])[0]
@@ -1076,7 +1087,7 @@ class OrbitGalpy(OrbitAnalysis):
     def galpy_pericenter_interp(self, distances, velocities, time_array, reach=20):
         """
         DESCRIPTION:
-            Reads in integrated subhalo distances and velocites across time,
+            Reads in subhalo distances, velocites, host virial radii across time,
             and snapshot information and returns a dictionary of pericenter
             distances, velocities, and times.
 
@@ -1084,12 +1095,19 @@ class OrbitGalpy(OrbitAnalysis):
             distances    : 2D array (given in kpc physical)
             velocites    : 2D array (km / s)
             time_array   : dictionary
+            reach        : integer
 
         NOTES:
             - Same as OrbitAnalysis.pericenter_interp() except this does not
               check to see if the subhalo is within the virial radius since the
               subhalos are integrated in a static potential (the virial radius
               does not change).
+            - Loops through an array and checks to see if a value is smaller than
+              N (defined by 'reach') of its neighbors on either side.
+              If True, also checks to see if this distance is within the virial
+              radius of the host. If True, saves some values.
+            - If a subhalo does not experience pericenter, the distances, velocities,
+              times, and host radii values are set to -1
             - Returns a dictionary
                 - d['pericenter.check'] is a 1D array of booleans
                   Each element tells you if the subhalo has experienced a pericenter
@@ -1114,7 +1132,9 @@ class OrbitGalpy(OrbitAnalysis):
                                                        any halo experienced)
                   Each row of the array corresponds to a different subhalo
                   Each element in a row gives the lookback time when the
-                    subhalo experienced a pericenter
+                  subhalo experienced a pericenter
+            **[Want to add more to this to have the sliding window on the other
+               side of the distance array]**
         """
         # Set up a dictionary and lists to save values to
         d = dict();
@@ -1142,6 +1162,7 @@ class OrbitGalpy(OrbitAnalysis):
                     left_ind = 0
                 else:
                     left_ind = i-reach
+                #
                 # Check its neighbors
                 if (all(temp_peri < temp_halo_d[left_ind:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])):
                     temp_check[i] = 1
@@ -1151,6 +1172,7 @@ class OrbitGalpy(OrbitAnalysis):
                     temp_peri = temp_halo_d[i+1]
                 else:
                     temp_peri = temp_halo_d[i+1]
+            #
             check.append(temp_check)
             peri_spl.append(temp_peri_spl)
             peri_vel_spl.append(temp_peri_vel_spl)
@@ -1170,6 +1192,7 @@ class OrbitGalpy(OrbitAnalysis):
         pericenter_spline = []
         pericenter_vel_spline = []
         time_spline = []
+        #
         # Loop over all of the subhalos
         for i in range(0, len(peri_spl)):
             # Check if subhalo experienced pericenter. If so, continue.
@@ -1227,7 +1250,6 @@ class OrbitGalpy(OrbitAnalysis):
         time_lb_spline_array = (-1)*np.ones((len(distances), N))
         mask = (time_spline_array > 0)
         time_lb_spline_array[mask] = (time_array['time'][-1] - time_spline_array[mask])
-        #
         d['pericenter.time.lb'] = time_lb_spline_array
         #
         return d
@@ -1244,6 +1266,7 @@ class OrbitGalpy(OrbitAnalysis):
             distances    : 2D array (given in kpc physical)
             velocites    : 2D array (km / s)
             time_array   : dictionary
+            reach        : integer
 
         NOTES:
             - Similar to OrbitAnalysis.apocenter_interp() except this does not
@@ -1286,10 +1309,8 @@ class OrbitGalpy(OrbitAnalysis):
         #
         # Loop through the number of subhalos
         for k in range(0, len(distances)):
-            #
             temp_halo_d = distances[k] # Now goes from z = 0 to z_form (un-normalized)
             temp_halo_v = velocities[k] # Same as above
-            #
             # Want initial element to be this because we check +- 10 neighbors on each side
             temp_apo = temp_halo_d[reach]
             temp_check = np.zeros(len(temp_halo_d))
@@ -1305,6 +1326,7 @@ class OrbitGalpy(OrbitAnalysis):
                     left_ind = 0
                 else:
                     left_ind = i-reach
+                #
                 # Check to make sure that this is the local maximum
                 if (all(temp_apo > temp_halo_d[left_ind:i])) and (all(temp_apo > temp_halo_d[i+1:i+1+reach])):
                     temp_check[i] = 1
@@ -1314,11 +1336,12 @@ class OrbitGalpy(OrbitAnalysis):
                     temp_apo = temp_halo_d[i+1]
                 else:
                     temp_apo = temp_halo_d[i+1]
+            #
             check.append(temp_check)
             apo_spl.append(temp_apo_spl)
             apo_vel_spl.append(temp_apo_vel_spl)
             time_spl.append(temp_time_spl)
-            #
+        #
         # Create a mask that tells you whether or not halo experienced apocenter
         apo_bool = np.zeros(len(check), bool)
         for i in range(0, len(check)):
@@ -1330,6 +1353,7 @@ class OrbitGalpy(OrbitAnalysis):
         apocenter_spline = []
         apocenter_vel_spline = []
         time_spline = []
+        #
         # Loop over all of the subhalos
         for i in range(0, len(apo_spl)):
             # Check if subhalo experienced apocenter. If so, continue.
@@ -1384,6 +1408,7 @@ class OrbitGalpy(OrbitAnalysis):
         d['apocenter.vel'] = apocenter_vel_spline_array
         d['apocenter.time'] = time_spline_array
         d['apocenter.time.lb'] = time_lb_spline_array
+        #
         return d
 
     def galpy_pole_check(self, orbits_int, times):
@@ -1407,11 +1432,15 @@ class OrbitGalpy(OrbitAnalysis):
                 - Checks of circular polar orbits  were strange which is why we
                   include this flag.
         """
+        # Create empty array to save to
         check = np.zeros(len(orbits_int), bool)
+        #
+        # Loop through each subhalo and find out if the angle is within 1 degree of a pole
         for i in range(1, len(orbits_int)):
             angle = np.rad2deg(np.arccos(orbits_int[i].z(times)/np.sqrt(orbits_int[i].R(times)**2+orbits_int[i].z(times)**2)))
             if np.sum(angle < 1) or np.sum(angle > 179):
                 check[i] = True
+        #
         return check
 
 class OrbitTree(OrbitAnalysis):
@@ -1468,14 +1497,15 @@ class OrbitTree(OrbitAnalysis):
               a given subhalo.
         """
         pos, ind = self.kdtree.query(x=centers, k=neigh_num_max, distance_upper_bound=neigh_dist_max, workers=workerss)
+        #
         return pos, ind
 
 class OrbitPlot(OrbitAnalysis):
 
     def __init__(self, tree, gal1, location, host, dmo=False):
         """
-        Need to do this to inherit the subhalo indices defined from __init__
-        in OrbitAnalysis
+        This is required to inherit the subhalo indices defined from
+        OrbitAnalysis.__init__()
         """
         OrbitAnalysis.__init__(self, tree, gal1, location, host, dmo=dmo)
 
