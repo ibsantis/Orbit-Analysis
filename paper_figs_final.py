@@ -31,7 +31,7 @@ summary = summary_io.SummaryDataSort()
 data_total = summary.data_read(directory=sim_data.home_dir, hosts='all_no_z', sim_type='baryon')
 data_potentials = summary.data_read_potential(directory=sim_data.home_dir, hosts='all_energy', sim_type='baryon')
 masks_infall = summary.data_mask(data_total, peri_sim=False, peri_model=False, hosts='all_no_z')
-#masks_infall = summary.data_mask(data_total, peri_sim=True, peri_model=False, hosts='all_no_z')
+masks_infall_peri = summary.data_mask(data_total, peri_sim=True, peri_model=False, hosts='all_no_z')
 summary_plot = summary_io.SummaryDataPlot()
 
 
@@ -40,26 +40,24 @@ directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/fina
 
 
 ### Generate all of the data for the plots below
-mask_selection = masks_infall
-# Fix for the outlier in the Mstar-Mhalo relation
-mask_selection['m12f'][57] = False
 #
-N_sim_tot = summary.nperi(data_total, mask_selection, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon')
-d_sim_tot = summary.dperi_recent(data_total, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
-d_min_tot = summary.dperi_min(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
-d_1st_tot = summary.dperi_first(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
-dz0_tot = summary.d_z0(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
-t_sim_tot = summary.tperi_recent(data_total, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
-t_min_tot = summary.tperi_min(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
-t_in_tot = summary.first_infall(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
-t_in_any_tot = summary.first_infall_any(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
-Mstar_z0_tot = summary.mstar(data_total, mask_selection, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
-Mstar_peak_tot = summary.mstar(data_total, mask_selection, selection='peak', oversample=True, hosts='all_no_z', sim_type='baryon')
-Mhalo_peak_tot = summary.mhalo(data_total, mask_selection, selection='peak', oversample=True, hosts='all_no_z', sim_type='baryon')
-vtan_tot = summary.velocities(data_total, mask_selection, selection='tan', oversample=True, hosts='all_no_z', sim_type='baryon')
-vrad_tot = summary.velocities(data_total, mask_selection, selection='rad', oversample=True, hosts='all_no_z', sim_type='baryon')
-vz0_tot = summary.v_z0(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
-L_tot = summary.L_z0(data_total, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+# Fix for the outlier in the Mstar-Mhalo relation
+masks_infall['m12f'][57] = False
+masks_infall_peri['m12f'][57] = False
+#
+N_sim_tot = summary.nperi(data_total, masks_infall, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon')
+d_sim_tot = summary.dperi_recent(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+d_min_tot = summary.dperi_min(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+d_1st_tot = summary.dperi_first(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+dz0_tot = summary.d_z0(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+t_sim_tot = summary.tperi_recent(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+t_min_tot = summary.tperi_min(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+t_in_tot = summary.first_infall(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+t_in_any_tot = summary.first_infall_any(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+Mhalo_peak_tot = summary.mhalo(data_total, masks_infall, selection='peak', oversample=True, hosts='all_no_z', sim_type='baryon')
+vz0_tot = summary.v_z0(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+L_tot = summary.L_z0(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
 ################################################################################
 
 
@@ -71,7 +69,10 @@ L_tot = summary.L_z0(data_total, mask_selection, selection='sim', oversample=Tru
     Figure 1:
         SMHM Relation
 """
-summary_plot.median_plot(x=Mhalo_peak_tot, y=Mstar_z0_tot, xtype='M.halo.peak', ytype='M.star.z0', binsize=0.5, binedges=(8,12), limits=((7.9,11.5),(4,10)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/smhm.pdf')
+Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+Mhalo_peak_tot = summary.mhalo(data_total, masks_infall, selection='peak', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+summary_plot.median_plot(x=Mhalo_peak_tot, y=Mstar_z0_tot, xtype='M.halo.peak', ytype='M.star.z0', binsize=0.5, binedges=(8,12), limits=((7.9,11.5),(4,10)), file_path_and_name=directory+'/smhm.pdf')
 
 
 ################################################################################
@@ -84,10 +85,10 @@ summary_plot.median_plot(x=Mhalo_peak_tot, y=Mstar_z0_tot, xtype='M.halo.peak', 
     Figure 2:
         Dynamics versus Mstar
 """
-Mstar_z0_tot = summary.mstar(data_total, mask_selection, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
-vz0_tot = summary.v_z0(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
-L_tot = summary.L_z0(data_total, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
-
+Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+vz0_tot = summary.v_z0(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+L_tot = summary.L_z0(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
 f, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10.5,16))
 colorss = ['#000080', '#006400']
 binedges = (4.5, 9.5)
@@ -241,10 +242,10 @@ ax2.set_xscale('log')
 ax2.set_xlim(10**(limits_2[0][0]), 10**(limits_2[0][1]))
 ax2.set_ylim(limits_2[1])
 #
-potential_tot = summary.potential(data_potentials, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
-ke_z0_tot = summary.kinetic_energy(data_total, mask_selection, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+potential_tot = summary.potential(data_potentials, masks_infall, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
+ke_z0_tot = summary.kinetic_energy(data_total, masks_infall, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
 #
-Mstar_z0_tot = summary.mstar(data_total, mask_selection, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
 #
 x = [Mstar_z0_tot]
 y = [(potential_tot+ke_z0_tot)/1e4]
@@ -336,7 +337,7 @@ ax3.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/dynamics_vs_mstar.pdf')
+plt.savefig(directory+'/dynamics_vs_mstar.pdf')
 
 
 ################################################################################
@@ -348,10 +349,10 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/fina
     Figure 3:
         Dynamics vs d(z = 0), binned by Mstar
 """
-dz0_tot = summary.d_z0(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
-Mstar_z0_tot = summary.mstar(data_total, mask_selection, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
-vz0_tot = summary.v_z0(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
-L_tot = summary.L_z0(data_total, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+dz0_tot = summary.d_z0(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+vz0_tot = summary.v_z0(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+L_tot = summary.L_z0(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
 #
 mass_high = (Mstar_z0_tot > 10**(7))
 mass_low = (Mstar_z0_tot < 10**(7))
@@ -503,11 +504,11 @@ ax2.set_xscale('linear')
 ax2.set_xlim(limits_2[0])
 ax2.set_ylim(limits_2[1])
 #
-potential_tot = summary.potential(data_potentials, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
-ke_z0_tot = summary.kinetic_energy(data_total, mask_selection, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+potential_tot = summary.potential(data_potentials, masks_infall, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
+ke_z0_tot = summary.kinetic_energy(data_total, masks_infall, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
 #
-Mstar_z0_tot = summary.mstar(data_total, mask_selection, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
-dz0_tot = summary.d_z0(data_total, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+dz0_tot = summary.d_z0(data_total, masks_infall, oversample=True, hosts='all_energy', sim_type='baryon')
 #
 mass_high = (Mstar_z0_tot > 10**(7))
 mass_low = (Mstar_z0_tot < 10**(7))
@@ -599,7 +600,7 @@ ax3.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/dynamics_vs_dz0.pdf')
+plt.savefig(directory+'/dynamics_vs_dz0.pdf')
 
 
 ################################################################################
@@ -612,9 +613,9 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/fina
     Figure 5:
         Dynamics vs Infall time
 """
-t_in_tot = summary.first_infall(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
-vz0_tot = summary.v_z0(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
-L_tot = summary.L_z0(data_total, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+t_in_tot = summary.first_infall(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+vz0_tot = summary.v_z0(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+L_tot = summary.L_z0(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
 #
 f, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10.5,16))
 colorss = ['#000080', '#006400']
@@ -767,10 +768,9 @@ ax2.plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10
 ax2.set_xlim(limits_2[0])
 ax2.set_ylim(limits_2[1])
 #
-potential_tot = summary.potential(data_potentials, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
-ke_z0_tot = summary.kinetic_energy(data_total, mask_selection, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
-#
-t_in_tot = summary.first_infall(data_total, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon')
+potential_tot = summary.potential(data_potentials, masks_infall, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
+ke_z0_tot = summary.kinetic_energy(data_total, masks_infall, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+t_in_tot = summary.first_infall(data_total, masks_infall, oversample=True, hosts='all_energy', sim_type='baryon')
 #
 x = [t_in_tot]
 y = [(potential_tot+ke_z0_tot)/1e4]
@@ -856,7 +856,7 @@ ax3.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/dynamics_vs_t_infall.pdf')
+plt.savefig(directory+'/dynamics_vs_t_infall.pdf')
 
 
 ################################################################################
@@ -869,6 +869,10 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/fina
     Figure 5:
         Pericenter time and Infall time vs Mstar
 """
+t_in_tot = summary.first_infall(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+t_in_any_tot = summary.first_infall_any(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
 f, (ax1, ax2) = plt.subplots(2, 1, figsize=(10.5,12))
 colorss = ['#000080', '#006400']
 binedges = (4.5, 9.5)
@@ -970,6 +974,9 @@ if 't.' in ytype[0]:
     ax3.set_ylabel(axis_3_label, labelpad=9)
     ax3.tick_params(pad=3)
 #
+t_sim_tot = summary.tperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+t_min_tot = summary.tperi_min(data_total, masks_infall_peri, oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
 x = [Mstar_z0_tot, Mstar_z0_tot]
 y = [t_sim_tot, t_min_tot]
 #
@@ -1080,8 +1087,7 @@ ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, 
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/times_vs_mstar.pdf')
-#plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/check_times_peri_req.pdf')
+plt.savefig(directory+'/times_vs_mstar.pdf')
 
 
 ################################################################################
@@ -1094,6 +1100,11 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/fina
     Figure 6:
         Infall time versus d(z = 0), binned by Mstar
 """
+dz0_tot = summary.d_z0(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+t_in_tot = summary.first_infall(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+t_in_any_tot = summary.first_infall_any(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
 mass_high = (Mstar_z0_tot > 10**(7))
 mass_low = (Mstar_z0_tot < 10**(7))
 #
@@ -1171,10 +1182,10 @@ ax1.fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color=colorss
 ax1.fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color=colorss[0], alpha=0.15)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax1.plot(binss[2][:-1]+half_bins[2], medians[2], color=colorss[1], markersize=10, alpha=0.5, label='MW-mass halo') # Recent, M < 1e7
-#ax1.plot(binss[3][:-1]+half_bins[3], medians[3], color=colorss[1], linestyle='--', markersize=10, alpha=0.5) # Recent, M < 1e7
-ax1.plot(binss[4][:-1]+half_bins[4], medians[4], color=colorss[0], markersize=10, alpha=0.5, label='Any halo') # Recent, M < 1e7
-#ax1.plot(binss[5][:-1]+half_bins[5], medians[5], color=colorss[0], linestyle='--', markersize=10, alpha=0.5) # Recent, M < 1e7
+ax1.plot(binss[2][:-1]+half_bins[2], medians[2], color=colorss[1], markersize=10, alpha=0.5, label='MW-mass halo')
+#ax1.plot(binss[3][:-1]+half_bins[3], medians[3], color=colorss[1], linestyle='--', markersize=10, alpha=0.5)
+ax1.plot(binss[4][:-1]+half_bins[4], medians[4], color=colorss[0], markersize=10, alpha=0.5, label='Any halo')
+#ax1.plot(binss[5][:-1]+half_bins[5], medians[5], color=colorss[0], linestyle='--', markersize=10, alpha=0.5)
 #
 ax1.set_xscale('linear')
 ax1.set_xlim(limits_1[0][0], limits_1[0][1])
@@ -1206,7 +1217,7 @@ ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/t_infall_vs_dz0.pdf')
+plt.savefig(directory+'/t_infall_vs_dz0.pdf')
 
 
 ###############################################################################
@@ -1219,17 +1230,21 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/fina
     Figure 7 :
         Pericenter distance and number versus Mstar.
 """
+d_sim_tot = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+d_min_tot = summary.dperi_min(data_total, masks_infall_peri, oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
 f, (ax1, ax2) = plt.subplots(2, 1, figsize=(10.5,12))
 colorss = ['#000080', '#006400']
 binedges = (4.5, 9.5)
 binsize = 0.5
 limits = ((4,9.5),(0,200))
 #
-x = [Mstar_z0_tot, Mstar_z0_tot, Mstar_z0_tot]
-y = [d_sim_tot, d_min_tot, N_sim_tot]
+x = [Mstar_z0_tot, Mstar_z0_tot]
+y = [d_sim_tot, d_min_tot]
 #
-xtype = ['M.star.z0', 'M.star.z0', 'M.star.z0']
-ytype = ['d.peri.text','d.peri.text','N.peri.text']
+xtype = ['M.star.z0', 'M.star.z0']
+ytype = ['d.peri.text','d.peri.text']
 #
 medians = []
 lowers = []
@@ -1300,6 +1315,8 @@ ax1.set_xscale('log')
 ax1.set_xlim(10**(limits[0][0]), 10**(limits[0][1]))
 ax1.set_ylim(limits[1])
 #
+N_sim_tot = summary.nperi(data_total, masks_infall, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
 x = [Mstar_z0_tot]
 y = [N_sim_tot]
 #
@@ -1393,8 +1410,7 @@ ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/figure_2.pdf')
-#plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/check_peri_dn_peri_req.pdf')
+plt.savefig(directory+'/peri_dn_vs_mstar.pdf')
 
 
 ################################################################################
@@ -1407,6 +1423,10 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/fina
     Figure 8:
         Pericenter number vs d(z = 0), binned by Mstar
 """
+N_sim_tot = summary.nperi(data_total, masks_infall, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon')
+dz0_tot = summary.d_z0(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
 mass_high = (Mstar_z0_tot > 10**(7))
 mass_low = (Mstar_z0_tot < 10**(7))
 #
@@ -1502,7 +1522,7 @@ ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/nperi_vs_dz0.pdf')
+plt.savefig(directory+'/nperi_vs_dz0.pdf')
 
 
 ################################################################################
@@ -1515,6 +1535,10 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/fina
     Figure 9:
         Pericenter distance and number versus t_infall
 """
+d_sim_tot = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+d_1st_tot = summary.dperi_first(data_total, masks_infall_peri, oversample=True, hosts='all_no_z', sim_type='baryon')
+t_in_tot = summary.first_infall(data_total, masks_infall_peri, oversample=True, hosts='all_no_z', sim_type='baryon')
+#
 f, (ax1, ax2) = plt.subplots(2, 1, figsize=(10.5,12))
 colorss = ['#000080', '#006400']
 binedges = None
@@ -1590,6 +1614,8 @@ ax1.plot(binss[1][:-1]+half_bins[1], medians[1], color=colorss[0], markersize=10
 ax1.set_xlim(limits_1[0])
 ax1.set_ylim(limits_1[1])
 #
+N_sim_tot = summary.nperi(data_total, masks_infall, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon')
+t_in_tot = summary.first_infall(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
 x = [t_in_tot]
 y = [N_sim_tot]
 #
@@ -1693,8 +1719,7 @@ ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/peri_dn_vs_t_infall.pdf')
-#plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/check_infall_peri_req.pdf')
+plt.savefig(directory+'/peri_dn_vs_t_infall.pdf')
 
 
 ################################################################################
@@ -1707,13 +1732,18 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/fina
     Figure 10:
         Outlier Histograms
 """
+d_sim_tot = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+d_min_tot = summary.dperi_min(data_total, masks_infall_peri, oversample=True, hosts='all_no_z', sim_type='baryon')
+t_sim_tot = summary.tperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+t_min_tot = summary.tperi_min(data_total, masks_infall_peri, oversample=True, hosts='all_no_z', sim_type='baryon')
+#
 # dperi fraction plots
 mask_delta_d = (np.abs((d_min_tot - d_sim_tot)/d_sim_tot) > 0.05)
-summary_plot.plot_hist(x=((d_min_tot-d_sim_tot)/d_sim_tot)[mask_delta_d], xtype='delta_d_frac', binsize=0.05, pdf=True, xlimits=(-1,0), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/delta_d_frac_histogram.pdf')
-
+summary_plot.plot_hist(x=((d_min_tot-d_sim_tot)/d_sim_tot)[mask_delta_d], xtype='delta_d_frac', binsize=0.05, pdf=True, xlimits=(-1,0), file_path_and_name=directory+'/delta_d_frac_histogram.pdf')
+#
 # delta tperi plots
 mask_delta_t = (np.abs((t_min_tot - t_sim_tot)/t_sim_tot) > 0.05)
-summary_plot.plot_hist(x=(t_min_tot-t_sim_tot)[mask_delta_t], xtype='delta_t', binsize=0.5, pdf=True, file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/delta_t_histogram.pdf')
+summary_plot.plot_hist(x=(t_min_tot-t_sim_tot)[mask_delta_t], xtype='delta_t', binsize=0.5, pdf=True, file_path_and_name=directory+'/delta_t_histogram.pdf')
 
 
 ################################################################################
@@ -1726,16 +1756,18 @@ summary_plot.plot_hist(x=(t_min_tot-t_sim_tot)[mask_delta_t], xtype='delta_t', b
     Figure 11:
         Outlier properties versus Mstar
 """
-
+N_sim_tot = summary.nperi(data_total, masks_infall, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon')
+d_sim_tot = summary.dperi_recent(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+d_min_tot = summary.dperi_min(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+t_in_tot = summary.first_infall(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
 # Outlier sample, purple with scatter
 mask_out = (np.abs((d_min_tot-d_sim_tot)/d_sim_tot) > 0.05)
-
 # N > 1 sample, red with scatter
 mask_mult = (N_sim_tot > 1)
-
 # Total - Outlier sample, dashed green no scatter
 mask_no_out = (np.abs((d_min_tot-d_sim_tot)/d_sim_tot) < 0.05)
-
 # N > 1 - Outlier sample, dashed red no scatter
 mask_mult = (N_sim_tot > 1)
 mask_mult_no_out = (np.abs((d_min_tot[mask_mult]-d_sim_tot[mask_mult])/d_sim_tot[mask_mult]) < 0.05)
@@ -1746,7 +1778,7 @@ binedges = None
 binsize = 0.5
 binedges = (4.5, 9.5)
 limits_1 = ((4,9.5),(0,12))
-limits_2 = ((4,9.5),(0,190))
+limits_2 = ((4,9.5),(0,160))
 #
 x = [Mstar_z0_tot, Mstar_z0_tot[mask_out], Mstar_z0_tot[mask_mult], Mstar_z0_tot[mask_no_out], Mstar_z0_tot[mask_mult][mask_mult_no_out]]
 y = [t_in_tot, t_in_tot[mask_out], t_in_tot[mask_mult], t_in_tot[mask_no_out], t_in_tot[mask_mult][mask_mult_no_out]]
@@ -1843,6 +1875,21 @@ if 't.' in ytype[0]:
 #
 ############
 #
+N_sim_tot = summary.nperi(data_total, masks_infall_peri, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon')
+d_sim_tot = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+d_min_tot = summary.dperi_min(data_total, masks_infall_peri, oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+# Outlier sample, purple with scatter
+mask_out = (np.abs((d_min_tot-d_sim_tot)/d_sim_tot) > 0.05)
+# N > 1 sample, red with scatter
+mask_mult = (N_sim_tot > 1)
+# Total - Outlier sample, dashed green no scatter
+mask_no_out = (np.abs((d_min_tot-d_sim_tot)/d_sim_tot) < 0.05)
+# N > 1 - Outlier sample, dashed red no scatter
+mask_mult = (N_sim_tot > 1)
+mask_mult_no_out = (np.abs((d_min_tot[mask_mult]-d_sim_tot[mask_mult])/d_sim_tot[mask_mult]) < 0.05)
+#
 x = [Mstar_z0_tot, Mstar_z0_tot[mask_out], Mstar_z0_tot[mask_mult], Mstar_z0_tot[mask_no_out], Mstar_z0_tot[mask_mult][mask_mult_no_out]]
 y = [d_min_tot, d_min_tot[mask_out], d_min_tot[mask_mult], d_min_tot[mask_no_out], d_min_tot[mask_mult][mask_mult_no_out]]
 #
@@ -1933,7 +1980,7 @@ ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/figure_12a.pdf')
+plt.savefig(directory+'/outlier_props_vs_mstar_1.pdf')
 #
 ############
 #
@@ -1944,6 +1991,23 @@ binsize = 0.5
 binedges = (4.5, 9.5)
 limits_1 = ((4,9.5),(0,3.5))
 limits_2 = ((4,9.5),(-4,0.5))
+#
+N_sim_tot = summary.nperi(data_total, masks_infall, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon')
+d_sim_tot = summary.dperi_recent(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+d_min_tot = summary.dperi_min(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+d_1st_tot = summary.dperi_first(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+L_tot = summary.L_z0(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+# Outlier sample, purple with scatter
+mask_out = (np.abs((d_min_tot-d_sim_tot)/d_sim_tot) > 0.05)
+# N > 1 sample, red with scatter
+mask_mult = (N_sim_tot > 1)
+# Total - Outlier sample, dashed green no scatter
+mask_no_out = (np.abs((d_min_tot-d_sim_tot)/d_sim_tot) < 0.05)
+# N > 1 - Outlier sample, dashed red no scatter
+mask_mult = (N_sim_tot > 1)
+mask_mult_no_out = (np.abs((d_min_tot[mask_mult]-d_sim_tot[mask_mult])/d_sim_tot[mask_mult]) < 0.05)
 #
 x = [Mstar_z0_tot, Mstar_z0_tot[mask_out], Mstar_z0_tot[mask_mult], Mstar_z0_tot[mask_no_out], Mstar_z0_tot[mask_mult][mask_mult_no_out]]
 y = [L_tot/1e4, (L_tot[mask_out])/1e4, (L_tot[mask_mult])/1e4, (L_tot[mask_no_out])/1e4, (L_tot[mask_mult][mask_mult_no_out])/1e4]
@@ -2023,13 +2087,13 @@ ax1.set_ylim(limits_1[1])
 ############
 #
 # For the energy plots
-N_sim_tot = summary.nperi(data_total, mask_selection, oversample=True, selection='sim', hosts='all_energy', sim_type='baryon')
-d_sim_tot = summary.dperi_recent(data_total, mask_selection, selection='sim', oversample=True, hosts='all_energy', sim_type='baryon')
-d_min_tot = summary.dperi_min(data_total, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon')
-potential_tot = summary.potential(data_potentials, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
-ke_z0_tot = summary.kinetic_energy(data_total, mask_selection, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+N_sim_tot = summary.nperi(data_total, masks_infall, oversample=True, selection='sim', hosts='all_energy', sim_type='baryon')
+d_sim_tot = summary.dperi_recent(data_total, masks_infall, selection='sim', oversample=True, hosts='all_energy', sim_type='baryon')
+d_min_tot = summary.dperi_min(data_total, masks_infall, oversample=True, hosts='all_energy', sim_type='baryon')
+potential_tot = summary.potential(data_potentials, masks_infall, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
+ke_z0_tot = summary.kinetic_energy(data_total, masks_infall, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
 #
-Mstar_z0_tot = summary.mstar(data_total, mask_selection, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
 #
 # Outlier sample, purple with scatter
 mask_out = (np.abs((d_min_tot-d_sim_tot)/d_sim_tot) > 0.05)
@@ -2129,7 +2193,7 @@ ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/outlier_props_vs_mstar_2.pdf')
+plt.savefig(directory+'/outlier_props_vs_mstar_2.pdf')
 
 
 ################################################################################
@@ -2142,7 +2206,21 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/fina
     Figure A1:
         Infall time versus Mstar, for Isolated versus Paired satellites
 """
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_in_iso, t_in_lg], xtype=['M.star.z0','M.star.z0'], ytype=['t.infall.text','t.infall.text'], labels=['Isolated', 'Paired'], binsize=1, binedges=(4,10), limits=((4,9.5),(0,11)), file_path_and_name=sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/iso_vs_lg_infall.pdf')
+### Generate all of the data for the plots below
+data_total_iso = summary.data_read(directory=sim_data.home_dir, hosts='iso_no_z', sim_type='baryon')
+masks_infall_iso = summary.data_mask(data_total_iso, peri_sim=False, peri_model=False, hosts='iso_no_z')
+masks_infall_iso['m12f'][57] = False
+#
+t_in_iso = summary.first_infall(data_total_iso, masks_infall_iso, oversample=True, hosts='iso_no_z', sim_type='baryon')
+Mstar_z0_iso = summary.mstar(data_total_iso, masks_infall_iso, selection='z0', oversample=True, hosts='iso_no_z', sim_type='baryon')
+#
+data_total_lg = summary.data_read(directory=sim_data.home_dir, hosts='lg', sim_type='baryon')
+masks_infall_lg = summary.data_mask(data_total_lg, peri_sim=False, peri_model=False, hosts='lg')
+#
+t_in_lg = summary.first_infall(data_total_lg, masks_infall_lg, oversample=True, hosts='lg', sim_type='baryon')
+Mstar_z0_lg = summary.mstar(data_total_lg, masks_infall_lg, selection='z0', oversample=True, hosts='lg', sim_type='baryon')
+#
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_in_iso, t_in_lg], xtype=['M.star.z0','M.star.z0'], ytype=['t.infall.text','t.infall.text'], labels=['Isolated', 'Paired'], binsize=1, binedges=(4,10), limits=((4,9.5),(0,11)), file_path_and_name=directory+'/iso_vs_lg_infall.pdf')
 
 
 ################################################################################
@@ -2155,9 +2233,14 @@ summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_in_iso, t_in_l
     Figure B1:
         Dynamics versus Mhalo
 """
-Mhalo_peak_tot_all = summary.mhalo(data_total_all, mask_selection, selection='peak', oversample=True, hosts='all_no_z', sim_type='baryon_all')
-vz0_tot_all = summary.v_z0(data_total_all, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon_all')
-L_tot_all = summary.L_z0(data_total_all, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon_all')
+data_total_all = summary.data_read(directory=sim_data.home_dir, hosts='all_no_z', sim_type='all_baryon')
+data_potentials_all = summary.data_read_potential(directory=sim_data.home_dir, hosts='all_energy', sim_type='all_baryon')
+masks_infall_all = summary.data_mask(data_total_all, peri_sim=False, peri_model=False, hosts='all_no_z')
+masks_infall_all_peri = summary.data_mask(data_total_all, peri_sim=True, peri_model=False, hosts='all_no_z')
+#
+Mhalo_peak_tot_all = summary.mhalo(data_total_all, masks_infall_all, selection='peak', oversample=True, hosts='all_no_z', sim_type='baryon_all')
+vz0_tot_all = summary.v_z0(data_total_all, masks_infall_all, oversample=True, hosts='all_no_z', sim_type='baryon_all')
+L_tot_all = summary.L_z0(data_total_all, masks_infall_all, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon_all')
 #
 f, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10.5,16))
 colorss = ['#000080', '#006400']
@@ -2312,10 +2395,9 @@ ax2.set_xscale('log')
 ax2.set_xlim(10**(limits_2[0][0]), 10**(limits_2[0][1]))
 ax2.set_ylim(limits_2[1])
 #
-potential_tot_all = summary.potential(data_potentials_all, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon_all', norm='kinetic')
-ke_z0_tot_all = summary.kinetic_energy(data_total_all, mask_selection, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon_all')
-#
-Mhalo_peak_tot_all = summary.mhalo(data_total_all, mask_selection, selection='peak', oversample=True, hosts='all_energy', sim_type='baryon_all')
+potential_tot_all = summary.potential(data_potentials_all, masks_infall_all, oversample=True, hosts='all_energy', sim_type='baryon_all', norm='kinetic')
+ke_z0_tot_all = summary.kinetic_energy(data_total_all, masks_infall_all, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon_all')
+Mhalo_peak_tot_all = summary.mhalo(data_total_all, masks_infall_all, selection='peak', oversample=True, hosts='all_energy', sim_type='baryon_all')
 #
 x = [Mhalo_peak_tot_all]
 y = [(potential_tot_all+ke_z0_tot_all)/1e4]
@@ -2407,7 +2489,7 @@ ax3.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/dynamics_vs_mhalo.pdf')
+plt.savefig(directory+'/dynamics_vs_mhalo.pdf')
 
 
 ################################################################################
@@ -2420,6 +2502,10 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/fina
     Figure B2:
         Pericenter time and Infall time versus Mhalo
 """
+t_in_tot_all = summary.first_infall(data_total_all, masks_infall_all, oversample=True, hosts='all_no_z', sim_type='baryon_all')
+t_in_any_tot_all = summary.first_infall_any(data_total_all, masks_infall_all, oversample=True, hosts='all_no_z', sim_type='baryon_all')
+Mhalo_peak_tot_all = summary.mhalo(data_total_all, masks_infall_all, selection='peak', oversample=True, hosts='all_no_z', sim_type='baryon_all')
+#
 f, (ax1, ax2) = plt.subplots(2, 1, figsize=(10.5,12))
 colorss = ['#000080', '#006400']
 binedges = (8,11.5)
@@ -2520,6 +2606,10 @@ if 't.' in ytype[0]:
     ax3.set_ylim(limits_1[1])
     ax3.set_ylabel(axis_3_label, labelpad=9)
     ax3.tick_params(pad=3)
+#
+t_sim_tot_all = summary.tperi_recent(data_total_all, masks_infall_all_peri, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon_all')
+t_min_tot_all = summary.tperi_min(data_total_all, masks_infall_all_peri, oversample=True, hosts='all_no_z', sim_type='baryon_all')
+Mhalo_peak_tot_all = summary.mhalo(data_total_all, masks_infall_all_peri, selection='peak', oversample=True, hosts='all_no_z', sim_type='baryon_all')
 #
 x = [Mhalo_peak_tot_all, Mhalo_peak_tot_all]
 y = [t_sim_tot_all, t_min_tot_all]
@@ -2631,7 +2721,7 @@ ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/times_vs_mhalo.pdf')
+plt.savefig(directory+'/times_vs_mhalo.pdf')
 
 
 ################################################################################
@@ -2644,6 +2734,9 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/fina
     Figure B3:
         Pericenter number versus Mhalo
 """
+N_sim_tot_all = summary.nperi(data_total_all, masks_infall_all, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon_all')
+Mhalo_peak_tot_all = summary.mhalo(data_total_all, masks_infall_all, selection='peak', oversample=True, hosts='all_no_z', sim_type='baryon_all')
+#
 f, ax1 = plt.subplots(1, 1, figsize=(10,8))
 colorss = ['#000080', '#006400']
 binedges = (8,11.5)
@@ -2737,7 +2830,7 @@ ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/nperi_vs_mhalo.pdf')
+plt.savefig(directory+'/nperi_vs_mhalo.pdf')
 
 
 ################################################################################
@@ -2750,12 +2843,25 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/fina
     Figure C1:
         DMO versus Baryonic comparison
 """
+data_total_all = summary.data_read(directory=sim_data.home_dir, hosts='iso_no_z', sim_type='all_baryon')
+masks_infall_all = summary.data_mask(data_total_all, peri_sim=False, peri_model=False, hosts='iso_no_z')
+masks_infall_all_peri = summary.data_mask(data_total_all, peri_sim=True, peri_model=False, hosts='iso_no_z')
+#
+data_total_dmo = summary.data_read(directory=sim_data.home_dir, hosts='iso_no_z', sim_type='dmo')
+masks_infall_dmo = summary.data_mask(data_total_dmo, peri_sim=False, peri_model=False, hosts='iso_no_z')
+masks_infall_dmo_peri = summary.data_mask(data_total_dmo, peri_sim=True, peri_model=False, hosts='iso_no_z')
+#
+Mhalo_peak_tot = summary.mhalo(data_total_all, masks_infall_all, selection='peak', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+L_tot = summary.L_z0(data_total_all, masks_infall_all, selection='sim', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+Mhalo_peak_tot_dmo = summary.mhalo(data_total_dmo, masks_infall_dmo, selection='peak', oversample=True, hosts='iso_no_z', sim_type='dmo')
+L_tot_dmo = summary.L_z0(data_total_dmo, masks_infall_dmo, selection='sim', oversample=True, hosts='iso_no_z', sim_type='dmo')
+#
 f, (ax1, ax2) = plt.subplots(2, 1, figsize=(10.5,12))
 colorss = ['#000080', '#006400']
 binedges = (8,11.5)
 binsize = 0.5
 limits_1 = ((8, 11.5),(0,3))
-limits_2 = ((8, 11.5),(0,185))
+limits_2 = ((8, 11.5),(0,145))
 #
 x = [Mhalo_peak_tot, Mhalo_peak_tot_dmo]
 y = [L_tot/1e4, L_tot_dmo/1e4]
@@ -2832,6 +2938,10 @@ ax1.set_xscale('log')
 ax1.set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
 ax1.set_ylim(limits_1[1])
 #
+d_min_tot = summary.dperi_min(data_total_all, masks_infall_all_peri, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+Mhalo_peak_tot = summary.mhalo(data_total_all, masks_infall_all_peri, selection='peak', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+d_min_tot_dmo = summary.dperi_min(data_total_dmo, masks_infall_dmo_peri, oversample=True, hosts='iso_no_z', sim_type='dmo')
+Mhalo_peak_tot_dmo = summary.mhalo(data_total_dmo, masks_infall_dmo_peri, selection='peak', oversample=True, hosts='iso_no_z', sim_type='dmo')
 x = [Mhalo_peak_tot, Mhalo_peak_tot_dmo]
 y = [d_min_tot, d_min_tot_dmo]
 #
@@ -2922,7 +3032,7 @@ ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/dmo_1.pdf')
+plt.savefig(directory+'/dmo_1.pdf')
 #
 ############
 #
@@ -2933,6 +3043,10 @@ binsize = 0.5
 limits_1 = ((8, 11.5),(0,13))
 limits_2 = ((8, 11.5),(0,7.5))
 #
+t_in_any_tot = summary.first_infall_any(data_total_all, masks_infall_all, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+Mhalo_peak_tot = summary.mhalo(data_total_all, masks_infall_all, selection='peak', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+t_in_any_tot_dmo = summary.first_infall_any(data_total_dmo, masks_infall_dmo, oversample=True, hosts='iso_no_z', sim_type='dmo')
+Mhalo_peak_tot_dmo = summary.mhalo(data_total_dmo, masks_infall_dmo, selection='peak', oversample=True, hosts='iso_no_z', sim_type='dmo')
 x = [Mhalo_peak_tot, Mhalo_peak_tot_dmo]
 y = [t_in_any_tot, t_in_any_tot_dmo]
 #
@@ -3027,6 +3141,10 @@ if 't.' in ytype[0]:
     ax3.set_ylabel(axis_3_label, labelpad=9)
     ax3.tick_params(pad=3)
 #
+N_sim_tot = summary.nperi(data_total_all, masks_infall_all, oversample=True, selection='sim', hosts='iso_no_z', sim_type='baryon_all')
+Mhalo_peak_tot = summary.mhalo(data_total_all, masks_infall_all, selection='peak', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+N_sim_tot_dmo = summary.nperi(data_total_dmo, masks_infall_dmo, oversample=True, selection='sim', hosts='iso_no_z', sim_type='dmo')
+Mhalo_peak_tot_dmo = summary.mhalo(data_total_dmo, masks_infall_dmo, selection='peak', oversample=True, hosts='iso_no_z', sim_type='dmo')
 x = [Mhalo_peak_tot, Mhalo_peak_tot_dmo]
 y = [N_sim_tot, N_sim_tot_dmo]
 #
@@ -3122,7 +3240,7 @@ ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final/dmo_2.pdf')
+plt.savefig(directory+'/dmo_2.pdf')
 
 
 
