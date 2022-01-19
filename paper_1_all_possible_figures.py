@@ -5,7 +5,7 @@
     = Paper I Summary Plots =
     =========================
 
-    Create figures featured in Paper I
+    Create figures for Paper I
 
 """
 
@@ -45,6 +45,7 @@ mask_selection['m12f'][57] = False
 N_sim_tot = summary.nperi(data_total, mask_selection, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon')
 d_sim_tot = summary.dperi_recent(data_total, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
 d_min_tot = summary.dperi_min(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
+d_1st_tot = summary.dperi_first(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
 dz0_tot = summary.d_z0(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
 t_sim_tot = summary.tperi_recent(data_total, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
 t_min_tot = summary.tperi_min(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
@@ -80,6 +81,13 @@ summary_plot.median_plot(x=t_sim_tot, y=t_min_tot, xtype='t.peri.recent', ytype=
 
 # N_sim vs Infall Time
 summary_plot.median_plot(x=t_in_tot, y=N_sim_tot, xtype='t.infall.text', ytype='N.peri.text', binsize=1, limits=((0,13.8),(None)), file_path_and_name=directory+'/N_sim_vs_t_infall.pdf')
+
+# vtot vs Infall Time
+summary_plot.median_plot(x=t_in_tot, y=vz0_tot, xtype='t.infall.text', ytype='v.tot', binsize=1, limits=((0,13.8),(None)), file_path_and_name=directory+'/final/vtot_vs_t_infall.pdf')
+
+# Ltot vs Infall Time
+summary_plot.median_plot(x=t_in_tot, y=L_tot/1e4, xtype='t.infall.text', ytype='L.tot', binsize=1, limits=((0,13.8),(0,4)), file_path_and_name=directory+'/final/Ltot_vs_t_infall.pdf')
+
 
 # N_sim vs Mstar(z = 0)
 summary_plot.median_plot(x=Mstar_z0_tot, y=N_sim_tot, xtype='M.star.z0', ytype='N.peri.text', binsize=0.5, file_path_and_name=directory+'/N_sim_vs_Mstar_z0.pdf')
@@ -142,6 +150,8 @@ ke_z0_tot = summary.kinetic_energy(data_total, mask_selection, ke_type='z0', ove
 #
 Mstar_z0_tot = summary.mstar(data_total, mask_selection, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
 dz0_tot = summary.d_z0(data_total, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon')
+t_in_tot = summary.first_infall(data_total, mask_selection, oversample=True, hosts='all_energy', sim_type='baryon')
+
 
 # E_tot vs Mstar (z = 0)
 summary_plot.median_plot(x=Mstar_z0_tot, y=(ke_z0_tot+potential_tot)/1e4, xtype='M.star.z0', ytype='E.tot', binsize=0.5, file_path_and_name=directory+'/Etot_vs_Mstar_z0.pdf')
@@ -150,6 +160,9 @@ summary_plot.median_plot(x=Mstar_z0_tot, y=(ke_z0_tot+potential_tot)/1e4, xtype=
 # E_tot vs d(z = 0)
 summary_plot.median_plot(x=dz0_tot, y=(ke_z0_tot+potential_tot)/1e4, xtype='d.z0', ytype='E.tot', binsize=50, file_path_and_name=directory+'/Etot_vs_dz0.pdf')
 summary_plot.median_plot(x=dz0_tot, y=(ke_z0_tot+potential_tot)/1e4, xtype='d.z0', ytype='E.tot', binsize=50, limits=((0,400),(-5,2)), file_path_and_name=directory+'/Etot_vs_dz0_zoom.pdf')
+
+# Etot vs Infall time
+summary_plot.median_plot(x=t_in_tot, y=(ke_z0_tot+potential_tot)/1e4, xtype='t.infall.text', ytype='E.tot', binsize=1, limits=((0,13.8),(-4,1)), file_path_and_name=directory+'/final/Etot_vs_t_infall.pdf')
 
 
 """
