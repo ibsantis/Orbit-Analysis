@@ -1904,9 +1904,11 @@ class SummaryDataPlot(SummaryDataSort):
             minn = binsize*np.floor(np.min(x)/binsize)
             maxx = binsize*np.ceil(np.max(x)/binsize)
             if minn < 0:
-                bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+                #bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+                bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize)-1)
             else:
-                bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+                #bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+                bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize)+1)
             bin_array = np.linspace(minn, maxx, bin_num)
             #
             # Calculate the scatter
@@ -1986,9 +1988,9 @@ class SummaryDataPlot(SummaryDataSort):
                 minn = binsize*np.floor(np.min(x[i])/binsize)
                 maxx = binsize*np.ceil(np.max(x[i])/binsize)
                 if minn < 0:
-                    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+                    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize)-1)
                 else:
-                    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+                    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize)+1)
                 bin_array = np.linspace(minn, maxx, bin_num)
                 #
                 # Calculate the scatter
