@@ -19,6 +19,8 @@ from matplotlib.ticker import LogLocator
 from matplotlib import pyplot as plt
 import orbit_io
 import summary_io
+from scipy import interpolate
+import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
@@ -72,7 +74,124 @@ L_tot = summary.L_z0(data_total, masks_infall, selection='sim', oversample=True,
 Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
 Mhalo_peak_tot = summary.mhalo(data_total, masks_infall, selection='peak', oversample=True, hosts='all_no_z', sim_type='baryon')
 #
-summary_plot.median_plot(x=Mhalo_peak_tot, y=Mstar_z0_tot, xtype='M.halo.peak', ytype='M.star.z0', binsize=0.5, binedges=(8,12), limits=((7.9,11.5),(4,10)), file_path_and_name=directory+'/smhm.pdf')
+#summary_plot.median_plot(x=Mhalo_peak_tot, y=Mstar_z0_tot, xtype='M.halo.peak', ytype='M.star.z0', binsize=0.5, binedges=(8,12), limits=((7.9,11.5),(4,10)), file_path_and_name=directory+'/smhm.pdf')
+
+# Generate the Behroozi median extrapolation
+df = pd.read_csv('~/simulation/orbit_data/smhm_behroozi_values.txt', sep=' ', header=0, skiprows=[1,2])
+x_behroozi = df['Log10(Mpeak/Msun)'][:15]
+y_behroozi = df['Log10(Median_SM/Msun)'][:15]
+#
+smhm_behroozi = interpolate.interp1d(x=x_behroozi, y=y_behroozi, bounds_error=False, fill_value='extrapolate')
+x_behroozi_new = np.linspace(8.25,10.5,300)
+
+# Generate the Moster (2013) function
+def moster_smhm(xs):
+    m1 = 10**11.59# + 1.195*(0.1/(0.1+1))
+    N = 0.0351# + (-0.0247)*(0.1/(0.1+1))
+    beta = 1.376# + (-0.826)*(0.1/(0.1+1))
+    gamma = 0.608# + 0.329*(0.1/(0.1+1))
+    return xs*2*N*( (xs/m1)**((-1)*beta) + (xs/m1)**(gamma) )**(-1)
+x_moster = np.logspace(8.25,11.25,300)
+smhm_moster = moster_smhm(x_moster)
+
+# Generate SGK (2017) function
+def sgk_smhm(xs, alpha, b):
+    return xs*(alpha)+(-1)*b
+x_sgk = np.linspace(8.25,11.25,300)
+smhm_sgk_1 = sgk_smhm(x_sgk, 1.8, 11.3)
+smhm_sgk_2 = sgk_smhm(x_sgk, 2.6, 20.4)
+
+f, ax1 = plt.subplots(1, 1, figsize=(10,8))
+colorss = ['#000080', '#006400']
+binedges = (8,12)
+binsize = 0.5
+limits=((7.9,11.5),(4,10))
+#
+x = [np.log10(Mhalo_peak_tot)]
+y = [np.log10(Mstar_z0_tot)]
+#
+xtype = ['M.halo.peak']
+ytype = ['M.star.z0']
+#
+medians = []
+lowers = []
+uppers = []
+lowests = []
+highests = []
+binss = []
+half_bins = []
+#
+for j in range(0, len(x)):
+    #
+    if binedges:
+        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+        bins = np.linspace(binedges[0], binedges[1], bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    else:
+        minn = binsize*np.floor(np.min(x[j])/binsize)
+        maxx = binsize*np.ceil(np.max(x[j])/binsize)
+        if minn < 0:
+            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+        else:
+            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+        bins = np.linspace(minn, maxx, bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    #
+    onesigp = 84.13
+    onesigm = 15.87
+    twosigp = 100
+    twosigm = 0
+    #
+    med = np.zeros(len(bins)-1)
+    lower = np.zeros(len(bins)-1)
+    upper = np.zeros(len(bins)-1)
+    lowest = np.zeros(len(bins)-1)
+    highest = np.zeros(len(bins)-1)
+    #
+    for i in range(0, len(bins)-1):
+        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+        med[i] = np.nanmedian(y[j][mask])
+        upper[i] = np.nanpercentile(y[j][mask], onesigp)
+        lower[i] = np.nanpercentile(y[j][mask], onesigm)
+        highest[i] = np.nanpercentile(y[j][mask], twosigp)
+        lowest[i] = np.nanpercentile(y[j][mask], twosigm)
+    medians.append(med)
+    lowers.append(lower)
+    uppers.append(upper)
+    lowests.append(lowest)
+    highests.append(highest)
+    binss.append(bins)
+    half_bins.append(half_bin)
+#
+# PLOTTING
+# Plot the scatter for the recent and minimum pericenters
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), 10**(uppers[0]), 10**(lowers[0]), color=colorss[1], alpha=0.3)
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), 10**(highests[0]), 10**(lowests[0]), color=colorss[1], alpha=0.15)
+#
+# Plot the medians for the two mass bins (low-mass)
+ax1.plot(10**(binss[0][:-1]+half_bins[0]), 10**(medians[0]), color=colorss[1], markersize=10, alpha=0.5, label='This work')
+#
+ax1.set_xlim(10**(limits[0][0]), 10**(limits[0][1]))
+ax1.set_ylim(10**(limits[1][0]), 10**(limits[1][1]))
+#
+# Plot the Behroozi extrapolation
+ax1.plot(x_moster, smhm_moster, color=summary_plot.colors[2], alpha=0.75, label='Moster (2013)')
+ax1.plot(10**(x_sgk), 10**(smhm_sgk_1), color=summary_plot.colors[9], alpha=0.7, label='SGK (2017, $\\alpha=1.8$)')
+ax1.plot(10**(x_sgk), 10**(smhm_sgk_2), color=summary_plot.colors[9], linestyle='--', alpha=0.75, label='SGK (2017, $\\alpha=2.6$)')
+ax1.plot(10**(x_behroozi), 10**(y_behroozi), color='k', alpha=0.75)
+ax1.plot(10**(x_behroozi_new), 10**(smhm_behroozi(x_behroozi_new)), color='k', alpha=0.75, label='Behroozi (2020)')
+#
+plt.hlines(y=3*10**4, xmin=10**(limits[0][0]), xmax=10**(limits[0][1]), colors='k', linestyles='dotted', alpha=0.5)
+#
+ax1.set_xscale('log')
+ax1.set_yscale('log')
+ax1.set_xlabel('$M_{\\rm halo,peak}$ [$M_{\\odot}$]', fontsize=28)
+ax1.set_ylabel('$M_{\\rm star}$ [$M_{\\odot}$]', fontsize=28)
+ax1.legend(prop={'size': 20}, loc='best')
+ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(directory+'/smhm_w_comparisons.pdf')
 
 
 ################################################################################
@@ -2581,7 +2700,7 @@ ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=c
 ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.15)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='MW/M31-mass halo')
+ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='MW-mass halo')
 ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='Any halo')
 #
 ax1.set_xscale('log')
@@ -3260,6 +3379,249 @@ plt.savefig(directory+'/dmo_2.pdf')
 ############# Move this to "paper_1_all_possible..."
 #############
 #############
+
+
+
+
+
+
+
+
+d_sim_tot = summary.dperi_recent(data_total_all, masks_infall_all_peri, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+Mhalo_peak_tot = summary.mhalo(data_total_all, masks_infall_all_peri, selection='peak', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+d_sim_tot_dmo = summary.dperi_recent(data_total_dmo, masks_infall_dmo_peri, oversample=True, hosts='iso_no_z', sim_type='dmo')
+Mhalo_peak_tot_dmo = summary.mhalo(data_total_dmo, masks_infall_dmo_peri, selection='peak', oversample=True, hosts='iso_no_z', sim_type='dmo')
+#
+f, (ax1, ax2) = plt.subplots(2, 1, figsize=(10.5,12))
+colorss = ['#000080', '#006400']
+binedges = (8,11.5)
+binsize = 0.5
+limits_1 = ((8,11.5),(0,150))
+limits_2 = ((8,11.5),(0,200))
+#
+x = [Mhalo_peak_tot, Mhalo_peak_tot_dmo]
+y = [d_sim_tot, d_sim_tot_dmo]
+#
+xtype = ['M.halo.peak', 'M.halo.peak']
+ytype = ['d.peri.text','d.peri.text']
+#
+medians = []
+lowers = []
+uppers = []
+lowests = []
+highests = []
+binss = []
+half_bins = []
+#
+for j in range(0, len(x)):
+    if 'M.' in xtype[j]:
+        x[j] = np.log10(x[j])
+    if 'M.' in ytype[j]:
+        y[j] = np.log10(y[j])
+    #
+    if binedges:
+        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+        bins = np.linspace(binedges[0], binedges[1], bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    else:
+        minn = binsize*np.floor(np.min(x[j])/binsize)
+        maxx = binsize*np.ceil(np.max(x[j])/binsize)
+        if minn < 0:
+            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+        else:
+            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+        bins = np.linspace(minn, maxx, bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    #
+    onesigp = 84.13
+    onesigm = 15.87
+    twosigp = 100
+    twosigm = 0
+    #
+    med = np.zeros(len(bins)-1)
+    lower = np.zeros(len(bins)-1)
+    upper = np.zeros(len(bins)-1)
+    lowest = np.zeros(len(bins)-1)
+    highest = np.zeros(len(bins)-1)
+    #
+    for i in range(0, len(bins)-1):
+        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+        med[i] = np.nanmedian(y[j][mask])
+        upper[i] = np.nanpercentile(y[j][mask], onesigp)
+        lower[i] = np.nanpercentile(y[j][mask], onesigm)
+        highest[i] = np.nanpercentile(y[j][mask], twosigp)
+        lowest[i] = np.nanpercentile(y[j][mask], twosigm)
+    medians.append(med)
+    lowers.append(lower)
+    uppers.append(upper)
+    lowests.append(lowest)
+    highests.append(highest)
+    binss.append(bins)
+    half_bins.append(half_bin)
+#
+# PLOTTING
+# Plot the scatter for the recent and minimum pericenters
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
+ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.3)
+ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.15)
+#
+# Plot the medians for the two mass bins (low-mass)
+ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='Baryon')
+ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='DMO')
+#
+ax1.set_xscale('log')
+ax1.set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
+ax1.set_ylim(limits_1[1])
+#
+if 't.' in ytype[0]:
+    # Instantiate the cosmology class and run this method first to set up scalefactors
+    cc = ut.cosmology.CosmologyClass()
+    red = np.array([0, 1])
+    cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+    #
+    axis_3_label = 'redshift'
+    axis_3_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+    axis_3_tick_values = [float(v) for v in axis_3_tick_labels]
+    axis_3_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_3_tick_values)
+    ax3 = ax1.twinx()
+    ax3.set_xscale('log')
+    ax3.set_yscale('linear')
+    ax3.set_yticks(axis_3_tick_locations)
+    ax3.set_yticklabels(axis_3_tick_labels, fontsize=24)
+    ax3.set_ylim(limits_1[1])
+    ax3.set_ylabel(axis_3_label, labelpad=9)
+    ax3.tick_params(pad=3)
+#
+d_min_tot = summary.dperi_min(data_total_all, masks_infall_all, oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+Mhalo_peak_tot = summary.mhalo(data_total_all, masks_infall_all, selection='peak', oversample=True, hosts='iso_no_z', sim_type='baryon_all')
+d_min_tot_dmo = summary.dperi_min(data_total_dmo, masks_infall_dmo, oversample=True, hosts='iso_no_z', sim_type='dmo')
+Mhalo_peak_tot_dmo = summary.mhalo(data_total_dmo, masks_infall_dmo, selection='peak', oversample=True, hosts='iso_no_z', sim_type='dmo')
+#
+x = [Mhalo_peak_tot, Mhalo_peak_tot_dmo]
+y = [d_min_tot, d_min_tot_dmo]
+#
+xtype = ['M.halo.peak', 'M.halo.peak']
+ytype = ['d.peri.text','d.peri.text']
+#
+medians = []
+lowers = []
+uppers = []
+lowests = []
+highests = []
+binss = []
+half_bins = []
+#
+for j in range(0, len(x)):
+    if 'M.' in xtype[j]:
+        x[j] = np.log10(x[j])
+    if 'M.' in ytype[j]:
+        y[j] = np.log10(y[j])
+    #
+    if binedges:
+        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+        bins = np.linspace(binedges[0], binedges[1], bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    else:
+        minn = binsize*np.floor(np.min(x[j])/binsize)
+        maxx = binsize*np.ceil(np.max(x[j])/binsize)
+        if minn < 0:
+            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+        else:
+            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+        bins = np.linspace(minn, maxx, bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    #
+    onesigp = 84.13
+    onesigm = 15.87
+    twosigp = 100
+    twosigm = 0
+    #
+    med = np.zeros(len(bins)-1)
+    lower = np.zeros(len(bins)-1)
+    upper = np.zeros(len(bins)-1)
+    lowest = np.zeros(len(bins)-1)
+    highest = np.zeros(len(bins)-1)
+    #
+    for i in range(0, len(bins)-1):
+        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+        med[i] = np.nanmedian(y[j][mask])
+        upper[i] = np.nanpercentile(y[j][mask], onesigp)
+        lower[i] = np.nanpercentile(y[j][mask], onesigm)
+        highest[i] = np.nanpercentile(y[j][mask], twosigp)
+        lowest[i] = np.nanpercentile(y[j][mask], twosigm)
+    medians.append(med)
+    lowers.append(lower)
+    uppers.append(upper)
+    lowests.append(lowest)
+    highests.append(highest)
+    binss.append(bins)
+    half_bins.append(half_bin)
+#
+# PLOTTING
+# Plot the scatter for the recent and minimum pericenters
+ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
+ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
+ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.3)
+ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.15)
+#
+# Plot the medians for the two mass bins (low-mass)
+ax2.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='Baryon')
+ax2.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='DMO')
+#
+ax2.set_xscale('log')
+ax2.set_xlim(10**(limits_2[0][0]), 10**(limits_2[0][1]))
+ax2.set_ylim(limits_2[1])
+#
+if 't.' in ytype[0]:
+    # Instantiate the cosmology class and run this method first to set up scalefactors
+    cc = ut.cosmology.CosmologyClass()
+    red = np.array([0, 1])
+    cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+    #
+    axis_4_label = 'redshift'
+    axis_4_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+    axis_4_tick_values = [float(v) for v in axis_4_tick_labels]
+    axis_4_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_4_tick_values)
+    ax4 = ax2.twinx()
+    ax4.set_xscale('log')
+    ax4.set_yscale('linear')
+    ax4.set_yticks(axis_4_tick_locations)
+    ax4.set_yticklabels(axis_4_tick_labels, fontsize=24)
+    ax4.set_ylim(limits_2[1])
+    ax4.set_ylabel(axis_4_label, labelpad=9)
+    ax4.tick_params(pad=3)
+#
+ax2.set_xlabel('$M_{\\rm halo,peak} [M_{\\odot}]$', fontsize=28)
+ax1.set_ylabel('Recent', fontsize=24)
+ax1.get_yaxis().set_label_coords(-0.075,0.5)
+ax2.set_ylabel('Minimum', fontsize=24)
+ax2.get_yaxis().set_label_coords(-0.075,0.5)
+ax1.legend(prop={'size': 20}, loc='best')
+ax2.legend(prop={'size': 20}, loc='best')
+ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=False)
+ax1.xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
+ax2.xaxis.set_major_locator(LogLocator(base=10))
+ax2.xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
+ax2.set_xticks([1e8, 1e9, 1e10, 1e11])
+ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
+plt.tight_layout()
+plt.subplots_adjust(wspace=0, hspace=0)
+#plt.show()
+plt.savefig(directory+'/dperi_dmo.pdf')
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
