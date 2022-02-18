@@ -566,6 +566,55 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    def dapo_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
+        """
+        DESCRIPTION:
+            ...
+
+        VARIABLES:
+            ...
+
+        NOTES:
+            ...
+        """
+        # Set up an empty list to save values to
+        data = []
+        #
+        # Determines if working with sim or model data, then whether oversampling or not.
+        # Also masks values with no pericenter and sets them equal to d(z = 0)
+        if (selection == 'sim'):
+            if oversample == False:
+                for name in self.host_names[hosts]:
+                    temp_array = data_dict[name]['apocenter.dist.sim'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array == -1)
+                    temp_array[mask_temp] = np.max(data_dict[name]['dtot.sim'][mask_dict[name]][mask_temp], axis=1)
+                    data.append(temp_array)
+            #
+            elif oversample == True:
+                for name in self.host_names[hosts]:
+                    temp_array = data_dict[name]['apocenter.dist.sim'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array == -1)
+                    temp_array[mask_temp] = np.max(data_dict[name]['dtot.sim'][mask_dict[name]][mask_temp], axis=1)
+                    data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
+        #
+        elif (selection == 'model'):
+            if oversample == False:
+                for name in self.host_names[hosts]:
+                    temp_array = data_dict[name]['apocenter.dist.galpy'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array == -1)
+                    temp_array[mask_temp] = np.max(data_dict[name]['dtot.sim'][mask_dict[name]][mask_temp], axis=1)
+                    data.append(temp_array)
+            #
+            elif oversample == True:
+                for name in self.host_names[hosts]:
+                    temp_array = data_dict[name]['apocenter.dist.galpy'][mask_dict[name]][:,0]
+                    mask_temp = (temp_array == -1)
+                    temp_array[mask_temp] = np.max(data_dict[name]['dtot.sim'][mask_dict[name]][mask_temp], axis=1)
+                    data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
+        #
+        return np.hstack(data)
+
+
     def delta_dperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all', sim_type='baryon'):
         """
         TBD
