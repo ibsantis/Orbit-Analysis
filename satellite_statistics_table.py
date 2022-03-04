@@ -41,18 +41,21 @@ data_total = summary.data_read(directory=sim_data.home_dir, hosts='all', sim_typ
 masks_infall = summary.data_mask(data_total, peri_sim=False, peri_model=False, hosts='all')
 summary_plot = summary_io.SummaryDataPlot()
 
+masks_infall['m12f'][57] = False
+#masks_infall_peri['m12f'][57] = False
+
 # Count the number of satellites that have ever passed within R200
 for name in summary.host_names['all']:
-    print(np.sum(masks_infall[name]))
+    print(np.sum(masks_infall[name]), name)
 
 # Count the number of satellites that have ever experienced pericenter
 for name in summary.host_names['all']:
-    print(np.sum(data_total[name]['pericenter.check.sim']))
+    print(np.sum(data_total[name]['pericenter.check.sim']), name)
 
 # Count the number of satellites within R200, but not experienced peri
 for name in summary.host_names['all']:
-    print(np.sum(~data_total[name]['pericenter.check.sim']*masks_infall[name]))
-    print(data_total[name]['dtot.sim'][~data_total[name]['pericenter.check.sim']*masks_infall[name]][:,0])
+    print(np.sum(~data_total[name]['pericenter.check.sim']*masks_infall[name]), name)
+    print(data_total[name]['dtot.sim'][~data_total[name]['pericenter.check.sim']*masks_infall[name]][:,0], name)
 
 # Counting the number of satellites with more than 1 pericenter
 for name in summary.host_names['all']:
@@ -83,7 +86,7 @@ for name in summary.host_names['all']:
     count = np.sum(data_total[name]['infall.check']*~data_total[name]['pericenter.check.sim']*data_total[name]['pericenter.check.galpy'])
     print(name, count)
 
-# For the satellites that have multiple pericenters, count how many have fractional differences > 10% (between recent and minimum)
+# For the satellites that have multiple pericenters, count how many have fractional differences > 5% (between recent and minimum)
 for name in summary.host_names['all']:
     data_recent = []
     data_min = []
@@ -95,7 +98,9 @@ for name in summary.host_names['all']:
     d_peri_recent = np.hstack(data_recent)
     d_peri_min = np.hstack(data_min)
     #
-    print(np.sum((d_peri_recent-d_peri_min)/d_peri_recent > 0.05))
+    #print(np.sum((d_peri_recent-d_peri_min)/d_peri_recent == 0), name)
+    #print(np.sum((d_peri_recent-d_peri_min)/d_peri_recent > 0.05))
+    print(np.sum((d_peri_recent-d_peri_min)/d_peri_recent > 0), name)
 
 # Print out the most massive sat stellar mass + halo mass, and see if they're the same subhalo
 for i in summary.host_names['all']:
