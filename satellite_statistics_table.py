@@ -86,7 +86,7 @@ for name in summary.host_names['all']:
     count = np.sum(data_total[name]['infall.check']*~data_total[name]['pericenter.check.sim']*data_total[name]['pericenter.check.galpy'])
     print(name, count)
 
-# For the satellites that have multiple pericenters, count how many have fractional differences > 5% (between recent and minimum)
+# For the satellites that have multiple pericenters, count how many have fractional differences > 0% (between recent and minimum)
 for name in summary.host_names['all']:
     data_recent = []
     data_min = []
