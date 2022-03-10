@@ -1597,7 +1597,7 @@ d_1st_tot = summary.dperi_first(data_total, masks_infall_peri, oversample=True, 
 t_in_tot = summary.first_infall(data_total, masks_infall_peri, oversample=True, hosts='all_no_z', sim_type='baryon')
 binsize = 1
 limits_1 = ((0,13),(0,200))
-limits_2 = ((0,13),(-0.5,9.8))
+limits_2 = ((0,13),(0,9.8))
 #
 x = [t_in_tot, t_in_tot]
 y = [d_min_tot, d_1st_tot]
