@@ -47,6 +47,7 @@ d_sim_tot = summary.dperi_recent(data_total, mask_selection, selection='sim', ov
 d_min_tot = summary.dperi_min(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
 d_1st_tot = summary.dperi_first(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
 dz0_tot = summary.d_z0(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
+d_apo_tot = summary.dapo_recent(data_total, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
 t_sim_tot = summary.tperi_recent(data_total, mask_selection, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
 t_min_tot = summary.tperi_min(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
 t_in_tot = summary.first_infall(data_total, mask_selection, oversample=True, hosts='all_no_z', sim_type='baryon')
@@ -754,3 +755,58 @@ summary_plot.plot_hist_mult(x=[dz0_tot_0, dz0_tot_1, dz0_tot_2], xtype=['d.z0','
 #
 summary_plot.median_plot_mult(x=[Mstar_z0_tot_0, Mstar_z0_tot_1, Mstar_z0_tot_2], y=[dz0_tot_0, dz0_tot_1, dz0_tot_2], xtype=['M.star.z0', 'M.star.z0', 'M.star.z0'], ytype=['d.z0','d.z0','d.z0'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=0.5, file_path_and_name=directory+'/dz0_vs_Mstar_z0_nperi_pops.pdf')
 summary_plot.median_plot_mult(x=[Mstar_z0_tot_0, Mstar_z0_tot_1, Mstar_z0_tot_2], y=[dz0_tot_0, dz0_tot_1, dz0_tot_2], xtype=['M.star.z0', 'M.star.z0', 'M.star.z0'], ytype=['d.z0','d.z0','d.z0'], labels=['N$_{\\rm peri}$ = 0','N$_{\\rm peri}$ = 1','N$_{\\rm peri}$ > 1'], binsize=0.5, limits=((4,9.5),(0,400)), file_path_and_name=directory+'/dz0_vs_Mstar_z0_nperi_pops_zoom.pdf')
+
+
+"""
+    Apocenter Plots
+"""
+summary = summary_io.SummaryDataSort()
+data_total = summary.data_read(directory=sim_data.home_dir, hosts='all_no_z', sim_type='baryon')
+data_potentials = summary.data_read_potential(directory=sim_data.home_dir, hosts='all_energy', sim_type='baryon')
+masks_infall = summary.data_mask(data_total, peri_sim=False, peri_model=False, hosts='all_no_z')
+masks_infall_apo = summary.data_mask_apo(data_total, hosts='all_no_z')
+summary_plot = summary_io.SummaryDataPlot()
+
+
+# Select which mask you want to use and the corresponding directory
+directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs'
+
+
+### Generate all of the data for the plots below
+# Fix for the outlier in the Mstar-Mhalo relation
+masks_infall['m12f'][57] = False
+masks_infall_apo['m12f'][57] = False
+#
+dz0_tot = summary.d_z0(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+dz0_apo_only = summary.d_z0(data_total, masks_infall_apo, oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+d_apo_tot = summary.dapo_recent(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+d_apo_only = summary.dapo_recent(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+t_in_tot = summary.first_infall(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+t_in_apo_only = summary.first_infall(data_total, masks_infall_apo, oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+t_in_any_tot = summary.first_infall_any(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+t_in_any_apo_only = summary.first_infall_any(data_total, masks_infall_apo, oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_apo_only = summary.mstar(data_total, masks_infall_apo, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+
+
+summary_plot.median_plot(x=dz0_tot, y=d_apo_tot, xtype='d.z0', ytype='d.apo.text', binsize=50, limits=((0,400),(0,800)), file_path_and_name=directory+'/d_apo_vs_dz0.pdf')
+summary_plot.median_plot(x=Mstar_z0_tot, y=d_apo_tot, xtype='M.star.z0', ytype='d.apo.text', binsize=0.5, binedges=(4.5,9.5), limits=((4,9.5),(0,600)), file_path_and_name=directory+'/d_apo_vs_Mstar_z0.pdf')
+summary_plot.median_plot_mult(x=[t_in_tot, t_in_any_tot], y=[d_apo_tot, d_apo_tot], xtype=['t.infall.text', 't.infall.text'], ytype=['d.apo.text', 'd.apo.text'], labels=['MW-mass halo', 'Any halo'], binsize=1, limits=((0,14),(0,800)), file_path_and_name=directory+'/d_apo_vs_t_infall.pdf')
+
+
+# Apocenter vs d(z = 0)
+summary_plot.median_plot_mult(x=[dz0_tot, dz0_apo_only], y=[d_apo_tot, d_apo_only], xtype=['d.z0','d.z0'], ytype=['d.apo.text', 'd.apo.text'], labels=['Including no apocenters', 'Real Apocenters'], binsize=50, limits=((0,400),(0,800)), file_path_and_name=directory+'/d_apo_vs_dz0_comp.pdf')
+summary_plot.median_plot_mult(x=[dz0_tot, dz0_apo_only], y=[d_apo_tot, d_apo_only], xtype=['d.z0','d.z0'], ytype=['d.apo.text', 'd.apo.text'], labels=['Including no apocenters', 'Real Apocenters'], binsize=50, limits=((0,400),(0,500)), file_path_and_name=directory+'/d_apo_vs_dz0_comp_zoom.pdf')
+
+# Apocenter vs Mstar(z = 0)
+summary_plot.median_plot_mult(x=[Mstar_z0_tot, Mstar_z0_apo_only], y=[d_apo_tot, d_apo_only], xtype=['M.star.z0', 'M.star.z0'], ytype=['d.apo.text', 'd.apo.text'], labels=['Including no apocenters', 'Real Apocenters'], binsize=0.5, binedges=(4.5,9.5), limits=((4,9.5),(0,600)), file_path_and_name=directory+'/d_apo_vs_Mstar_z0_comp.pdf')
+
+# Apocenter vs t_infall (MW-mass host)
+summary_plot.median_plot_mult(x=[t_in_tot, t_in_apo_only], y=[d_apo_tot, d_apo_only], xtype=['t.infall.text', 't.infall.text'], ytype=['d.apo.text', 'd.apo.text'], labels=['Including no apocenters', 'Real Apocenters'], binsize=1, limits=((0,14),(0,800)), file_path_and_name=directory+'/d_apo_vs_t_infall_MW_comp.pdf')
+
+# Apocenter vs t_infall (any host)
+summary_plot.median_plot_mult(x=[t_in_any_tot, t_in_any_apo_only], y=[d_apo_tot, d_apo_only], xtype=['t.infall.text', 't.infall.text'], ytype=['d.apo.text', 'd.apo.text'], labels=['Including no apocenters', 'Real Apocenters'], binsize=1, limits=((0,14),(0,800)), file_path_and_name=directory+'/d_apo_vs_t_infall_any_comp.pdf')
