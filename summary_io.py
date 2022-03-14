@@ -247,6 +247,25 @@ class SummaryDataSort:
         #
         return mask_dict
 
+    def data_mask_apo(self, dictionary, hosts='all'):
+        """
+        DESCRIPTION:
+            ...
+
+        VARIABLES:
+            ...
+
+        NOTES:
+            ...
+        """
+        # Set up a dictionary to save the masks to
+        mask_dict = dict()
+        #
+        for name in self.host_names[hosts]:
+            mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['apocenter.check.sim']
+        #
+        return mask_dict
+
     def data_mask_nperi(self, dictionary, nperi, hosts='all'):
         """
         [Mask out the subhalos that have experienced 0, 1, or > 1 pericenters]
@@ -613,7 +632,6 @@ class SummaryDataSort:
                     data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
         #
         return np.hstack(data)
-
 
     def delta_dperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all', sim_type='baryon'):
         """
@@ -1093,6 +1111,7 @@ class SummaryDataPlot(SummaryDataSort):
                        'd.peri.recent': 'd$_{\\rm peri, recent}$ [kpc]',\
                        'd.peri.min': 'd$_{\\rm peri, min}$ [kpc]',\
                        'd.peri.text': 'Pericenter distance [kpc]',\
+                       'd.apo.text': 'Apocenter distance [kpc]',\
                        'd.model': 'd$_{\\rm peri,model}$ [kpc]',\
                        'd.z0': 'Host distance $d$ [kpc]',\
                        'delta.d.frac': '(d$_{\\rm peri,model}$ - d$_{\\rm peri,sim}$)/d$_{\\rm peri,sim}$',\
