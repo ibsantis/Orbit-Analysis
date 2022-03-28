@@ -1801,6 +1801,155 @@ mask_delta_t = (np.abs((t_min_tot - t_sim_tot)/t_sim_tot) > 0)
 summary_plot.plot_hist(x=(t_min_tot-t_sim_tot)[mask_delta_t], xtype='delta_t', binsize=0.5, pdf=True, file_path_and_name=directory+'/delta_t_histogram.pdf')
 
 
+"""
+    Figure 6:
+        Orbits and L evolution subplots
+"""
+import matplotlib.patches as mpatches
+import matplotlib.ticker as ticker
+times = data_total['m12b']['time.sim'][-1] - np.flip(data_total['m12b']['time.sim'])
+#
+orbit_1 = data_total['m12b']['dtot.sim'][31][data_total['m12b']['dtot.sim'][31]>0]
+orbit_2 = data_total['m12f']['dtot.sim'][42][data_total['m12f']['dtot.sim'][42]>0]
+orbit_3 = data_total['Thelma']['dtot.sim'][100][data_total['Thelma']['dtot.sim'][100]>0]
+orbit_4 = data_total['m12w']['dtot.sim'][33][data_total['m12w']['dtot.sim'][33]>0]
+#
+ang_1 = data_total['m12b']['Ltot.sim'][31][data_total['m12b']['Ltot.sim'][31]>0]/1e4
+ang_2 = data_total['m12f']['Ltot.sim'][42][data_total['m12f']['Ltot.sim'][42]>0]/1e4
+ang_3 = data_total['Thelma']['Ltot.sim'][100][data_total['Thelma']['Ltot.sim'][100]>0]/1e4
+ang_4 = data_total['m12w']['Ltot.sim'][33][data_total['m12w']['Ltot.sim'][33]>0]/1e4
+#
+f, axs = plt.subplots(2, 4, figsize=(22,10))
+colorss = ['#000080', '#006400']
+xlimit = (13.8,0)
+ylimit_1 = (0,400)
+ylimit_2 = (0, 3.4)
+#
+# PLOTTING
+axs[0,0].plot(times[:len(data_total['m12b']['host.radius'])], data_total['m12b']['host.radius'], color='k', markersize=10, alpha=0.3)#, label='$R_{\\rm 200m,host}$')
+axs[0,0].plot(times[:len(orbit_1)], orbit_1, color='b', markersize=10, alpha=0.5)
+arrow0m = mpatches.FancyArrowPatch((data_total['m12b']['pericenter.time.lb.sim'][31][1], 50), (data_total['m12b']['pericenter.time.lb.sim'][31][1], 5), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
+arrow0r = mpatches.FancyArrowPatch((data_total['m12b']['pericenter.time.lb.sim'][31][0], 50), (data_total['m12b']['pericenter.time.lb.sim'][31][0], 5), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
+axs[0,0].add_patch(arrow0m)
+axs[0,0].add_patch(arrow0r)
+axs[0,0].scatter([],[],marker='$\\rightarrow$', label='Min = 70 kpc', color=colorss[0], s=300)
+axs[0,0].scatter([],[],marker='$\\rightarrow$', label='Recent = 79 kpc', color=colorss[1], s=300)
+axs[0,0].plot([],[], ' ', label='frac diff = 12%')
+axs[0,0].legend(prop={'size': 20}, loc='upper left')
+axs[0,0].text(x=7, y=180,s='$R_{\\rm 200m,host}$', fontsize=25, rotation=43)
+#
+axs[0,1].plot(times[:len(data_total['m12f']['host.radius'])], data_total['m12f']['host.radius'], color='k', markersize=10, alpha=0.3)
+axs[0,1].plot(times[:len(orbit_2)], orbit_2, color='b', markersize=10, alpha=0.5)
+arrow1m = mpatches.FancyArrowPatch((data_total['m12f']['pericenter.time.lb.sim'][42][2], 45), (data_total['m12f']['pericenter.time.lb.sim'][42][2], 5), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
+arrow1r = mpatches.FancyArrowPatch((data_total['m12f']['pericenter.time.lb.sim'][42][0], 50), (data_total['m12f']['pericenter.time.lb.sim'][42][0], 5), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
+axs[0,1].add_patch(arrow1m)
+axs[0,1].add_patch(arrow1r)
+axs[0,1].scatter([],[],marker='$\\rightarrow$', label='Min = 45 kpc', color=colorss[0], s=300)
+axs[0,1].scatter([],[],marker='$\\rightarrow$', label='Recent = 76 kpc', color=colorss[1], s=300)
+axs[0,1].plot([],[], ' ', label='frac diff = 41%')
+axs[0,1].legend(prop={'size': 20}, loc='upper center')
+#
+axs[0,2].plot(times[:len(data_total['Thelma']['host.radius'])], data_total['Thelma']['host.radius'], color='k', markersize=10, alpha=0.3)
+axs[0,2].plot(times[:len(orbit_3)], orbit_3, color='b', markersize=10, alpha=0.5)
+arrow2m = mpatches.FancyArrowPatch((data_total['Thelma']['pericenter.time.lb.sim'][100][5], 125), (data_total['Thelma']['pericenter.time.lb.sim'][100][5], 75), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
+arrow2r = mpatches.FancyArrowPatch((data_total['Thelma']['pericenter.time.lb.sim'][100][0], 50), (data_total['Thelma']['pericenter.time.lb.sim'][100][0], 5), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
+axs[0,2].add_patch(arrow2m)
+axs[0,2].add_patch(arrow2r)
+axs[0,2].scatter([],[],marker='$\\rightarrow$', label='Min = 25 kpc', color=colorss[0], s=300)
+axs[0,2].scatter([],[],marker='$\\rightarrow$', label='Recent = 68 kpc', color=colorss[1], s=300)
+axs[0,2].plot([],[], ' ', label='frac diff = 63%')
+axs[0,2].legend(prop={'size': 20}, loc='upper center')
+#
+axs[0,3].plot(times[:len(data_total['m12w']['host.radius'])], data_total['m12w']['host.radius'], color='k', markersize=10, alpha=0.3)
+axs[0,3].plot(times[:len(orbit_4)], orbit_4, color='b', markersize=10, alpha=0.5)
+arrow3m = mpatches.FancyArrowPatch((data_total['m12w']['pericenter.time.lb.sim'][33][1], 175), (data_total['m12w']['pericenter.time.lb.sim'][33][1], 125), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
+arrow3r = mpatches.FancyArrowPatch((data_total['m12w']['pericenter.time.lb.sim'][33][0], 50), (data_total['m12w']['pericenter.time.lb.sim'][33][0], 5), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
+axs[0,3].add_patch(arrow3m)
+axs[0,3].add_patch(arrow3r)
+axs[0,3].scatter([],[],marker='$\\rightarrow$', label='Min = 6 kpc', color=colorss[0], s=300)
+axs[0,3].scatter([],[],marker='$\\rightarrow$', label='Recent = 80 kpc', color=colorss[1], s=300)
+axs[0,3].plot([],[], ' ', label='frac diff = 93%')
+axs[0,3].legend(prop={'size': 20}, loc='upper center')
+#
+axs[1,0].plot(times[:len(ang_1)], ang_1, color='b', markersize=10, alpha=0.5)
+arrow0m = mpatches.FancyArrowPatch((data_total['m12b']['pericenter.time.lb.sim'][31][1], 2.5), (data_total['m12b']['pericenter.time.lb.sim'][31][1], 2), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
+arrow0r = mpatches.FancyArrowPatch((data_total['m12b']['pericenter.time.lb.sim'][31][0], 2.5), (data_total['m12b']['pericenter.time.lb.sim'][31][0], 2), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
+axs[1,0].add_patch(arrow0m)
+axs[1,0].add_patch(arrow0r)
+#
+axs[1,1].plot(times[:len(ang_2)], ang_2, color='b', markersize=10, alpha=0.5)
+arrow1m = mpatches.FancyArrowPatch((data_total['m12f']['pericenter.time.lb.sim'][42][2], 2.1), (data_total['m12f']['pericenter.time.lb.sim'][42][2], 1.6), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
+arrow1r = mpatches.FancyArrowPatch((data_total['m12f']['pericenter.time.lb.sim'][42][0], 2.5), (data_total['m12f']['pericenter.time.lb.sim'][42][0], 2), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
+axs[1,1].add_patch(arrow1m)
+axs[1,1].add_patch(arrow1r)
+#
+axs[1,2].plot(times[:len(ang_3)], ang_3, color='b', markersize=10, alpha=0.5)
+arrow2m = mpatches.FancyArrowPatch((data_total['Thelma']['pericenter.time.lb.sim'][100][5], 1.1), (data_total['Thelma']['pericenter.time.lb.sim'][100][5], 0.6), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
+arrow2r = mpatches.FancyArrowPatch((data_total['Thelma']['pericenter.time.lb.sim'][100][0], 2.1), (data_total['Thelma']['pericenter.time.lb.sim'][100][0], 1.6), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
+axs[1,2].add_patch(arrow2m)
+axs[1,2].add_patch(arrow2r)
+#
+axs[1,3].plot(times[:len(ang_4)], ang_4, color='b', markersize=10, alpha=0.5)
+arrow3m = mpatches.FancyArrowPatch((data_total['m12w']['pericenter.time.lb.sim'][33][1], 0.8), (data_total['m12w']['pericenter.time.lb.sim'][33][1], 0.3), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
+arrow3r = mpatches.FancyArrowPatch((data_total['m12w']['pericenter.time.lb.sim'][33][0], 2.4), (data_total['m12w']['pericenter.time.lb.sim'][33][0], 1.9), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
+axs[1,3].add_patch(arrow3m)
+axs[1,3].add_patch(arrow3r)
+#
+axs[0,0].set_xlim(xlimit)
+axs[0,1].set_xlim(xlimit)
+axs[0,2].set_xlim(xlimit)
+axs[0,3].set_xlim(xlimit)
+axs[0,0].set_ylim(ylimit_1)
+axs[0,1].set_ylim(ylimit_1)
+axs[0,2].set_ylim(ylimit_1)
+axs[0,3].set_ylim(ylimit_1)
+#
+axs[1,0].set_xlim(xlimit)
+axs[1,1].set_xlim(xlimit)
+axs[1,2].set_xlim(xlimit)
+axs[1,3].set_xlim(xlimit)
+axs[1,0].set_ylim(ylimit_2)
+axs[1,1].set_ylim(ylimit_2)
+axs[1,2].set_ylim(ylimit_2)
+axs[1,3].set_ylim(ylimit_2)
+#
+axs[0,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False)
+axs[0,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False, labelleft=False)
+axs[0,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False, labelleft=False)
+axs[0,3].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False, labelleft=False)
+#
+axs[1,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
+axs[1,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelleft=False)
+axs[1,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelleft=False)
+axs[1,3].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelleft=False)
+#
+majors = [0,2,4,6,8,10,12]
+axs[0,0].xaxis.set_major_locator(ticker.FixedLocator(majors))
+axs[0,1].xaxis.set_major_locator(ticker.FixedLocator(majors))
+axs[0,2].xaxis.set_major_locator(ticker.FixedLocator(majors))
+axs[0,3].xaxis.set_major_locator(ticker.FixedLocator(majors))
+#
+axs[1,0].xaxis.set_major_locator(ticker.FixedLocator(majors))
+axs[1,1].xaxis.set_major_locator(ticker.FixedLocator(majors))
+axs[1,2].xaxis.set_major_locator(ticker.FixedLocator(majors))
+axs[1,3].xaxis.set_major_locator(ticker.FixedLocator(majors))
+#
+axs[0,0].set_ylabel('Host Distance $d$ [kpc]', fontsize=24)
+axs[0,0].set_xlabel('Lookback time [Gyr]', fontsize=24)
+axs[0,1].set_xlabel('Lookback time [Gyr]', fontsize=24)
+axs[0,2].set_xlabel('Lookback time [Gyr]', fontsize=24)
+axs[0,3].set_xlabel('Lookback time [Gyr]', fontsize=24)
+#
+axs[1,0].set_ylabel('$\\ell$ [10$^{4}$ kpc km s$^{-1}$]', fontsize=24)
+axs[1,0].set_xlabel('Lookback time [Gyr]', fontsize=24)
+axs[1,1].set_xlabel('Lookback time [Gyr]', fontsize=24)
+axs[1,2].set_xlabel('Lookback time [Gyr]', fontsize=24)
+axs[1,3].set_xlabel('Lookback time [Gyr]', fontsize=24)
+plt.tight_layout()
+plt.subplots_adjust(wspace=0.02, hspace=0)
+plt.savefig(directory+'/outlier_orbits_and_angs.pdf')
+
+
 ################################################################################
 
 
@@ -3319,369 +3468,6 @@ plt.savefig(directory+'/dmo_2.pdf')
 
 
 
-"""
-    Figure X:
-        Orbits of outliers
-"""
-import matplotlib.patches as mpatches
-import matplotlib.ticker as ticker
-times = data_total['m12b']['time.sim'][-1] - np.flip(data_total['m12b']['time.sim'])
-#
-orbit_1 = data_total['m12b']['dtot.sim'][31][data_total['m12b']['dtot.sim'][31]>0]
-orbit_2 = data_total['m12f']['dtot.sim'][42][data_total['m12f']['dtot.sim'][42]>0]
-orbit_3 = data_total['Thelma']['dtot.sim'][100][data_total['Thelma']['dtot.sim'][100]>0]
-orbit_4 = data_total['m12w']['dtot.sim'][33][data_total['m12w']['dtot.sim'][33]>0]
-#
-#f, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10.5,16))
-f, axs = plt.subplots(1, 4, figsize=(22,6))
-colorss = ['#000080', '#006400']
-xlimit = (13.8,0)
-ylimit = (0,400)
-#
-# PLOTTING
-axs[0].plot(times[:len(data_total['m12b']['host.radius'])], data_total['m12b']['host.radius'], color='k', markersize=10, alpha=0.3)#, label='$R_{\\rm 200m,host}$')
-axs[0].plot(times[:len(orbit_1)], orbit_1, color='b', markersize=10, alpha=0.5)
-arrow0m = mpatches.FancyArrowPatch((data_total['m12b']['pericenter.time.lb.sim'][31][1], 50), (data_total['m12b']['pericenter.time.lb.sim'][31][1], 5), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
-arrow0r = mpatches.FancyArrowPatch((data_total['m12b']['pericenter.time.lb.sim'][31][0], 50), (data_total['m12b']['pericenter.time.lb.sim'][31][0], 5), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
-axs[0].add_patch(arrow0m)
-axs[0].add_patch(arrow0r)
-axs[0].scatter([],[],marker='$\\rightarrow$', label='Min = 70 kpc', color=colorss[0], s=300)
-axs[0].scatter([],[],marker='$\\rightarrow$', label='Recent = 79 kpc', color=colorss[1], s=300)
-axs[0].plot([],[], ' ', label='frac diff = 12%')
-axs[0].legend(prop={'size': 20}, loc='upper left')
-axs[0].text(x=7, y=180,s='$R_{\\rm 200m,host}$', fontsize=25, rotation=43)
-#
-axs[1].plot(times[:len(data_total['m12f']['host.radius'])], data_total['m12f']['host.radius'], color='k', markersize=10, alpha=0.3)
-axs[1].plot(times[:len(orbit_2)], orbit_2, color='b', markersize=10, alpha=0.5)
-arrow1m = mpatches.FancyArrowPatch((data_total['m12f']['pericenter.time.lb.sim'][42][2], 45), (data_total['m12f']['pericenter.time.lb.sim'][42][2], 5), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
-arrow1r = mpatches.FancyArrowPatch((data_total['m12f']['pericenter.time.lb.sim'][42][0], 50), (data_total['m12f']['pericenter.time.lb.sim'][42][0], 5), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
-axs[1].add_patch(arrow1m)
-axs[1].add_patch(arrow1r)
-axs[1].scatter([],[],marker='$\\rightarrow$', label='Min = 45 kpc', color=colorss[0], s=300)
-axs[1].scatter([],[],marker='$\\rightarrow$', label='Recent = 76 kpc', color=colorss[1], s=300)
-axs[1].plot([],[], ' ', label='frac diff = 41%')
-axs[1].legend(prop={'size': 20}, loc='upper center')
-#
-axs[2].plot(times[:len(data_total['Thelma']['host.radius'])], data_total['Thelma']['host.radius'], color='k', markersize=10, alpha=0.3)
-axs[2].plot(times[:len(orbit_3)], orbit_3, color='b', markersize=10, alpha=0.5)
-arrow2m = mpatches.FancyArrowPatch((data_total['Thelma']['pericenter.time.lb.sim'][100][5], 125), (data_total['Thelma']['pericenter.time.lb.sim'][100][5], 75), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
-arrow2r = mpatches.FancyArrowPatch((data_total['Thelma']['pericenter.time.lb.sim'][100][0], 50), (data_total['Thelma']['pericenter.time.lb.sim'][100][0], 5), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
-axs[2].add_patch(arrow2m)
-axs[2].add_patch(arrow2r)
-axs[2].scatter([],[],marker='$\\rightarrow$', label='Min = 25 kpc', color=colorss[0], s=300)
-axs[2].scatter([],[],marker='$\\rightarrow$', label='Recent = 68 kpc', color=colorss[1], s=300)
-axs[2].plot([],[], ' ', label='frac diff = 63%')
-axs[2].legend(prop={'size': 20}, loc='upper center')
-#
-axs[3].plot(times[:len(data_total['m12w']['host.radius'])], data_total['m12w']['host.radius'], color='k', markersize=10, alpha=0.3)
-axs[3].plot(times[:len(orbit_4)], orbit_4, color='b', markersize=10, alpha=0.5)
-arrow3m = mpatches.FancyArrowPatch((data_total['m12w']['pericenter.time.lb.sim'][33][1], 175), (data_total['m12w']['pericenter.time.lb.sim'][33][1], 125), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
-arrow3r = mpatches.FancyArrowPatch((data_total['m12w']['pericenter.time.lb.sim'][33][0], 50), (data_total['m12w']['pericenter.time.lb.sim'][33][0], 5), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
-axs[3].add_patch(arrow3m)
-axs[3].add_patch(arrow3r)
-axs[3].scatter([],[],marker='$\\rightarrow$', label='Min = 6 kpc', color=colorss[0], s=300)
-axs[3].scatter([],[],marker='$\\rightarrow$', label='Recent = 80 kpc', color=colorss[1], s=300)
-axs[3].plot([],[], ' ', label='frac diff = 93%')
-axs[3].legend(prop={'size': 20}, loc='upper center')
-#
-axs[0].set_xlim(xlimit)
-axs[1].set_xlim(xlimit)
-axs[2].set_xlim(xlimit)
-axs[3].set_xlim(xlimit)
-axs[0].set_ylim(ylimit)
-axs[1].set_ylim(ylimit)
-axs[2].set_ylim(ylimit)
-axs[3].set_ylim(ylimit)
-#
-axs[0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
-axs[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelleft=False)
-axs[2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelleft=False)
-axs[3].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelleft=False)
-#
-majors = [0,2,4,6,8,10,12]
-axs[0].xaxis.set_major_locator(ticker.FixedLocator(majors))
-axs[1].xaxis.set_major_locator(ticker.FixedLocator(majors))
-axs[2].xaxis.set_major_locator(ticker.FixedLocator(majors))
-axs[3].xaxis.set_major_locator(ticker.FixedLocator(majors))
-#
-axs[0].set_ylabel('Host Distance $d$ [kpc]', fontsize=24)
-axs[0].set_xlabel('Lookback time [Gyr]', fontsize=24)
-axs[1].set_xlabel('Lookback time [Gyr]', fontsize=24)
-axs[2].set_xlabel('Lookback time [Gyr]', fontsize=24)
-axs[3].set_xlabel('Lookback time [Gyr]', fontsize=24)
-#f.supxlabel('Lookback time [Gyr]', fontsize=28, y=0.07)
-plt.tight_layout()
-plt.subplots_adjust(wspace=0.02, hspace=0)
-#plt.show()
-plt.savefig(directory+'/outlier_orbits.pdf')
-
-
-
-
-
-
-
-import matplotlib.patches as mpatches
-import matplotlib.ticker as ticker
-times = data_total['m12b']['time.sim'][-1] - np.flip(data_total['m12b']['time.sim'])
-#
-orbit_1 = data_total['m12b']['dtot.sim'][31][data_total['m12b']['dtot.sim'][31]>0]
-orbit_2 = data_total['m12f']['dtot.sim'][42][data_total['m12f']['dtot.sim'][42]>0]
-orbit_3 = data_total['Thelma']['dtot.sim'][100][data_total['Thelma']['dtot.sim'][100]>0]
-orbit_4 = data_total['m12w']['dtot.sim'][33][data_total['m12w']['dtot.sim'][33]>0]
-#
-ang_1 = data_total['m12b']['Ltot.sim'][31][data_total['m12b']['Ltot.sim'][31]>0]/1e4
-ang_2 = data_total['m12f']['Ltot.sim'][42][data_total['m12f']['Ltot.sim'][42]>0]/1e4
-ang_3 = data_total['Thelma']['Ltot.sim'][100][data_total['Thelma']['Ltot.sim'][100]>0]/1e4
-ang_4 = data_total['m12w']['Ltot.sim'][33][data_total['m12w']['Ltot.sim'][33]>0]/1e4
-#
-f, axs = plt.subplots(2, 4, figsize=(22,10))
-colorss = ['#000080', '#006400']
-xlimit = (13.8,0)
-ylimit_1 = (0,400)
-ylimit_2 = (0, 3.4)
-#
-# PLOTTING
-axs[0,0].plot(times[:len(data_total['m12b']['host.radius'])], data_total['m12b']['host.radius'], color='k', markersize=10, alpha=0.3)#, label='$R_{\\rm 200m,host}$')
-axs[0,0].plot(times[:len(orbit_1)], orbit_1, color='b', markersize=10, alpha=0.5)
-arrow0m = mpatches.FancyArrowPatch((data_total['m12b']['pericenter.time.lb.sim'][31][1], 50), (data_total['m12b']['pericenter.time.lb.sim'][31][1], 5), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
-arrow0r = mpatches.FancyArrowPatch((data_total['m12b']['pericenter.time.lb.sim'][31][0], 50), (data_total['m12b']['pericenter.time.lb.sim'][31][0], 5), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
-axs[0,0].add_patch(arrow0m)
-axs[0,0].add_patch(arrow0r)
-axs[0,0].scatter([],[],marker='$\\rightarrow$', label='Min = 70 kpc', color=colorss[0], s=300)
-axs[0,0].scatter([],[],marker='$\\rightarrow$', label='Recent = 79 kpc', color=colorss[1], s=300)
-axs[0,0].plot([],[], ' ', label='frac diff = 12%')
-axs[0,0].legend(prop={'size': 20}, loc='upper left')
-axs[0,0].text(x=7, y=180,s='$R_{\\rm 200m,host}$', fontsize=25, rotation=43)
-#
-axs[0,1].plot(times[:len(data_total['m12f']['host.radius'])], data_total['m12f']['host.radius'], color='k', markersize=10, alpha=0.3)
-axs[0,1].plot(times[:len(orbit_2)], orbit_2, color='b', markersize=10, alpha=0.5)
-arrow1m = mpatches.FancyArrowPatch((data_total['m12f']['pericenter.time.lb.sim'][42][2], 45), (data_total['m12f']['pericenter.time.lb.sim'][42][2], 5), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
-arrow1r = mpatches.FancyArrowPatch((data_total['m12f']['pericenter.time.lb.sim'][42][0], 50), (data_total['m12f']['pericenter.time.lb.sim'][42][0], 5), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
-axs[0,1].add_patch(arrow1m)
-axs[0,1].add_patch(arrow1r)
-axs[0,1].scatter([],[],marker='$\\rightarrow$', label='Min = 45 kpc', color=colorss[0], s=300)
-axs[0,1].scatter([],[],marker='$\\rightarrow$', label='Recent = 76 kpc', color=colorss[1], s=300)
-axs[0,1].plot([],[], ' ', label='frac diff = 41%')
-axs[0,1].legend(prop={'size': 20}, loc='upper center')
-#
-axs[0,2].plot(times[:len(data_total['Thelma']['host.radius'])], data_total['Thelma']['host.radius'], color='k', markersize=10, alpha=0.3)
-axs[0,2].plot(times[:len(orbit_3)], orbit_3, color='b', markersize=10, alpha=0.5)
-arrow2m = mpatches.FancyArrowPatch((data_total['Thelma']['pericenter.time.lb.sim'][100][5], 125), (data_total['Thelma']['pericenter.time.lb.sim'][100][5], 75), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
-arrow2r = mpatches.FancyArrowPatch((data_total['Thelma']['pericenter.time.lb.sim'][100][0], 50), (data_total['Thelma']['pericenter.time.lb.sim'][100][0], 5), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
-axs[0,2].add_patch(arrow2m)
-axs[0,2].add_patch(arrow2r)
-axs[0,2].scatter([],[],marker='$\\rightarrow$', label='Min = 25 kpc', color=colorss[0], s=300)
-axs[0,2].scatter([],[],marker='$\\rightarrow$', label='Recent = 68 kpc', color=colorss[1], s=300)
-axs[0,2].plot([],[], ' ', label='frac diff = 63%')
-axs[0,2].legend(prop={'size': 20}, loc='upper center')
-#
-axs[0,3].plot(times[:len(data_total['m12w']['host.radius'])], data_total['m12w']['host.radius'], color='k', markersize=10, alpha=0.3)
-axs[0,3].plot(times[:len(orbit_4)], orbit_4, color='b', markersize=10, alpha=0.5)
-arrow3m = mpatches.FancyArrowPatch((data_total['m12w']['pericenter.time.lb.sim'][33][1], 175), (data_total['m12w']['pericenter.time.lb.sim'][33][1], 125), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
-arrow3r = mpatches.FancyArrowPatch((data_total['m12w']['pericenter.time.lb.sim'][33][0], 50), (data_total['m12w']['pericenter.time.lb.sim'][33][0], 5), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
-axs[0,3].add_patch(arrow3m)
-axs[0,3].add_patch(arrow3r)
-axs[0,3].scatter([],[],marker='$\\rightarrow$', label='Min = 6 kpc', color=colorss[0], s=300)
-axs[0,3].scatter([],[],marker='$\\rightarrow$', label='Recent = 80 kpc', color=colorss[1], s=300)
-axs[0,3].plot([],[], ' ', label='frac diff = 93%')
-axs[0,3].legend(prop={'size': 20}, loc='upper center')
-#
-axs[1,0].plot(times[:len(ang_1)], ang_1, color='b', markersize=10, alpha=0.5)
-arrow0m = mpatches.FancyArrowPatch((data_total['m12b']['pericenter.time.lb.sim'][31][1], 2.5), (data_total['m12b']['pericenter.time.lb.sim'][31][1], 2), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
-arrow0r = mpatches.FancyArrowPatch((data_total['m12b']['pericenter.time.lb.sim'][31][0], 2.5), (data_total['m12b']['pericenter.time.lb.sim'][31][0], 2), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
-axs[1,0].add_patch(arrow0m)
-axs[1,0].add_patch(arrow0r)
-#
-axs[1,1].plot(times[:len(ang_2)], ang_2, color='b', markersize=10, alpha=0.5)
-arrow1m = mpatches.FancyArrowPatch((data_total['m12f']['pericenter.time.lb.sim'][42][2], 2.1), (data_total['m12f']['pericenter.time.lb.sim'][42][2], 1.6), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
-arrow1r = mpatches.FancyArrowPatch((data_total['m12f']['pericenter.time.lb.sim'][42][0], 2.5), (data_total['m12f']['pericenter.time.lb.sim'][42][0], 2), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
-axs[1,1].add_patch(arrow1m)
-axs[1,1].add_patch(arrow1r)
-#
-axs[1,2].plot(times[:len(ang_3)], ang_3, color='b', markersize=10, alpha=0.5)
-arrow2m = mpatches.FancyArrowPatch((data_total['Thelma']['pericenter.time.lb.sim'][100][5], 1.1), (data_total['Thelma']['pericenter.time.lb.sim'][100][5], 0.6), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
-arrow2r = mpatches.FancyArrowPatch((data_total['Thelma']['pericenter.time.lb.sim'][100][0], 2.1), (data_total['Thelma']['pericenter.time.lb.sim'][100][0], 1.6), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
-axs[1,2].add_patch(arrow2m)
-axs[1,2].add_patch(arrow2r)
-#
-axs[1,3].plot(times[:len(ang_4)], ang_4, color='b', markersize=10, alpha=0.5)
-arrow3m = mpatches.FancyArrowPatch((data_total['m12w']['pericenter.time.lb.sim'][33][1], 0.8), (data_total['m12w']['pericenter.time.lb.sim'][33][1], 0.3), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
-arrow3r = mpatches.FancyArrowPatch((data_total['m12w']['pericenter.time.lb.sim'][33][0], 2.4), (data_total['m12w']['pericenter.time.lb.sim'][33][0], 1.9), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
-axs[1,3].add_patch(arrow3m)
-axs[1,3].add_patch(arrow3r)
-#
-axs[0,0].set_xlim(xlimit)
-axs[0,1].set_xlim(xlimit)
-axs[0,2].set_xlim(xlimit)
-axs[0,3].set_xlim(xlimit)
-axs[0,0].set_ylim(ylimit_1)
-axs[0,1].set_ylim(ylimit_1)
-axs[0,2].set_ylim(ylimit_1)
-axs[0,3].set_ylim(ylimit_1)
-#
-axs[1,0].set_xlim(xlimit)
-axs[1,1].set_xlim(xlimit)
-axs[1,2].set_xlim(xlimit)
-axs[1,3].set_xlim(xlimit)
-axs[1,0].set_ylim(ylimit_2)
-axs[1,1].set_ylim(ylimit_2)
-axs[1,2].set_ylim(ylimit_2)
-axs[1,3].set_ylim(ylimit_2)
-#
-axs[0,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False)
-axs[0,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False, labelleft=False)
-axs[0,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False, labelleft=False)
-axs[0,3].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False, labelleft=False)
-#
-axs[1,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
-axs[1,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelleft=False)
-axs[1,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelleft=False)
-axs[1,3].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelleft=False)
-#
-majors = [0,2,4,6,8,10,12]
-axs[0,0].xaxis.set_major_locator(ticker.FixedLocator(majors))
-axs[0,1].xaxis.set_major_locator(ticker.FixedLocator(majors))
-axs[0,2].xaxis.set_major_locator(ticker.FixedLocator(majors))
-axs[0,3].xaxis.set_major_locator(ticker.FixedLocator(majors))
-#
-axs[1,0].xaxis.set_major_locator(ticker.FixedLocator(majors))
-axs[1,1].xaxis.set_major_locator(ticker.FixedLocator(majors))
-axs[1,2].xaxis.set_major_locator(ticker.FixedLocator(majors))
-axs[1,3].xaxis.set_major_locator(ticker.FixedLocator(majors))
-#
-axs[0,0].set_ylabel('Host Distance $d$ [kpc]', fontsize=24)
-axs[0,0].set_xlabel('Lookback time [Gyr]', fontsize=24)
-axs[0,1].set_xlabel('Lookback time [Gyr]', fontsize=24)
-axs[0,2].set_xlabel('Lookback time [Gyr]', fontsize=24)
-axs[0,3].set_xlabel('Lookback time [Gyr]', fontsize=24)
-#
-axs[1,0].set_ylabel('$\\ell$ [10$^{4}$ kpc km s$^{-1}$]', fontsize=24)
-axs[1,0].set_xlabel('Lookback time [Gyr]', fontsize=24)
-axs[1,1].set_xlabel('Lookback time [Gyr]', fontsize=24)
-axs[1,2].set_xlabel('Lookback time [Gyr]', fontsize=24)
-axs[1,3].set_xlabel('Lookback time [Gyr]', fontsize=24)
-plt.tight_layout()
-plt.subplots_adjust(wspace=0.02, hspace=0)
-plt.savefig(directory+'/outlier_orbits_and_angs.pdf')
-
-
-
-
-
-
-import matplotlib.patches as mpatches
-import matplotlib.ticker as ticker
-times = data_total['m12b']['time.sim'][-1] - np.flip(data_total['m12b']['time.sim'])
-#
-orbit_1 = data_total['m12b']['Ltot.sim'][31][data_total['m12b']['Ltot.sim'][31]>0]/1e4
-orbit_2 = data_total['m12f']['Ltot.sim'][42][data_total['m12f']['Ltot.sim'][42]>0]/1e4
-orbit_3 = data_total['Thelma']['Ltot.sim'][100][data_total['Thelma']['Ltot.sim'][100]>0]/1e4
-orbit_4 = data_total['m12w']['Ltot.sim'][33][data_total['m12w']['Ltot.sim'][33]>0]/1e4
-#
-#f, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10.5,16))
-f, axs = plt.subplots(1, 4, figsize=(22,6))
-colorss = ['#000080', '#006400']
-xlimit = (13.8,0)
-#ylimit = (0,400)
-#
-# PLOTTING
-#axs[0].plot(times[:len(data_total['m12b']['host.radius'])], data_total['m12b']['host.radius'], color='k', markersize=10, alpha=0.3)#, label='$R_{\\rm 200m,host}$')
-axs[0].plot(times[:len(orbit_1)], orbit_1, color='b', markersize=10, alpha=0.5)
-arrow0m = mpatches.FancyArrowPatch((data_total['m12b']['pericenter.time.lb.sim'][31][1], 1), (data_total['m12b']['pericenter.time.lb.sim'][31][1], 0), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
-arrow0r = mpatches.FancyArrowPatch((data_total['m12b']['pericenter.time.lb.sim'][31][0], 1), (data_total['m12b']['pericenter.time.lb.sim'][31][0], 0), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
-axs[0].add_patch(arrow0m)
-axs[0].add_patch(arrow0r)
-axs[0].scatter([],[],marker='$\\rightarrow$', label='Min = 70 kpc', color=colorss[0], s=300)
-axs[0].scatter([],[],marker='$\\rightarrow$', label='Recent = 79 kpc', color=colorss[1], s=300)
-axs[0].plot([],[], ' ', label='frac diff = 12%')
-axs[0].legend(prop={'size': 20}, loc='upper left')
-#axs[0].text(x=7, y=180,s='$R_{\\rm 200m,host}$', fontsize=25, rotation=43)
-#
-#axs[1].plot(times[:len(data_total['m12f']['host.radius'])], data_total['m12f']['host.radius'], color='k', markersize=10, alpha=0.3)
-axs[1].plot(times[:len(orbit_2)], orbit_2, color='b', markersize=10, alpha=0.5)
-arrow1m = mpatches.FancyArrowPatch((data_total['m12f']['pericenter.time.lb.sim'][42][2], 1), (data_total['m12f']['pericenter.time.lb.sim'][42][2], 0), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
-arrow1r = mpatches.FancyArrowPatch((data_total['m12f']['pericenter.time.lb.sim'][42][0], 1), (data_total['m12f']['pericenter.time.lb.sim'][42][0], 0), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
-axs[1].add_patch(arrow1m)
-axs[1].add_patch(arrow1r)
-axs[1].scatter([],[],marker='$\\rightarrow$', label='Min = 45 kpc', color=colorss[0], s=300)
-axs[1].scatter([],[],marker='$\\rightarrow$', label='Recent = 76 kpc', color=colorss[1], s=300)
-axs[1].plot([],[], ' ', label='frac diff = 41%')
-axs[1].legend(prop={'size': 20}, loc='upper center')
-#
-#axs[2].plot(times[:len(data_total['Thelma']['host.radius'])], data_total['Thelma']['host.radius'], color='k', markersize=10, alpha=0.3)
-axs[2].plot(times[:len(orbit_3)], orbit_3, color='b', markersize=10, alpha=0.5)
-arrow2m = mpatches.FancyArrowPatch((data_total['Thelma']['pericenter.time.lb.sim'][100][5], 0.4), (data_total['Thelma']['pericenter.time.lb.sim'][100][5], 0), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
-arrow2r = mpatches.FancyArrowPatch((data_total['Thelma']['pericenter.time.lb.sim'][100][0], 0.4), (data_total['Thelma']['pericenter.time.lb.sim'][100][0], 0), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
-axs[2].add_patch(arrow2m)
-axs[2].add_patch(arrow2r)
-axs[2].scatter([],[],marker='$\\rightarrow$', label='Min = 25 kpc', color=colorss[0], s=300)
-axs[2].scatter([],[],marker='$\\rightarrow$', label='Recent = 68 kpc', color=colorss[1], s=300)
-axs[2].plot([],[], ' ', label='frac diff = 63%')
-axs[2].legend(prop={'size': 20}, loc='upper center')
-#
-#axs[3].plot(times[:len(data_total['m12w']['host.radius'])], data_total['m12w']['host.radius'], color='k', markersize=10, alpha=0.3)
-axs[3].plot(times[:len(orbit_4)], orbit_4, color='b', markersize=10, alpha=0.5)
-arrow3m = mpatches.FancyArrowPatch((data_total['m12w']['pericenter.time.lb.sim'][33][1], 1.5), (data_total['m12w']['pericenter.time.lb.sim'][33][1], 0.5), color=colorss[0], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # minimum
-arrow3r = mpatches.FancyArrowPatch((data_total['m12w']['pericenter.time.lb.sim'][33][0], 1), (data_total['m12w']['pericenter.time.lb.sim'][33][0], 0), color=colorss[1], arrowstyle=mpatches.ArrowStyle('Fancy',head_length=9, head_width=9, tail_width=3)) # recent
-axs[3].add_patch(arrow3m)
-axs[3].add_patch(arrow3r)
-axs[3].scatter([],[],marker='$\\rightarrow$', label='Min = 6 kpc', color=colorss[0], s=300)
-axs[3].scatter([],[],marker='$\\rightarrow$', label='Recent = 80 kpc', color=colorss[1], s=300)
-axs[3].plot([],[], ' ', label='frac diff = 93%')
-axs[3].legend(prop={'size': 20}, loc='upper center')
-#
-axs[0].set_xlim(xlimit)
-axs[1].set_xlim(xlimit)
-axs[2].set_xlim(xlimit)
-axs[3].set_xlim(xlimit)
-#axs[0].set_ylim(ylimit)
-#axs[1].set_ylim(ylimit)
-#axs[2].set_ylim(ylimit)
-#axs[3].set_ylim(ylimit)
-#
-axs[0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
-axs[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)#, labelleft=False)
-axs[2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)#, labelleft=False)
-axs[3].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)#, labelleft=False)
-#
-majors = [0,2,4,6,8,10,12]
-axs[0].xaxis.set_major_locator(ticker.FixedLocator(majors))
-axs[1].xaxis.set_major_locator(ticker.FixedLocator(majors))
-axs[2].xaxis.set_major_locator(ticker.FixedLocator(majors))
-axs[3].xaxis.set_major_locator(ticker.FixedLocator(majors))
-#
-axs[0].set_ylabel('$\\ell$ [10$^{4}$ kpc km s$^{-1}$]', fontsize=24)
-axs[0].set_xlabel('Lookback time [Gyr]', fontsize=24)
-axs[1].set_xlabel('Lookback time [Gyr]', fontsize=24)
-axs[2].set_xlabel('Lookback time [Gyr]', fontsize=24)
-axs[3].set_xlabel('Lookback time [Gyr]', fontsize=24)
-#f.supxlabel('Lookback time [Gyr]', fontsize=28, y=0.07)
-plt.tight_layout()
-#plt.subplots_adjust(wspace=0.02, hspace=0)
-#plt.show()
-plt.savefig(directory+'/outlier_angs.pdf')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -3747,19 +3533,6 @@ cb.ax.tick_params(labelsize=12)
 plt.tight_layout()
 #plt.show()
 plt.savefig(directory+'/L_tot_comparison.pdf')
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
