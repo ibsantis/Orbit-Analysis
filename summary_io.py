@@ -295,6 +295,34 @@ class SummaryDataSort:
         #
         return mask_dict
 
+    def halo_id(self, data_dict, mask_dict, hosts='all'):
+        """
+        DESCRIPTION:
+            ...
+
+        VARIABLES:
+            ...
+
+        NOTES:
+            ...
+        """
+        # Set up an empty list to save values to
+        data = dict()
+        names = []
+        ids = []
+        indices = []
+        #
+        for name in self.host_names[hosts]:
+            for i in range(0, len(data_dict[name]['id'][mask_dict[name]])):
+                names.append(name)
+                ids.append(data_dict[name]['id'][mask_dict[name]][i])
+                indices.append(data_dict[name]['indices.z0'][mask_dict[name]][:,0][i])
+        data['host'] = np.asarray(names)
+        data['ids'] = np.asarray(ids)
+        data['indices'] = np.asarray(indices)
+        #
+        return data
+
     def delta_nperi(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
