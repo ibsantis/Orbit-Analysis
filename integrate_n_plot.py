@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -78,31 +78,44 @@ if sim_data.num_gal == 1:
     print(poles)
     print(np.sum(poles))
 
+    galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vR(ts), galpy_orbits.vT(ts))
+    galpy_angs = np.linalg.norm(galpy_orbits.L(ts), axis=2)
+
+
     for i in range(0, orbits.shape[0]):
         if (infall_info['check'][i]) & (peris['pericenter.check'][i]):
             # Integrate the subhalo orbit in each potential
             d_model = galpy_orbits[i]._parse_plot_quantity(quant='r')
-            v_model = galpy_orbits[i]._parse_plot_quantity(quant='vR')
-            Lz_model = galpy_orbits[i]._parse_plot_quantity(quant='Lz')
+            #v_model = galpy_orbits[i]._parse_plot_quantity(quant='vR')
+            #Lz_model = galpy_orbits[i]._parse_plot_quantity(quant='Lz')
+            v_model = galpy_vels[i]
+            L_model = galpy_angs[i]
             #
             # Set up the distances and times to plot
             d_mask = (halt_dists[i] >= 0)
             d_data = halt_dists[i][d_mask]
             lookback_time = np.flip(snaps['time'][-1] - snaps['time'])
             times = lookback_time[:len(d_data)]
-            v_data = halt.prop('host.velocity.principal.spherical', orbits.sub_inds[i][orbits.sub_inds[i]>=0])[:,0][:len(times)]
-            Lz_data = angs['ang.mom.vector'][i][:,2][:len(times)]
+            #v_data = halt.prop('host.velocity.principal.spherical', orbits.sub_inds[i][orbits.sub_inds[i]>=0])[:,0][:len(times)]
+            v_data = halt_vels[i][:len(times)]
+            #Lz_data = angs['ang.mom.vector'][i][:,2][:len(times)]
+            L_data = angs['ang.mom.total'][i][:len(times)]
             #
             # Set up the figure
             plt.rcParams["font.family"] = "serif"
-            plt.figure(figsize=(10, 12))
-            ax1 = plt.subplot(311)
-            ax2 = plt.subplot(312, sharex=ax1)
-            ax3 = plt.subplot(313, sharex=ax2)
+            #plt.figure(figsize=(10, 12))
+            #ax1 = plt.subplot(311)
+            #ax2 = plt.subplot(312, sharex=ax1)
+            #ax3 = plt.subplot(313, sharex=ax2)
+            plt.figure(figsize=(10, 8))
+            ax1 = plt.subplot(211)
+            #ax2 = plt.subplot(312, sharex=ax1)
+            ax3 = plt.subplot(212, sharex=ax1)
             #
             # Plot the distances
             ax1.plot(times, d_data, 'k', label='Simulation')
             ax1.plot(-1*ts, d_model, label='Model', alpha=0.5)
+            ax1.plot(times, host_radii[:len(times)], 'k', alpha=0.3)
             ax1.set_xlim(times[-1], times[0])
             #
             # Check to see if there were infall, pericenter, or apocenter events
@@ -120,28 +133,28 @@ if sim_data.num_gal == 1:
             # Set the labels and save the figure
             ax1.set_ylim(top=np.nanmax(d_data)+100)
             ax1.label_outer()
-            ax1.set_ylabel('r [kpc]', fontsize=32)
+            ax1.set_ylabel('Host Distance [kpc]', fontsize=20)
             ax1.legend(prop={'size': 16})
             #
             # Plot the velocity data
-            ax2.plot(times, v_data, 'k')
-            ax2.plot(-1*ts, v_model, alpha=0.5)
-            ax2.set_xlim(times[-1], times[0])
-            ax2.label_outer()
-            if infall == True:
-                infall_time = infall_info['first.infall.time.lb'][i]
-                ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
-            if peri:
-                for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
-                    ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
+            #ax2.plot(times, v_data, 'k')
+            #ax2.plot(-1*ts, v_model, alpha=0.5)
+            #ax2.set_xlim(times[-1], times[0])
+            #ax2.label_outer()
+            #if infall == True:
+            #    infall_time = infall_info['first.infall.time.lb'][i]
+            #    ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+            #if peri:
+            #    for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
+            #        ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
             #
-            ax2.set_ylabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=32)
+            #ax2.set_ylabel('Total velocity [km s$^{-1}$]', fontsize=20)
             #
             # Plot the velocity data
-            ax3.plot(times, Lz_data/1000, 'k')
-            ax3.plot(-1*ts, Lz_model/1000, alpha=0.5)
+            ax3.plot(times, L_data/1000, 'k')
+            ax3.plot(-1*ts, L_model/1000, alpha=0.5)
             ax3.set_xlim(times[-1], times[0])
-            ax3.set_ylabel('$L_{\\rm z}$ [$10^3$ kpc km s$^{-1}$]', fontsize=20)
+            ax3.set_ylabel('$\\ell$ [$10^3$ kpc km s$^{-1}$]', fontsize=20)
             if infall == True:
                 infall_time = infall_info['first.infall.time.lb'][i]
                 ax3.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
@@ -198,31 +211,44 @@ if sim_data.num_gal == 2:
     print(poles)
     print(np.sum(poles))
 
+    galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vR(ts), galpy_orbits.vT(ts))
+    galpy_angs = np.linalg.norm(galpy_orbits.L(ts), axis=2)
+
+
     for i in range(1, orbits.shape[0]):
         if (infall_info['check'][i]) & (peris['pericenter.check'][i]):
             # Integrate the subhalo orbit in each potential
             d_model = galpy_orbits[i]._parse_plot_quantity(quant='r')
-            v_model = galpy_orbits[i]._parse_plot_quantity(quant='vR')
-            Lz_model = galpy_orbits[i]._parse_plot_quantity(quant='Lz')
+            v_model = galpy_vels[i]
+            L_model = galpy_angs[i]
+            #v_model = galpy_orbits[i]._parse_plot_quantity(quant='vR')
+            #Lz_model = galpy_orbits[i]._parse_plot_quantity(quant='Lz')
             #
             # Set up the distances and times to plot
             d_mask = (halt_dists[i] >= 0)
             d_data = halt_dists[i][d_mask]
             lookback_time = np.flip(snaps['time'][-1] - snaps['time'])
             times = lookback_time[:len(d_data)]
-            v_data = halt.prop('host.velocity.principal.spherical', orbits.sub_inds[i][orbits.sub_inds[i]>=0])[:,0][:len(times)]
-            Lz_data = angs['ang.mom.vector'][i][:,2][:len(times)]
+            #v_data = halt.prop('host.velocity.principal.spherical', orbits.sub_inds[i][orbits.sub_inds[i]>=0])[:,0][:len(times)]
+            v_data = halt_vels[i][:len(times)]
+            #Lz_data = angs['ang.mom.vector'][i][:,2][:len(times)]
+            L_data = angs['ang.mom.total'][i][:len(times)]
             #
             # Set up the figure
             plt.rcParams["font.family"] = "serif"
-            plt.figure(figsize=(10, 12))
-            ax1 = plt.subplot(311)
-            ax2 = plt.subplot(312, sharex=ax1)
-            ax3 = plt.subplot(313, sharex=ax2)
+            #plt.figure(figsize=(10, 12))
+            #ax1 = plt.subplot(311)
+            #ax2 = plt.subplot(312, sharex=ax1)
+            #ax3 = plt.subplot(313, sharex=ax2)
+            plt.figure(figsize=(10, 8))
+            ax1 = plt.subplot(211)
+            #ax2 = plt.subplot(312, sharex=ax1)
+            ax3 = plt.subplot(212, sharex=ax1)
             #
             # Plot the distances
             ax1.plot(times, d_data, 'k', label='Simulation')
             ax1.plot(-1*ts, d_model, label='Model', alpha=0.5)
+            ax1.plot(times, host_radii[:len(times)], 'k', alpha=0.3)
             ax1.set_xlim(times[-1], times[0])
             #
             # Check to see if there were infall, pericenter, or apocenter events
@@ -230,38 +256,38 @@ if sim_data.num_gal == 2:
             peri = peris['pericenter.check'][i]
             #
             # If there were, plot when they occurred
-            if infall == True:
+            if infall:
                 infall_time = infall_info['first.infall.time.lb'][i]
                 ax1.axvline(x=infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+            #
             if peri:
                 for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
                     ax1.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
-            #
             # Set the labels and save the figure
             ax1.set_ylim(top=np.nanmax(d_data)+100)
             ax1.label_outer()
-            ax1.set_ylabel('r [kpc]', fontsize=32)
+            ax1.set_ylabel('Host Distance [kpc]', fontsize=20)
             ax1.legend(prop={'size': 16})
             #
             # Plot the velocity data
-            ax2.plot(times, v_data, 'k')
-            ax2.plot(-1*ts, v_model, alpha=0.5)
-            ax2.set_xlim(times[-1], times[0])
-            ax2.label_outer()
-            if infall == True:
-                infall_time = infall_info['first.infall.time.lb'][i]
-                ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
-            if peri:
-                for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
-                    ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
+            #ax2.plot(times, v_data, 'k')
+            #ax2.plot(-1*ts, v_model, alpha=0.5)
+            #ax2.set_xlim(times[-1], times[0])
+            #ax2.label_outer()
+            #if infall == True:
+            #    infall_time = infall_info['first.infall.time.lb'][i]
+            #    ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+            #if peri:
+            #    for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
+            #        ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
             #
-            ax2.set_ylabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=32)
+            #ax2.set_ylabel('Total velocity [km s$^{-1}$]', fontsize=20)
             #
             # Plot the velocity data
-            ax3.plot(times, Lz_data/1000, 'k')
-            ax3.plot(-1*ts, Lz_model/1000, alpha=0.5)
+            ax3.plot(times, L_data/1000, 'k')
+            ax3.plot(-1*ts, L_model/1000, alpha=0.5)
             ax3.set_xlim(times[-1], times[0])
-            ax3.set_ylabel('$L_{\\rm z}$ [$10^3$ kpc km s$^{-1}$]', fontsize=20)
+            ax3.set_ylabel('$\\ell$ [$10^3$ kpc km s$^{-1}$]', fontsize=20)
             if infall == True:
                 infall_time = infall_info['first.infall.time.lb'][i]
                 ax3.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
@@ -316,31 +342,43 @@ if sim_data.num_gal == 2:
     print(poles)
     print(np.sum(poles))
 
+    galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vR(ts), galpy_orbits.vT(ts))
+    galpy_angs = np.linalg.norm(galpy_orbits.L(ts), axis=2)
+
     for i in range(1, orbits.shape[0]):
         if (infall_info['check'][i]) & (peris['pericenter.check'][i]):
             # Integrate the subhalo orbit in each potential
             d_model = galpy_orbits[i]._parse_plot_quantity(quant='r')
-            v_model = galpy_orbits[i]._parse_plot_quantity(quant='vR')
-            Lz_model = galpy_orbits[i]._parse_plot_quantity(quant='Lz')
+            v_model = galpy_vels[i]
+            L_model = galpy_angs[i]
+            #v_model = galpy_orbits[i]._parse_plot_quantity(quant='vR')
+            #Lz_model = galpy_orbits[i]._parse_plot_quantity(quant='Lz')
             #
             # Set up the distances and times to plot
             d_mask = (halt_dists[i] >= 0)
             d_data = halt_dists[i][d_mask]
             lookback_time = np.flip(snaps['time'][-1] - snaps['time'])
             times = lookback_time[:len(d_data)]
-            v_data = halt.prop('host2.velocity.principal.spherical', orbits.sub_inds[i][orbits.sub_inds[i]>=0])[:,0][:len(times)]
-            Lz_data = angs['ang.mom.vector'][i][:,2][:len(times)]
+            #v_data = halt.prop('host.velocity.principal.spherical', orbits.sub_inds[i][orbits.sub_inds[i]>=0])[:,0][:len(times)]
+            v_data = halt_vels[i][:len(times)]
+            #Lz_data = angs['ang.mom.vector'][i][:,2][:len(times)]
+            L_data = angs['ang.mom.total'][i][:len(times)]
             #
             # Set up the figure
             plt.rcParams["font.family"] = "serif"
-            plt.figure(figsize=(10, 12))
-            ax1 = plt.subplot(311)
-            ax2 = plt.subplot(312, sharex=ax1)
-            ax3 = plt.subplot(313, sharex=ax2)
+            #plt.figure(figsize=(10, 12))
+            #ax1 = plt.subplot(311)
+            #ax2 = plt.subplot(312, sharex=ax1)
+            #ax3 = plt.subplot(313, sharex=ax2)
+            plt.figure(figsize=(10, 8))
+            ax1 = plt.subplot(211)
+            #ax2 = plt.subplot(312, sharex=ax1)
+            ax3 = plt.subplot(212, sharex=ax1)
             #
             # Plot the distances
             ax1.plot(times, d_data, 'k', label='Simulation')
             ax1.plot(-1*ts, d_model, label='Model', alpha=0.5)
+            ax1.plot(times, host_radii[:len(times)], 'k', alpha=0.3)
             ax1.set_xlim(times[-1], times[0])
             #
             # Check to see if there were infall, pericenter, or apocenter events
@@ -348,38 +386,38 @@ if sim_data.num_gal == 2:
             peri = peris['pericenter.check'][i]
             #
             # If there were, plot when they occurred
-            if infall == True:
+            if infall:
                 infall_time = infall_info['first.infall.time.lb'][i]
                 ax1.axvline(x=infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+            #
             if peri:
                 for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
                     ax1.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
-            #
             # Set the labels and save the figure
             ax1.set_ylim(top=np.nanmax(d_data)+100)
             ax1.label_outer()
-            ax1.set_ylabel('r [kpc]', fontsize=32)
+            ax1.set_ylabel('Host Distance [kpc]', fontsize=20)
             ax1.legend(prop={'size': 16})
             #
             # Plot the velocity data
-            ax2.plot(times, v_data, 'k')
-            ax2.plot(-1*ts, v_model, alpha=0.5)
-            ax2.set_xlim(times[-1], times[0])
-            ax2.label_outer()
-            if infall == True:
-                infall_time = infall_info['first.infall.time.lb'][i]
-                ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
-            if peri:
-                for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
-                    ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
+            #ax2.plot(times, v_data, 'k')
+            #ax2.plot(-1*ts, v_model, alpha=0.5)
+            #ax2.set_xlim(times[-1], times[0])
+            #ax2.label_outer()
+            #if infall == True:
+            #    infall_time = infall_info['first.infall.time.lb'][i]
+            #    ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+            #if peri:
+            #    for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
+            #        ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
             #
-            ax2.set_ylabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=32)
+            #ax2.set_ylabel('Total velocity [km s$^{-1}$]', fontsize=20)
             #
             # Plot the velocity data
-            ax3.plot(times, Lz_data/1000, 'k')
-            ax3.plot(-1*ts, Lz_model/1000, alpha=0.5)
+            ax3.plot(times, L_data/1000, 'k')
+            ax3.plot(-1*ts, L_model/1000, alpha=0.5)
             ax3.set_xlim(times[-1], times[0])
-            ax3.set_ylabel('$L_{\\rm z}$ [$10^3$ kpc km s$^{-1}$]', fontsize=20)
+            ax3.set_ylabel('$\\ell$ [$10^3$ kpc km s$^{-1}$]', fontsize=20)
             if infall == True:
                 infall_time = infall_info['first.infall.time.lb'][i]
                 ax3.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
