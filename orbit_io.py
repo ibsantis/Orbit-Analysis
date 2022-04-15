@@ -344,7 +344,7 @@ class OrbitAnalysis:
                 distances_norm[i][j] = val
         return distances_norm
 
-    def halo_velocities(self, tree, host=1):
+    def halo_velocities(self, tree, host=1, vel_type='total'):
         """
         DESCRIPTION:
             Reads in the halo tree and subhalo indices, then returns a 2D array,
@@ -376,11 +376,11 @@ class OrbitAnalysis:
             mask = (self.sub_inds[i] >= 0)
             # Loop over the number of snapshots a subhalo exists
             if host == 1:
-                for j, val in enumerate(tree.prop('host.velocity.total', self.sub_inds[i][mask])):
+                for j, val in enumerate(tree.prop('host.velocity.'+vel_type, self.sub_inds[i][mask])):
                     # Fill in the null array with 1D distances
                     velocities[i][j] = val
             elif host == 2:
-                for j, val in enumerate(tree.prop('host2.velocity.total', self.sub_inds[i][mask])):
+                for j, val in enumerate(tree.prop('host2.velocity.'+vel_type, self.sub_inds[i][mask])):
                     # Fill in the null array with 1D distances
                     velocities[i][j] = val
             else:
