@@ -99,7 +99,7 @@ class SummaryDataSort:
         #
         if sim_type == 'baryon':
             for name in self.host_names[hosts]:
-                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/apr18_new/data_'+name, verbose=True)
                 data_dict[name] = data
         #
         elif sim_type == 'all_baryon':
@@ -1106,6 +1106,54 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    def L_rec(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
+        """
+        Only works with the simulation data right now, not the model data...
+        """
+        data = []
+        #
+        if oversample == False:
+            for name in self.host_names[hosts]:
+                data.append(data_dict[name]['L.at.peri'][mask_dict[name]][:,0])
+        #
+        elif oversample == True:
+            for name in self.host_names[hosts]:
+                data.append(np.repeat(data_dict[name]['L.at.peri'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
+        #
+        return np.hstack(data)
+
+    def L_min(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
+        """
+        Only works with the simulation data right now, not the model data...
+        """
+        data = []
+        #
+        if oversample == False:
+            for name in self.host_names[hosts]:
+                for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
+                    mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
+                    #
+                    if np.sum(mask_temp) == 0:
+                        data.append(data_dict[name]['Ltot.sim'][mask_dict[name]][i][0])
+                    #
+                    else:
+                        index = np.where(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]) == data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp])[0]
+                        data.append(data_dict[name]['L.at.peri'][mask_dict[name]][i][index])
+        #
+        elif oversample == True:
+            for name in self.host_names[hosts]:
+                for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
+                    mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
+                    #
+                    if np.sum(mask_temp) == 0:
+                        data.append(np.repeat(data_dict[name]['Ltot.sim'][mask_dict[name]][i][0], self.oversample[sim_type][name]))
+                    #
+                    else:
+                        index = np.where(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]) == data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp])[0]
+                        data.append(np.repeat(data_dict[name]['L.at.peri'][mask_dict[name]][i][index], self.oversample[sim_type][name]))
+        #
+        return np.hstack(data)
+
 
 class SummaryDataPlot(SummaryDataSort):
 
@@ -1135,6 +1183,7 @@ class SummaryDataPlot(SummaryDataSort):
                        'd.sim.min': 'd$_{\\rm peri,min,sim}$ [kpc]',\
                        'delta_d': '(d$_{\\rm peri,min}$ - d$_{\\rm peri,recent}$) [kpc]',\
                        'delta_d_frac': '($d_{\\rm peri,min}$ - $d_{\\rm peri,recent}$)/$d_{\\rm peri,recent}$',\
+                       'delta_ell_frac': '($\\ell_{\\rm peri,min}$ - $\\ell_{\\rm peri,recent}$)/$\\ell_{\\rm peri,recent}$',\
                        'd.peri': 'd$_{\\rm peri}$ [kpc]',\
                        'd.peri.recent': 'd$_{\\rm peri, recent}$ [kpc]',\
                        'd.peri.min': 'd$_{\\rm peri, min}$ [kpc]',\
