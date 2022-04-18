@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12b', location='stampede')
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -38,14 +38,16 @@ halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_k
 
 if sim_data.num_gal == 1:
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='stampede', host=1, dmo=False)
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location='stampede', host=1, dmo=False)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location='stampede', host=1, dmo=False)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=False)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=False)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=False)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
     halt_dists_3d = orbits.halo_distances(tree=halt, dist_type='3d')
-    halt_vels = orbits.halo_velocities(halt)
+    halt_vels = orbits.halo_velocities(halt, vel_type='total')
+    halt_rad_vels = orbits.halo_velocities(halt, vel_type='rad')
+    halt_tan_vels = orbits.halo_velocities(halt, vel_type='tan')
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
@@ -166,11 +168,23 @@ if sim_data.num_gal == 1:
     data_dict['dtot.sim'] = halt_dists
     data_dict['d.sim'] = halt_dists_3d
     data_dict['vtot.sim'] = halt_vels
+    data_dict['v.tan.sim'] = halt_tan_vels
+    data_dict['v.rad.sim'] = halt_rad_vels
     data_dict['L.sim'] = angs['ang.mom.vector']
     data_dict['Ltot.sim'] = angs['ang.mom.total']
     data_dict['Lz.sim'] = angs['ang.mom.vector'][:,:,2]
-    data_dict['v.tan.z0'] = halt.prop('host.velocity.tan', orbits.sub_inds[:,0])
-    data_dict['v.rad.z0'] = halt.prop('host.velocity.rad', orbits.sub_inds[:,0])
+    #
+    # Find the angular momentum at each pericenter event
+    angs_at_peri = (-1)*np.ones(peris['pericenter.dist'].shape)
+    times = snaps['time'][-1] - np.flip(snaps['time'])
+    for i in range(0, len(peris['pericenter.check'])):
+        if (peris['pericenter.check'][i]):
+            mask = (peris['pericenter.time.lb'][i] >= 0)
+            for j in range(0, len(peris['pericenter.time.lb'][i][mask])):
+                t = peris['pericenter.time.lb'][i][mask][j]
+                angs_at_peri[i][j] = angs['ang.mom.total'][i][np.where(np.min(np.abs(times - t)) == np.abs(times - t))[0][0]]
+    data_dict['L.at.peri'] = angs_at_peri
+    #
     data_dict['time.sim'] = snaps['time']
     #
     data_dict['dtot.galpy'] = galpy_orbits.r(ts)
@@ -190,14 +204,16 @@ if sim_data.num_gal == 2:
     #
     ### GALAXY 1
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='stampede', host=1, dmo=False)
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='stampede', host=1, dmo=False)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='stampede', host=1, dmo=False)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=False)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=False)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=False)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
     halt_dists_3d = orbits.halo_distances(tree=halt, dist_type='3d')
     halt_vels = orbits.halo_velocities(halt)
+    halt_rad_vels = orbits.halo_velocities(halt, vel_type='rad')
+    halt_tan_vels = orbits.halo_velocities(halt, vel_type='tan')
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
@@ -313,11 +329,23 @@ if sim_data.num_gal == 2:
     data_dict['dtot.sim'] = halt_dists
     data_dict['d.sim'] = halt_dists_3d
     data_dict['vtot.sim'] = halt_vels
+    data_dict['v.tan.sim'] = halt_tan_vels
+    data_dict['v.rad.sim'] = halt_rad_vels
     data_dict['L.sim'] = angs['ang.mom.vector']
     data_dict['Ltot.sim'] = angs['ang.mom.total']
     data_dict['Lz.sim'] = angs['ang.mom.vector'][:,:,2]
-    data_dict['v.tan.z0'] = halt.prop('host.velocity.tan', orbits.sub_inds[:,0])
-    data_dict['v.rad.z0'] = halt.prop('host.velocity.rad', orbits.sub_inds[:,0])
+    #
+    # Find the angular momentum at each pericenter event
+    angs_at_peri = (-1)*np.ones(peris['pericenter.dist'].shape)
+    times = snaps['time'][-1] - np.flip(snaps['time'])
+    for i in range(0, len(peris['pericenter.check'])):
+        if (peris['pericenter.check'][i]):
+            mask = (peris['pericenter.time.lb'][i] >= 0)
+            for j in range(0, len(peris['pericenter.time.lb'][i][mask])):
+                t = peris['pericenter.time.lb'][i][mask][j]
+                angs_at_peri[i][j] = angs['ang.mom.total'][i][np.where(np.min(np.abs(times - t)) == np.abs(times - t))[0][0]]
+    data_dict['L.at.peri'] = angs_at_peri
+    #
     data_dict['time.sim'] = snaps['time']
     #
     data_dict['dtot.galpy'] = galpy_orbits.r(ts)
@@ -335,14 +363,16 @@ if sim_data.num_gal == 2:
     #
     ### GALAXY 2
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='stampede', host=2, dmo=False)
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='stampede', host=2, dmo=False)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='stampede', host=2, dmo=False)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=False)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=False)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=False)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt, host=2) # set host=1 for the first host, host=2 for the other
     halt_dists_3d = orbits.halo_distances(tree=halt, host=2, dist_type='3d')
     halt_vels = orbits.halo_velocities(halt, host=2)
+    halt_rad_vels = orbits.halo_velocities(halt, host=2, vel_type='rad')
+    halt_tan_vels = orbits.halo_velocities(halt, host=2, vel_type='tan')
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host2.index'][0])]
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
@@ -458,11 +488,23 @@ if sim_data.num_gal == 2:
     data_dict['dtot.sim'] = halt_dists
     data_dict['d.sim'] = halt_dists_3d
     data_dict['vtot.sim'] = halt_vels
+    data_dict['v.tan.sim'] = halt_tan_vels
+    data_dict['v.rad.sim'] = halt_rad_vels
     data_dict['L.sim'] = angs['ang.mom.vector']
     data_dict['Ltot.sim'] = angs['ang.mom.total']
     data_dict['Lz.sim'] = angs['ang.mom.vector'][:,:,2]
-    data_dict['v.tan.z0'] = halt.prop('host2.velocity.tan', orbits.sub_inds[:,0])
-    data_dict['v.rad.z0'] = halt.prop('host2.velocity.rad', orbits.sub_inds[:,0])
+    #
+    # Find the angular momentum at each pericenter event
+    angs_at_peri = (-1)*np.ones(peris['pericenter.dist'].shape)
+    times = snaps['time'][-1] - np.flip(snaps['time'])
+    for i in range(0, len(peris['pericenter.check'])):
+        if (peris['pericenter.check'][i]):
+            mask = (peris['pericenter.time.lb'][i] >= 0)
+            for j in range(0, len(peris['pericenter.time.lb'][i][mask])):
+                t = peris['pericenter.time.lb'][i][mask][j]
+                angs_at_peri[i][j] = angs['ang.mom.total'][i][np.where(np.min(np.abs(times - t)) == np.abs(times - t))[0][0]]
+    data_dict['L.at.peri'] = angs_at_peri
+    #
     data_dict['time.sim'] = snaps['time']
     #
     data_dict['dtot.galpy'] = galpy_orbits.r(ts)
