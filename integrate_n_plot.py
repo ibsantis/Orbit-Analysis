@@ -46,6 +46,8 @@ if sim_data.num_gal == 1:
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
     halt_vels = orbits.halo_velocities(halt)
+    halt_rad_vels = orbits.halo_velocities(halt, vel_type='rad')
+    halt_tan_vels = orbits.halo_velocities(halt, vel_type='tan')
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host.index'][0])] # Want to divide the other distances by this distance
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
@@ -88,7 +90,8 @@ if sim_data.num_gal == 1:
             d_model = galpy_orbits[i]._parse_plot_quantity(quant='r')
             #v_model = galpy_orbits[i]._parse_plot_quantity(quant='vR')
             #Lz_model = galpy_orbits[i]._parse_plot_quantity(quant='Lz')
-            v_model = galpy_vels[i]
+            #v_model = galpy_vels[i]
+            v_model = galpy_orbits.vT(ts)[i]
             L_model = galpy_angs[i]
             #
             # Set up the distances and times to plot
@@ -97,20 +100,21 @@ if sim_data.num_gal == 1:
             lookback_time = np.flip(snaps['time'][-1] - snaps['time'])
             times = lookback_time[:len(d_data)]
             #v_data = halt.prop('host.velocity.principal.spherical', orbits.sub_inds[i][orbits.sub_inds[i]>=0])[:,0][:len(times)]
-            v_data = halt_vels[i][:len(times)]
+            #v_data = halt_vels[i][:len(times)]
+            v_data = halt_tan_vels[i][:len(times)]
             #Lz_data = angs['ang.mom.vector'][i][:,2][:len(times)]
             L_data = angs['ang.mom.total'][i][:len(times)]
             #
             # Set up the figure
             plt.rcParams["font.family"] = "serif"
-            #plt.figure(figsize=(10, 12))
-            #ax1 = plt.subplot(311)
+            plt.figure(figsize=(10, 12))
+            ax1 = plt.subplot(311)
+            ax2 = plt.subplot(312, sharex=ax1)
+            ax3 = plt.subplot(313, sharex=ax2)
+            #plt.figure(figsize=(10, 8))
+            #ax1 = plt.subplot(211)
             #ax2 = plt.subplot(312, sharex=ax1)
-            #ax3 = plt.subplot(313, sharex=ax2)
-            plt.figure(figsize=(10, 8))
-            ax1 = plt.subplot(211)
-            #ax2 = plt.subplot(312, sharex=ax1)
-            ax3 = plt.subplot(212, sharex=ax1)
+            #ax3 = plt.subplot(212, sharex=ax1)
             #
             # Plot the distances
             ax1.plot(times, d_data, 'k', label='Simulation')
@@ -137,18 +141,18 @@ if sim_data.num_gal == 1:
             ax1.legend(prop={'size': 16})
             #
             # Plot the velocity data
-            #ax2.plot(times, v_data, 'k')
-            #ax2.plot(-1*ts, v_model, alpha=0.5)
-            #ax2.set_xlim(times[-1], times[0])
-            #ax2.label_outer()
-            #if infall == True:
-            #    infall_time = infall_info['first.infall.time.lb'][i]
-            #    ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
-            #if peri:
-            #    for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
-            #        ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
-            #
-            #ax2.set_ylabel('Total velocity [km s$^{-1}$]', fontsize=20)
+            ax2.plot(times, v_data, 'k')
+            ax2.plot(-1*ts, v_model, alpha=0.5)
+            ax2.set_xlim(times[-1], times[0])
+            ax2.label_outer()
+            if infall == True:
+                infall_time = infall_info['first.infall.time.lb'][i]
+                ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+            if peri:
+                for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
+                    ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
+
+            ax2.set_ylabel('Tangential velocity [km s$^{-1}$]', fontsize=20)
             #
             # Plot the velocity data
             ax3.plot(times, L_data/1000, 'k')
@@ -179,6 +183,8 @@ if sim_data.num_gal == 2:
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt, host=1) # set host=1 for the first host, host=2 for the other
     halt_vels = orbits.halo_velocities(halt, host=1)
+    halt_rad_vels = orbits.halo_velocities(halt, vel_type='rad', host=1)
+    halt_tan_vels = orbits.halo_velocities(halt, vel_type='tan', host=1)
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host.index'][0])] # Want to divide the other distances by this distance
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
@@ -219,7 +225,8 @@ if sim_data.num_gal == 2:
         if (infall_info['check'][i]) & (peris['pericenter.check'][i]):
             # Integrate the subhalo orbit in each potential
             d_model = galpy_orbits[i]._parse_plot_quantity(quant='r')
-            v_model = galpy_vels[i]
+            #v_model = galpy_vels[i]
+            v_model = galpy_orbits.vT(ts)[i]
             L_model = galpy_angs[i]
             #v_model = galpy_orbits[i]._parse_plot_quantity(quant='vR')
             #Lz_model = galpy_orbits[i]._parse_plot_quantity(quant='Lz')
@@ -230,20 +237,21 @@ if sim_data.num_gal == 2:
             lookback_time = np.flip(snaps['time'][-1] - snaps['time'])
             times = lookback_time[:len(d_data)]
             #v_data = halt.prop('host.velocity.principal.spherical', orbits.sub_inds[i][orbits.sub_inds[i]>=0])[:,0][:len(times)]
-            v_data = halt_vels[i][:len(times)]
+            #v_data = halt_vels[i][:len(times)]
+            v_data = halt_tan_vels[i][:len(times)]
             #Lz_data = angs['ang.mom.vector'][i][:,2][:len(times)]
             L_data = angs['ang.mom.total'][i][:len(times)]
             #
             # Set up the figure
             plt.rcParams["font.family"] = "serif"
-            #plt.figure(figsize=(10, 12))
-            #ax1 = plt.subplot(311)
+            plt.figure(figsize=(10, 12))
+            ax1 = plt.subplot(311)
+            ax2 = plt.subplot(312, sharex=ax1)
+            ax3 = plt.subplot(313, sharex=ax2)
+            #plt.figure(figsize=(10, 8))
+            #ax1 = plt.subplot(211)
             #ax2 = plt.subplot(312, sharex=ax1)
-            #ax3 = plt.subplot(313, sharex=ax2)
-            plt.figure(figsize=(10, 8))
-            ax1 = plt.subplot(211)
-            #ax2 = plt.subplot(312, sharex=ax1)
-            ax3 = plt.subplot(212, sharex=ax1)
+            #ax3 = plt.subplot(212, sharex=ax1)
             #
             # Plot the distances
             ax1.plot(times, d_data, 'k', label='Simulation')
@@ -270,18 +278,18 @@ if sim_data.num_gal == 2:
             ax1.legend(prop={'size': 16})
             #
             # Plot the velocity data
-            #ax2.plot(times, v_data, 'k')
-            #ax2.plot(-1*ts, v_model, alpha=0.5)
-            #ax2.set_xlim(times[-1], times[0])
-            #ax2.label_outer()
-            #if infall == True:
-            #    infall_time = infall_info['first.infall.time.lb'][i]
-            #    ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
-            #if peri:
-            #    for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
-            #        ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
-            #
-            #ax2.set_ylabel('Total velocity [km s$^{-1}$]', fontsize=20)
+            ax2.plot(times, v_data, 'k')
+            ax2.plot(-1*ts, v_model, alpha=0.5)
+            ax2.set_xlim(times[-1], times[0])
+            ax2.label_outer()
+            if infall == True:
+                infall_time = infall_info['first.infall.time.lb'][i]
+                ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+            if peri:
+                for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
+                    ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
+
+            ax2.set_ylabel('Tangential velocity [km s$^{-1}$]', fontsize=20)
             #
             # Plot the velocity data
             ax3.plot(times, L_data/1000, 'k')
@@ -310,6 +318,8 @@ if sim_data.num_gal == 2:
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt, host=2) # set host=1 for the first host, host=2 for the other
     halt_vels = orbits.halo_velocities(halt, host=2)
+    halt_rad_vels = orbits.halo_velocities(halt, vel_type='rad', host=2)
+    halt_tan_vels = orbits.halo_velocities(halt, vel_type='tan', host=2)
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host2.index'][0])] # Want to divide the other distances by this distance
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
@@ -349,7 +359,8 @@ if sim_data.num_gal == 2:
         if (infall_info['check'][i]) & (peris['pericenter.check'][i]):
             # Integrate the subhalo orbit in each potential
             d_model = galpy_orbits[i]._parse_plot_quantity(quant='r')
-            v_model = galpy_vels[i]
+            #v_model = galpy_vels[i]
+            v_model = galpy_orbits.vT(ts)[i]
             L_model = galpy_angs[i]
             #v_model = galpy_orbits[i]._parse_plot_quantity(quant='vR')
             #Lz_model = galpy_orbits[i]._parse_plot_quantity(quant='Lz')
@@ -360,20 +371,21 @@ if sim_data.num_gal == 2:
             lookback_time = np.flip(snaps['time'][-1] - snaps['time'])
             times = lookback_time[:len(d_data)]
             #v_data = halt.prop('host.velocity.principal.spherical', orbits.sub_inds[i][orbits.sub_inds[i]>=0])[:,0][:len(times)]
-            v_data = halt_vels[i][:len(times)]
+            #v_data = halt_vels[i][:len(times)]
+            v_data = halt_tan_vels[i][:len(times)]
             #Lz_data = angs['ang.mom.vector'][i][:,2][:len(times)]
             L_data = angs['ang.mom.total'][i][:len(times)]
             #
             # Set up the figure
             plt.rcParams["font.family"] = "serif"
-            #plt.figure(figsize=(10, 12))
-            #ax1 = plt.subplot(311)
+            plt.figure(figsize=(10, 12))
+            ax1 = plt.subplot(311)
+            ax2 = plt.subplot(312, sharex=ax1)
+            ax3 = plt.subplot(313, sharex=ax2)
+            #plt.figure(figsize=(10, 8))
+            #ax1 = plt.subplot(211)
             #ax2 = plt.subplot(312, sharex=ax1)
-            #ax3 = plt.subplot(313, sharex=ax2)
-            plt.figure(figsize=(10, 8))
-            ax1 = plt.subplot(211)
-            #ax2 = plt.subplot(312, sharex=ax1)
-            ax3 = plt.subplot(212, sharex=ax1)
+            #ax3 = plt.subplot(212, sharex=ax1)
             #
             # Plot the distances
             ax1.plot(times, d_data, 'k', label='Simulation')
@@ -400,18 +412,18 @@ if sim_data.num_gal == 2:
             ax1.legend(prop={'size': 16})
             #
             # Plot the velocity data
-            #ax2.plot(times, v_data, 'k')
-            #ax2.plot(-1*ts, v_model, alpha=0.5)
-            #ax2.set_xlim(times[-1], times[0])
-            #ax2.label_outer()
-            #if infall == True:
-            #    infall_time = infall_info['first.infall.time.lb'][i]
-            #    ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
-            #if peri:
-            #    for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
-            #        ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
-            #
-            #ax2.set_ylabel('Total velocity [km s$^{-1}$]', fontsize=20)
+            ax2.plot(times, v_data, 'k')
+            ax2.plot(-1*ts, v_model, alpha=0.5)
+            ax2.set_xlim(times[-1], times[0])
+            ax2.label_outer()
+            if infall == True:
+                infall_time = infall_info['first.infall.time.lb'][i]
+                ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+            if peri:
+                for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
+                    ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
+
+            ax2.set_ylabel('Tangential velocity [km s$^{-1}$]', fontsize=20)
             #
             # Plot the velocity data
             ax3.plot(times, L_data/1000, 'k')
