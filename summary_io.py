@@ -2049,10 +2049,8 @@ class SummaryDataPlot(SummaryDataSort):
             minn = binsize*np.floor(np.min(x)/binsize)
             maxx = binsize*np.ceil(np.max(x)/binsize)
             if minn < 0:
-                #bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
-                bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize)-1)
+                bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
             else:
-                #bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
                 bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize)+1)
             bin_array = np.linspace(minn, maxx, bin_num)
             #
@@ -2082,8 +2080,8 @@ class SummaryDataPlot(SummaryDataSort):
             plt.scatter(np.mean(x), y_mean, s=250, marker='s', c='k')
         #
         plt.xlim(xlimits)
-        plt.xlabel(self.labels[xtype], fontsize=28)
-        plt.ylabel(y_label, fontsize=28)
+        plt.xlabel(self.labels[xtype], fontsize=36)
+        plt.ylabel(y_label, fontsize=34)
         if title:
             plt.title(self.titles[title], fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
