@@ -44,8 +44,8 @@ directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/fina
 ### Generate all of the data for the plots below
 #
 # Fix for the outlier in the Mstar-Mhalo relation
-masks_infall['m12f'][57] = False
-masks_infall_peri['m12f'][57] = False
+masks_infall['m12f'][59] = False
+masks_infall_peri['m12f'][59] = False
 #
 N_sim_tot = summary.nperi(data_total, masks_infall, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon')
 d_sim_tot = summary.dperi_recent(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
@@ -1911,11 +1911,11 @@ summary_plot.plot_hist(x=(t_min_tot-t_sim_tot)[mask_delta_t], xtype='delta_t', b
 #
 # delta tperi plots
 mask_delta_d = (np.abs((d_min_tot - d_sim_tot)/d_sim_tot) > 0)
-summary_plot.plot_hist(x=((L_min_tot-L_rec_tot)/L_rec_tot)[mask_delta_d], xtype='delta_ell_frac', binsize=0.05, pdf=True, xlimits=(-1, 1), file_path_and_name=directory+'/delta_ell_frac_histogram.pdf')
+summary_plot.plot_hist(x=((L_min_tot-L_rec_tot)/L_rec_tot)[mask_delta_d], xtype='delta_ell_frac', binsize=0.05, pdf=True, xlimits=(-1, 0), file_path_and_name=directory+'/delta_ell_frac_histogram.pdf')
 
 
 """
-    Figure 6:
+    Figure 7:
         Orbits and L evolution subplots
 """
 import matplotlib.patches as mpatches
@@ -2122,7 +2122,7 @@ plt.savefig(directory+'/outlier_orbits_and_angs_and_vtans.pdf')
 
 
 """
-    Figure 7:
+    Figure 8:
         Outlier properties versus Mstar
 """
 N_sim_tot = summary.nperi(data_total, masks_infall, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon')
