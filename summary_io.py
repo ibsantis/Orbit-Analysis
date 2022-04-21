@@ -1198,8 +1198,8 @@ class SummaryDataPlot(SummaryDataSort):
                        'v.tot': 'Total velocity [km s$^{-1}$]',\
                        't.sim': 't$_{\\rm peri,lb,sim}$ [Gyr]',\
                        't.sim.min': 't$_{\\rm peri,min,lb,sim}$ [Gyr]',\
-                       'delta_t': '$t_{\\rm peri,lb,min}$ - $t_{\\rm peri,lb,recent}$ [Gyr]',\
-                       'delta_t_frac': '(t$_{\\rm peri,lb,min}$ - t$_{\\rm peri,lb,recent}$)/t$_{\\rm peri,lb,recent}$',\
+                       'delta_t': '$t^{\\rm lb}_{\\rm peri,lb,min}$ - $t^{\\rm lb}_{\\rm peri,lb,recent}$ [Gyr]',\
+                       'delta_t_frac': '(t$^{\\rm lb}_{\\rm peri,min}$ - t$^{\\rm lb}_{\\rm peri,lb,recent}$)/t$^{\\rm lb}_{\\rm peri,lb,recent}$',\
                        't.model': 't$_{\\rm peri,lb,model}$ [Gyr]',\
                        't.peri': 't$_{\\rm peri,lb}$ [Gyr]',\
                        't.peri.recent': 't$_{\\rm peri,recent,lb}$ [Gyr]',\
