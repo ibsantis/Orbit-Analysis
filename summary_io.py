@@ -84,11 +84,11 @@ class SummaryDataSort:
                         dmo        - dark subhalos in dark matter-only simulations
 
             hosts     : string
-                        Choose either 'all', 'iso', or 'lg' to select different
-                        samples.
+                        Choose any of the options listed in self.host_names within
+                        the __init__ function above.
 
         NOTES:
-            - The dictionary that gets returned is a dictionary of dictionaries.
+            - The returned dictionary contains other dictionaries.
             - Each key in the dictionary is a host name
                 - Each key in the sub-dictionaries is given in summary_data.py
             - Data is arranged in order of self.host_names[hosts]. Subhalos in
@@ -97,9 +97,11 @@ class SummaryDataSort:
         """
         data_dict = dict()
         #
+        # Given the type of data you want, read in from the appropriate directory
         if sim_type == 'baryon':
             for name in self.host_names[hosts]:
-                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/apr18_new/data_'+name, verbose=True)
+                #data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/apr18_new/data_'+name, verbose=True)
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
                 data_dict[name] = data
         #
         elif sim_type == 'all_baryon':
@@ -116,10 +118,36 @@ class SummaryDataSort:
 
     def data_read_potential(self, directory, sim_type='baryon', hosts='all'):
         """
-        TBD
+        DESCRIPTION:
+            Reads in the potential data and stores it in a dictionary with each
+            key being the host name.
+
+        VARIABLES:
+            directory : string
+                        Home directory.
+
+            sim_type  : string
+                        Choose which subhalos you want to read in; same keys
+                        as in the oversampling factors:
+                        baryon     - luminous subhalos in baryonic simulations
+                        baryon_all - luminous + dark subhalos in baryonic simulations
+                        dmo        - dark subhalos in dark matter-only simulations
+
+            hosts     : string
+                        Choose any of the options listed in self.host_names within
+                        the __init__ function above.
+
+        NOTES:
+            - The returned dictionary contains other dictionaries.
+            - Each key in the dictionary is a host name
+                - Each key in the sub-dictionaries is given in summary_data.py
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
         """
         data_dict = dict()
         #
+        # Given the type of data, read in from the appropriate directory
         if sim_type == 'baryon':
             for name in self.host_names[hosts]:
                 data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/'+name+'_potentials', verbose=True)
@@ -170,8 +198,9 @@ class SummaryDataSort:
                           Set to True if you want subhalos that had a pericenter
                           in either the simulations or model.
 
-            hosts       : Choose either 'all', 'iso', or 'lg' to select different
-                          samples.
+            hosts       : string
+                          Choose any of the options listed in self.host_names within
+                          the __init__ function above.
 
         NOTES:
             - Returns a dictionary of masks where each key corresponds to each
@@ -250,17 +279,32 @@ class SummaryDataSort:
     def data_mask_apo(self, dictionary, hosts='all'):
         """
         DESCRIPTION:
-            ...
+            Create a dictionary of masks for the satellites that checks whether
+            or not a satellite experienced an apocenter in the simulations
+            ** Probably want to add another mask to check if a satellite has
+               experienced an apocenter in the model as well **
 
         VARIABLES:
-            ...
+            dictionary  : dictionary
+                          Dictionary of data for all hosts. This is read in by
+                          data_read()
+
+            hosts       : string
+                          Choose any of the options listed in self.host_names within
+                          the __init__ function above.
 
         NOTES:
-            ...
+            - Returns a dictionary of masks where each key corresponds to each
+              host galaxy.
+              - This masking dictionary is used by ALL other methods in this class.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
         """
         # Set up a dictionary to save the masks to
         mask_dict = dict()
         #
+        # Loop through each host and save the masks in a dictionary
         for name in self.host_names[hosts]:
             mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['apocenter.check.sim']
         #
@@ -268,11 +312,18 @@ class SummaryDataSort:
 
     def data_mask_nperi(self, dictionary, nperi, hosts='all'):
         """
-        [Mask out the subhalos that have experienced 0, 1, or > 1 pericenters]
+        OLD METHOD:
+        ===========
+        This was primarily used to create masks for the satellites that had
+        experienced 0, 1, and > 1 pericenters. I used this in previous plots
+        that are no longer included in Paper I, so it would be okay to eventually
+        delete this method.
         """
         # Set up a dictionary to save the masks to
         mask_dict = dict()
         #
+        # Depending on the pericenter number you are interested in, create a
+        # dictionary of masks, similar to data_mask and data_mask_apo
         if nperi == 0:
             for name in self.host_names[hosts]:
                 mask_dict[name] = dictionary[name]['infall.check']*(~dictionary[name]['pericenter.check.sim'])
@@ -298,13 +349,35 @@ class SummaryDataSort:
     def halo_id(self, data_dict, mask_dict, hosts='all'):
         """
         DESCRIPTION:
-            ...
+            Given the data and mask dictionaries generated by the methods above,
+            return another dictionary to list various identifiers for the
+            satellites to better distinguish them. This is purely a diagnostic
+            tool.
+            ** Might want to think about incorporating this into the data_read()
+               function, but this also requires the masking dictionary. The
+               masking dictionary is not entirely necessary though... **
 
         VARIABLES:
-            ...
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
 
         NOTES:
-            ...
+            - Returns a dictionary.
+                - Within the dictionary, there are three arrays that give:
+                    - Host galaxy a satellite is in
+                    - The "id" I have given it
+                    - The merger tree indices of the satellite from the simulations
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
         """
         # Set up an empty list to save values to
         data = dict()
@@ -312,11 +385,15 @@ class SummaryDataSort:
         ids = []
         indices = []
         #
+        # Loop through each host
         for name in self.host_names[hosts]:
+            # Loop through each subhalo and save the properties to the arrays
             for i in range(0, len(data_dict[name]['id'][mask_dict[name]])):
                 names.append(name)
                 ids.append(data_dict[name]['id'][mask_dict[name]][i])
                 indices.append(data_dict[name]['indices.z0'][mask_dict[name]][:,0][i])
+        #
+        # Save the arrays to a dictionary
         data['host'] = np.asarray(names)
         data['ids'] = np.asarray(ids)
         data['indices'] = np.asarray(indices)
@@ -549,9 +626,9 @@ class SummaryDataSort:
         # Set up an empty list to save values to
         data = []
         #
-        # Determines whether oversampling or not, then
+        # Determines if oversampling or not.
+        # Also masks values with no pericenter and sets them equal to d(z = 0)
         if oversample == False:
-            count = 0
             for name in self.host_names[hosts]:
                 for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
                     mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
@@ -561,11 +638,6 @@ class SummaryDataSort:
                     #
                     else:
                         data.append(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]))
-                    #
-                    # ...?
-                    if np.sum(mask_temp) == 1:
-                        count += 1
-            print(count)
         #
         elif oversample == True:
             for name in self.host_names[hosts]:
@@ -582,8 +654,10 @@ class SummaryDataSort:
 
     def dperi_first(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
-        DESCRIPTION:
-            first peris
+        OLD METHOD:
+        ===========
+        I am not using first pericenters as a metric anymore in Paper I, therefore,
+        it is probably worth getting rid of this method eventually.
         """
         # Set up an empty list to save values to
         data = []
@@ -616,19 +690,49 @@ class SummaryDataSort:
     def dapo_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
-            ...
+            Groups the recent apocenter distances a subhalo experiences, either
+            in the simulation or model, together into one array.
 
         VARIABLES:
-            ...
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            selection  : string
+                         Choose whether you want values from simulation data or
+                         data from the model.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
 
         NOTES:
-            ...
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
+            - If a subhalo has not experienced an apocenter, sets the most recent
+              apocenter distance equal to the maximum distance a subhalo has
+              ever experienced.
+              ** Need to check whether this is a problem. I don't want to count
+                 an apocenter as the max distance outside of the virial radius **
         """
         # Set up an empty list to save values to
         data = []
         #
         # Determines if working with sim or model data, then whether oversampling or not.
-        # Also masks values with no pericenter and sets them equal to d(z = 0)
+        # Also masks values with no apocenter and sets them equal to d_max
         if (selection == 'sim'):
             if oversample == False:
                 for name in self.host_names[hosts]:
@@ -663,13 +767,51 @@ class SummaryDataSort:
 
     def delta_dperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all', sim_type='baryon'):
         """
-        TBD
+        DESCRIPTION:
+            Similar to delta_nperi(), except calculates the difference in
+            pericenter distances between the model and the simulation.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            fraction   : boolean
+                         Set to True if interested in fractional difference in
+                         pericenter distances.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - This only calculates the difference between the MOST RECENT
+              pericenter distances.
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
         """
         data = []
         #
+        # Check first if doing fractional differences, then check if oversampling
         if fraction == False:
             if oversample == False:
+                # Loop over each host
                 for name in self.host_names[hosts]:
+                    # Save the recent pericenters, and use present-day distances
+                    # for satellites that have not experienced pericenter yet
                     temp_array_model = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
                     mask_temp = (temp_array_model == -1)
                     temp_array_model[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
@@ -678,6 +820,7 @@ class SummaryDataSort:
                     mask_temp = (temp_array_sim == -1)
                     temp_array_sim[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
                     #
+                    # Append the difference between the model and simulation to the list
                     data.append(temp_array_model - temp_array_sim)
             #
             elif oversample == True:
@@ -723,12 +866,49 @@ class SummaryDataSort:
 
     def tperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
-        TBD
+        DESCRIPTION:
+            Groups the recent pericenter lookback times a subhalo experienced, either
+            in the simulation or model, together into one array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            selection  : string
+                         Choose whether you want values from simulation data or
+                         data from the model.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
+            - If a subhalo has not experienced a pericenter, sets the most recent
+              pericenter time equal to 0 Gyr, i.e. present-day.
         """
+        # Set up an empty list to save the data to
         data = []
         #
+        # Work with either the sim or model data, and determine whether or not oversampling
         if (selection == 'sim'):
             if oversample == False:
+                # Loop through each host and save values to the empty list
                 for name in self.host_names[hosts]:
                     temp_array = data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0]
                     mask_temp = (temp_array == -1)
@@ -791,6 +971,7 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    # Pick up again here for documentation...
     def delta_tperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all', sim_type='baryon'):
         """
         TBD
