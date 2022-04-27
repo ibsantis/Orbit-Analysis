@@ -449,6 +449,7 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    # optimized
     def nperi(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -488,26 +489,17 @@ class SummaryDataSort:
         # Set up an empty list to save values to
         data = []
         #
-        # Determines if working with sim or model data, and whether oversampling or not.
-        # Then appends values to list.
-        if selection == 'sim':
-            #
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    data.append(data_dict[name]['N.peri.sim'][mask_dict[name]])
-            #
-            elif oversample == True:
-                for name in self.host_names[hosts]:
-                    data.append(np.repeat(data_dict[name]['N.peri.sim'][mask_dict[name]], self.oversample[sim_type][name]))
+        # Quick label fix if interested in the model property
+        if selection == 'model':
+            selection = 'galpy' # Eventually, I'm going to re-run the data with the "galpy" label replaced with "model"
         #
-        elif selection == 'model':
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    data.append(data_dict[name]['N.peri.galpy'][mask_dict[name]])
-            #
-            elif oversample == True:
-                for name in self.host_names[hosts]:
-                    data.append(np.repeat(data_dict[name]['N.peri.galpy'][mask_dict[name]], self.oversample[sim_type][name]))
+        # Loop over the hosts
+        for name in self.host_names[hosts]:
+            # Determine whether or not oversampling, then save the data to the list
+            if oversample:
+                data.append(np.repeat(data_dict[name]['N.peri.'+selection][mask_dict[name]], self.oversample[sim_type][name]))
+            else:
+                data.append(data_dict[name]['N.peri.'+selection][mask_dict[name]])
         #
         return np.hstack(data)
 
