@@ -503,6 +503,7 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    # optimized
     def dperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -544,40 +545,27 @@ class SummaryDataSort:
         # Set up an empty list to save values to
         data = []
         #
-        # Determines if working with sim or model data, then whether oversampling or not.
-        # Also masks values with no pericenter and sets them equal to d(z = 0)
-        if (selection == 'sim'):
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    temp_array = data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
-                    data.append(temp_array)
-            #
-            elif oversample == True:
-                for name in self.host_names[hosts]:
-                    temp_array = data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
-                    data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
+        # Quick fix on labels
+        if selection == 'model':
+            selection = 'galpy'
         #
-        elif (selection == 'model'):
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    temp_array = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
-                    data.append(temp_array)
-            #
-            elif oversample == True:
-                for name in self.host_names[hosts]:
-                    temp_array = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
-                    data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
+        # Loops through each host
+        for name in self.host_names[hosts]:
+            # Get all of the most recent pericenters
+            temp_array = data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][:,0]
+            # Mask out the cases where there are no pericenters
+            mask_temp = (temp_array == -1)
+            # For the null values, replace with present-day distances
+            temp_array[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
+            # Determine oversampling and save to list
+            if oversample:
+                data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
+            else:
+                data.append(temp_array)
         #
         return np.hstack(data)
 
+    # optimized
     def dperi_min(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -618,32 +606,28 @@ class SummaryDataSort:
         # Set up an empty list to save values to
         data = []
         #
-        # Determines if oversampling or not.
-        # Also masks values with no pericenter and sets them equal to d(z = 0)
-        if oversample == False:
-            for name in self.host_names[hosts]:
-                for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
-                    mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
-                    #
-                    if np.sum(mask_temp) == 0:
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            # Loop through each subhalo in the host
+            for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
+                # Mask out the null pericenter values
+                mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
+                # If there are no pericenters, append the present-day distance as the minimum
+                if np.sum(mask_temp) == 0:
+                    if oversample:
+                        data.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][i][0], self.oversample[sim_type][name]))
+                    else:
                         data.append(data_dict[name]['dtot.sim'][mask_dict[name]][i][0])
-                    #
+                # If there are pericenters, append the minimum value to the list
+                else:
+                    if oversample:
+                        data.append(np.repeat(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]), self.oversample[sim_type][name]))
                     else:
                         data.append(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]))
         #
-        elif oversample == True:
-            for name in self.host_names[hosts]:
-                for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
-                    mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
-                    #
-                    if np.sum(mask_temp) == 0:
-                        data.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][i][0], self.oversample[sim_type][name]))
-                    #
-                    else:
-                        data.append(np.repeat(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]), self.oversample[sim_type][name]))
-        #
         return np.hstack(data)
 
+    # Old and ready to delete after Paper I submission
     def dperi_first(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
         OLD METHOD:
@@ -679,6 +663,7 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    # optimized
     def dapo_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -723,40 +708,27 @@ class SummaryDataSort:
         # Set up an empty list to save values to
         data = []
         #
-        # Determines if working with sim or model data, then whether oversampling or not.
-        # Also masks values with no apocenter and sets them equal to d_max
-        if (selection == 'sim'):
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    temp_array = data_dict[name]['apocenter.dist.sim'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = np.max(data_dict[name]['dtot.sim'][mask_dict[name]][mask_temp], axis=1)
-                    data.append(temp_array)
-            #
-            elif oversample == True:
-                for name in self.host_names[hosts]:
-                    temp_array = data_dict[name]['apocenter.dist.sim'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = np.max(data_dict[name]['dtot.sim'][mask_dict[name]][mask_temp], axis=1)
-                    data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
+        # Quick label fix
+        if selection == 'model':
+            selection = 'galpy'
         #
-        elif (selection == 'model'):
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    temp_array = data_dict[name]['apocenter.dist.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = np.max(data_dict[name]['dtot.sim'][mask_dict[name]][mask_temp], axis=1)
-                    data.append(temp_array)
-            #
-            elif oversample == True:
-                for name in self.host_names[hosts]:
-                    temp_array = data_dict[name]['apocenter.dist.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = np.max(data_dict[name]['dtot.sim'][mask_dict[name]][mask_temp], axis=1)
-                    data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            # Select all recent apocenter values
+            temp_array = data_dict[name]['apocenter.dist.'+selection][mask_dict[name]][:,0]
+            # Mask out cases with null values
+            mask_temp = (temp_array == -1)
+            # For null cases, replace them with maximum distances the satellites experienced
+            temp_array[mask_temp] = np.max(data_dict[name]['dtot.sim'][mask_dict[name]][mask_temp], axis=1)
+            # Oversample if needed and append to the list
+            if oversample:
+                data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
+            else:
+                data.append(temp_array)
         #
         return np.hstack(data)
 
+    # optimized
     def delta_dperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -795,67 +767,39 @@ class SummaryDataSort:
               each host are arranged in the same way they were generated from
               summary_data.py or summary_data_dmo.py.
         """
+        # Initialize an empty list to save data to
         data = []
         #
-        # Check first if doing fractional differences, then check if oversampling
-        if fraction == False:
-            if oversample == False:
-                # Loop over each host
-                for name in self.host_names[hosts]:
-                    # Save the recent pericenters, and use present-day distances
-                    # for satellites that have not experienced pericenter yet
-                    temp_array_model = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array_model == -1)
-                    temp_array_model[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
-                    #
-                    temp_array_sim = data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array_sim == -1)
-                    temp_array_sim[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
-                    #
-                    # Append the difference between the model and simulation to the list
-                    data.append(temp_array_model - temp_array_sim)
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            # Save the most recent pericenters
+            temp_array_model = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
+            # If no pericenters, replace with present-day distances
+            mask_temp = (temp_array_model == -1)
+            temp_array_model[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
             #
-            elif oversample == True:
-                for name in self.host_names[hosts]:
-                    temp_array_model = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array_model == -1)
-                    temp_array_model[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
-                    #
-                    temp_array_sim = data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array_sim == -1)
-                    temp_array_sim[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
-                    #
+            temp_array_sim = data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0]
+            mask_temp = (temp_array_sim == -1)
+            temp_array_sim[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
+            #
+            # Determine what kind of difference, oversample if needed, and append to list
+            if fraction:
+                if oversample:
+                    data.append((np.repeat(temp_array_model, self.oversample[sim_type][name]) - \
+                                 np.repeat(temp_array_sim, self.oversample[sim_type][name]))\
+                                 /np.repeat(temp_array_sim, self.oversample[sim_type][name]))
+                else:
+                    data.append((temp_array_model - temp_array_sim)/temp_array_sim)
+            else:
+                if oversample:
                     data.append(np.repeat(temp_array_model,self.oversample[sim_type][name]) - \
                                  np.repeat(temp_array_sim,self.oversample[sim_type][name]))
+                else:
+                    data.append(temp_array_model - temp_array_sim)
         #
-        elif fraction == True:
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    temp_array_model = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array_model == -1)
-                    temp_array_model[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
-                    #
-                    temp_array_sim = data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array_sim == -1)
-                    temp_array_sim[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
-                    #
-                    data.append((temp_array_model - temp_array_sim)/temp_array_sim)
-            #
-            elif oversample == True:
-                for name in self.host_names[hosts]:
-                    temp_array_model = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array_model == -1)
-                    temp_array_model[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
-                    #
-                    temp_array_sim = data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array_sim == -1)
-                    temp_array_sim[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
-                    #
-                    data.append((np.repeat(temp_array_model,self.oversample[sim_type][name]) - \
-                                 np.repeat(temp_array_sim,self.oversample[sim_type][name]))\
-                                 /np.repeat(temp_array_sim,self.oversample[sim_type][name]))
         return np.hstack(data)
 
+    # Pick up again here for optimization
     def tperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
