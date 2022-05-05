@@ -44,8 +44,10 @@ directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/fina
 ### Generate all of the data for the plots below
 #
 # Fix for the outlier in the Mstar-Mhalo relation
-masks_infall['m12f'][59] = False
-masks_infall_peri['m12f'][59] = False
+#masks_infall['m12f'][59] = False ####### This is for the April 18th new data
+#masks_infall_peri['m12f'][59] = False
+masks_infall['m12f'][57] = False
+masks_infall_peri['m12f'][57] = False
 #
 N_sim_tot = summary.nperi(data_total, masks_infall, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon')
 d_sim_tot = summary.dperi_recent(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
@@ -105,7 +107,7 @@ f, ax1 = plt.subplots(1, 1, figsize=(10,8))
 colorss = ['#000080', '#006400']
 binedges = (8,12)
 binsize = 0.5
-limits=((7.9,11.5),(4,10))
+limits=((8.2,11.3),(4,10))
 #
 x = [np.log10(Mhalo_peak_tot)]
 y = [np.log10(Mstar_z0_tot)]
@@ -169,7 +171,7 @@ ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), 10**(uppers[0]), 10**(lowers[
 ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), 10**(highests[0]), 10**(lowests[0]), color=colorss[1], alpha=0.15)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax1.plot(10**(binss[0][:-1]+half_bins[0]), 10**(medians[0]), color=colorss[1], markersize=10, alpha=0.5, label='This work')
+ax1.plot(10**(binss[0][:-1]+half_bins[0]), 10**(medians[0]), color=colorss[1], markersize=10, alpha=0.9, label='This work')
 #
 ax1.set_xlim(10**(limits[0][0]), 10**(limits[0][1]))
 ax1.set_ylim(10**(limits[1][0]), 10**(limits[1][1]))
@@ -185,10 +187,10 @@ plt.hlines(y=3*10**4, xmin=10**(limits[0][0]), xmax=10**(limits[0][1]), colors='
 #
 ax1.set_xscale('log')
 ax1.set_yscale('log')
-ax1.set_xlabel('$M_{\\rm halo,peak}$ [$M_{\\odot}$]', fontsize=28)
-ax1.set_ylabel('$M_{\\rm star}$ [$M_{\\odot}$]', fontsize=28)
-ax1.legend(prop={'size': 18}, loc='best')
-ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
+ax1.set_xlabel('$M_{\\rm halo,peak}$ [$M_{\\odot}$]', fontsize=32)
+ax1.set_ylabel('$M_{\\rm star}$ [$M_{\\odot}$]', fontsize=32)
+ax1.legend(prop={'size': 22}, loc='best')
+ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28)
 plt.tight_layout()
 #plt.show()
 plt.savefig(directory+'/smhm_w_comparisons.pdf')
@@ -901,9 +903,11 @@ axs[2,2].set_xscale('log')
 axs[2,2].set_xlim(10**(limits_3[0][0]), 10**(limits_3[0][1]))
 axs[2,2].set_ylim(limits_3[1])
 #
+axs[0,2].xaxis.set_major_locator(LogLocator(base=10))
 axs[0,2].xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
 axs[1,2].xaxis.set_major_locator(LogLocator(base=10))
 axs[1,2].xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
+axs[2,2].xaxis.set_major_locator(LogLocator(base=10))
 axs[2,2].xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
 axs[2,2].set_xticks([1e4, 1e5, 1e6, 1e7, 1e8, 1e9])
 #
@@ -1330,7 +1334,7 @@ y = [N_sim_tot]
 #
 binsize = 1
 binedges = None
-limits = ((0,13),(0,14))
+limits = ((0,13),(0,10))
 #
 xtype = ['t.infall.text']
 ytype = ['N.peri.text']
@@ -1433,7 +1437,7 @@ mass_low = (Mstar_z0_tot < 10**(7))
 #
 binedges = None
 binsize = 50
-limits = ((0,400),(0,14))
+limits = ((0,400),(0,8))
 #
 x = [dz0_tot, dz0_tot[mass_low], dz0_tot[mass_high]]
 y = [N_sim_tot, N_sim_tot[mass_low], N_sim_tot[mass_high]]
@@ -1523,7 +1527,7 @@ x = [Mstar_z0_tot]
 y = [N_sim_tot]
 binedges = (4.5, 9.5)
 binsize = 0.5
-limits = ((4,9.5),(0,14))
+limits = ((4,9.5),(0,5))
 #
 xtype = ['M.star.z0']
 ytype = ['N.peri.text']
@@ -1604,14 +1608,15 @@ axs[0,2].set_ylim(limits[1])
         Pericenter distance versus t_infall
 """
 d_min_tot = summary.dperi_min(data_total, masks_infall_peri, oversample=True, hosts='all_no_z', sim_type='baryon')
-d_1st_tot = summary.dperi_first(data_total, masks_infall_peri, oversample=True, hosts='all_no_z', sim_type='baryon')
+#d_1st_tot = summary.dperi_first(data_total, masks_infall_peri, oversample=True, hosts='all_no_z', sim_type='baryon')
+d_sim_tot = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
 t_in_tot = summary.first_infall(data_total, masks_infall_peri, oversample=True, hosts='all_no_z', sim_type='baryon')
 binsize = 1
 binedges = None
-limits = ((0,13),(0,200))
+limits = ((0,13),(0,220))
 #
 x = [t_in_tot, t_in_tot]
-y = [d_min_tot, d_1st_tot]
+y = [d_sim_tot, d_min_tot]
 #
 xtype = ['t.infall.text','t.infall.text']
 ytype = ['d.peri.text','d.peri.text']
@@ -1668,12 +1673,14 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[1,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[0], alpha=0.3)
-axs[1,0].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[0], alpha=0.15)
+axs[1,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.3)
+axs[1,0].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.15)
+axs[1,0].fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color=colorss[0], alpha=0.3)
+axs[1,0].fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color=colorss[0], alpha=0.15)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[1,0].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[0], markersize=10, alpha=0.5, label='Minimum')
-axs[1,0].plot(binss[1][:-1]+half_bins[1], medians[1], color='k', linestyle='-.', markersize=10, alpha=0.8, label='First')
+axs[1,0].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.8, label='Recent')
+axs[1,0].plot(binss[1][:-1]+half_bins[1], medians[1], color=colorss[0], markersize=10, alpha=0.5, label='Minimum')
 #
 axs[1,0].set_xlim(limits[0])
 axs[1,0].set_ylim(limits[1])
@@ -1687,7 +1694,7 @@ dz0_tot = summary.d_z0(data_total, masks_infall_peri, oversample=True, hosts='al
 #
 binedges = None
 binsize = 50
-limits = ((0,400),(0,175))
+limits = ((0,400),(0,165))
 #
 x = [dz0_tot, dz0_tot]
 y = [d_sim_tot, d_min_tot]
@@ -1768,7 +1775,7 @@ Mstar_z0_tot = summary.mstar(data_total, masks_infall_peri, selection='z0', over
 #
 binedges = (4.5, 9.5)
 binsize = 0.5
-limits = ((4,9.5),(0,175))
+limits = ((4,9.5),(0,165))
 #
 x = [Mstar_z0_tot, Mstar_z0_tot]
 y = [d_sim_tot, d_min_tot]
@@ -1852,28 +1859,28 @@ axs[1,1].set_xlabel('Host distance $d$ [kpc]', fontsize=32)
 axs[1,2].set_xlabel('$M_{\\rm star} [M_{\\odot}]$', fontsize=32)
 axs[0,0].set_ylabel('Pericenter Number', fontsize=32)
 axs[1,0].set_ylabel('Pericenter distance [kpc]', fontsize=30)
-axs[0,0].get_yaxis().set_label_coords(-0.1,0.5)
-axs[1,0].get_yaxis().set_label_coords(-0.1,0.5)
+axs[0,0].get_yaxis().set_label_coords(-0.12,0.5)
+axs[1,0].get_yaxis().set_label_coords(-0.12,0.5)
 #
 axs[0,1].legend(prop={'size': 26}, loc='best')
 axs[1,0].legend(prop={'size': 26}, loc='best')
-axs[1,1].legend(prop={'size': 26}, loc='best')
-axs[1,2].legend(prop={'size': 26}, loc='best')
+#axs[1,1].legend(prop={'size': 26}, loc='best')
+#axs[1,2].legend(prop={'size': 26}, loc='best')
 #
 axs[0,2].xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
 axs[1,2].xaxis.set_major_locator(LogLocator(base=10))
 axs[1,2].xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
 axs[1,2].set_xticks([1e4, 1e5, 1e6, 1e7, 1e8, 1e9])
 #
-axs[0,0].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=26, labelbottom=False)
-axs[1,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26)
-axs[0,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26, labelbottom=False)
-axs[1,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26)
-axs[0,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26, labelbottom=False)
-axs[1,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26)
+axs[0,0].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=24, labelbottom=False)
+axs[1,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
+axs[0,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=False)
+axs[1,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
+axs[0,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=False)
+axs[1,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 #
 plt.tight_layout()
-plt.subplots_adjust(wspace=0.1, hspace=0)
+plt.subplots_adjust(wspace=0.12, hspace=0)
 #plt.show()
 plt.savefig(directory+'/peri_dn.pdf')
 
@@ -2218,8 +2225,8 @@ ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=c
 #
 # Plot the medians for the two mass bins (low-mass)
 ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='Total Sample')
-ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='$N_{\\rm peri}$ > 1, torqued')
-ax1.plot(10**(binss[2][:-1]+half_bins[2]), medians[2], color=colorss[2], markersize=10, alpha=0.5, label='$N_{\\rm peri}$ > 1, non-torqued')
+ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='$N_{\\rm peri}$ > 1, growing pericenters')
+ax1.plot(10**(binss[2][:-1]+half_bins[2]), medians[2], color=colorss[2], markersize=10, alpha=0.5, label='$N_{\\rm peri}$ > 1, shrinking pericenters')
 #
 ax1.set_xscale('log')
 ax1.set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
@@ -2574,33 +2581,6 @@ plt.savefig(directory+'/outlier_props_vs_mstar_2.pdf')
 
 """
     Figure A1:
-        Infall time versus Mstar, for Isolated versus Paired satellites
-"""
-### Generate all of the data for the plots below
-data_total_iso = summary.data_read(directory=sim_data.home_dir, hosts='iso_no_z', sim_type='baryon')
-masks_infall_iso = summary.data_mask(data_total_iso, peri_sim=False, peri_model=False, hosts='iso_no_z')
-masks_infall_iso['m12f'][57] = False
-#
-t_in_iso = summary.first_infall(data_total_iso, masks_infall_iso, oversample=True, hosts='iso_no_z', sim_type='baryon')
-Mstar_z0_iso = summary.mstar(data_total_iso, masks_infall_iso, selection='z0', oversample=True, hosts='iso_no_z', sim_type='baryon')
-#
-data_total_lg = summary.data_read(directory=sim_data.home_dir, hosts='lg', sim_type='baryon')
-masks_infall_lg = summary.data_mask(data_total_lg, peri_sim=False, peri_model=False, hosts='lg')
-#
-t_in_lg = summary.first_infall(data_total_lg, masks_infall_lg, oversample=True, hosts='lg', sim_type='baryon')
-Mstar_z0_lg = summary.mstar(data_total_lg, masks_infall_lg, selection='z0', oversample=True, hosts='lg', sim_type='baryon')
-#
-summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_in_iso, t_in_lg], xtype=['M.star.z0','M.star.z0'], ytype=['t.infall.text','t.infall.text'], labels=['Isolated', 'Paired'], binsize=1, binedges=(4,10), limits=((4,9.5),(0,11)), file_path_and_name=directory+'/iso_vs_lg_infall.pdf')
-
-
-################################################################################
-
-
-################################################################################
-
-
-"""
-    Figure B1:
         Dynamics versus Mhalo
 """
 data_total_all = summary.data_read(directory=sim_data.home_dir, hosts='all_no_z', sim_type='all_baryon')
@@ -2869,7 +2849,7 @@ plt.savefig(directory+'/dynamics_vs_mhalo.pdf')
 
 
 """
-    Figure B2:
+    Figure A2:
         Pericenter time and Infall time versus Mhalo
 """
 t_in_tot_all = summary.first_infall(data_total_all, masks_infall_all, oversample=True, hosts='all_no_z', sim_type='baryon_all')
@@ -3101,7 +3081,7 @@ plt.savefig(directory+'/times_vs_mhalo.pdf')
 
 
 """
-    Figure B3:
+    Figure A3:
         Pericenter number versus Mhalo
 """
 N_sim_tot_all = summary.nperi(data_total_all, masks_infall_all, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon_all')
@@ -3210,7 +3190,7 @@ plt.savefig(directory+'/nperi_vs_mhalo.pdf')
 
 
 """
-    Figure C1:
+    Figure B1:
         DMO versus Baryonic comparison
 """
 data_total_all = summary.data_read(directory=sim_data.home_dir, hosts='iso_no_z', sim_type='all_baryon')
@@ -3706,6 +3686,26 @@ plt.savefig(directory+'/L_tot_comparison.pdf')
 
 
 
+"""
+    Figure A1:
+        OLD
+        Infall time versus Mstar, for Isolated versus Paired satellites
+"""
+### Generate all of the data for the plots below
+data_total_iso = summary.data_read(directory=sim_data.home_dir, hosts='iso_no_z', sim_type='baryon')
+masks_infall_iso = summary.data_mask(data_total_iso, peri_sim=False, peri_model=False, hosts='iso_no_z')
+masks_infall_iso['m12f'][57] = False
+#
+t_in_iso = summary.first_infall(data_total_iso, masks_infall_iso, oversample=True, hosts='iso_no_z', sim_type='baryon')
+Mstar_z0_iso = summary.mstar(data_total_iso, masks_infall_iso, selection='z0', oversample=True, hosts='iso_no_z', sim_type='baryon')
+#
+data_total_lg = summary.data_read(directory=sim_data.home_dir, hosts='lg', sim_type='baryon')
+masks_infall_lg = summary.data_mask(data_total_lg, peri_sim=False, peri_model=False, hosts='lg')
+#
+t_in_lg = summary.first_infall(data_total_lg, masks_infall_lg, oversample=True, hosts='lg', sim_type='baryon')
+Mstar_z0_lg = summary.mstar(data_total_lg, masks_infall_lg, selection='z0', oversample=True, hosts='lg', sim_type='baryon')
+#
+summary_plot.median_plot_mult(x=[Mstar_z0_iso, Mstar_z0_lg], y=[t_in_iso, t_in_lg], xtype=['M.star.z0','M.star.z0'], ytype=['t.infall.text','t.infall.text'], labels=['Isolated', 'Paired'], binsize=1, binedges=(4,10), limits=((4,9.5),(0,11)), file_path_and_name=directory+'/iso_vs_lg_infall.pdf')
 
 
 
