@@ -100,8 +100,8 @@ class SummaryDataSort:
         # Given the type of data you want, read in from the appropriate directory
         if sim_type == 'baryon':
             for name in self.host_names[hosts]:
-                #data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/apr18_new/data_'+name, verbose=True)
-                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/apr18_new/data_'+name, verbose=True)
+                #data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
                 data_dict[name] = data
         #
         elif sim_type == 'all_baryon':
@@ -799,7 +799,7 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # Pick up again here for optimization
+    # optimized
     def tperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -841,433 +841,867 @@ class SummaryDataSort:
         # Set up an empty list to save the data to
         data = []
         #
-        # Work with either the sim or model data, and determine whether or not oversampling
-        if (selection == 'sim'):
-            if oversample == False:
-                # Loop through each host and save values to the empty list
-                for name in self.host_names[hosts]:
-                    temp_array = data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = 0.0
-                    data.append(temp_array)
-            #
-            elif oversample == True:
-                for name in self.host_names[hosts]:
-                    temp_array = data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = 0.0
-                    data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
+        # Quick label fix
+        if selection == 'model':
+            selection = 'galpy'
         #
-        elif (selection == 'model'):
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    temp_array = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = 0.0
-                    data.append(temp_array)
-            #
-            elif oversample == True:
-                for name in self.host_names[hosts]:
-                    temp_array = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array == -1)
-                    temp_array[mask_temp] = 0.0
-                    data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            # Get the most recent pericenter lookback time
+            temp_array = data_dict[name]['pericenter.time.lb.'+selection][mask_dict[name]][:,0]
+            # Mask out the null values
+            mask_temp = (temp_array == -1)
+            # If no pericenter, set the lookback time to present-day
+            temp_array[mask_temp] = 0.0
+            # Oversample if needed and append to the list
+            if oversample:
+                data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
+            else:
+                data.append(temp_array)
         #
         return np.hstack(data)
 
+    # optimized
     def tperi_min(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
+        """
+        DESCRIPTION:
+            Groups the lookback times of the minimum pericenter a subhalo experienced
+            in the simulation into one array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
+            - If a subhalo has not experienced a pericenter, sets the most recent
+              pericenter time equal to 0 Gyr, i.e. present-day.
+        """
+        # Set up an empty list to save the data to
         data = []
-        if oversample == False:
-            count = 0
-            #
-            for name in self.host_names[hosts]:
-                for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
-                    mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
-                    #
-                    if np.sum(mask_temp) == 0:
-                        data.append(0.0)
-                    #
+        #
+        # Loop through each host galaxy
+        for name in self.host_names[hosts]:
+            # Loop through each subhalo
+            for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
+                # Mask out the null values
+                mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
+                # If there are no pericenters, set the lookback time to present-day, oversample if needed and append to the list
+                if np.sum(mask_temp) == 0:
+                    if oversample:
+                        data.append(np.repeat(0.0, self.oversample[sim_type][name]))
                     else:
-                        index = np.where(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]) \
-                                         == data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp])[0][0]
+                        data.append(0.0)
+                #
+                # If there pericenters, find the minimum, select the time, oversample if needed and append to the list
+                else:
+                    index = np.where(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]) \
+                                     == data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp])[0][0]
+                    if oversample:
+                        data.append(np.repeat(data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][i][mask_temp][index], self.oversample[sim_type][name]))
+                    else:
                         data.append(data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][i][mask_temp][index])
         #
-        elif oversample == True:
-            for name in self.host_names[hosts]:
-                for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
-                    mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
-                    #
-                    if np.sum(mask_temp) == 0:
-                        data.append(np.repeat(0.0, self.oversample[sim_type][name]))
-                    #
-                    else:
-                        index = np.where(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]) \
-                                         == data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp])[0][0]
-                        data.append(np.repeat(data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][i][mask_temp][index], self.oversample[sim_type][name]))
-        #
         return np.hstack(data)
 
-    # Pick up again here for documentation...
-    def delta_tperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all', sim_type='baryon'):
+    # optimized
+    def delta_tperi_new(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all', sim_type='baryon'):
         """
-        TBD
+        DESCRIPTION:
+            Similar to delta_nperi(), except calculates the difference in
+            pericenter lookback times between the model and the simulation.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            fraction   : boolean
+                         Set to True if interested in fractional difference in
+                         pericenter lookback times.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - This only calculates the time difference between the MOST RECENT
+              pericenter events.
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
         """
+        # Set up an empty list to save data to
         data = []
         #
-        if fraction == False:
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    temp_array_model = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array_model == -1)
-                    temp_array_model[mask_temp] = 0.0
-                    #
-                    temp_array_sim = data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array_sim == -1)
-                    temp_array_sim[mask_temp] = 0.0
-                    #
-                    data.append(temp_array_model - temp_array_sim)
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            # Save data from the model to a temporary array
+            temp_array_model = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
+            # Mask out null values
+            mask_temp = (temp_array_model == -1)
+            # Set null values to present-day
+            temp_array_model[mask_temp] = 0.0
             #
-            elif oversample == True:
-                for name in self.host_names[hosts]:
-                    temp_array_model = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array_model == -1)
-                    temp_array_model[mask_temp] = 0.0
-                    #
-                    temp_array_sim = data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array_sim == -1)
-                    temp_array_sim[mask_temp] = 0.0
-                    #
-                    data.append(np.repeat(temp_array_model,self.oversample[sim_type][name]) - \
-                                 np.repeat(temp_array_sim,self.oversample[sim_type][name]))
-        #
-        elif fraction == True:
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    temp_array_model = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array_model == -1)
-                    temp_array_model[mask_temp] = 0.0
-                    #
-                    temp_array_sim = data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array_sim == -1)
-                    temp_array_sim[mask_temp] = 0.0
-                    #
-                    ratio = (temp_array_model - temp_array_sim)/temp_array_sim
-                    ratio[~np.isfinite(ratio)] = 0
-                    data.append(ratio)
+            # Repeat for the simulation
+            temp_array_sim = data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0]
+            mask_temp = (temp_array_sim == -1)
+            temp_array_sim[mask_temp] = 0.0
             #
-            elif oversample == True:
-                for name in self.host_names[hosts]:
-                    temp_array_model = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array_model == -1)
-                    temp_array_model[mask_temp] = 0.0
-                    #
-                    temp_array_sim = data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0]
-                    mask_temp = (temp_array_sim == -1)
-                    temp_array_sim[mask_temp] = 0.0
-                    #
+            # If fractional difference, oversample if needed
+            if fraction:
+                if oversample:
                     ratio = (np.repeat(temp_array_model,self.oversample[sim_type][name]) - \
                                  np.repeat(temp_array_sim,self.oversample[sim_type][name]))\
                                  /np.repeat(temp_array_sim,self.oversample[sim_type][name])
+                    # For cases where the lookback time is present-day, set the fraction to present-day
+                    # i.e., do not save infinite values
                     ratio[~np.isfinite(ratio)] = 0
                     data.append(ratio)
+                else:
+                    ratio = (temp_array_model - temp_array_sim)/temp_array_sim
+                    ratio[~np.isfinite(ratio)] = 0
+                    data.append(ratio)
+            # If not interested in fractional difference, oversample if needed and save data to array
+            else:
+                if oversample:
+                    data.append(np.repeat(temp_array_model,self.oversample[sim_type][name]) - \
+                                 np.repeat(temp_array_sim,self.oversample[sim_type][name]))
+                else:
+                    data.append(temp_array_model - temp_array_sim)
+        #
         return np.hstack(data)
 
+    # optimized
     def first_infall(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
-        TBD
+        DESCRIPTION:
+            Groups the lookback times of satellite first infall into their MW-mass
+            host together into one array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
         """
+        # Set up empty array to save to
         data = []
         #
-        if oversample == False:
-            for name in self.host_names[hosts]:
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            # Oversample if needed and save to the list
+            if oversample:
+                data.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]], self.oversample[sim_type][name]))
+            else:
                 data.append(data_dict[name]['first.infall.time.lb'][mask_dict[name]])
         #
-        elif oversample == True:
-            for name in self.host_names[hosts]:
-                data.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]], self.oversample[sim_type][name]))
-        #
         return np.hstack(data)
 
+    # optimized ; could probably absorb this into the method above eventually
     def first_infall_any(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
-        TBD
+        DESCRIPTION:
+            Groups the lookback times of satellite first infall into ANY more
+            massive halo together into one array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
         """
+        # Set up empty array to save to
         data = []
         #
-        if oversample == False:
-            for name in self.host_names[hosts]:
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            # Oversample if needed and save to list
+            if oversample:
+                data.append(np.repeat(data_dict[name]['first.infall.time.lb.any'][mask_dict[name]], self.oversample[sim_type][name]))
+            else:
                 data.append(data_dict[name]['first.infall.time.lb.any'][mask_dict[name]])
         #
-        elif oversample == True:
-            for name in self.host_names[hosts]:
-                data.append(np.repeat(data_dict[name]['first.infall.time.lb.any'][mask_dict[name]], self.oversample[sim_type][name]))
-        #
         return np.hstack(data)
 
+    # optimized
     def mstar(self, data_dict, mask_dict, selection='z0', oversample=False, hosts='all', sim_type='baryon'):
         """
-        TBD
+        DESCRIPTION:
+            Groups the peak or present-day satellite stellar masses together
+            into one array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            selection  : string
+                         Choose either 'peak' for the peak stellar mass, or 'z0'
+                         for the present-day stellar mass.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
         """
+        # Set up empty array to save data to
         data = []
         #
-        if selection == 'z0':
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    data.append(data_dict[name]['Mstar.z0'][mask_dict[name]])
-            #
-            elif oversample == True:
-                for name in self.host_names[hosts]:
-                    data.append(np.repeat(data_dict[name]['Mstar.z0'][mask_dict[name]], self.oversample[sim_type][name]))
-        #
-        elif selection == 'peak':
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    data.append(data_dict[name]['Mstar.peak'][mask_dict[name]])
-            #
-            elif oversample == True:
-                for name in self.host_names[hosts]:
-                    data.append(np.repeat(data_dict[name]['Mstar.peak'][mask_dict[name]], self.oversample[sim_type][name]))
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            # Oversample if needed and append to list
+            if oversample:
+                data.append(np.repeat(data_dict[name]['Mstar.'+selection][mask_dict[name]], self.oversample[sim_type][name]))
+            else:
+                data.append(data_dict[name]['Mstar.'+selection][mask_dict[name]])
         #
         return np.hstack(data)
 
+    # optimized
     def mhalo(self, data_dict, mask_dict, selection='z0', oversample=False, hosts='all', sim_type='baryon'):
         """
-        TBD
+        DESCRIPTION:
+            Groups the peak or present-day satellite halo masses together
+            into one array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            selection  : string
+                         Choose either 'peak' for the peak stellar mass, or 'z0'
+                         for the present-day stellar mass.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
         """
+        # Set up empty list to save to
         data = []
         #
-        if selection == 'z0':
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    data.append(data_dict[name]['Mhalo.z0'][mask_dict[name]])
-            #
-            elif oversample == True:
-                for name in self.host_names[hosts]:
-                    data.append(np.repeat(data_dict[name]['Mhalo.z0'][mask_dict[name]], self.oversample[sim_type][name]))
-        #
-        elif selection == 'peak':
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    data.append(data_dict[name]['Mhalo.peak'][mask_dict[name]])
-            #
-            elif oversample == True:
-                for name in self.host_names[hosts]:
-                    data.append(np.repeat(data_dict[name]['Mhalo.peak'][mask_dict[name]], self.oversample[sim_type][name]))
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            # Oversample if needed and append to list
+            if oversample:
+                data.append(np.repeat(data_dict[name]['Mhalo.'+selection][mask_dict[name]], self.oversample[sim_type][name]))
+            else:
+                data.append(data_dict[name]['Mhalo.'+selection][mask_dict[name]])
         #
         return np.hstack(data)
 
+    # optimized
     def d_z0(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
-        TBD
+        DESCRIPTION:
+            Get the present-day 1D satellite distances and save them in an array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
         """
+        # Set up empty list to save to
         data = []
         #
-        if oversample == False:
-            for name in self.host_names[hosts]:
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            # Oversample if needed and append to list
+            if oversample:
+                data.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
+            else:
                 data.append(data_dict[name]['dtot.sim'][mask_dict[name]][:,0])
         #
-        elif oversample == True:
-            for name in self.host_names[hosts]:
-                data.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
-        #
         return np.hstack(data)
 
+    # optimized, update once data is re-run and absorb velocities() method here
     def v_z0(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
-        TBD
+        DESCRIPTION:
+            Get the present-day total/scalar velocities and save them in an array.
+            ** I don't really use this metric in Paper I, worth deciding on if
+               I should keep it or not **
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
+              ** Should just add a "selection = tot/tan/rad" option and get rid
+                 of velocities() function below. Requires me to re-name the
+                 vtot property key name
         """
+        # Set up empty list to save to
         data = []
         #
-        if oversample == False:
-            for name in self.host_names[hosts]:
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            # Oversample if needed and append to list
+            if oversample:
+                data.append(np.repeat(data_dict[name]['vtot.sim'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
+            else:
                 data.append(data_dict[name]['vtot.sim'][mask_dict[name]][:,0])
         #
-        elif oversample == True:
-            for name in self.host_names[hosts]:
-                data.append(np.repeat(data_dict[name]['vtot.sim'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
-        #
         return np.hstack(data)
 
+    # optimized
     def potential(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon', norm='potential'):
         """
-        TBD
+        DESCRIPTION:
+            Groups the satellite potentials into an array and normalizes them.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read_potential()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+            norm       : string
+                         Choose which type of normalization you want to apply
+                         to the data. "potential" will normalize the subhalos
+                         by simply subtracting the host potential at R200m from
+                         the subhalo values. "kinetic" will normalize them such
+                         that their total energy is 0 at the host R200m
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
+            - Note that there are two different types of normalization; I only
+              used the "kinetic" version in Paper I
+            - Not all host galaxies have potential data. I usually use the
+              hosts='all_energy' selection of hosts, which excludes m12z and R&R
+            ** Should maybe point to screenshot I have of how I normalize in the
+               kinetic scheme; or just explain it more here **
         """
+        # Set up an empty list to save to
         data = []
         #
-        if oversample == False:
-            for name in self.host_names[hosts]:
-                if norm == 'potential':
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            # Determine which normalization, oversample if needed, and append data to list
+            if norm == 'potential':
+                if oversample:
+                    data.append(np.repeat(data_dict[name]['subhalo.potential'][mask_dict[name]]-data_dict[name]['host.potential.R200m'], self.oversample[sim_type][name]))
+                else:
                     data.append(data_dict[name]['subhalo.potential'][mask_dict[name]]-data_dict[name]['host.potential.R200m'])
-                elif norm == 'kinetic':
-                    k = (-1)*data_dict[name]['host.potential.R200m']-data_dict[name]['KE.at.Rvir']
+            elif norm == 'kinetic':
+                k = (-1)*data_dict[name]['host.potential.R200m']-data_dict[name]['KE.at.Rvir']
+                if oversample:
+                    data.append(np.repeat(data_dict[name]['subhalo.potential'][mask_dict[name]]+k, self.oversample[sim_type][name]))
+                else:
                     data.append(data_dict[name]['subhalo.potential'][mask_dict[name]]+k)
         #
-        elif oversample == True:
-            for name in self.host_names[hosts]:
-                if norm == 'potential':
-                    data.append(np.repeat(data_dict[name]['subhalo.potential'][mask_dict[name]]-data_dict[name]['host.potential.R200m'], self.oversample[sim_type][name]))
-                elif norm == 'kinetic':
-                    k = (-1)*data_dict[name]['host.potential.R200m']-data_dict[name]['KE.at.Rvir']
-                    data.append(np.repeat(data_dict[name]['subhalo.potential'][mask_dict[name]]+k, self.oversample[sim_type][name]))
-        #
         return np.hstack(data)
 
+    # optimized
     def kinetic_energy(self, data_dict, mask_dict, ke_type, oversample=False, hosts='all', sim_type='baryon'):
+        """
+        DESCRIPTION:
+            Calculates the kinetic energies of the satellites based on a few
+            different selections, and groups them together into an array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read_potential()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            ke_type    : string
+                         Type of kinetic energy you want. 'z0' is the present-day
+                         kinetic energy, 'max' is the maximum kinetic energy a
+                         satellite experienced, and 'peri' is the kinetic energy
+                         at the most recent pericenter.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
+            - Note that there are three different types of kinetic energy; I only
+              used the "z0" version in Paper I
+            - In Paper I, I only selected the 'all_energy' hosts because I used
+              kinetic energy to find the total energy, and not all hosts had
+              values for the satellite potential energy.
+        """
+        # Set up empty list to save to
         data = []
         #
-        if ke_type == 'max':
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    for i in range(0, len(data_dict[name]['vtot.sim'][mask_dict[name]])):
-                        data.append(np.nanmax(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i]**2))
-            else:
-                for name in self.host_names[hosts]:
-                    for i in range(0, len(data_dict[name]['vtot.sim'][mask_dict[name]])):
+        # Loop through all hosts
+        for name in self.host_names[hosts]:
+            # Determine type of kinetic energy
+            if ke_type == 'max':
+                # Loop through each satellite
+                for i in range(0, len(data_dict[name]['vtot.sim'][mask_dict[name]])):
+                    if oversample:
                         data.append(np.repeat(np.nanmax(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i]**2), self.oversample[sim_type][name]))
-        #
-        elif ke_type == 'z0':
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    data.append(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][:,0]**2)
-            else:
-                for name in self.host_names[hosts]:
-                    data.append(np.repeat(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][:,0]**2, self.oversample[sim_type][name]))
-        #
-        elif ke_type == 'peri':
-            if oversample == False:
-                for name in self.host_names[hosts]:
-                    for i in range(0, len(data_dict[name]['pericenter.vel.sim'][mask_dict[name]])):
-                        if (data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0] == -1):
-                            data.append(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i][0]**2)
-                        else:
-                            data.append(0.5*data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0]**2)
-            else:
-                for name in self.host_names[hosts]:
-                    for i in range(0, len(data_dict[name]['pericenter.vel.sim'][mask_dict[name]])):
-                        if (data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0] == -1):
+                    else:
+                        data.append(np.nanmax(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i]**2))
+            #
+            # If you want KE at pericenter, get data at most recent pericenter
+            elif ke_type == 'peri':
+                for i in range(0, len(data_dict[name]['pericenter.vel.sim'][mask_dict[name]])):
+                    if (data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0] == -1):
+                        if oversample:
                             data.append(np.repeat(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i][0]**2, self.oversample[sim_type][name]))
                         else:
+                            data.append(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i][0]**2)
+                    else:
+                        if oversample:
                             data.append(np.repeat(0.5*data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0]**2, self.oversample[sim_type][name]))
+                        else:
+                            data.append(0.5*data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0]**2)
+            #
+            # If present-day KE, select present-day velocity, oversample if needed, and append to list
+            elif ke_type == 'z0':
+                if oversample:
+                    data.append(np.repeat(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][:,0]**2, self.oversample[sim_type][name]))
+                else:
+                    data.append(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][:,0]**2)
         #
         return np.hstack(data)
 
+    # optimized, but still needs a lot of work.
     def mass_masking_property(self, data_dict, mask_dict, prop, mass_array, mass_type='Mstar.z0', oversample=False, hosts='all', sim_type='baryon'):
         """
-        STILL NEEDS A LOT OF WORK AND CHECKING...
+        DESCRIPTION:
+            Takes a mass array and saves a property of interest in a dictionary
+            where each entry in the dictionary are the properties for galaxies
+            that fall in the mass bins supplied by the mass array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read().
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            prop       : string
+                         Property that you want to save to a dictionary.
+                         Only takes one property.
+                         The properties that you can select are the keys in
+                         data_dict. See orbit_io.py for the output properties
+                         that are saved in data_dict().
+
+            mass_array : 1D array
+                         Numpy array of mass values that are the bin edges for which
+                         you want to select galaxies.
+
+            mass_type  : string
+                         The mass type you are selecting the galaxies by. Can be
+                         stellar or halo mass, and either present-day or peak
+                         values.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a dictionary.
+            - Each key in the dictionary corresponds to one of the mass bins.
+              There are len(mass_array)-1 bins, and dictionary keys, total.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py. However, only galaxies that
+              fall in the mass bins are saved.
+              ** This is still very much so a work in progress! I have not written
+                 this to account for all properties. Especially properties in
+                 data_dict, which is an array for each satellite. I have not
+                 yet thought about how to best account for those.
         """
+        # Set up an empty dictionary to save to
         props = dict()
-        prop_low = []
-        prop_mid = []
         #
-        if oversample == False:
+        # Loop through the mass bins
+        for i in range(0, len(mass_array)-1):
+            # Set up empty list to save data to
+            prop_list = []
+            # Loop through each of the hosts
             for name in self.host_names[hosts]:
-                mask_low = ((data_dict[name][mass_type][mask_dict[name]] > mass_array[0])*(data_dict[name][mass_type][mask_dict[name]] < mass_array[1]))
-                mask_mid = (data_dict[name][mass_type][mask_dict[name]] > mass_array[1])
-                if prop == 't.infall':
-                    prop_low.append(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_low])
-                    prop_mid.append(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_mid])
-                elif prop == 'dz0':
-                    prop_low.append(data_dict[name]['dtot.sim'][mask_dict[name]][mask_low][:,0])
-                    prop_mid.append(data_dict[name]['dtot.sim'][mask_dict[name]][mask_mid][:,0])
+                # Select satellites within the mass bin
+                prop_mask = ((data_dict[name][mass_type][mask_dict[name]] > mass_array[i])*(data_dict[name][mass_type][mask_dict[name]] < mass_array[i+1]))
+                # Oversample if needed and save data to list
+                if oversample:
+                    prop_list.append(np.repeat(data_dict[name][prop][mask_dict[name]][prop_mask], self.oversample[sim_type][name]))
+                else:
+                    prop_list.append(data_dict[name][prop][mask_dict[name]][prop_mask])
             #
-            props['low'] = np.hstack(prop_low)
-            props['mid'] = np.hstack(prop_mid)
-        #
-        elif oversample == True:
-            for name in self.host_names[hosts]:
-                mask_low = ((data_dict[name][mass_type][mask_dict[name]] > mass_array[0])*(data_dict[name][mass_type][mask_dict[name]] < mass_array[1]))
-                mask_mid = (data_dict[name][mass_type][mask_dict[name]] > mass_array[1])
-                if prop == 't.infall':
-                    prop_low.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_low], self.oversample[sim_type][name]))
-                    prop_mid.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]][mask_mid], self.oversample[sim_type][name]))
-                elif prop == 'dz0':
-                    prop_low.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_low][:,0], self.oversample[sim_type][name]))
-                    prop_mid.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][mask_mid][:,0], self.oversample[sim_type][name]))
-            #
-            props['low'] = np.hstack(prop_low)
-            props['mid'] = np.hstack(prop_mid)
+            # Save the galaxies in the mass bin to the dictionary
+            props['bin.'+str(i+1)] = np.hstack(prop_list)
         #
         return props
 
+    # optimized, but will get rid of and absorb into v_z0 function...
     def velocities(self, data_dict, mask_dict, selection='tan', oversample=False, hosts='all', sim_type='baryon'):
         """
         Only works with the simulation data right now, not the model data...
 
         selection = rad or tan
+
+        Only saves the z = 0 value
         """
+        # Set up empty array to save data to
         data = []
         #
-        if oversample == False:
-            for name in self.host_names[hosts]:
-                data.append(data_dict[name]['v.'+selection+'.z0'][mask_dict[name]])
-        #
-        elif oversample == True:
-            for name in self.host_names[hosts]:
-                data.append(np.repeat(data_dict[name]['v.'+selection+'.z0'][mask_dict[name]], self.oversample[sim_type][name]))
+        # Loop over each host
+        for name in self.host_names[hosts]:
+            # oversample if needed and append data to list
+            if oversample:
+                data.append(np.repeat(data_dict[name]['v.'+selection+'.sim'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
+            else:
+                data.append(data_dict[name]['v.'+selection+'.sim'][mask_dict[name]][:,0])
         #
         return np.hstack(data)
 
+    # optimized
     def L_z0(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
-        Only works with the simulation data right now, not the model data...
+        DESCRIPTION:
+            Get the present-day specific angular momentum for satellite galaxies
+            and save them in an array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            selection  : string
+                         Select whether you want simulation or model data.
+                          ** Right now, only works with simulation data... **
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
+              ** Only works with the simulation data right now, but in time, I
+                 will adapt this to work with the model data **
         """
+        # Set up empty list to save data to
         data = []
         #
-        if oversample == False:
-            for name in self.host_names[hosts]:
-                data.append(data_dict[name]['Ltot.sim'][mask_dict[name]][:,0])
-        #
-        elif oversample == True:
-            for name in self.host_names[hosts]:
-                data.append(np.repeat(data_dict[name]['Ltot.sim'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            # Oversample if needed and append data to list
+            if oversample:
+                data.append(np.repeat(data_dict[name]['Ltot.'+selection][mask_dict[name]][:,0], self.oversample[sim_type][name]))
+            else:
+                data.append(data_dict[name]['Ltot.'+selection][mask_dict[name]][:,0])
         #
         return np.hstack(data)
 
+    # optimized
     def L_rec(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
-        Only works with the simulation data right now, not the model data...
+        DESCRIPTION:
+            Groups the specific angular momenta of satellites at their most recent
+            pericenters, either in the simulation or model, together into one array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            selection  : string
+                         Choose whether you want values from simulation data or
+                         data from the model.
+                         ** Right now, only works with simulation data **
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
+            - Only works if there are actual pericenters, will not work on all
+              satellites.
+              ** Only works with the simulation data right now, not the model
+                 data... **
         """
+        # Set up empty list to save to
         data = []
         #
-        if oversample == False:
-            for name in self.host_names[hosts]:
-                data.append(data_dict[name]['L.at.peri'][mask_dict[name]][:,0])
-        #
-        elif oversample == True:
-            for name in self.host_names[hosts]:
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            # Oversample if needed and append data to list
+            if oversample:
                 data.append(np.repeat(data_dict[name]['L.at.peri'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
+            else:
+                data.append(data_dict[name]['L.at.peri'][mask_dict[name]][:,0])
         #
         return np.hstack(data)
 
+    # optimized
     def L_min(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
-        Only works with the simulation data right now, not the model data...
+        DESCRIPTION:
+            Groups the specific angular momenta of satellites at their minimum
+            pericenters, either in the simulation or model, together into one array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            selection  : string
+                         Choose whether you want values from simulation data or
+                         data from the model.
+                         ** Right now, only works with simulation data **
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
+            - Only works if there are actual pericenters, will not work on all
+              satellites.
+              ** Only works with the simulation data right now, not the model
+                 data... **
         """
+        # Set up empty list to save data to
         data = []
         #
-        if oversample == False:
-            for name in self.host_names[hosts]:
-                for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
-                    mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
-                    #
-                    if np.sum(mask_temp) == 0:
-                        data.append(data_dict[name]['Ltot.sim'][mask_dict[name]][i][0])
-                    #
-                    else:
-                        index = np.where(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]) == data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp])[0]
-                        data.append(data_dict[name]['L.at.peri'][mask_dict[name]][i][index])
-        #
-        elif oversample == True:
-            for name in self.host_names[hosts]:
-                for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
-                    mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
-                    #
-                    if np.sum(mask_temp) == 0:
-                        data.append(np.repeat(data_dict[name]['Ltot.sim'][mask_dict[name]][i][0], self.oversample[sim_type][name]))
-                    #
-                    else:
-                        index = np.where(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]) == data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp])[0]
-                        data.append(np.repeat(data_dict[name]['L.at.peri'][mask_dict[name]][i][index], self.oversample[sim_type][name]))
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            # Loop through each satellite
+            for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
+                mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
+                # Find the index in the array of pericenters for each satellite
+                # that corresponds to the minimum pericenter
+                index = np.where(np.min(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp]) == data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp])[0]
+                # Oversample if needed and save the data to the list
+                if oversample:
+                    data.append(np.repeat(data_dict[name]['L.at.peri'][mask_dict[name]][i][mask_temp][index], self.oversample[sim_type][name]))
+                else:
+                    data.append(data_dict[name]['L.at.peri'][mask_dict[name]][i][mask_temp][index])
         #
         return np.hstack(data)
 
@@ -2153,7 +2587,7 @@ class SummaryDataPlot(SummaryDataSort):
               is set to.
         """
         if pdf:
-            y_label = 'PDF'
+            y_label = 'Probability'
         else:
             y_label = 'N'
         #
