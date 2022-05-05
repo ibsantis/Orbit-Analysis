@@ -1,40 +1,42 @@
 #!/usr/bin/python3
 
 """
-Intended for use with the FIRE-2 simulations
 
-@author: Isaiah Santistevan <ibsantistevan@ucdavis.edu>
+    Intended for use with the FIRE-2 simulations.
 
-This package contains multiple classes designed to ultimately calculate orbit
-parameters of simulated satellite galaxies. Below is a brief description of the
-various classes included:
+    @author: Isaiah Santistevan <ibsantistevan@ucdavis.edu>
 
-OrbitRead:
-    - Defines the home and simulation directories, sets the number of host galaxies,
-      and reads in the potential profile fitting data for Galpy.
-        [Need to adopt this into my actual code...]
+    This package contains multiple classes designed to ultimately calculate orbit
+    parameters of simulated satellite galaxies. Below is a brief description of the
+    various classes included:
 
-OrbitAnalysis:
-    - Applies a selection function to the satellites. Satellites at z = 0 must
-      have:
-        - low-resolution DM mass fractions < 2%
-        - Mstar > 3e4 (if working with luminous satellites)
-        - Mpeak > 1e8 (if working with any satellite)
-        - Mpeak * (1-f_baryon) > 1e8 (if working with DMO simulations)
-      Then, saves their indices across all time
-    - Methods included in this class calculate a variety of orbital properties
+    OrbitRead:
+        - Defines the home and simulation directories, sets the number of host galaxies,
+          and reads in the potential profile fitting data for Galpy.
+            [Need to adopt this into my actual code...]
 
-OrbitGalpy:
-    - Similar to OrbitAnalysis, includes methods to calculate orbtial properties
-      of satellites integrated with Galpy.
-    - Selects 6D ICs from a simulation for the satellites of interest, creates
-      orbit instances to be used in Galpy.
-    - Finally, does a check to see whether or not a satellite nears a "pole",
-      which could cause numerical problems in Galpy.
+    OrbitAnalysis:
+        - Applies a selection function to the satellites. Satellites at z = 0 must
+          have:
+            - low-resolution DM mass fractions < 2%
+            - Mstar > 3e4 (if working with luminous satellites)
+            - Mpeak > 1e8 (if working with any satellite)
+            - Mpeak * (1-f_baryon) > 1e8 (if working with DMO simulations)
+          Then, saves their indices across all time
+        - Methods included in this class calculate a variety of orbital properties
 
-OrbitPlot:
-    - Includes methods to plot different orbital properties.
-      [I don't really use this anymore, but this could be improved and useful later.]
+    OrbitGalpy:
+        - Similar to OrbitAnalysis, includes methods to calculate orbtial properties
+          of satellites integrated with Galpy.
+        - Selects 6D ICs from a simulation for the satellites of interest, creates
+          orbit instances to be used in Galpy.
+        - Finally, does a check to see whether or not a satellite nears a "pole",
+          which could cause numerical problems in Galpy.
+
+    OrbitPlot:
+        - Includes methods to plot different orbital properties.
+          [I don't really use this anymore, but this could be improved and useful later.]
+
 """
 
 import utilities as ut
@@ -57,13 +59,23 @@ class OrbitRead:
 
         VARIABLES:
             - gal1     : string
+                         Name of the MW-mass galaxy you are interested in.
+                         If analyzing the LG-pairs, this is the name of the
+                         first host (Romeo, Thelma, Romulus).
+
             - location : string
+                         Name of where you are working (peloton, stampede, or on
+                         my mac).
+
             - dmo      : boolean
+                         True/False of whether analyzing DMO or Baryonic
+                         simulations.
 
         NOTES:
             - Depending on the variables you enter, sets the number of galaxies,
               the simulation directory, the home directory, and the galaxy name.
         """
+        # Depending on the galaxy name, set up a few variables
         if gal1 == 'Romeo':
             gal2 = 'Juliet'
             self.galaxy = 'm12_elvis_'+gal1+gal2
@@ -88,16 +100,17 @@ class OrbitRead:
             resolution = '_res7100'
             self.num_gal = 1
 
+        # Set up the important paths
         if location == 'mac' and self.num_gal == 1:
             self.home_dir = '/Users/isaiahsantistevan/simulation'
             self.simulation_dir = self.home_dir+'/galaxies/'+self.galaxy+resolution # maybe this is a good place for a try-except statement?
             self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
         elif location == 'mac' and self.num_gal == 2:
             self.home_dir = '/Users/isaiahsantistevan/simulation'
-            #self.simulation_dir = '/Users/isaiahsantistevan/simulation/galaxies/'+self.galaxy+resolution
             self.gal_1 = gal1
             self.gal_2 = gal2
             self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
+        #
         elif location == 'peloton' and self.num_gal == 1:
             self.home_dir = '/home/ibsantis/scripts'
             self.simulation_dir = '/share/wetzellab/'+self.galaxy+'/'+self.galaxy+resolution
@@ -108,6 +121,7 @@ class OrbitRead:
             self.gal_1 = gal1
             self.gal_2 = gal2
             self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
+        #
         elif location == 'stampede' and self.num_gal == 1:
             self.home_dir = '/home1/05400/ibsantis/scripts'
             self.simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+self.galaxy+resolution
@@ -125,6 +139,7 @@ class OrbitRead:
 
 class OrbitAnalysis:
 
+    # optimized
     def __init__(self, tree, gal1, location, host, dmo=False):
         """
         DESCRIPTION:
@@ -133,10 +148,25 @@ class OrbitAnalysis:
 
         VARIABLES:
             tree     : dictionary
+                       This is the halo merger tree, read in by Andrew's function
+                       "halo.io.IO.read_tree" from halo_io.py
+
             gal1     : string
+                       Name of the MW-mass galaxy you are interested in.
+                       If analyzing the LG-pairs, this is the name of the
+                       first host (Romeo, Thelma, Romulus).
+
             location : string
+                       Name of where you are working (peloton, stampede, or on
+                       my mac).
+
             host     : integer (1 or 2)
+                       Host number. This is 1 for the 'm12' hosts, and could be
+                       1 or 2 for the LG-pair hosts.
+
             dmo      : boolean
+                       True/False moreso to decide if doing a 'halo'-like selection
+                       or 'stellar mass' selection. Set dmo=True for the former.
 
         NOTES:
             - Returns a 2D array:
@@ -156,86 +186,32 @@ class OrbitAnalysis:
         OrbitRead.__init__(self, gal1, location, dmo=dmo)
         #
         # Selection criteria for the DMO simulations or for non-luminous satellites in the baryonic simulations
-        if dmo:
-            if self.num_gal == 1:
-                # Select the subhalo indices at z = 0
-                z0_inds = ut.array.get_indices(tree['snapshot'], 600)
-                z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
-                z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
-                # Select subhalos based on their halo mass
-                self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega_matter']
-                z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds)*(1-self.baryon_frac), [1e8,np.inf])]
-                z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
-                # Set attributes for subhalo indices and the shape of the array
-                self.sub_inds = z0_inds_w_prog
-                self.shape = self.sub_inds.shape
-            #
-            elif self.num_gal == 2:
-                if host == 1:
-                    # Select the subhalo indices at z = 0
-                    z0_inds = ut.array.get_indices(tree['snapshot'], 600)
-                    z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
-                    z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
-                    # Select subhalos based on their halo mass
-                    self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega_matter']
-                    z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds)*(1-self.baryon_frac), [1e8,np.inf])]
-                    z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
-                    # Set attributes for subhalo indices and the shape of the array
-                    self.sub_inds = z0_inds_w_prog
-                    self.shape = self.sub_inds.shape
-                #
-                elif host == 2:
-                    # Select the subhalo indices at z = 0
-                    z0_inds = ut.array.get_indices(tree['snapshot'], 600)
-                    z0_inds = z0_inds[z0_inds != tree['host2.index'][0]]
-                    z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
-                    # Select subhalos based on their halo mass
-                    self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega_matter']
-                    z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds)*(1-self.baryon_frac), [1e8,np.inf])]
-                    z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
-                    # Set attributes for subhalo indices and the shape of the array
-                    self.sub_inds = z0_inds_w_prog
-                    self.shape = self.sub_inds.shape
-        #
-        # Selection criteria for the baryonic simulations
+        if host == 2:
+            hindex = 'host2'
         else:
-            if self.num_gal == 1:
-                # Select the subhalo indices at z = 0
-                z0_inds = ut.array.get_indices(tree['snapshot'], 600)
-                z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
-                z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
-                # Select luminous subhalos at z = 0 and find their progenitor indices
-                z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [3e4, np.inf], z0_inds)
-                z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
-                # Set attributes for subhalo indices and the shape of the array
-                self.sub_inds = z0_inds_w_star_prog
-                self.shape = self.sub_inds.shape
-            #
-            elif self.num_gal == 2:
-                if host == 1:
-                    # Select the subhalo indices at z = 0
-                    z0_inds = ut.array.get_indices(tree['snapshot'], 600)
-                    z0_inds = z0_inds[z0_inds != tree['host.index'][0]]
-                    z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
-                    # Select luminous subhalos at z = 0 and find their progenitor indices
-                    z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [3e4, np.inf], z0_inds)
-                    z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
-                    # Set attributes for subhalo indices and the shape of the array
-                    self.sub_inds = z0_inds_w_star_prog
-                    self.shape = self.sub_inds.shape
-                #
-                elif host == 2:
-                    # Select the subhalo indices at z = 0
-                    z0_inds = ut.array.get_indices(tree['snapshot'], 600)
-                    z0_inds = z0_inds[z0_inds != tree['host2.index'][0]]
-                    z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
-                    # Select luminous subhalos at z = 0 and find their progenitor indices
-                    z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [3e4, np.inf], z0_inds)
-                    z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
-                    # Set attributes for subhalo indices and the shape of the array
-                    self.sub_inds = z0_inds_w_star_prog
-                    self.shape = self.sub_inds.shape
+            hindex = 'host'
+        #
+        # Select the subhalo indices at z = 0
+        z0_inds = ut.array.get_indices(tree['snapshot'], 600)
+        z0_inds = z0_inds[z0_inds != tree[hindex+'.index'][0]]
+        z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
+        #
+        # Select subhalos based on their halo mass
+        if dmo:
+            self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega_matter']
+            z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds)*(1-self.baryon_frac), [1e8,np.inf])]
+            z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
+            self.sub_inds = z0_inds_w_prog
+        #
+        # Select subhalos based on their stellar mass
+        else:
+            z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [3e4, np.inf], z0_inds)
+            z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
+            self.sub_inds = z0_inds_w_star_prog
+        #
+        self.shape = self.sub_inds.shape
 
+    # Pick up here next time when working on cleaning up the code.
     def halo_distances(self, tree, dist_type='total', host=1):
         """
         DESCRIPTION:
