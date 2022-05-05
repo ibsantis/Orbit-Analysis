@@ -1,32 +1,33 @@
 #!/usr/bin/python3
 
 """
-Intended for use with astropy's modeling packages
 
-@author: Isaiah Santistevan <ibsantistevan@ucdavis.edu>
+    Intended for use with astropy's modeling packages and the FIRE-2 simulations.
 
-    This was written to help compute parameters for different density / mass
-    models for:
+    @author: Isaiah Santistevan <ibsantistevan@ucdavis.edu>
 
-        - Double exponential disk
-            - This accounts for an "inner" and "outer" disk region
+        This was written to help compute parameters for different density / mass
+        models for:
 
-        - NFW halo
+            - Double exponential disk
+                - This accounts for an "inner" and "outer" disk region
 
-        - Generalized NFW halo with an inner and outer slope
+            - NFW halo
+
+            - Generalized NFW halo with an inner and outer slope
+
 """
 
+
+# Import the necessary tools
 import halo_analysis as halo
 import gizmo_analysis as gizmo
 import utilities as ut
 import numpy as np
-import matplotlib
-from matplotlib import pyplot as plt
 from astropy.modeling.models import custom_model
 from astropy.modeling.fitting import LevMarLSQFitter
 from scipy import special
 import pandas as pd
-import sys
 
 
 class MassModelFit:
@@ -47,12 +48,30 @@ class MassModelFit:
 
         VARIABLES:
             distances  : 1D array
+                         Units not important, but need to be the same as hz
+
             masses     : 1D array
+                         Units generally Msun
+
             Amp        : float
+                         Amplitude of the mass profile with units of M_sun (or
+                         at least whatever units 'masses' array is in)
+
             hz         : float
+                         Disk scale height.
+                         Units usually in kpc
+
             Amp_bounds : tuple
+                         Initial guess for the amplitude parameter.
+                         Include a lower and upper bound guess in a tuple.
+
             hz_bounds  : tuple
+                         Initial guess for the scale height parameter.
+                         Include a lower and upper bound guess in a tuple.
+
             iters      : int
+                         Maximum number of iterations astropy will do to converge
+                         on a best-fit guess.
 
         NOTES:
             - Makes use of astropy's modeling functions
@@ -86,23 +105,57 @@ class MassModelFit:
 
         VARIABLES:
             distances    : 1D array
+                           Units not important, but need to be the same as hz,
+                           r_in, and r_out.
+
             masses       : 1D array
+                           Units generally in Msun.
+
             A_in         : float
+                           Amplitude of the inner stellar disk mass profile.
+                           Units in Msun (or whatever units the 'masses' array
+                           is in).
+
             r_in         : float or int
+                           Inner disk scale length.
+                           Generally in units of kpc.
+
             A_out        : float
+                           Amplitude of the inner stellar disk mass profile.
+                           Units in Msun (or whatever units the 'masses' array
+                           is in).
+
             r_out        : float or int
+                           Inner disk scale length.
+                           Generally in units of kpc.
+
             h_z          : float or int
+                           Disk scale height.
+
             A_in_bounds  : tuple
+                           Initial guess for the inner disk amplitude parameter.
+                           Include a lower and upper bound guess in a tuple.
+
             r_in_bounds  : tuple
+                           Initial guess for the inner scale length.
+                           Include a lower and upper bound guess in a tuple.
+
             A_out_bounds : tuple
+                           Initial guess for the outer disk amplitude parameter.
+                           Include a lower and upper bound guess in a tuple.
+
             r_out_bounds : tuple
+                           Initial guess for the outer scale length.
+                           Include a lower and upper bound guess in a tuple.
+
             iters        : int
+                           Maximum number of iterations astropy will do to converge
+                           on a best-fit guess.
 
         NOTES:
             - Makes use of astropy's modeling functions
             - Need to already have a good estimate for h_z (disk scale height)
             - Need to provide good estimates for the amplitudes and scale radii
-            - Also, need to provide reasonable bounds for these parameters
             - Returns the enclosed mass model for the inner and outer radial
               components of the disk.
                 - Returns amplitudes and scale radii for both components.
@@ -127,18 +180,44 @@ class MassModelFit:
     def halo_nfw_mass_model(self, distances, masses, A_halo, a_halo, A_halo_bounds, a_halo_bounds, r_min=10, r_max=None, iters=100000):
         """
         DESCRIPTION:
-            Model the halo of the galaxy with a regular NFW profile.
+            Model the dark matter halo of the galaxy with a regular NFW profile.
 
         VARIABLES:
             distances     : 1D array
+                            Units not important, but need to be the same as a_halo,
+                            r_min, and r_max.
+
             masses        : 1D array
+                            Units usually in Msun
+
             A_halo        : float or int
+                            Amplitude of the halo mass profile.
+                            Units usually in Msun (or whatever units the 'masses'
+                            array is in).
+
             a_halo        : float or int
+                            Halo scale length.
+                            Units usually in kpc.
+
             A_halo_bounds : tuple
+                            Initial guess for the amplitude parameter.
+                            Include a lower and upper bound guess in a tuple.
+
             a_halo_bounds : tuple
+                            Initial guess for the scale length parameter.
+                            Include a lower and upper bound guess in a tuple.
+
             r_min         : float or int
+                            Minimum radius to fit the data to.
+                            Need to be in the same units as 'distances' array.
+
             r_max         : float or int or None
+                            Maximum radius to fit the data to.
+                            Need to be in the same units as 'distances' array.
+
             iters         : int
+                            Maximum number of iterations astropy will do to converge
+                            on a best-fit guess.
 
         NOTES:
             - Makes use of astropy's modeling functions
@@ -146,44 +225,32 @@ class MassModelFit:
             - Returns a model of the halo component of the galaxy
                 - Returns an amplitude and scale radius
         """
-        # Find the minimum index of the distance array depending on r_min; default to 10 kpc
+        # Find the minimum index of the distance array depending on r_min
         r_cut_min = np.where(distances > r_min)[0][0]
+        #
+        # Define the model
+        @custom_model
+        def nfw_mass_model(r, amp=A_halo, a=a_halo):
+            return amp*(np.log((a+r)/a)+a/(a+r)-1)
+        #
+        # Initialize the model
+        model_init = nfw_mass_model(bounds={'amp':A_halo_bounds, 'a':a_halo_bounds})
+        fit = LevMarLSQFitter()
         #
         # If no maximum distance to fit to, fit over entire distance array
         if r_max == None:
-            #
-            # Define the model
-            @custom_model
-            def nfw_mass_model(r, amp=A_halo, a=a_halo):
-                return amp*(np.log((a+r)/a)+a/(a+r)-1)
-            #
-            # Initialize the model
-            model_init = nfw_mass_model(bounds={'amp':A_halo_bounds, 'a':a_halo_bounds})
-            fit = LevMarLSQFitter()
-            #
-            # Fit the model to the data and print it out
+            # Fit the model to the data
             model_halo = fit(model_init, distances[r_cut_min:], np.cumsum(masses)[r_cut_min-1:], maxiter=iters)
-            print(model_halo)
-            #
-            return model_halo
+        #
         else:
             # If there is a maximum distance to fit to, find the index in the distances array
             r_cut_max = np.where(distances > r_max)[0][0]
-            #
-            # Define the model
-            @custom_model
-            def nfw_mass_model(r, amp=A_halo, a=a_halo):
-                return amp*(np.log((a+r)/a)+a/(a+r)-1)
-            #
-            # Initialize the model
-            model_init = nfw_mass_model(bounds={'amp':A_halo_bounds, 'a':a_halo_bounds})
-            fit = LevMarLSQFitter()
-            #
-            # Fit the model to the data and print it out
+            # Fit the model to the data
             model_halo = fit(model_init, distances[r_cut_min:r_cut_max], np.cumsum(masses)[r_cut_min-1:r_cut_max-1], maxiter=iters)
-            print(model_halo)
-            #
-            return model_halo
+        # Print out and return the model
+        print(model_halo)
+        #
+        return model_halo
 
     def halo_2p_mass_model(self, distances, masses, A_halo, a_halo, slope_in, slope_out, A_halo_bounds, a_halo_bounds, slope_in_bounds, slope_out_bounds, r_min=10, r_max=None, iters=100000):
         """
@@ -192,18 +259,56 @@ class MassModelFit:
 
         VARIABLES:
             distances        : 1D array
+                               Units not important, but need to be the same as a_halo,
+                               r_min, and r_max.
+
             masses           : 1D array
+                               Units usually in Msun
+
             A_halo           : float or int
+                               Amplitude of the halo mass profile.
+                               Units usually in Msun (or whatever units the 'masses'
+                               array is in).
+
             a_halo           : float or int
+                               Halo scale length.
+                               Units usually in kpc.
+
             slope_in         : float or int
+                               Slope of the inner halo profile.
+
             slope_out        : float or int
+                               Slope of the outer halo profile
+
             A_halo_bounds    : tuple
+                               Initial guess for the amplitude parameter.
+                               Include a lower and upper bound guess in a tuple.
+
             a_halo_bounds    : tuple
+                               Initial guess for the scale length parameter.
+                               Include a lower and upper bound guess in a tuple.
+
             slope_in_bounds  : tuple
+                               Initial guess for the slope of them inner halo profile
+                               paramter.
+                               Include a lower and upper bound guess in a tuple.
+
             slope_out_bounds : tuple
+                               Initial guess for the slope of them inner halo profile
+                               paramter.
+                               Include a lower and upper bound guess in a tuple.
+
             r_min            : float or int
+                               Minimum radius to fit the data to.
+                               Need to be in the same units as 'distances' array.
+
             r_max            : float or int or None
+                               Maximum radius to fit the data to.
+                               Need to be in the same units as 'distances' array.
+
             iters            : int
+                               Maximum number of iterations astropy will do to converge
+                               on a best-fit guess.
 
         NOTES:
             - Makes use of astropy's modeling functions
@@ -214,41 +319,29 @@ class MassModelFit:
         # Find the minimum index of the distance array depending on r_min; default to 10 kpc
         r_cut_min = np.where(distances > r_min)[0][0]
         #
+        # Define the model
+        @custom_model
+        def two_power_beta_fixed(r, amp=A_halo, a=a_halo, alpha=slope_in, beta=slope_out):
+            return (amp/(3-alpha))*((r/a)**(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-r/a)
+        #
+        # Initialize the model
+        model_init = two_power_beta_fixed(bounds={'amp':A_halo_bounds, 'a':a_halo_bounds, 'alpha':slope_in_bounds, 'beta':slope_out_bounds})
+        fit = LevMarLSQFitter()
+        #
         # If there is no maximum radius to fit to, fit over entire distance array
         if r_max == None:
-            #
-            # Define the model
-            @custom_model
-            def two_power_beta_fixed(r, amp=A_halo, a=a_halo, alpha=slope_in, beta=slope_out):
-                return (amp/(3-alpha))*((r/a)**(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-r/a)
-            #
-            # Initialize the model
-            model_init = two_power_beta_fixed(bounds={'amp':A_halo_bounds, 'a':a_halo_bounds, 'alpha':slope_in_bounds, 'beta':slope_out_bounds})
-            fit = LevMarLSQFitter()
-            #
             # Fit the model to the data and print it out
             model_halo = fit(model_init, distances[r_cut_min:], np.cumsum(masses)[r_cut_min-1:], maxiter=iters)
-            print(model_halo)
-            #
-            return model_halo
+        #
         else:
             # If there is a maximum radius to fit to, find the corresponding index in the distance array
             r_cut_max = np.where(distances > r_max)[0][0]
-            #
-            # Define the model
-            @custom_model
-            def two_power_beta_fixed(r, amp=A_halo, a=a_halo, alpha=slope_in, beta=slope_out):
-                return (amp/(3-alpha))*((r/a)**(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-r/a)
-            #
-            # Initialize the model
-            model_init = two_power_beta_fixed(bounds={'amp':A_halo_bounds, 'a':a_halo_bounds, 'alpha':slope_in_bounds, 'beta':slope_out_bounds})
-            fit = LevMarLSQFitter()
-            #
             # Fit the model to the data and print it out
             model_halo = fit(model_init, distances[r_cut_min:r_cut_max], np.cumsum(masses)[r_cut_min-1:r_cut_max-1], maxiter=iters)
-            print(model_halo)
-            #
-            return model_halo
+        #
+        print(model_halo)
+        #
+        return model_halo
 
 
 class DensityModelFit:
@@ -268,12 +361,30 @@ class DensityModelFit:
 
         VARIABLES:
             distances  : 1D array
+                         Units not important, but need to be the same as hz
+
             densities  : 1D array
+                         Units generally Msun / kpc^3
+
             Amp        : float
+                         Amplitude of the mass profile with units of M_sun / kpc^3
+                         (or at least whatever units 'densities' array is in)
+
             hz         : float
+                         Disk scale height.
+                         Units usually in kpc
+
             Amp_bounds : tuple
+                         Initial guess for the amplitude parameter.
+                         Include a lower and upper bound guess in a tuple.
+
             hz_bounds  : tuple
+                         Initial guess for the scale height parameter.
+                         Include a lower and upper bound guess in a tuple.
+
             iters      : int
+                         Maximum number of iterations astropy will do to converge
+                         on a best-fit guess.
 
         NOTES:
             - Makes use of astropy's modeling functions
@@ -305,17 +416,52 @@ class DensityModelFit:
 
         VARIABLES:
             distances    : 1D array
-            densiti      : 1D array
+                           Units not important, but need to be the same as hz,
+                           r_in, and r_out.
+
+            densities    : 1D array
+                           Units generally in Msun / kpc^3.
+
             A_in         : float
+                           Amplitude of the inner stellar disk mass profile.
+                           Units in Msun / kpc^3 (or whatever units the 'densities'
+                           array is in).
+
             r_in         : float or int
+                           Inner disk scale length.
+                           Generally in units of kpc.
+
             A_out        : float
+                           Amplitude of the inner stellar disk mass profile.
+                           Units in Msun / kpc^3 (or whatever units the 'densities'
+                           array is in).
+
             r_out        : float or int
+                           Inner disk scale length.
+                           Generally in units of kpc.
+
+            h_z          : float or int
+                           Disk scale height.
+
             A_in_bounds  : tuple
+                           Initial guess for the inner disk amplitude parameter.
+                           Include a lower and upper bound guess in a tuple.
+
             r_in_bounds  : tuple
+                           Initial guess for the inner scale length.
+                           Include a lower and upper bound guess in a tuple.
+
             A_out_bounds : tuple
+                           Initial guess for the outer disk amplitude parameter.
+                           Include a lower and upper bound guess in a tuple.
+
             r_out_bounds : tuple
-            r_cut        : float or int or None
+                           Initial guess for the outer scale length.
+                           Include a lower and upper bound guess in a tuple.
+
             iters        : int
+                           Maximum number of iterations astropy will do to converge
+                           on a best-fit guess.
 
         NOTES:
             - Makes use of astropy's modeling functions
@@ -368,26 +514,28 @@ class DensityModelFit:
     def halo_nfw_dens_model(self):
         """
         DESCRIPTION:
-            Blah blah blah
+            TBD
 
         VARIABLES:
-            HMMM
+            TBD
 
         NOTES:
-            Yes.
+            There is currently no method for this in my pipeline, but I wanted
+            to include a blank one for completeness-sake. Eventually...
         """
         pass
 
     def halo_2p_dens_model(self):
         """
         DESCRIPTION:
-            Blah blah blah
+            TBD
 
         VARIABLES:
-            HMMM
+            TBD
 
         NOTES:
-            Yes.
+            There is currently no method for this in my pipeline, but I wanted
+            to include a blank one for completeness-sake. Eventually...
         """
         pass
 
@@ -411,10 +559,15 @@ class Profiles:
 
         VARIABLES:
             distances : 1D array
+                        Units need to be in kpc to be consistent with the
+                        fitting data used.
+
             gal       : str
+                        Name of the MW-mass galaxy you are interested in.
 
         NOTES:
             - Returns the density at all points in the 'distances' array.
+            - Units in Msun / kpc^3
             - Uses values for the amplitudes, scale lengths, and scale height
               from data that was already compiled.
         """
@@ -441,10 +594,15 @@ class Profiles:
 
         VARIABLES:
             distances : 1D array
+                        Units need to be in kpc to be consistent with the
+                        fitting data used.
+
             gal       : str
+                        Name of the MW-mass galaxy you are interested in.
 
         NOTES:
             - Returns the enclosed mass at all points in the 'distances' array.
+            - Units in Msun.
             - Uses values for the amplitudes, scale lengths, and scale height
               from data that was already compiled.
         """
@@ -464,56 +622,83 @@ class Profiles:
     def halo_nfw_density(self):
         """
         DESCRIPTION:
-            Blah blah blah
+            TBD
 
         VARIABLES:
-            HMMM
+            distances : 1D array
+                        Units need to be in kpc to be consistent with the
+                        fitting data used.
+
+            gal       : str
+                        Name of the MW-mass galaxy you are interested in.
 
         NOTES:
-            Yes.
+            There is currently no method for this in my pipeline, but I wanted
+            to include a blank one for completeness-sake. Eventually...
         """
         pass
 
     def halo_nfw_mass(self, distances, gal):
         """
         DESCRIPTION:
-            Blah blah blah
+            Model of the dark matter NFW halo mass profile.
 
         VARIABLES:
-            HMMM
+            distances : 1D array
+                        Units need to be in kpc to be consistent with the
+                        fitting data used.
+
+            gal       : str
+                        Name of the MW-mass galaxy you are interested in.
 
         NOTES:
-            Yes.
+            - Returns the enclosed mass at all points in the 'distances' array.
+            - Units in Msun.
+            - Uses values for the amplitudes, scale lengths, and scale height
+              from data that was already compiled.
         """
         A_halo = self.fitting_data['A_halo'][gal]
         a_halo = self.fitting_data['a_halo'][gal]
         #
         return A_halo*(np.log((a_halo+distances)/a_halo)+a_halo/(a_halo+distances)-1)
 
-
     def halo_2p_nfw_density(self):
         """
         DESCRIPTION:
-            Blah blah blah
+            TBD
 
         VARIABLES:
-            HMMM
+            distances : 1D array
+                        Units need to be in kpc to be consistent with the
+                        fitting data used.
+
+            gal       : str
+                        Name of the MW-mass galaxy you are interested in.
 
         NOTES:
-            Yes.
+            There is currently no method for this in my pipeline, but I wanted
+            to include a blank one for completeness-sake. Eventually...
         """
         pass
 
     def halo_2p_nfw_mass(self, distances, gal):
         """
         DESCRIPTION:
-            Blah blah blah
+            Model of the generalized dark matter NFW halo mass profile.
 
         VARIABLES:
-            HMMM
+            distances : 1D array
+                        Units need to be in kpc to be consistent with the
+                        fitting data used.
+
+            gal       : str
+                        Name of the MW-mass galaxy you are interested in.
 
         NOTES:
-            Yes.
+            - Returns the enclosed mass at all points in the 'distances' array.
+            - Units in Msun.
+            - Uses values for the amplitudes, scale lengths, and scale height
+              from data that was already compiled.
         """
         A_halo = self.fitting_data['A_halo'][gal]
         a_halo = self.fitting_data['a_halo'][gal]
