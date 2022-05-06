@@ -38,9 +38,9 @@ halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_k
 
 if sim_data.num_gal == 1:
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=False)
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=False)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=False)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
@@ -99,10 +99,10 @@ if sim_data.num_gal == 1:
     data_dict['id'] = np.arange(len(orbits.sub_inds[:,0]))+1
     #
     # Stellar mass of the subhalos at z = 0 and peak stellar mass
-    data_dict['Mstar.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
-    data_dict['Mstar.peak'] = halt.prop('star.mass.peak', orbits.sub_inds[:,0])
-    data_dict['Mhalo.z0'] = halt['mass'][orbits.sub_inds[:,0]]
-    data_dict['Mhalo.peak'] = halt.prop('mass.peak', orbits.sub_inds[:,0])
+    data_dict['M.star.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
+    data_dict['M.star.peak'] = halt.prop('star.mass.peak', orbits.sub_inds[:,0])
+    data_dict['M.halo.z0'] = halt['mass'][orbits.sub_inds[:,0]]
+    data_dict['M.halo.peak'] = halt.prop('mass.peak', orbits.sub_inds[:,0])
     #
     # Check for poles
     data_dict['pole.check'] = poles
@@ -124,40 +124,40 @@ if sim_data.num_gal == 1:
     # Pericenter checks and numbers
     data_dict['pericenter.check.sim'] = peris['pericenter.check']
     data_dict['N.peri.sim'] = peris['pericenter.num']
-    data_dict['pericenter.check.galpy'] = peris_galpy['pericenter.check']
-    data_dict['N.peri.galpy'] = peris_galpy['pericenter.num']
+    data_dict['pericenter.check.model'] = peris_galpy['pericenter.check']
+    data_dict['N.peri.model'] = peris_galpy['pericenter.num']
     #
     # Pericenter distances
     data_dict['pericenter.dist.sim'] = peris['pericenter.dist']
-    data_dict['pericenter.dist.galpy'] = peris_galpy['pericenter.dist']
+    data_dict['pericenter.dist.model'] = peris_galpy['pericenter.dist']
     #
     # Pericenter velocities
     data_dict['pericenter.vel.sim'] = peris['pericenter.vel']
-    data_dict['pericenter.vel.galpy'] = peris_galpy['pericenter.vel']
+    data_dict['pericenter.vel.model'] = peris_galpy['pericenter.vel']
     #
     # Pericenter times
     data_dict['pericenter.time.sim'] = peris['pericenter.time']
-    data_dict['pericenter.time.galpy'] = peris_galpy['pericenter.time']
+    data_dict['pericenter.time.model'] = peris_galpy['pericenter.time']
     data_dict['pericenter.time.lb.sim'] = peris['pericenter.time.lb']
-    data_dict['pericenter.time.lb.galpy'] = peris_galpy['pericenter.time.lb']
+    data_dict['pericenter.time.lb.model'] = peris_galpy['pericenter.time.lb']
     #
     # Apocenter checks
     data_dict['apocenter.check.sim'] = apos['apocenter.check']
-    data_dict['apocenter.check.galpy'] = apos_galpy['apocenter.check']
+    data_dict['apocenter.check.model'] = apos_galpy['apocenter.check']
     #
     # Apocenter distances
     data_dict['apocenter.dist.sim'] = apos['apocenter.dist']
-    data_dict['apocenter.dist.galpy'] = apos_galpy['apocenter.dist']
+    data_dict['apocenter.dist.model'] = apos_galpy['apocenter.dist']
     #
     # Apocenter velocities
     data_dict['apocenter.vel.sim'] = apos['apocenter.vel']
-    data_dict['apocenter.vel.galpy'] = apos_galpy['apocenter.vel']
+    data_dict['apocenter.vel.model'] = apos_galpy['apocenter.vel']
     #
     # Apocenter times
     data_dict['apocenter.time.sim'] = apos['apocenter.time']
-    data_dict['apocenter.time.galpy'] = apos_galpy['apocenter.time']
+    data_dict['apocenter.time.model'] = apos_galpy['apocenter.time']
     data_dict['apocenter.time.lb.sim'] = apos['apocenter.time.lb']
-    data_dict['apocenter.time.lb.galpy'] = apos_galpy['apocenter.time.lb']
+    data_dict['apocenter.time.lb.model'] = apos_galpy['apocenter.time.lb']
     #
     # Maximum distances and times
     data_dict['max.dist.sim'] = apos['max.dist']
@@ -165,14 +165,14 @@ if sim_data.num_gal == 1:
     data_dict['max.dist.time.lb.sim'] = apos['max.dist.time.lb']
     #
     # distance, velocity, Lz vs time
-    data_dict['dtot.sim'] = halt_dists
+    data_dict['d.tot.sim'] = halt_dists
     data_dict['d.sim'] = halt_dists_3d
-    data_dict['vtot.sim'] = halt_vels
+    data_dict['v.tot.sim'] = halt_vels
     data_dict['v.tan.sim'] = halt_tan_vels
     data_dict['v.rad.sim'] = halt_rad_vels
     data_dict['L.sim'] = angs['ang.mom.vector']
-    data_dict['Ltot.sim'] = angs['ang.mom.total']
-    data_dict['Lz.sim'] = angs['ang.mom.vector'][:,:,2]
+    data_dict['L.tot.sim'] = angs['ang.mom.total']
+    data_dict['L.z.sim'] = angs['ang.mom.vector'][:,:,2]
     #
     # Find the angular momentum at each pericenter event
     angs_at_peri = (-1)*np.ones(peris['pericenter.dist'].shape)
@@ -187,26 +187,26 @@ if sim_data.num_gal == 1:
     #
     data_dict['time.sim'] = snaps['time']
     #
-    data_dict['dtot.galpy'] = galpy_orbits.r(ts)
-    data_dict['d.galpy'] = galpy_dist_3d
-    data_dict['vtot.galpy'] = galpy_vels
-    data_dict['L.galpy'] = galpy_orbits.L(ts)
-    data_dict['Lz.galpy'] = galpy_orbits.Lz(ts)
-    data_dict['time.galpy'] = ts
+    data_dict['d.tot.model'] = galpy_orbits.r(ts)
+    data_dict['d.model'] = galpy_dist_3d
+    data_dict['v.tot.model'] = galpy_vels
+    data_dict['L.model'] = galpy_orbits.L(ts)
+    data_dict['L.z.model'] = galpy_orbits.Lz(ts)
+    data_dict['time.model'] = ts
     #
     # Save the host radius
     data_dict['host.radius'] = host_radii
 
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
-    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
+    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
 
 if sim_data.num_gal == 2:
     #
     ### GALAXY 1
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=False)
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=False)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=False)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=True)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=True)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=True)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
@@ -260,10 +260,10 @@ if sim_data.num_gal == 2:
     data_dict['id'] = np.arange(len(orbits.sub_inds[:,0]))+1
     #
     # Stellar mass of the subhalos at z = 0 and peak stellar mass
-    data_dict['Mstar.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
-    data_dict['Mstar.peak'] = halt.prop('star.mass.peak', orbits.sub_inds[:,0])
-    data_dict['Mhalo.z0'] = halt['mass'][orbits.sub_inds[:,0]]
-    data_dict['Mhalo.peak'] = halt.prop('mass.peak', orbits.sub_inds[:,0])
+    data_dict['M.star.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
+    data_dict['M.star.peak'] = halt.prop('star.mass.peak', orbits.sub_inds[:,0])
+    data_dict['M.halo.z0'] = halt['mass'][orbits.sub_inds[:,0]]
+    data_dict['M.halo.peak'] = halt.prop('mass.peak', orbits.sub_inds[:,0])
     #
     # Check for poles
     data_dict['pole.check'] = poles
@@ -285,40 +285,40 @@ if sim_data.num_gal == 2:
     # Pericenter checks and numbers
     data_dict['pericenter.check.sim'] = peris['pericenter.check']
     data_dict['N.peri.sim'] = peris['pericenter.num']
-    data_dict['pericenter.check.galpy'] = peris_galpy['pericenter.check']
-    data_dict['N.peri.galpy'] = peris_galpy['pericenter.num']
+    data_dict['pericenter.check.model'] = peris_galpy['pericenter.check']
+    data_dict['N.peri.model'] = peris_galpy['pericenter.num']
     #
     # Pericenter distances
     data_dict['pericenter.dist.sim'] = peris['pericenter.dist']
-    data_dict['pericenter.dist.galpy'] = peris_galpy['pericenter.dist']
+    data_dict['pericenter.dist.model'] = peris_galpy['pericenter.dist']
     #
     # Pericenter velocities
     data_dict['pericenter.vel.sim'] = peris['pericenter.vel']
-    data_dict['pericenter.vel.galpy'] = peris_galpy['pericenter.vel']
+    data_dict['pericenter.vel.model'] = peris_galpy['pericenter.vel']
     #
     # Pericenter times
     data_dict['pericenter.time.sim'] = peris['pericenter.time']
-    data_dict['pericenter.time.galpy'] = peris_galpy['pericenter.time']
+    data_dict['pericenter.time.model'] = peris_galpy['pericenter.time']
     data_dict['pericenter.time.lb.sim'] = peris['pericenter.time.lb']
-    data_dict['pericenter.time.lb.galpy'] = peris_galpy['pericenter.time.lb']
+    data_dict['pericenter.time.lb.model'] = peris_galpy['pericenter.time.lb']
     #
     # Apocenter checks
     data_dict['apocenter.check.sim'] = apos['apocenter.check']
-    data_dict['apocenter.check.galpy'] = apos_galpy['apocenter.check']
+    data_dict['apocenter.check.model'] = apos_galpy['apocenter.check']
     #
     # Apocenter distances
     data_dict['apocenter.dist.sim'] = apos['apocenter.dist']
-    data_dict['apocenter.dist.galpy'] = apos_galpy['apocenter.dist']
+    data_dict['apocenter.dist.model'] = apos_galpy['apocenter.dist']
     #
     # Apocenter velocities
     data_dict['apocenter.vel.sim'] = apos['apocenter.vel']
-    data_dict['apocenter.vel.galpy'] = apos_galpy['apocenter.vel']
+    data_dict['apocenter.vel.model'] = apos_galpy['apocenter.vel']
     #
     # Apocenter times
     data_dict['apocenter.time.sim'] = apos['apocenter.time']
-    data_dict['apocenter.time.galpy'] = apos_galpy['apocenter.time']
+    data_dict['apocenter.time.model'] = apos_galpy['apocenter.time']
     data_dict['apocenter.time.lb.sim'] = apos['apocenter.time.lb']
-    data_dict['apocenter.time.lb.galpy'] = apos_galpy['apocenter.time.lb']
+    data_dict['apocenter.time.lb.model'] = apos_galpy['apocenter.time.lb']
     #
     # Maximum distances and times
     data_dict['max.dist.sim'] = apos['max.dist']
@@ -326,14 +326,14 @@ if sim_data.num_gal == 2:
     data_dict['max.dist.time.lb.sim'] = apos['max.dist.time.lb']
     #
     # distance, velocity, Lz vs time
-    data_dict['dtot.sim'] = halt_dists
+    data_dict['d.tot.sim'] = halt_dists
     data_dict['d.sim'] = halt_dists_3d
-    data_dict['vtot.sim'] = halt_vels
+    data_dict['v.tot.sim'] = halt_vels
     data_dict['v.tan.sim'] = halt_tan_vels
     data_dict['v.rad.sim'] = halt_rad_vels
     data_dict['L.sim'] = angs['ang.mom.vector']
-    data_dict['Ltot.sim'] = angs['ang.mom.total']
-    data_dict['Lz.sim'] = angs['ang.mom.vector'][:,:,2]
+    data_dict['L.tot.sim'] = angs['ang.mom.total']
+    data_dict['L.z.sim'] = angs['ang.mom.vector'][:,:,2]
     #
     # Find the angular momentum at each pericenter event
     angs_at_peri = (-1)*np.ones(peris['pericenter.dist'].shape)
@@ -348,24 +348,24 @@ if sim_data.num_gal == 2:
     #
     data_dict['time.sim'] = snaps['time']
     #
-    data_dict['dtot.galpy'] = galpy_orbits.r(ts)
-    data_dict['vtot.galpy'] = galpy_vels
-    data_dict['L.galpy'] = galpy_orbits.L(ts)
-    data_dict['Lz.galpy'] = galpy_orbits.Lz(ts)
-    data_dict['time.galpy'] = ts
+    data_dict['d.tot.model'] = galpy_orbits.r(ts)
+    data_dict['v.tot.model'] = galpy_vels
+    data_dict['L.model'] = galpy_orbits.L(ts)
+    data_dict['L.z.model'] = galpy_orbits.Lz(ts)
+    data_dict['time.model'] = ts
     #
     # Save the host radius
     data_dict['host.radius'] = host_radii
     #
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1, dict_or_array_to_write=data_dict, verbose=True)
-    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
+    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1, dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
     #
     #
     ### GALAXY 2
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=False)
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=False)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=False)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=True)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=True)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=True)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt, host=2) # set host=1 for the first host, host=2 for the other
@@ -419,10 +419,10 @@ if sim_data.num_gal == 2:
     data_dict['id'] = np.arange(len(orbits.sub_inds[:,0]))+1
     #
     # Stellar mass of the subhalos at z = 0 and peak stellar mass
-    data_dict['Mstar.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
-    data_dict['Mstar.peak'] = halt.prop('star.mass.peak', orbits.sub_inds[:,0])
-    data_dict['Mhalo.z0'] = halt['mass'][orbits.sub_inds[:,0]]
-    data_dict['Mhalo.peak'] = halt.prop('mass.peak', orbits.sub_inds[:,0])
+    data_dict['M.star.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
+    data_dict['M.star.peak'] = halt.prop('star.mass.peak', orbits.sub_inds[:,0])
+    data_dict['M.halo.z0'] = halt['mass'][orbits.sub_inds[:,0]]
+    data_dict['M.halo.peak'] = halt.prop('mass.peak', orbits.sub_inds[:,0])
     #
     # Check for poles
     data_dict['pole.check'] = poles
@@ -444,40 +444,40 @@ if sim_data.num_gal == 2:
     # Pericenter checks and numbers
     data_dict['pericenter.check.sim'] = peris['pericenter.check']
     data_dict['N.peri.sim'] = peris['pericenter.num']
-    data_dict['pericenter.check.galpy'] = peris_galpy['pericenter.check']
-    data_dict['N.peri.galpy'] = peris_galpy['pericenter.num']
+    data_dict['pericenter.check.model'] = peris_galpy['pericenter.check']
+    data_dict['N.peri.model'] = peris_galpy['pericenter.num']
     #
     # Pericenter distances
     data_dict['pericenter.dist.sim'] = peris['pericenter.dist']
-    data_dict['pericenter.dist.galpy'] = peris_galpy['pericenter.dist']
+    data_dict['pericenter.dist.model'] = peris_galpy['pericenter.dist']
     #
     # Pericenter velocities
     data_dict['pericenter.vel.sim'] = peris['pericenter.vel']
-    data_dict['pericenter.vel.galpy'] = peris_galpy['pericenter.vel']
+    data_dict['pericenter.vel.model'] = peris_galpy['pericenter.vel']
     #
     # Pericenter times
     data_dict['pericenter.time.sim'] = peris['pericenter.time']
-    data_dict['pericenter.time.galpy'] = peris_galpy['pericenter.time']
+    data_dict['pericenter.time.model'] = peris_galpy['pericenter.time']
     data_dict['pericenter.time.lb.sim'] = peris['pericenter.time.lb']
-    data_dict['pericenter.time.lb.galpy'] = peris_galpy['pericenter.time.lb']
+    data_dict['pericenter.time.lb.model'] = peris_galpy['pericenter.time.lb']
     #
     # Apocenter checks
     data_dict['apocenter.check.sim'] = apos['apocenter.check']
-    data_dict['apocenter.check.galpy'] = apos_galpy['apocenter.check']
+    data_dict['apocenter.check.model'] = apos_galpy['apocenter.check']
     #
     # Apocenter distances
     data_dict['apocenter.dist.sim'] = apos['apocenter.dist']
-    data_dict['apocenter.dist.galpy'] = apos_galpy['apocenter.dist']
+    data_dict['apocenter.dist.model'] = apos_galpy['apocenter.dist']
     #
     # Apocenter velocities
     data_dict['apocenter.vel.sim'] = apos['apocenter.vel']
-    data_dict['apocenter.vel.galpy'] = apos_galpy['apocenter.vel']
+    data_dict['apocenter.vel.model'] = apos_galpy['apocenter.vel']
     #
     # Apocenter times
     data_dict['apocenter.time.sim'] = apos['apocenter.time']
-    data_dict['apocenter.time.galpy'] = apos_galpy['apocenter.time']
+    data_dict['apocenter.time.model'] = apos_galpy['apocenter.time']
     data_dict['apocenter.time.lb.sim'] = apos['apocenter.time.lb']
-    data_dict['apocenter.time.lb.galpy'] = apos_galpy['apocenter.time.lb']
+    data_dict['apocenter.time.lb.model'] = apos_galpy['apocenter.time.lb']
     #
     # Maximum distances and times
     data_dict['max.dist.sim'] = apos['max.dist']
@@ -485,14 +485,14 @@ if sim_data.num_gal == 2:
     data_dict['max.dist.time.lb.sim'] = apos['max.dist.time.lb']
     #
     # distance, velocity, Lz vs time
-    data_dict['dtot.sim'] = halt_dists
+    data_dict['d.tot.sim'] = halt_dists
     data_dict['d.sim'] = halt_dists_3d
-    data_dict['vtot.sim'] = halt_vels
+    data_dict['v.tot.sim'] = halt_vels
     data_dict['v.tan.sim'] = halt_tan_vels
     data_dict['v.rad.sim'] = halt_rad_vels
     data_dict['L.sim'] = angs['ang.mom.vector']
-    data_dict['Ltot.sim'] = angs['ang.mom.total']
-    data_dict['Lz.sim'] = angs['ang.mom.vector'][:,:,2]
+    data_dict['L.tot.sim'] = angs['ang.mom.total']
+    data_dict['L.z.sim'] = angs['ang.mom.vector'][:,:,2]
     #
     # Find the angular momentum at each pericenter event
     angs_at_peri = (-1)*np.ones(peris['pericenter.dist'].shape)
@@ -507,14 +507,14 @@ if sim_data.num_gal == 2:
     #
     data_dict['time.sim'] = snaps['time']
     #
-    data_dict['dtot.galpy'] = galpy_orbits.r(ts)
-    data_dict['vtot.galpy'] = galpy_vels
-    data_dict['L.galpy'] = galpy_orbits.L(ts)
-    data_dict['Lz.galpy'] = galpy_orbits.Lz(ts)
-    data_dict['time.galpy'] = ts
+    data_dict['d.tot.model'] = galpy_orbits.r(ts)
+    data_dict['v.tot.model'] = galpy_vels
+    data_dict['L.model'] = galpy_orbits.L(ts)
+    data_dict['L.z.model'] = galpy_orbits.Lz(ts)
+    data_dict['time.model'] = ts
     #
     # Save the host radius
     data_dict['host.radius'] = host_radii
 
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2, dict_or_array_to_write=data_dict, verbose=True)
-    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
+    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2, dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
