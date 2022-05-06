@@ -9,6 +9,7 @@
     Select halos in the DMO runs and save a their properties
     without integrating them in Galpy.
 
+    Couldn't run on m12z
 """
 
 import orbit_io
@@ -16,11 +17,10 @@ import halo_analysis as halo
 import gizmo_analysis as gizmo
 import utilities as ut
 import numpy as np
-import h5py
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12w', location='peloton', dmo=True)
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton', dmo=True)
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -49,8 +49,8 @@ if sim_data.num_gal == 1:
     data_dict['indices.z0'] = orbits.sub_inds
     #
     # Stellar mass of the subhalos at z = 0 and peak stellar mass
-    data_dict['Mhalo.z0'] = halt['mass'][orbits.sub_inds[:,0]]*(1-orbits.baryon_frac)
-    data_dict['Mhalo.peak'] = halt.prop('mass.peak', orbits.sub_inds[:,0])*(1-orbits.baryon_frac)
+    data_dict['M.halo.z0'] = halt['mass'][orbits.sub_inds[:,0]]*(1-orbits.baryon_frac)
+    data_dict['M.halo.peak'] = halt.prop('mass.peak', orbits.sub_inds[:,0])*(1-orbits.baryon_frac)
     #
     # Infall information
     data_dict['infall.check'] = infall_info['check']
@@ -99,11 +99,11 @@ if sim_data.num_gal == 1:
     data_dict['max.dist.time.lb.sim'] = apos['max.dist.time.lb']
     #
     # distance, velocity, Lz vs time
-    data_dict['dtot.sim'] = halt_dists
-    data_dict['vtot.sim'] = halt_vels
+    data_dict['d.tot.sim'] = halt_dists
+    data_dict['v.tot.sim'] = halt_vels
     data_dict['L.sim'] = angs['ang.mom.vector']
-    data_dict['Ltot.sim'] = angs['ang.mom.total']
-    data_dict['Lz.sim'] = angs['ang.mom.vector'][:,:,2]
+    data_dict['L.tot.sim'] = angs['ang.mom.total']
+    data_dict['L.z.sim'] = angs['ang.mom.vector'][:,:,2]
     data_dict['v.tan.z0'] = halt.prop('host.velocity.tan', orbits.sub_inds[:,0])
     data_dict['v.rad.z0'] = halt.prop('host.velocity.rad', orbits.sub_inds[:,0])
     data_dict['time.sim'] = snaps['time']
@@ -135,8 +135,8 @@ if sim_data.num_gal == 2:
     data_dict['indices.z0'] = orbits.sub_inds
     #
     # Stellar mass of the subhalos at z = 0 and peak stellar mass
-    data_dict['Mhalo.z0'] = halt['mass'][orbits.sub_inds[:,0]]*(1-orbits.baryon_frac)
-    data_dict['Mhalo.peak'] = halt.prop('mass.peak', orbits.sub_inds[:,0])*(1-orbits.baryon_frac)
+    data_dict['M.halo.z0'] = halt['mass'][orbits.sub_inds[:,0]]*(1-orbits.baryon_frac)
+    data_dict['M.halo.peak'] = halt.prop('mass.peak', orbits.sub_inds[:,0])*(1-orbits.baryon_frac)
     #
     # Infall information
     data_dict['infall.check'] = infall_info['check']
@@ -185,11 +185,11 @@ if sim_data.num_gal == 2:
     data_dict['max.dist.time.lb.sim'] = apos['max.dist.time.lb']
     #
     # distance, velocity, Lz vs time
-    data_dict['dtot.sim'] = halt_dists
-    data_dict['vtot.sim'] = halt_vels
+    data_dict['d.tot.sim'] = halt_dists
+    data_dict['v.tot.sim'] = halt_vels
     data_dict['L.sim'] = angs['ang.mom.vector']
-    data_dict['Ltot.sim'] = angs['ang.mom.total']
-    data_dict['Lz.sim'] = angs['ang.mom.vector'][:,:,2]
+    data_dict['L.tot.sim'] = angs['ang.mom.total']
+    data_dict['L.z.sim'] = angs['ang.mom.vector'][:,:,2]
     data_dict['v.tan.z0'] = halt.prop('host.velocity.tan', orbits.sub_inds[:,0])
     data_dict['v.rad.z0'] = halt.prop('host.velocity.rad', orbits.sub_inds[:,0])
     data_dict['time.sim'] = snaps['time']
@@ -223,8 +223,8 @@ if sim_data.num_gal == 2:
     data_dict['indices.z0'] = orbits.sub_inds
     #
     # Stellar mass of the subhalos at z = 0 and peak stellar mass
-    data_dict['Mhalo.z0'] = halt['mass'][orbits.sub_inds[:,0]]*(1-orbits.baryon_frac)
-    data_dict['Mhalo.peak'] = halt.prop('mass.peak', orbits.sub_inds[:,0])*(1-orbits.baryon_frac)
+    data_dict['M.halo.z0'] = halt['mass'][orbits.sub_inds[:,0]]*(1-orbits.baryon_frac)
+    data_dict['M.halo.peak'] = halt.prop('mass.peak', orbits.sub_inds[:,0])*(1-orbits.baryon_frac)
     #
     # Infall information
     data_dict['infall.check'] = infall_info['check']
@@ -273,11 +273,11 @@ if sim_data.num_gal == 2:
     data_dict['max.dist.time.lb.sim'] = apos['max.dist.time.lb']
     #
     # distance, velocity, Lz vs time
-    data_dict['dtot.sim'] = halt_dists
-    data_dict['vtot.sim'] = halt_vels
+    data_dict['d.tot.sim'] = halt_dists
+    data_dict['v.tot.sim'] = halt_vels
     data_dict['L.sim'] = angs['ang.mom.vector']
-    data_dict['Ltot.sim'] = angs['ang.mom.total']
-    data_dict['Lz.sim'] = angs['ang.mom.vector'][:,:,2]
+    data_dict['L.tot.sim'] = angs['ang.mom.total']
+    data_dict['L.z.sim'] = angs['ang.mom.vector'][:,:,2]
     data_dict['v.tan.z0'] = halt.prop('host2.velocity.tan', orbits.sub_inds[:,0])
     data_dict['v.rad.z0'] = halt.prop('host2.velocity.rad', orbits.sub_inds[:,0])
     data_dict['time.sim'] = snaps['time']
