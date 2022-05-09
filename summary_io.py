@@ -1,11 +1,14 @@
 #!/usr/bin/python3
 
 """
-@author: Isaiah Santistevan <ibsantistevan@ucdavis.edu>
 
-    This was written to create summary statistic plots with data output from
-    orbit_io.py and model_io.py. Data that I import was previously compiled
-    using summary_data.py and summary_data_dmo.py
+    Intended for use with the FIRE-2 simulations
+
+    @author: Isaiah Santistevan <ibsantistevan@ucdavis.edu>
+
+        This was written to create summary statistic plots with data output from
+        orbit_io.py and model_io.py. Data that I import was previously compiled
+        using summary_data.py and summary_data_dmo.py
 
 """
 
@@ -1797,6 +1800,20 @@ class SummaryDataPlot(SummaryDataSort):
                        'N.sim': 'Pericenters',\
                        'N.model': 'Pericenters',\
                        'N.delta': 'Pericenters'}
+
+    def binning_scheme(self):
+        """
+        DESCRIPTION:
+            Function that makes bins... finish later.
+        """
+        pass
+
+    def median_and_scatter(self):
+        """
+        DESCRIPTION:
+            Function that finds median and scatter... finish later.
+        """
+        pass
 
     def scatter_plot(self, x, y, xtype, ytype, file_path_and_name, x_out=None, y_out=None, limits=None, title=None):
         """
