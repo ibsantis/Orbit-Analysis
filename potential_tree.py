@@ -153,8 +153,7 @@ if sim_data.num_gal == 2:
     #halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, host_number=sim_data.num_gal)
     #
     # For luminous and ALL subhalos
-    #part = gizmo.io.Read.read_snapshots('dark', 'redshift', 0, properties=['position', 'potential'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
-    # For luminous and ALL subhalos
+    part = gizmo.io.Read.read_snapshots('dark', 'redshift', 0, properties=['position', 'potential'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
     #
     end = time.time()
     print('Tree and particles at z = 0 read in in {0} seconds'.format(end-start))
