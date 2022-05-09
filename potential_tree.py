@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=TL_potentials
+#SBATCH --job-name=m12b_potentials_all_subhalos
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=500G
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
 #SBATCH --time=01:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/TL_potentials_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/m12b_potentials_all_subhalos_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -45,7 +45,7 @@ import time
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Thelma', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
 #sim_data = orbit_io.OrbitRead(gal1='Romeo', location='peloton', dmo=True)
 print('Set paths')
 
@@ -55,10 +55,8 @@ if sim_data.num_gal == 1:
     start = time.time()
     snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
     #
-    # For the luminous subhalos
+    # For the luminous and ALL subhalos
     halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', species_snapshot_indices=600, host_number=sim_data.num_gal)
-    # For ALL subhalos
-    #halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', species_snapshot_indices=600, host_number=sim_data.num_gal)
     # For DMO subhalos
     #halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, host_number=sim_data.num_gal, species_snapshot_indices=600)
     #
@@ -71,14 +69,14 @@ if sim_data.num_gal == 1:
     #
     # Set up the halo inds and KDTree
     # For the luminous only
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
+    #orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
     # For the halo-selection, and DMO selection
-    #orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True)
     start = time.time()
     # For the luminous only
-    orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, particles=part, subsampling=15)
+    #orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, particles=part, subsampling=15)
     # For the halo-selection and DMO selection
-    #orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True, particles=part, subsampling=15)
+    orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True, particles=part, subsampling=15)
     end = time.time()
     print('KDTree created in {0} seconds'.format(end-start))
     #
@@ -135,8 +133,8 @@ if sim_data.num_gal == 1:
         end = time.time()
         print('Done with mass bin {0} in {1} seconds'.format(i, end-start))
     #
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
-    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials_all_subs', dict_or_array_to_write=data_dict, verbose=True)
+    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials_all_subs', dict_or_array_to_write=data_dict, verbose=True)
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials_dmo', dict_or_array_to_write=data_dict, verbose=True)
 
 if sim_data.num_gal == 2:
@@ -145,10 +143,8 @@ if sim_data.num_gal == 2:
     start = time.time()
     snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
     #
-    # For the luminous subhalos
+    # For the luminous and ALL subhalos
     halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', species_snapshot_indices=600, host_number=sim_data.num_gal)
-    # For ALL subhalos
-    #halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', species_snapshot_indices=600, host_number=sim_data.num_gal)
     # For DMO subhalos
     #halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, host_number=sim_data.num_gal)
     #
@@ -168,11 +164,11 @@ if sim_data.num_gal == 2:
     #
     ## GALAXY 1
     # Set up the halo inds and KDTree
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
-    #orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True)
+    #orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True)
     start = time.time()
-    orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, particles=part, subsampling=15)
-    #orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True, particles=part, subsampling=15)
+    #orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, particles=part, subsampling=15)
+    orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True, particles=part, subsampling=15)
     end = time.time()
     print('KDTree created in {0} seconds'.format(end-start))
     #
@@ -221,17 +217,17 @@ if sim_data.num_gal == 2:
         end = time.time()
         print('Done with mass bin {0} in {1} seconds'.format(i, end-start))
     #
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_1+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
-    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_1+'_potentials_all_subs', dict_or_array_to_write=data_dict, verbose=True)
+    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_1+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_1+'_potentials_all_subs', dict_or_array_to_write=data_dict, verbose=True)
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_1+'_potentials_dmo', dict_or_array_to_write=data_dict, verbose=True)
     #
     ## GALAXY 2
     # Set up the halo inds and KDTree
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=2)
-    #orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=2, dmo=True)
+    #orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=2)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=2, dmo=True)
     start = time.time()
-    orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=2, particles=part, subsampling=15)
-    #orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=2, dmo=True, particles=part, subsampling=15)
+    #orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=2, particles=part, subsampling=15)
+    orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=2, dmo=True, particles=part, subsampling=15)
     end = time.time()
     print('KDTree created in {0} seconds'.format(end-start))
     #
@@ -280,6 +276,6 @@ if sim_data.num_gal == 2:
         end = time.time()
         print('Done with mass bin {0} in {1} seconds'.format(i, end-start))
     #
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_2+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
-    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_2+'_potentials_all_subs', dict_or_array_to_write=data_dict, verbose=True)
+    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_2+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_2+'_potentials_all_subs', dict_or_array_to_write=data_dict, verbose=True)
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.gal_2+'_potentials_dmo', dict_or_array_to_write=data_dict, verbose=True)
