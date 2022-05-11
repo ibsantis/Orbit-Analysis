@@ -40,7 +40,6 @@ summary_plot = summary_io.SummaryDataPlot()
 # Select which mask you want to use and the corresponding directory
 directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_1/paper_figs/final'
 
-
 ### Generate all of the data for the plots below
 #
 # Fix for the outlier in the Mstar-Mhalo relation
