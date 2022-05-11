@@ -1913,7 +1913,7 @@ summary_plot.plot_hist(x=((d_min_tot-d_sim_tot)/d_sim_tot)[mask_delta_d], xtype=
 mask_delta_t = (np.abs((t_min_tot - t_sim_tot)/t_sim_tot) > 0)
 summary_plot.plot_hist(x=(t_min_tot-t_sim_tot)[mask_delta_t], xtype='delta_t', binsize=0.5, pdf=True, file_path_and_name=directory+'/delta_t_histogram.pdf')
 #
-# delta tperi plots
+# delta Lperi plots
 mask_delta_d = (np.abs((d_min_tot - d_sim_tot)/d_sim_tot) > 0)
 summary_plot.plot_hist(x=((L_min_tot-L_rec_tot)/L_rec_tot)[mask_delta_d], xtype='delta_ell_frac', binsize=0.05, pdf=True, xlimits=(-1, 0), file_path_and_name=directory+'/delta_ell_frac_histogram.pdf')
 
