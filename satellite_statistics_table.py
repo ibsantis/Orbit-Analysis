@@ -41,7 +41,7 @@ data_total = summary.data_read(directory=sim_data.home_dir, hosts='all', sim_typ
 masks_infall = summary.data_mask(data_total, peri_sim=False, peri_model=False, hosts='all')
 summary_plot = summary_io.SummaryDataPlot()
 
-masks_infall['m12f'][57] = False
+masks_infall['m12f'][59] = False # used to be satellite 57 in the older data
 #masks_infall_peri['m12f'][57] = False
 
 # Count the number of satellites that have ever passed within R200
@@ -55,7 +55,7 @@ for name in summary.host_names['all']:
 # Count the number of satellites within R200, but not experienced peri
 for name in summary.host_names['all']:
     print(np.sum(~data_total[name]['pericenter.check.sim']*masks_infall[name]), name)
-    print(data_total[name]['dtot.sim'][~data_total[name]['pericenter.check.sim']*masks_infall[name]][:,0], name)
+    print(data_total[name]['d.tot.sim'][~data_total[name]['pericenter.check.sim']*masks_infall[name]][:,0], name)
 
 # Counting the number of satellites with more than 1 pericenter
 for name in summary.host_names['all']:
@@ -78,12 +78,12 @@ for name in summary.host_names['all']:
 
 # Count how many satellites have peris in sims but not model
 for name in summary.host_names['all']:
-    count = np.sum(data_total[name]['infall.check']*data_total[name]['pericenter.check.sim']*~data_total[name]['pericenter.check.galpy'])
+    count = np.sum(data_total[name]['infall.check']*data_total[name]['pericenter.check.sim']*~data_total[name]['pericenter.check.model'])
     print(name, count)
 
 # Count how many satellites have peris in model but not sim
 for name in summary.host_names['all']:
-    count = np.sum(data_total[name]['infall.check']*~data_total[name]['pericenter.check.sim']*data_total[name]['pericenter.check.galpy'])
+    count = np.sum(data_total[name]['infall.check']*~data_total[name]['pericenter.check.sim']*data_total[name]['pericenter.check.model'])
     print(name, count)
 
 # For the satellites that have multiple pericenters, count how many have fractional differences > 0% (between recent and minimum)
@@ -104,9 +104,9 @@ for name in summary.host_names['all']:
 
 # Print out the most massive sat stellar mass + halo mass, and see if they're the same subhalo
 for i in summary.host_names['all']:
-    print('The maximum stellar mass in {0} is {1} with index {2}'.format(i, data_total[i]['Mstar.z0'][masks_infall[i]].max(), np.where(data_total[i]['Mstar.z0'][masks_infall[i]].max() == data_total[i]['Mstar.z0'][masks_infall[i]])[0][0]))
+    print('The maximum stellar mass in {0} is {1} with index {2}'.format(i, data_total[i]['M.star.z0'][masks_infall[i]].max(), np.where(data_total[i]['M.star.z0'][masks_infall[i]].max() == data_total[i]['M.star.z0'][masks_infall[i]])[0][0]))
     #
-    print('The maximum peak halo mass in {0} is {1} with index {2}'.format(i, data_total[i]['Mhalo.peak'][masks_infall[i]].max(), np.where(data_total[i]['Mhalo.peak'][masks_infall[i]].max() == data_total[i]['Mhalo.peak'][masks_infall[i]])[0][0]))
+    print('The maximum peak halo mass in {0} is {1} with index {2}'.format(i, data_total[i]['M.halo.peak'][masks_infall[i]].max(), np.where(data_total[i]['M.halo.peak'][masks_infall[i]].max() == data_total[i]['M.halo.peak'][masks_infall[i]])[0][0]))
     #
     print('\n')
 
