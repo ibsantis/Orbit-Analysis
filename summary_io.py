@@ -103,8 +103,7 @@ class SummaryDataSort:
         # Given the type of data you want, read in from the appropriate directory
         if sim_type == 'baryon':
             for name in self.host_names[hosts]:
-                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/apr18_new/data_'+name, verbose=True)
-                #data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
                 data_dict[name] = data
         #
         elif sim_type == 'all_baryon':
@@ -229,7 +228,7 @@ class SummaryDataSort:
                 # If interested in current sats only, do this
                 elif current_sat == True:
                     for name in self.host_names[hosts]:
-                        mask_dict[name] = dictionary[name]['infall.check']*(dictionary[name]['pericenter.check.sim'] | dictionary[name]['pericenter.check.galpy'])*(dictionary[name]['dtot.sim'][:,0] < dictionary[name]['host.radius'][0])
+                        mask_dict[name] = dictionary[name]['infall.check']*(dictionary[name]['pericenter.check.sim'] | dictionary[name]['pericenter.check.galpy'])*(dictionary[name]['d.tot.sim'][:,0] < dictionary[name]['host.radius'][0])
             #
             elif either == False:
                 #
@@ -244,7 +243,7 @@ class SummaryDataSort:
                     # If interested in current sats only, do this
                     elif current_sat == True:
                         for name in self.host_names[hosts]:
-                            mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*(dictionary[name]['dtot.sim'][:,0] < dictionary[name]['host.radius'][0])
+                            mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*(dictionary[name]['d.tot.sim'][:,0] < dictionary[name]['host.radius'][0])
                 #
                 # Pericenter required in simulation and in model
                 elif (peri_sim == True) & (peri_model == True):
@@ -257,7 +256,7 @@ class SummaryDataSort:
                     # If interested in current sats only, do this
                     elif current_sat == True:
                         for name in self.host_names[hosts]:
-                            mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*dictionary[name]['pericenter.check.galpy']*(dictionary[name]['dtot.sim'][:,0] < dictionary[name]['host.radius'][0])
+                            mask_dict[name] = dictionary[name]['infall.check']*dictionary[name]['pericenter.check.sim']*dictionary[name]['pericenter.check.galpy']*(dictionary[name]['d.tot.sim'][:,0] < dictionary[name]['host.radius'][0])
                 #
                 # Pericenter not required in simulation or model
                 elif (peri_sim == False) & (peri_model == False):
@@ -270,7 +269,7 @@ class SummaryDataSort:
                         # If interested in current sats only, do this
                         elif current_sat == True:
                             for name in self.host_names[hosts]:
-                                mask_dict[name] = dictionary[name]['infall.check']*(dictionary[name]['dtot.sim'][:,0] < dictionary[name]['host.radius'][0])
+                                mask_dict[name] = dictionary[name]['infall.check']*(dictionary[name]['d.tot.sim'][:,0] < dictionary[name]['host.radius'][0])
         #
         # If interested in outliers do this.
         elif outliers == True:
@@ -559,7 +558,7 @@ class SummaryDataSort:
             # Mask out the cases where there are no pericenters
             mask_temp = (temp_array == -1)
             # For the null values, replace with present-day distances
-            temp_array[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
+            temp_array[mask_temp] = data_dict[name]['d.tot.sim'][mask_dict[name]][:,0][mask_temp]
             # Determine oversampling and save to list
             if oversample:
                 data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
@@ -618,9 +617,9 @@ class SummaryDataSort:
                 # If there are no pericenters, append the present-day distance as the minimum
                 if np.sum(mask_temp) == 0:
                     if oversample:
-                        data.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][i][0], self.oversample[sim_type][name]))
+                        data.append(np.repeat(data_dict[name]['d.tot.sim'][mask_dict[name]][i][0], self.oversample[sim_type][name]))
                     else:
-                        data.append(data_dict[name]['dtot.sim'][mask_dict[name]][i][0])
+                        data.append(data_dict[name]['d.tot.sim'][mask_dict[name]][i][0])
                 # If there are pericenters, append the minimum value to the list
                 else:
                     if oversample:
@@ -648,7 +647,7 @@ class SummaryDataSort:
                     mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
                     #
                     if np.sum(mask_temp) == 0:
-                        data.append(data_dict[name]['dtot.sim'][mask_dict[name]][i][0])
+                        data.append(data_dict[name]['d.tot.sim'][mask_dict[name]][i][0])
                     #
                     else:
                         data.append(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp][-1])
@@ -659,7 +658,7 @@ class SummaryDataSort:
                     mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
                     #
                     if np.sum(mask_temp) == 0:
-                        data.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][i][0], self.oversample[sim_type][name]))
+                        data.append(np.repeat(data_dict[name]['d.tot.sim'][mask_dict[name]][i][0], self.oversample[sim_type][name]))
                     #
                     else:
                         data.append(np.repeat(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp][-1], self.oversample[sim_type][name]))
@@ -722,7 +721,7 @@ class SummaryDataSort:
             # Mask out cases with null values
             mask_temp = (temp_array == -1)
             # For null cases, replace them with maximum distances the satellites experienced
-            temp_array[mask_temp] = np.max(data_dict[name]['dtot.sim'][mask_dict[name]][mask_temp], axis=1)
+            temp_array[mask_temp] = np.max(data_dict[name]['d.tot.sim'][mask_dict[name]][mask_temp], axis=1)
             # Oversample if needed and append to the list
             if oversample:
                 data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
@@ -779,11 +778,11 @@ class SummaryDataSort:
             temp_array_model = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
             # If no pericenters, replace with present-day distances
             mask_temp = (temp_array_model == -1)
-            temp_array_model[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
+            temp_array_model[mask_temp] = data_dict[name]['d.tot.sim'][mask_dict[name]][:,0][mask_temp]
             #
             temp_array_sim = data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0]
             mask_temp = (temp_array_sim == -1)
-            temp_array_sim[mask_temp] = data_dict[name]['dtot.sim'][mask_dict[name]][:,0][mask_temp]
+            temp_array_sim[mask_temp] = data_dict[name]['d.tot.sim'][mask_dict[name]][:,0][mask_temp]
             #
             # Determine what kind of difference, oversample if needed, and append to list
             if fraction:
@@ -1142,9 +1141,9 @@ class SummaryDataSort:
         for name in self.host_names[hosts]:
             # Oversample if needed and append to list
             if oversample:
-                data.append(np.repeat(data_dict[name]['Mstar.'+selection][mask_dict[name]], self.oversample[sim_type][name]))
+                data.append(np.repeat(data_dict[name]['M.star.'+selection][mask_dict[name]], self.oversample[sim_type][name]))
             else:
-                data.append(data_dict[name]['Mstar.'+selection][mask_dict[name]])
+                data.append(data_dict[name]['M.star.'+selection][mask_dict[name]])
         #
         return np.hstack(data)
 
@@ -1192,9 +1191,9 @@ class SummaryDataSort:
         for name in self.host_names[hosts]:
             # Oversample if needed and append to list
             if oversample:
-                data.append(np.repeat(data_dict[name]['Mhalo.'+selection][mask_dict[name]], self.oversample[sim_type][name]))
+                data.append(np.repeat(data_dict[name]['M.halo.'+selection][mask_dict[name]], self.oversample[sim_type][name]))
             else:
-                data.append(data_dict[name]['Mhalo.'+selection][mask_dict[name]])
+                data.append(data_dict[name]['M.halo.'+selection][mask_dict[name]])
         #
         return np.hstack(data)
 
@@ -1237,9 +1236,9 @@ class SummaryDataSort:
         for name in self.host_names[hosts]:
             # Oversample if needed and append to list
             if oversample:
-                data.append(np.repeat(data_dict[name]['dtot.sim'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
+                data.append(np.repeat(data_dict[name]['d.tot.sim'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
             else:
-                data.append(data_dict[name]['dtot.sim'][mask_dict[name]][:,0])
+                data.append(data_dict[name]['d.tot.sim'][mask_dict[name]][:,0])
         #
         return np.hstack(data)
 
@@ -1287,9 +1286,9 @@ class SummaryDataSort:
         for name in self.host_names[hosts]:
             # Oversample if needed and append to list
             if oversample:
-                data.append(np.repeat(data_dict[name]['vtot.sim'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
+                data.append(np.repeat(data_dict[name]['v.tot.sim'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
             else:
-                data.append(data_dict[name]['vtot.sim'][mask_dict[name]][:,0])
+                data.append(data_dict[name]['v.tot.sim'][mask_dict[name]][:,0])
         #
         return np.hstack(data)
 
@@ -1410,20 +1409,20 @@ class SummaryDataSort:
             # Determine type of kinetic energy
             if ke_type == 'max':
                 # Loop through each satellite
-                for i in range(0, len(data_dict[name]['vtot.sim'][mask_dict[name]])):
+                for i in range(0, len(data_dict[name]['v.tot.sim'][mask_dict[name]])):
                     if oversample:
-                        data.append(np.repeat(np.nanmax(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i]**2), self.oversample[sim_type][name]))
+                        data.append(np.repeat(np.nanmax(0.5*data_dict[name]['v.tot.sim'][mask_dict[name]][i]**2), self.oversample[sim_type][name]))
                     else:
-                        data.append(np.nanmax(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i]**2))
+                        data.append(np.nanmax(0.5*data_dict[name]['v.tot.sim'][mask_dict[name]][i]**2))
             #
             # If you want KE at pericenter, get data at most recent pericenter
             elif ke_type == 'peri':
                 for i in range(0, len(data_dict[name]['pericenter.vel.sim'][mask_dict[name]])):
                     if (data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0] == -1):
                         if oversample:
-                            data.append(np.repeat(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i][0]**2, self.oversample[sim_type][name]))
+                            data.append(np.repeat(0.5*data_dict[name]['v.tot.sim'][mask_dict[name]][i][0]**2, self.oversample[sim_type][name]))
                         else:
-                            data.append(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][i][0]**2)
+                            data.append(0.5*data_dict[name]['v.tot.sim'][mask_dict[name]][i][0]**2)
                     else:
                         if oversample:
                             data.append(np.repeat(0.5*data_dict[name]['pericenter.vel.sim'][mask_dict[name]][i][0]**2, self.oversample[sim_type][name]))
@@ -1433,14 +1432,14 @@ class SummaryDataSort:
             # If present-day KE, select present-day velocity, oversample if needed, and append to list
             elif ke_type == 'z0':
                 if oversample:
-                    data.append(np.repeat(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][:,0]**2, self.oversample[sim_type][name]))
+                    data.append(np.repeat(0.5*data_dict[name]['v.tot.sim'][mask_dict[name]][:,0]**2, self.oversample[sim_type][name]))
                 else:
-                    data.append(0.5*data_dict[name]['vtot.sim'][mask_dict[name]][:,0]**2)
+                    data.append(0.5*data_dict[name]['v.tot.sim'][mask_dict[name]][:,0]**2)
         #
         return np.hstack(data)
 
     # optimized, but still needs a lot of work.
-    def mass_masking_property(self, data_dict, mask_dict, prop, mass_array, mass_type='Mstar.z0', oversample=False, hosts='all', sim_type='baryon'):
+    def mass_masking_property(self, data_dict, mask_dict, prop, mass_array, mass_type='M.star.z0', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
             Takes a mass array and saves a property of interest in a dictionary
@@ -1586,9 +1585,9 @@ class SummaryDataSort:
         for name in self.host_names[hosts]:
             # Oversample if needed and append data to list
             if oversample:
-                data.append(np.repeat(data_dict[name]['Ltot.'+selection][mask_dict[name]][:,0], self.oversample[sim_type][name]))
+                data.append(np.repeat(data_dict[name]['L.tot.'+selection][mask_dict[name]][:,0], self.oversample[sim_type][name]))
             else:
-                data.append(data_dict[name]['Ltot.'+selection][mask_dict[name]][:,0])
+                data.append(data_dict[name]['L.tot.'+selection][mask_dict[name]][:,0])
         #
         return np.hstack(data)
 
