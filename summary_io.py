@@ -59,9 +59,12 @@ class SummaryDataSort:
                            'lg_no_RR': ['Romeo', 'Juliet', 'Thelma', 'Louise']}
         #
         # Oversampling factors
-        self.oversample = {'baryon': {'m12b': 16, 'm12c': 14, 'm12f': 13, 'm12i': 22, 'm12m': 12,\
+        self.oversample = {'baryon_old': {'m12b': 16, 'm12c': 14, 'm12f': 13, 'm12i': 22, 'm12m': 12,\
                                       'm12r': 20, 'm12w': 14, 'm12z': 21, 'Romeo': 16, 'Juliet': 14,\
                                       'Thelma': 17, 'Louise': 16, 'Romulus': 10, 'Remus': 17},\
+                           'baryon': {'m12b': 16, 'm12c': 13, 'm12f': 12, 'm12i': 20, 'm12m': 12,\
+                                      'm12r': 19, 'm12w': 14, 'm12z': 21, 'Romeo': 16, 'Juliet': 14,\
+                                      'Thelma': 16, 'Louise': 15, 'Romulus': 10, 'Remus': 15},\
                            'baryon_all': {'m12b': 17, 'm12c': 14, 'm12f': 14, 'm12i': 18, 'm12m': 14,\
                                           'm12r': 18, 'm12w': 19, 'm12z': 18, 'Romeo': 19, 'Juliet': 18,\
                                           'Thelma': 15, 'Louise': 15, 'Romulus': 10, 'Remus': 20},\
