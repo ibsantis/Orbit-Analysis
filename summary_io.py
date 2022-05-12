@@ -2651,7 +2651,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.ylabel(y_label, fontsize=34)
         if title:
             plt.title(self.titles[title], fontsize=24)
-        plt.tick_params(axis='both', which='major', labelsize=24)
+        plt.tick_params(axis='both', which='major', labelsize=28)
         plt.tight_layout()
         plt.savefig(file_path_and_name)
         plt.close()
