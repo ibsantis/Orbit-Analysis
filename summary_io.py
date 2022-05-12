@@ -491,10 +491,6 @@ class SummaryDataSort:
         # Set up an empty list to save values to
         data = []
         #
-        # Quick label fix if interested in the model property
-        if selection == 'model':
-            selection = 'galpy' # Eventually, I'm going to re-run the data with the "galpy" label replaced with "model"
-        #
         # Loop over the hosts
         for name in self.host_names[hosts]:
             # Determine whether or not oversampling, then save the data to the list
@@ -546,10 +542,6 @@ class SummaryDataSort:
         """
         # Set up an empty list to save values to
         data = []
-        #
-        # Quick fix on labels
-        if selection == 'model':
-            selection = 'galpy'
         #
         # Loops through each host
         for name in self.host_names[hosts]:
@@ -710,10 +702,6 @@ class SummaryDataSort:
         # Set up an empty list to save values to
         data = []
         #
-        # Quick label fix
-        if selection == 'model':
-            selection = 'galpy'
-        #
         # Loop through each host
         for name in self.host_names[hosts]:
             # Select all recent apocenter values
@@ -842,10 +830,6 @@ class SummaryDataSort:
         """
         # Set up an empty list to save the data to
         data = []
-        #
-        # Quick label fix
-        if selection == 'model':
-            selection = 'galpy'
         #
         # Loop through each host
         for name in self.host_names[hosts]:
