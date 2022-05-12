@@ -1784,12 +1784,39 @@ class SummaryDataPlot(SummaryDataSort):
                        'N.model': 'Pericenters',\
                        'N.delta': 'Pericenters'}
 
-    def binning_scheme(self):
+    def binning_scheme(self, x, xtype, binsize, binedges=None):
         """
         DESCRIPTION:
             Function that makes bins... finish later.
         """
-        pass
+        if 'M.' in xtype:
+            x = np.log10(x)
+        #
+        if binedges:
+            bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+            bins = np.linspace(binedges[0], binedges[1], bin_num)
+            half_bin = (bins[1]-bins[0])/2
+        #
+        else:
+            if 'N.' not in xtype:
+                minn = binsize*np.floor(np.min(x)/binsize)
+                maxx = binsize*np.ceil(np.max(x)/binsize)
+                if minn < 0:
+                    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+                else:
+                    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+                bins = np.linspace(minn, maxx, bin_num)
+                half_bin = (bins[1]-bins[0])/2
+            #
+            elif 'N.' in xtype:
+                minn = int(binsize*np.floor(np.min(x)/binsize))-0.5
+                maxx = int(binsize*np.ceil(np.max(x)/binsize))+0.5
+                bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
+                bins = np.linspace(minn, maxx, bin_num)
+                #
+                half_bin = (bins[1]-bins[0])/2
+        #
+        return bins, half_bin
 
     def median_and_scatter(self):
         """
