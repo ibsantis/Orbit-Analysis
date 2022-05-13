@@ -1033,7 +1033,7 @@ class OrbitAnalysis:
         eccentricity = (-1)*np.ones((len(peri_dict['pericenter.check']), N))
         for i in range(0, len(peri_dict['pericenter.check'])):
             for j in range(0, len(ecc[i])):
-                eccentricity[i,j] = ecc[i,j]
+                eccentricity[i,j] = ecc[i][j]
         return eccentricity
 
     def satellite_host_angle(self):
