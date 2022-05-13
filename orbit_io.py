@@ -1128,24 +1128,6 @@ class OrbitGalpy(OrbitAnalysis):
         """
         return np.sqrt(vrad**2 + vtan**2)
 
-    def galpy_infall(self):
-        """
-            Calculate infall with distance and host radius vs time
-        """
-        pass
-
-    def galpy_eccentricity(self):
-        """
-            Same as above, but using galpy values. Probably wont change over time
-        """
-        pass
-
-    def galpy_orbit_period(self):
-        """
-            Same as above, but using galpy values. Probably wont change over time
-        """
-        pass
-
     def galpy_pericenter_interp(self, distances, velocities, time_array, reach=20):
         """
         DESCRIPTION:
