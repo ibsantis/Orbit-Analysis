@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -38,9 +38,9 @@ halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_k
 
 if sim_data.num_gal == 1:
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True)
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=False)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=False)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=False)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
@@ -55,6 +55,8 @@ if sim_data.num_gal == 1:
     peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
     apos = orbits.apocenter_interp(distances=halt_dists, velocities=halt_vels, time_array=snaps, infall_array=infall_info)
     angs = orbits.angular_momentum(tree=halt)
+    periods = orbits.orbit_period(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
+    eccs = orbits.eccentricity(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
     #
     # Initialize the orbits in Galpy
     galpy_orbits = orbit_gal.galpy_orbit_init(tree=halt)
@@ -85,6 +87,11 @@ if sim_data.num_gal == 1:
     tts = (-1)*np.flip(snaps['time'] - snaps['time'][-1])
     peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
     apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
+    eccs_galpy = galpy_orbits.e(pot=potential_two_power)
+
+    galpy_orbits_norm = galpy_orbits.r(ts)[:,:len(host_radii)]/host_radii
+    infall_info_galpy = orbits.infall_times(galpy_orbits_norm, snaps)
+    periods_galpy = orbits.orbit_period(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info_galpy)
 
     galpy_dist_3d = np.ones((orbits.shape[0],len(ts),3))
     galpy_dist_3d[:,:,0] = (-1)*galpy_orbits.x(ts) # x and y have values negative from the sims for some reason...
@@ -120,6 +127,14 @@ if sim_data.num_gal == 1:
     data_dict['first.infall.snap.any'] = infall_info_any['first.infall.snap.any']
     data_dict['first.infall.time.any'] = infall_info_any['first.infall.time.any']
     data_dict['first.infall.time.lb.any'] = infall_info_any['first.infall.time.lb.any']
+    #
+    data_dict['infall.check.model'] = infall_info_galpy['check']
+    data_dict['first.infall.snap.model'] = infall_info_galpy['first.infall.snap']
+    data_dict['first.infall.time.model'] = infall_info_galpy['first.infall.time']
+    data_dict['first.infall.time.lb.model'] = infall_info_galpy['first.infall.time.lb']
+    data_dict['all.infall.snap.model'] = infall_info_galpy['all.infall.snap']
+    data_dict['all.infall.time.model'] = infall_info_galpy['all.infall.time']
+    data_dict['all.infall.time.lb.model'] = infall_info_galpy['all.infall.time.lb']
     #
     # Pericenter checks and numbers
     data_dict['pericenter.check.sim'] = peris['pericenter.check']
@@ -187,6 +202,14 @@ if sim_data.num_gal == 1:
     #
     data_dict['time.sim'] = snaps['time']
     #
+    data_dict['orbit.period.peri'] = periods['pericenter.orbit.period']
+    data_dict['orbit.period.apo'] = periods['apocenter.orbit.period']
+    data_dict['eccentricity'] = eccs
+    #
+    data_dict['orbit.period.peri.model'] = periods_galpy['pericenter.orbit.period']
+    data_dict['orbit.period.apo.model'] = periods_galpy['apocenter.orbit.period']
+    data_dict['eccentricity.model'] = eccs_galpy
+    #
     data_dict['d.tot.model'] = galpy_orbits.r(ts)
     data_dict['d.model'] = galpy_dist_3d
     data_dict['v.tot.model'] = galpy_vels
@@ -197,9 +220,10 @@ if sim_data.num_gal == 1:
     # Save the host radius
     data_dict['host.radius'] = host_radii
 
-    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
+    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
 
+# NEED TO ADD EXTRA STUFF TO LG ANALYSIS
 if sim_data.num_gal == 2:
     #
     ### GALAXY 1
