@@ -975,6 +975,26 @@ class OrbitAnalysis:
         #
         return d
 
+    def orbit_period(self):
+        """
+            Calculate orbital period of satellite based on pericenters, and
+            maybe apocenters too.
+        """
+        pass
+
+    def eccentricity(self):
+        """
+            Calculate the eccentricity based on the apocenters and pericenters.
+        """
+        pass
+
+    def satellite_host_angle(self):
+        """
+            Calculate the angle between the angular momentum vectors between the
+            satellite and host galaxy.
+        """
+        pass
+
 class OrbitGalpy(OrbitAnalysis):
 
     def __init__(self, tree, gal1, location, host, dmo=False):
@@ -1059,6 +1079,24 @@ class OrbitGalpy(OrbitAnalysis):
               to return pericenter and apocenter velocities.
         """
         return np.sqrt(vrad**2 + vtan**2)
+
+    def galpy_infall(self):
+        """
+            Calculate infall with distance and host radius vs time
+        """
+        pass
+
+    def galpy_eccentricity(self):
+        """
+            Same as above, but using galpy values. Probably wont change over time
+        """
+        pass
+
+    def galpy_orbit_period(self):
+        """
+            Same as above, but using galpy values. Probably wont change over time
+        """
+        pass
 
     def galpy_pericenter_interp(self, distances, velocities, time_array, reach=20):
         """
