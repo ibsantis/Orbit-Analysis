@@ -982,7 +982,7 @@ class OrbitAnalysis:
         """
         # Find the pericenter and apocenter times
         peri_dict = self.pericenter_interp(distances=distances, velocities=velocities, virial_radii=virial_radii, time_array=time_array)
-        apo_dict = self.pericenter_interp(distances=distances, velocities=velocities, time_array=time_array, infall_array=infall_array)
+        apo_dict = self.apocenter_interp(distances=distances, velocities=velocities, time_array=time_array, infall_array=infall_array)
         #
         d = dict()
         #
@@ -1012,7 +1012,7 @@ class OrbitAnalysis:
         """
         # Find the pericenter and apocenter times
         peri_dict = self.pericenter_interp(distances=distances, velocities=velocities, virial_radii=virial_radii, time_array=time_array)
-        apo_dict = self.pericenter_interp(distances=distances, velocities=velocities, time_array=time_array, infall_array=infall_array)
+        apo_dict = self.apocenter_interp(distances=distances, velocities=velocities, time_array=time_array, infall_array=infall_array)
         #
         # Calculate the eccentricities
         ecc = []
