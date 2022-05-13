@@ -1029,7 +1029,7 @@ class OrbitAnalysis:
                                 ecc_ind.append((apo_dict['apocenter.dist'][n][mask_apo][i]-peri_dict['pericenter.dist'][n][mask_peri][j])/(apo_dict['apocenter.dist'][n][mask_apo][i]+peri_dict['pericenter.dist'][n][mask_peri][j]))
         #
             ecc.append(ecc_ind)
-        N = [np.max(len(ecc[i]) for i in range(0, len(ecc)))]
+        N = np.max([len(ecc[i]) for i in range(0, len(ecc))])
         eccentricity = (-1)*np.ones((len(peri_dict['pericenter.check']), N))
         for i in range(0, len(peri_dict['pericenter.check'])):
             for j in range(0, len(ecc[i])):
