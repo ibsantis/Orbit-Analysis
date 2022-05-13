@@ -1022,7 +1022,7 @@ class OrbitAnalysis:
                 mask_peri = (peri_dict['pericenter.dist'][n] != -1)
                 mask_apo = (apo_dict['apocenter.dist'][n] != -1)
                 ecc_ind.append((apo_dict['apocenter.dist'][n][mask_apo][0]-peri_dict['pericenter.dist'][n][mask_peri][0])/(apo_dict['apocenter.dist'][n][mask_apo][0]+peri_dict['pericenter.dist'][n][mask_peri][0]))
-                if (np.sum(mask_apo) > 1):
+                if (np.sum(mask_apo) >= 1):
                     for j in range(1, len(peri_dict['pericenter.dist'][n][mask_peri])):
                         for i in range(0, len(apo_dict['apocenter.dist'][n][mask_apo])):
                             if ((j-i == 1) or (j-i == 0)):
