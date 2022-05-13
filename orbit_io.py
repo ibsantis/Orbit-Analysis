@@ -1025,7 +1025,7 @@ class OrbitAnalysis:
                 if (np.sum(mask_apo) > 1):
                     for j in range(1, len(peri_dict['pericenter.dist'][n][mask_peri])):
                         for i in range(0, len(apo_dict['apocenter.dist'][n][mask_apo])):
-                            if ((j-1) <= 1):
+                            if ((j-i) <= 1):
                                 ecc_ind.append((apo_dict['apocenter.dist'][n][mask_apo][i]-peri_dict['pericenter.dist'][n][mask_peri][j])/(apo_dict['apocenter.dist'][n][mask_apo][i]+peri_dict['pericenter.dist'][n][mask_peri][j]))
         #
             ecc.append(ecc_ind)
