@@ -975,18 +975,66 @@ class OrbitAnalysis:
         #
         return d
 
-    def orbit_period(self):
+    def orbit_period(self, distances, velocities, virial_radii, time_array, infall_array):
         """
             Calculate orbital period of satellite based on pericenters, and
             maybe apocenters too.
         """
-        pass
+        # Find the pericenter and apocenter times
+        peri_dict = self.pericenter_interp(distances=distances, velocities=velocites, virial_radii=virial_radii, time_array=time_array)
+        apo_dict = self.pericenter_interp(distances=distances, velocities=velocites, time_array=time_array, infall_array=infall_array)
+        #
+        d = dict()
+        #
+        # Pericenter periods
+        peri_period = (-1)*np.ones((len(peri_dict['pericenter.dist']), np.max(peri_dict['pericenter.num'])-1))
+        for i in range(0, len(peri_dict['pericenter.time.lb'])):
+            if (peri_dict['pericenter.num'][i] > 1):
+                for j in range(0, peri_dict['pericenter.num'][i]-1):
+                    peri_period[i,j] = peri_dict['pericenter.time.lb'][i][j+1] - peri_dict['pericenter.time.lb'][i][j]
+        #
+        # Apocenter periods
+        N = np.max([len(apo_dict['apocenter.time.lb'][i]) for i in range(0, len(apo_dict['apocenter.time.lb']))])
+        apo_period = (-1)*np.ones((len(apo_dict['apocenter.time.lb']), N-1))
+        for i in range(0, len(apo_dict['apocenter.time.lb'])):
+            mask = (apo_dict['apocenter.time.lb'][i] != -1)
+            if (np.sum(mask) > 1):
+                for j in range(0, np.sum(mask)-1):
+                    apo_period[i,j] = apo_dict['apocenter.time.lb'][i][j+1] - apo_dict['apocenter.time.lb'][i][j]
+        #
+        d['pericenter.orbit.period'] = peri_period
+        d['apocenter.orbit.period'] = apo_period
+        return d
 
-    def eccentricity(self):
+    def eccentricity(self, distances, velocities, virial_radii, time_array, infall_array):
         """
             Calculate the eccentricity based on the apocenters and pericenters.
         """
-        pass
+        # Find the pericenter and apocenter times
+        peri_dict = self.pericenter_interp(distances=distances, velocities=velocites, virial_radii=virial_radii, time_array=time_array)
+        apo_dict = self.pericenter_interp(distances=distances, velocities=velocites, time_array=time_array, infall_array=infall_array)
+        #
+        # Calculate the eccentricities
+        ecc = []
+        for n in range(0, len(peri_dict['pericenter.check'])):
+            ecc_ind = []
+            if (peri_dict['pericenter.check'][n] & apo_dict['apocenter.check'][n]):
+                mask_peri = (peri_dict['pericenter.dist'][n] != -1)
+                mask_apo = (apo_dict['apocenter.dist'][n] != -1)
+                ecc_ind.append((apo_dict['apocenter.dist'][n][mask_apo][0]-peri_dict['pericenter.dist'][n][mask_peri][0])/(apo_dict['apocenter.dist'][n][mask_apo][0]+peri_dict['pericenter.dist'][n][mask_peri][0]))
+                if (np.sum(mask_apo) > 1):
+                    for j in range(1, len(peri_dict['pericenter.dist'][n][mask_peri])):
+                        for i in range(0, len(apo_dict['apocenter.dist'][n][mask_apo])):
+                            if ((j-1) <= 1):
+                                ecc_ind.append((apo_dict['apocenter.dist'][n][mask_apo][i]-peri_dict['pericenter.dist'][n][mask_peri][j])/(apo_dict['apocenter.dist'][n][mask_apo][i]+peri_dict['pericenter.dist'][n][mask_peri][j]))
+        #
+            ecc.append(ecc_ind)
+        N = [np.max(len(ecc[i]) for i in range(0, len(ecc)))]
+        eccentricity = (-1)*np.ones((len(peri_dict['pericenter.check']), N))
+        for i in range(0, len(peri_dict['pericenter.check'])):
+            for j in range(0, len(ecc[i])):
+                eccentricity[i,j] = ecc[i,j]
+        return eccentricity
 
     def satellite_host_angle(self):
         """
