@@ -1,18 +1,5 @@
 #!/usr/bin/python3
 
-#SBATCH --job-name=summary_data_all
-###SBATCH --partition=high2    # peloton node: 32 cores, 7.8 GB per core, 250 GB total
-#SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
-#SBATCH --mem=500G
-#SBATCH --nodes=1
-#SBATCH --ntasks=4
-#SBATCH --time=3:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/summary/summary_data_all_%j.txt
-#SBATCH --mail-user=ibsantistevan@ucdavis.edu
-#SBATCH --mail-type=fail
-#SBATCH --mail-type=end
-#SBATCH --mail-type=begin
-
 """
 
     ========================
