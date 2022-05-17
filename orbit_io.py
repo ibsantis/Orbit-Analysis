@@ -1511,7 +1511,7 @@ class OrbitGalpy(OrbitAnalysis):
             - Negative elements correspond to subhalos that have not fallen into
               the host galaxy
             - Very similar to OrbitAnalysis.infall_time(), only I'm saving the
-              most recent infall times, and taking in non-normalized distances 
+              most recent infall times, and taking in non-normalized distances
         """
         # Set up a dictionary to store the information you want
         d = dict();
@@ -1576,9 +1576,9 @@ class OrbitGalpy(OrbitAnalysis):
         #
         # Assign arrays to dictionary elements
         d['check'] = infall_check
-        d['infall.snap'] = all_infall_snaps[-1]
-        d['infall.time'] = all_infall_times[-1]
-        d['infall.time.lb'] = all_infall_times_lookback[-1]
+        d['infall.snap'] = all_infall_snaps[:,-1]
+        d['infall.time'] = all_infall_times[:,-1]
+        d['infall.time.lb'] = all_infall_times_lookback[:,-1]
         #
         return d
 
