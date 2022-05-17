@@ -1487,6 +1487,7 @@ class OrbitGalpy(OrbitAnalysis):
         #
         return check
 
+    # Needs dox
     def galpy_infall_times(self, distances, time_array, distance_threshold=300):
         """
         DESCRIPTION:
@@ -1579,7 +1580,7 @@ class OrbitGalpy(OrbitAnalysis):
         d['infall.snap'] = (-1)*np.ones(len(infall_check))
         d['infall.time'] = (-1)*np.ones(len(infall_check))
         d['infall.time.lb'] = (-1)*np.ones(len(infall_check))
-        print(all_infall_times)
+        #
         for i in range(0, len(infall_check)):
             if infall_check[i]:
                 d['infall.snap'][i] = all_infall_snaps[i][all_infall_snaps[i] != -1][0]
