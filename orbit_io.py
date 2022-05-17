@@ -1579,6 +1579,7 @@ class OrbitGalpy(OrbitAnalysis):
         d['infall.snap'] = (-1)*np.ones(len(infall_check))
         d['infall.time'] = (-1)*np.ones(len(infall_check))
         d['infall.time.lb'] = (-1)*np.ones(len(infall_check))
+        print(all_infall_times)
         for i in range(0, len(infall_check)):
             d['infall.snap'][i] = all_infall_snaps[i][all_infall_snaps[i] != -1][-1]
             d['infall.time'][i] = all_infall_times[i][all_infall_times[i] != -1][-1]
