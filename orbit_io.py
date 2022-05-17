@@ -1487,6 +1487,101 @@ class OrbitGalpy(OrbitAnalysis):
         #
         return check
 
+    def galpy_infall_times(self, distances, time_array, distance_threshold=300):
+        """
+        DESCRIPTION:
+            Reads in normalized subhalo distances and snapshot information and returns
+            the snapshots and times when the subhalos first fell into the host
+
+        VARIABLES:
+            distances_norm     : 2D array (given in kpc physical)
+            time_array         : dictionary
+            distance_threshold : Distance at which you define infall
+                                 Default to 300 kpc
+
+        NOTES:
+            - Returns a dictionary
+                - d['check'] is a boolean array that tells you if the subhalo has
+                  fallen into the host
+                - d['infall.snap'] is a 1D array that gives the snapshot at infall
+                - d['infall.time'] is a 1D array that gives the age of the Universe when
+                  a subhalo recently fell into the host galaxy
+                - d['infall.time.lb'] is a 1D array that gives the lookback time when
+                  a subhalo recently fell into the host galaxy
+            - Negative elements correspond to subhalos that have not fallen into
+              the host galaxy
+            - Very similar to OrbitAnalysis.infall_time(), only I'm saving the
+              most recent infall times, and taking in non-normalized distances 
+        """
+        # Set up a dictionary to store the information you want
+        d = dict();
+        #
+        # Initialize some arrays for the dictionary
+        first_infall_snap = (-1)*np.ones(len(distances), int)
+        first_infall_times = (-1)*np.ones(len(distances))
+        first_infall_times_lookback = (-1)*np.ones(len(distances))
+        infall_check = np.zeros(len(distances), bool)
+        #
+        infall_snaps = []
+        infall_times = []
+        infall_times_lookback = []
+        #
+        # Set up lookback time array
+        lookback = time_array['time'][-1] - time_array['time']
+        distances_norm = distances/distance_threshold
+        #
+        # Loop over subhalos (normalized distance arrays)
+        for i in range(0, len(distances_norm)):
+            temp = []
+            # Check to see if the subhalo is within the virial radius of the host
+            inds = np.where(np.abs(distances_norm[i]) < 1)[0]
+            # If it is, save all indices of when it fell into the host
+            if len(inds) != 0:
+                for j in range(0, len(inds)-1):
+                    if (inds[j+1] > inds[j]+1):
+                        temp.append(inds[j])
+                temp.append(np.max(inds))
+                #
+                # Save the infall snapshots and times
+                infall_snaps.append(time_array['index'][-1] - temp)
+                infall_times.append(time_array['time'][infall_snaps[i]])
+                infall_times_lookback.append(lookback[infall_snaps[i]])
+                #
+                first_infall_snap[i] = time_array['index'][-1]-np.max(np.where(np.abs(distances_norm[i]) < 1)[0])
+                first_infall_times[i] = time_array['time'][first_infall_snap[i]]
+                first_infall_times_lookback[i] = lookback[first_infall_snap[i]]
+                #
+                # Save whether or not subhalo fell into host
+                if first_infall_snap[i] >= 0:
+                    infall_check[i] = True
+            else:
+                infall_snaps.append(np.array([-1]))
+                infall_times.append(np.array([-1]))
+                infall_times_lookback.append(np.array([-1]))
+        #
+        # Find the maximum number of infalls any of the satellites experienced
+        N = np.max([len(infall_snaps[i]) for i in range(0, len(infall_snaps))])
+        #
+        # Set up empty arrays to save all instances of infall
+        all_infall_snaps = (-1)*np.ones((len(distances_norm), N))
+        all_infall_times = (-1)*np.ones((len(distances_norm), N))
+        all_infall_times_lookback = (-1)*np.ones((len(distances_norm), N))
+        #
+        # Fill in the data
+        for i in range(0, len(distances_norm)):
+            for j in range(0, len(infall_snaps[i])):
+                all_infall_snaps[i,j] = infall_snaps[i][j]
+                all_infall_times[i,j] = infall_times[i][j]
+                all_infall_times_lookback[i,j] = infall_times_lookback[i][j]
+        #
+        # Assign arrays to dictionary elements
+        d['check'] = infall_check
+        d['infall.snap'] = all_infall_snaps[-1]
+        d['infall.time'] = all_infall_times[-1]
+        d['infall.time.lb'] = all_infall_times_lookback[-1]
+        #
+        return d
+
 class OrbitTree(OrbitAnalysis):
 
     def __init__(self, tree, gal1, location, host, particles, subsampling, dmo=False):
