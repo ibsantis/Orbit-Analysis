@@ -66,7 +66,7 @@ def mass_evolution(snap, sim_data, rs):
             #print('Done with step', j)
         #
         # Save this data to a file ADD VERBOSE
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.galaxy+'/'+sim_data.galaxy+'_mass_profile_evolution_'+str(snap), dict_or_array_to_write=mass_array, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/may_18_new/'+sim_data.galaxy+'/'+sim_data.galaxy+'_mass_profile_evolution_'+str(snap), dict_or_array_to_write=mass_array, verbose=True)
         print('Done with snapshot {0}'.format(snap))
     #
     # Check if one or two hosts
@@ -93,8 +93,8 @@ def mass_evolution(snap, sim_data, rs):
             #print('Done with step', j)
         #
         # Save this data to a file ADD VERBOSE
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.gal_1+'/'+sim_data.gal_1+'_mass_profile_evolution_'+str(snap), dict_or_array_to_write=mass_array_1, verbose=True)
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.gal_2+'/'+sim_data.gal_2+'_mass_profile_evolution_'+str(snap), dict_or_array_to_write=mass_array_2, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/may_18_new/'+sim_data.gal_1+'/'+sim_data.gal_1+'_mass_profile_evolution_'+str(snap), dict_or_array_to_write=mass_array_1, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/may_18_new/'+sim_data.gal_2+'/'+sim_data.gal_2+'_mass_profile_evolution_'+str(snap), dict_or_array_to_write=mass_array_2, verbose=True)
         print('Done with snapshot {0}'.format(snap))
 
 args_list = [
