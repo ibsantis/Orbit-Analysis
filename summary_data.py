@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -94,7 +94,7 @@ if sim_data.num_gal == 1:
     infall_info_galpy = orbits.infall_times(galpy_orbits_norm, snaps)
     infall_info_galpy_static_300 = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=300)
     infall_info_galpy_static_400 = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=400)
-    infall_info_galpy_static_R200 = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=host_radii[0])
+    infall_info_galpy_static_R200m = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=host_radii[0])
     periods_galpy = orbits.orbit_period(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info_galpy)
 
     galpy_dist_3d = np.ones((orbits.shape[0],len(ts),3))
@@ -216,9 +216,9 @@ if sim_data.num_gal == 1:
     #
     data_dict['time.sim'] = snaps['time']
     #
-    data_dict['orbit.period.peri'] = periods['pericenter.orbit.period']
-    data_dict['orbit.period.apo'] = periods['apocenter.orbit.period']
-    data_dict['eccentricity'] = eccs
+    data_dict['orbit.period.peri.sim'] = periods['pericenter.orbit.period']
+    data_dict['orbit.period.apo.sim'] = periods['apocenter.orbit.period']
+    data_dict['eccentricity.sim'] = eccs
     #
     data_dict['orbit.period.peri.model'] = periods_galpy['pericenter.orbit.period']
     data_dict['orbit.period.apo.model'] = periods_galpy['apocenter.orbit.period']
@@ -298,7 +298,7 @@ if sim_data.num_gal == 2:
     infall_info_galpy = orbits.infall_times(galpy_orbits_norm, snaps)
     infall_info_galpy_static_300 = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=300)
     infall_info_galpy_static_400 = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=400)
-    infall_info_galpy_static_R200 = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=host_radii[0])
+    infall_info_galpy_static_R200m = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=host_radii[0])
     periods_galpy = orbits.orbit_period(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info_galpy)
 
     galpy_dist_3d = np.ones((orbits.shape[0],len(ts),3))
@@ -420,9 +420,9 @@ if sim_data.num_gal == 2:
     #
     data_dict['time.sim'] = snaps['time']
     #
-    data_dict['orbit.period.peri'] = periods['pericenter.orbit.period']
-    data_dict['orbit.period.apo'] = periods['apocenter.orbit.period']
-    data_dict['eccentricity'] = eccs
+    data_dict['orbit.period.peri.sim'] = periods['pericenter.orbit.period']
+    data_dict['orbit.period.apo.sim'] = periods['apocenter.orbit.period']
+    data_dict['eccentricity.sim'] = eccs
     #
     data_dict['orbit.period.peri.model'] = periods_galpy['pericenter.orbit.period']
     data_dict['orbit.period.apo.model'] = periods_galpy['apocenter.orbit.period']
@@ -500,7 +500,7 @@ if sim_data.num_gal == 2:
     infall_info_galpy = orbits.infall_times(galpy_orbits_norm, snaps)
     infall_info_galpy_static_300 = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=300)
     infall_info_galpy_static_400 = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=400)
-    infall_info_galpy_static_R200 = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=host_radii[0])
+    infall_info_galpy_static_R200m = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=host_radii[0])
     periods_galpy = orbits.orbit_period(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info_galpy)
 
     galpy_dist_3d = np.ones((orbits.shape[0],len(ts),3))
@@ -622,9 +622,9 @@ if sim_data.num_gal == 2:
     #
     data_dict['time.sim'] = snaps['time']
     #
-    data_dict['orbit.period.peri'] = periods['pericenter.orbit.period']
-    data_dict['orbit.period.apo'] = periods['apocenter.orbit.period']
-    data_dict['eccentricity'] = eccs
+    data_dict['orbit.period.peri.sim'] = periods['pericenter.orbit.period']
+    data_dict['orbit.period.apo.sim'] = periods['apocenter.orbit.period']
+    data_dict['eccentricity.sim'] = eccs
     #
     data_dict['orbit.period.peri.model'] = periods_galpy['pericenter.orbit.period']
     data_dict['orbit.period.apo.model'] = periods_galpy['apocenter.orbit.period']
