@@ -103,8 +103,8 @@ class SummaryDataSort:
         # Given the type of data you want, read in from the appropriate directory
         if sim_type == 'baryon':
             for name in self.host_names[hosts]:
-                #data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
-                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/with_ecc_per/data_'+name, verbose=True)
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
+                #data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/with_ecc_per/data_'+name, verbose=True)
                 data_dict[name] = data
         #
         elif sim_type == 'all_baryon':
@@ -1140,6 +1140,91 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    # needs dox and optimization
+    def recent_infall(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
+        """
+        DESCRIPTION:
+            Groups the lookback times of satellite first infall into their MW-mass
+            host together into one array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
+        """
+        # Set up empty array to save to
+        data = []
+        #
+        if selection == 'model':
+            time_name = 'all.infall.time.lb.'+selection
+        else:
+            time_name = 'all.infall.time.lb'
+        #
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            for i in range(0, len(data_dict[name][time_name][mask_dict[name]])):
+                mask = (data_dict[name][time_name][mask_dict[name]][i] != -1)
+                if np.sum(mask != 0):
+                    if oversample:
+                        data.append(np.repeat(data_dict[name][time_name][mask_dict[name]][i][mask][0], self.oversample[sim_type][name]))
+                    else:
+                        data.append(data_dict[name][time_name][mask_dict[name]][i][mask][0])
+                else:
+                    if oversample:
+                        data.append(np.repeat(np.nan, self.oversample[sim_type][name]))
+                    else:
+                        data.append(np.nan)
+                #
+        return np.hstack(data)
+
+    # not going to be around for long, this is just to check how the other infall metrics compare
+    def infall_diagnostics(self, data_dict, mask_dict, selection='300kpc', oversample=False, hosts='all', sim_type='baryon'):
+        """
+            Not a long-term method...
+        """
+        # Set up empty array to save to
+        data = []
+        #
+        time_name = 'infall.time.lb.model.'+selection
+        #
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            for i in range(0, len(data_dict[name][time_name][mask_dict[name]])):
+                mask = (data_dict[name][time_name][mask_dict[name]][i] != -1)
+                if np.sum(mask != 0):
+                    if oversample:
+                        data.append(np.repeat(data_dict[name][time_name][mask_dict[name]][i][mask], self.oversample[sim_type][name]))
+                    else:
+                        data.append(data_dict[name][time_name][mask_dict[name]][i][mask])
+                else:
+                    if oversample:
+                        data.append(np.repeat(np.nan, self.oversample[sim_type][name]))
+                    else:
+                        data.append(np.nan)
+                #
+        return np.hstack(data)
+
     # optimized
     def mstar(self, data_dict, mask_dict, selection='z0', oversample=False, hosts='all', sim_type='baryon'):
         """
@@ -1915,18 +2000,72 @@ class SummaryDataSort:
         # Set up an empty list to save values to
         data = []
         #
-        if selection == 'sim':
-            ecc_type = 'eccentricity'
-        else:
-            ecc_type = 'eccentricity.model'
         for name in self.host_names[hosts]:
-            for i in range(0, len(data_dict[name][ecc_type][mask_dict[name]])):
-                mask = (data_dict[name][ecc_type][mask_dict[name]][i] != -1)
+            for i in range(0, len(data_dict[name]['eccentricity.'+selection][mask_dict[name]])):
+                mask = (data_dict[name]['eccentricity.'+selection][mask_dict[name]][i] != -1)
                 if (np.sum(mask) != 0):
                     if oversample:
-                        data.append(np.repeat(np.average(data_dict[name][ecc_type][mask_dict[name]][i][mask]), self.oversample[sim_type][name]))
+                        data.append(np.repeat(np.average(data_dict[name]['eccentricity.'+selection][mask_dict[name]][i][mask]), self.oversample[sim_type][name]))
                     else:
-                        data.append(np.average(data_dict[name][ecc_type][mask_dict[name]][i][mask]))
+                        data.append(np.average(data_dict[name]['eccentricity.'+selection][mask_dict[name]][i][mask]))
+                else:
+                    if oversample:
+                        data.append(np.repeat(np.nan, self.oversample[sim_type][name]))
+                    else:
+                        data.append(np.nan)
+        #
+        return np.hstack(data)
+
+    # This is currently a diagnostic method... need dox
+    def eccentricity_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
+        """
+        DESCRIPTION:
+            Calculates the average eccentricity for a subhalo and stores them
+            all in an array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            selection  : string
+                         Choose whether you want values from simulation data or
+                         data from the model.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
+            - If a subhalo has not experienced at least one pericenter and one
+              apocenter, then the eccentricity is set to -1.
+        """
+        # Set up an empty list to save values to
+        data = []
+        #
+        for name in self.host_names[hosts]:
+            for i in range(0, len(data_dict[name]['eccentricity.'+selection][mask_dict[name]])):
+                mask = (data_dict[name]['eccentricity.'+selection][mask_dict[name]][i] != -1)
+                if (np.sum(mask) != 0):
+                    if oversample:
+                        data.append(np.repeat(data_dict[name]['eccentricity.'+selection][mask_dict[name]][i][mask][0], self.oversample[sim_type][name]))
+                    else:
+                        data.append(data_dict[name]['eccentricity.'+selection][mask_dict[name]][i][mask][0])
         #
         return np.hstack(data)
 
