@@ -2376,7 +2376,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.close()
         pass
 
-    def median_plot(self, x, y, xtype, ytype, binsize, file_path_and_name, binedges=None, limits=None, title=None):
+    def median_plot(self, x, y, xtype, ytype, binsize, file_path_and_name, binedges=None, limits=None, title=None, hl=False):
         """
         DESCRIPTION:
             Bins the x-axis quantity and plots either the mean or median, along
@@ -2425,6 +2425,8 @@ class SummaryDataPlot(SummaryDataSort):
             if limits:
                 plt.xlim(10**(limits[0][0]), 10**(limits[0][1]))
                 plt.ylim(limits[1])
+            if hl:
+                plt.hlines(y=0, xmin=10**(limits[0][0]), xmax=10**(limits[0][1]), color='k', linestyles='dotted', alpha=0.5)
             #
             if 't.' in ytype:
                 # Instantiate the cosmology class and run this method first to set up scalefactors
@@ -2465,6 +2467,8 @@ class SummaryDataPlot(SummaryDataSort):
             if limits:
                 plt.xlim(limits[0])
                 plt.ylim(limits[1])
+            if hl:
+                plt.hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], color='k', linestyles='dotted', alpha=0.5)
             #
             if 't.' in xtype:
                 # Instantiate the cosmology class and run this method first to set up scalefactors
