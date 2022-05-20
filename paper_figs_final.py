@@ -18,6 +18,7 @@ import matplotlib
 from matplotlib.ticker import LogLocator
 from matplotlib.ticker import AutoLocator
 from matplotlib.ticker import ScalarFormatter
+from matplotlib.ticker import MultipleLocator
 from matplotlib import pyplot as plt
 import orbit_io
 import summary_io
@@ -103,7 +104,7 @@ smhm_sgk_1 = sgk_smhm(x_sgk, 1.8, 11.3)
 smhm_sgk_2 = sgk_smhm(x_sgk, 2.6, 20.4)
 
 f, ax1 = plt.subplots(1, 1, figsize=(10,8))
-colorss = ['#000080', '#006400']
+colorss = ['#000080', '#3579DC']
 binedges = (8,12)
 binsize = 0.5
 limits=((7.99,11.3),(4,10))
@@ -177,7 +178,7 @@ ax1.set_ylim(10**(limits[1][0]), 10**(limits[1][1]))
 #
 # Plot the Behroozi extrapolation
 ax1.plot(x_moster, smhm_moster, color=summary_plot.colors[2], linestyle='--', alpha=0.35, label='Moster+ (2013)')
-ax1.plot(10**(x_sgk), 10**(smhm_sgk_1), color=summary_plot.colors[9], linestyle='--', alpha=0.35, label='Garrison-Kimmel+ (2017a)') # alpha = 1.8
+ax1.plot(10**(x_sgk), 10**(smhm_sgk_1), color='#006400', linestyle='--', alpha=0.35, label='Garrison-Kimmel+ (2017a)') # alpha = 1.8
 #ax1.plot(10**(x_sgk), 10**(smhm_sgk_2), color=summary_plot.colors[9], linestyle='--', alpha=0.75, label='Garrison-Kimmel+ (2017a, $\\alpha=2.6$)')
 ax1.plot(10**(x_behroozi), 10**(y_behroozi), color='k', linestyle='--', alpha=0.35)
 ax1.plot(10**(x_behroozi_new), 10**(smhm_behroozi(x_behroozi_new)), linestyle='--', color='k', alpha=0.35, label='Behroozi+ (2020)')
@@ -206,7 +207,8 @@ plt.savefig(directory+'/smhm_w_comparisons.pdf')
         Dynamics vs Mstar, d(z = 0), and t_infall
 """
 f, axs = plt.subplots(3, 3, figsize=(24,16))
-colorss = ['#000080', '#006400']
+colorss = ['#000080', '#3579DC']
+#gs = gridspec.GridSpec(4, 3, height_ratios=[1,5,5,5]) 
 #
 """
     Plotting versus t_infall
@@ -284,11 +286,13 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[0,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-axs[0,0].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.15)
+axs[0,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+axs[0,0].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[0,0].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.5)
+axs[0,0].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
+axs[0,0].axvspan(2.85, 3.01, alpha=0.15, color='k')
+axs[0,0].text(3.1,180,'Free-fall time',fontsize=24,rotation=90)
 #
 axs[0,0].set_xlim(limits_1[0])
 axs[0,0].set_ylim(limits_1[1])
@@ -355,11 +359,12 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[1,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-axs[1,0].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.15)
+axs[1,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+axs[1,0].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[1,0].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.5)
+axs[1,0].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
+axs[1,0].axvspan(2.85, 3.01, alpha=0.15, color='k')
 #
 axs[1,0].set_xlim(limits_2[0])
 axs[1,0].set_ylim(limits_2[1])
@@ -430,11 +435,12 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[2,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-axs[2,0].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.15)
+axs[2,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+axs[2,0].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[2,0].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.5)
+axs[2,0].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
+axs[2,0].axvspan(2.85, 3.01, alpha=0.15, color='k')
 #
 axs[2,0].set_xlim(limits_3[0])
 axs[2,0].set_ylim(limits_3[1])
@@ -509,17 +515,39 @@ for j in range(0, len(x)):
     binss.append(bins)
     half_bins.append(half_bin)
 #
+# Make circular velocity line
+def vc(m,r):
+    return np.sqrt((6.67*10**(-11)*10**(12)*2*10**(30)*m)/(1000*3.086*10**(16)*r))/1000
+ds = np.linspace(25, 425, 1000)
+vcirc = np.zeros(len(ds))
+for i in range(0, len(ds)):
+    vcirc[i] = vc(1, ds[i])
+#
+def vc_nfw(amp, rs, r):
+    return np.sqrt((amp*6.67*10**(-11)*2*10**(30)*(np.log((rs+r)/rs)+rs/(rs+r)-1))/(r*1000*3.086*10**(16)))/1000
+#
+vcirc_nfw_mean = np.zeros(len(ds))
+vcirc_nfw_median = np.zeros(len(ds))
+for i in range(0, len(ds)):
+    vcirc_nfw_mean[i] = vc_nfw(554760646622.4431, 20.52222313571508, ds[i])
+    vcirc_nfw_median[i] = vc_nfw(416798929010.74097, 20.0940230187877, ds[i])
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[0,1].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-axs[0,1].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.15)
+axs[0,1].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+axs[0,1].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[0,1].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.5)
+axs[0,1].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
+axs[0,1].plot(ds, vcirc, color='k', linestyle='dotted', alpha=0.8, label='$\\upsilon_{\\rm c}$: point mass')
+axs[0,1].plot(ds, vcirc_nfw_mean, color='b', linestyle='dotted', alpha=0.8, label='$\\upsilon_{\\rm c}$: NFW mean')
+axs[0,1].plot(ds, vcirc_nfw_median, color='r', linestyle='dotted', alpha=0.8, label='$\\upsilon_{\\rm c}$: NFW median')
+axs[0,1].axvspan(319, 406, alpha=0.15, color='k')
+axs[0,1].text(330,300,'$R_{\\rm 200m}$', fontsize=30)
 #
 axs[0,1].set_xscale('linear')
 axs[0,1].set_xlim(limits_1[0])
 axs[0,1].set_ylim(limits_1[1])
+axs[0,1].legend(prop={'size': 20}, loc='best')
 #
 ############
 #
@@ -578,17 +606,36 @@ for j in range(0, len(x)):
     binss.append(bins)
     half_bins.append(half_bin)
 #
+# Define the circular angular momentum
+def lc(m,r):
+    return np.sqrt((6.67*10**(-11)*2*10**(30)*m*r)/(1000*3.086*10**(16)))/1000
+lcirc = np.zeros(len(ds))
+for i in range(0, len(ds)):
+    lcirc[i] = lc(10**(12), ds[i])
+#
+def lc_nfw(amp,rs,r):
+    return np.sqrt(((6.67*10**(-11)*2*10**(30)*amp*r)/(1000*3.086*10**(16))*(np.log((rs+r)/rs)+(rs/(rs+r))-1)))/1000
+lcirc_mean_nfw = np.zeros(len(ds))
+lcirc_median_nfw = np.zeros(len(ds))
+for i in range(0, len(ds)):
+    lcirc_mean_nfw[i] = lc_nfw(554760646622.4431, 20.52222313571508, ds[i])
+    lcirc_median_nfw[i] = lc_nfw(416798929010.74097, 20.0940230187877, ds[i])
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[1,1].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-axs[1,1].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.15)
+axs[1,1].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+axs[1,1].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[1,1].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.5)
+axs[1,1].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
+axs[1,1].plot(ds, lcirc/1e4, color='k', linestyle='dotted', label='$\\ell_{\\rm c}$: point mass')
+axs[1,1].plot(ds, lcirc_mean_nfw/1e4, color='b', linestyle='dotted', label='$\\ell_{\\rm c}$: NFW mean')
+axs[1,1].plot(ds, lcirc_median_nfw/1e4, color='r', linestyle='dotted', label='$\\ell_{\\rm c}$: NFW median')
+axs[1,1].axvspan(319, 406, alpha=0.15, color='k')
 #
 axs[1,1].set_xscale('linear')
 axs[1,1].set_xlim(limits_2[0])
 axs[1,1].set_ylim(limits_2[1])
+axs[1,1].legend(prop={'size': 20}, loc='best')
 #
 potential_tot = summary.potential(data_potentials, masks_infall, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
 ke_z0_tot = summary.kinetic_energy(data_total, masks_infall, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
@@ -596,11 +643,11 @@ ke_z0_tot = summary.kinetic_energy(data_total, masks_infall, ke_type='z0', overs
 Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_energy', sim_type='baryon')
 dz0_tot = summary.d_z0(data_total, masks_infall, oversample=True, hosts='all_energy', sim_type='baryon')
 #
-x = [dz0_tot]
-y = [(potential_tot+ke_z0_tot)/1e4]
+x = [dz0_tot, dz0_tot]
+y = [(potential_tot+ke_z0_tot)/1e4, potential_tot/1e4]
 #
-xtype = ['d.z0']
-ytype = ['E.tot']
+xtype = ['d.z0', 'd.z0']
+ytype = ['E.tot', 'E.tot']
 #
 medians = []
 lowers = []
@@ -656,17 +703,37 @@ for j in range(0, len(x)):
     binss.append(bins)
     half_bins.append(half_bin)
 #
+# Calculate simple potentials
+def phi_pm(m,r):
+    return (-1)*((6.67*10**(-11)*10**(12)*2*10**(30))/(r*1000*3.086*10**(16)))*(1/1000)**2
+phi_point = np.zeros(len(ds))
+for i in range(0, len(ds)):
+    phi_point[i] = phi_pm(1, ds[i])
+#
+def phi_nfw(amp, rs, r):
+    return (-1)*((6.67*10**(-11)*amp*2*10**(30))/(r*1000*3.086*10**(16)))*np.log(1+r/rs)*(1/1000)**2
+phi_mean = np.zeros(len(ds))
+phi_median = np.zeros(len(ds))
+for i in range(0, len(ds)):
+    phi_mean[i] = phi_nfw(554760646622.4431, 20.52222313571508, ds[i])
+    phi_median[i] = phi_nfw(416798929010.74097, 20.0940230187877, ds[i])
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[2,1].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-axs[2,1].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.15)
+axs[2,1].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+axs[2,1].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[2,1].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.5)
+axs[2,1].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
+axs[2,1].plot(ds, phi_point/1e4, color='k', linestyle='dotted', alpha=0.7, label='$\\Phi$: point mass')
+axs[2,1].plot(ds, phi_mean/1e4, color='b', linestyle='dotted', alpha=0.7, label='$\\Phi$: NFW mean')
+axs[2,1].plot(ds, phi_median/1e4, color='r', linestyle='dotted', alpha=0.7, label='$\\Phi$: NFW median')
+axs[2,1].plot(binss[1][:-1]+half_bins[1], medians[1], color='g', linestyle='dotted', markersize=10, alpha=0.7, label='$\\Phi$: Simulations')
+axs[2,1].axvspan(319, 406, alpha=0.15, color='k')
 #
 axs[2,1].set_xscale('linear')
 axs[2,1].set_xlim(limits_3[0])
 axs[2,1].set_ylim(limits_3[1])
+axs[2,1].legend(prop={'size': 20}, loc='best')
 
 """
     Plotting versus Mstar
@@ -743,11 +810,11 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[0,2].fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-axs[0,2].fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
+axs[0,2].fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+axs[0,2].fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[0,2].plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5)
+axs[0,2].plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7)
 #
 axs[0,2].set_xscale('log')
 axs[0,2].set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
@@ -815,11 +882,11 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[1,2].fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-axs[1,2].fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
+axs[1,2].fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+axs[1,2].fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[1,2].plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5)
+axs[1,2].plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7)
 #
 axs[1,2].set_xscale('log')
 axs[1,2].set_xlim(10**(limits_2[0][0]), 10**(limits_2[0][1]))
@@ -892,11 +959,11 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[2,2].fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-axs[2,2].fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
+axs[2,2].fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+axs[2,2].fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[2,2].plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5)
+axs[2,2].plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7)
 #
 axs[2,2].set_xscale('log')
 axs[2,2].set_xlim(10**(limits_3[0][0]), 10**(limits_3[0][1]))
@@ -968,7 +1035,8 @@ t_in_any_tot = summary.first_infall_any(data_total, masks_infall, oversample=Tru
 Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
 #
 f, (ax1, ax2) = plt.subplots(2, 1, figsize=(10.5,12))
-colorss = ['#000080', '#006400']
+#colorss = ['#aa2222', '#42193d']
+colorss = ['#000000', '#ff4900']
 binedges = (4.5, 9.5)
 binsize = 0.5
 limits_1 = ((4.5,9.5), (0,13.8))
@@ -1042,8 +1110,8 @@ ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=c
 ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.15)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='MW-mass halo')
-ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='Any halo')
+ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.6, label='MW-mass halo')
+ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.6, label='Any halo')
 ax1.hlines(y=12.84, xmin=10**(limits_1[0][0]), xmax=10**(limits_1[0][1]), colors='k', linestyles='dotted', alpha=0.5)
 
 #
@@ -1078,6 +1146,7 @@ y = [t_sim_tot, t_min_tot]
 #
 xtype = ['M.star.z0', 'M.star.z0']
 ytype = ['t.peri.text','t.peri.text']
+colorss = ['#000080', '#006400']
 #
 medians = []
 lowers = []
@@ -1208,7 +1277,7 @@ t_in_any_tot = summary.first_infall_any(data_total, masks_infall, oversample=Tru
 Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
 #
 f, ax1 = plt.subplots(1, 1, figsize=(10,8))
-colorss = ['#000080', '#006400']
+colorss = ['#000000', '#ff4900']
 binedges=None
 binsize = 50
 limits_1 = ((0, 400),(0,13.5))
@@ -1330,7 +1399,9 @@ plt.savefig(directory+'/t_infall_vs_dz0.pdf')
         Pericenter number vs infall time
 """
 f, axs = plt.subplots(2, 3, figsize=(26,16))
-colorss = ['#000080', '#006400']
+#colorss = ['#000080', '#006400']
+colorss = ['#A02422']
+#colorss = ['#3579DC']
 #
 N_sim_tot = summary.nperi(data_total, masks_infall, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon')
 t_in_tot = summary.first_infall(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
@@ -1403,11 +1474,13 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[0,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-axs[0,0].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.15)
+axs[0,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[0], alpha=0.5)
+axs[0,0].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[0], alpha=0.3)
+#
+axs[0,0].axvspan(2.85, 3.01, alpha=0.15, color='k')
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[0,0].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.5)
+axs[0,0].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[0], markersize=10, alpha=0.7)
 #
 axs[0,0].set_xlim(limits[0])
 axs[0,0].set_ylim(limits[1])
@@ -1513,12 +1586,14 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[0,1].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-axs[0,1].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.15)
+axs[0,1].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[0], alpha=0.5)
+axs[0,1].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[0], alpha=0.3)
+#
+axs[0,1].axvspan(319, 406, alpha=0.15, color='k')
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[0,1].plot(binss[1][:-1]+half_bins[1], medians[1], color=colorss[1], markersize=10, alpha=0.5, label='$M_{\\rm star} < 10^7 M_{\\odot}$')
-axs[0,1].plot(binss[2][:-1]+half_bins[2], medians[2], color=colorss[1], linestyle='--', markersize=10, alpha=0.5, label='$M_{\\rm star} > 10^7 M_{\\odot}$')
+axs[0,1].plot(binss[1][:-1]+half_bins[1], medians[1], color=colorss[0], markersize=10, alpha=0.7, label='$M_{\\rm star} < 10^7 M_{\\odot}$')
+axs[0,1].plot(binss[2][:-1]+half_bins[2], medians[2], color=colorss[0], linestyle='--', markersize=10, alpha=0.7, label='$M_{\\rm star} > 10^7 M_{\\odot}$')
 #
 axs[0,1].set_xscale('linear')
 axs[0,1].set_xlim(limits[0])
@@ -1600,11 +1675,11 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[0,2].fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-axs[0,2].fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
+axs[0,2].fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[0], alpha=0.5)
+axs[0,2].fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[0], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[0,2].plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5) # Recent, M < 1e7
+axs[0,2].plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[0], markersize=10, alpha=0.7) # Recent, M < 1e7
 #
 axs[0,2].set_xscale('log')
 axs[0,2].set_xlim(10**(limits[0][0]), 10**(limits[0][1]))
@@ -1620,6 +1695,7 @@ t_in_tot = summary.first_infall(data_total, masks_infall_peri, oversample=True, 
 binsize = 1
 binedges = None
 limits = ((0,13),(0,220))
+colorss = ['#000080', '#006400']
 #
 x = [t_in_tot, t_in_tot]
 y = [d_sim_tot, d_min_tot]
@@ -1683,6 +1759,8 @@ axs[1,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=co
 axs[1,0].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.15)
 axs[1,0].fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color=colorss[0], alpha=0.3)
 axs[1,0].fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color=colorss[0], alpha=0.15)
+#
+axs[1,0].axvspan(2.85, 3.01, alpha=0.15, color='k')
 #
 # Plot the medians for the two mass bins (low-mass)
 axs[1,0].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.8, label='Recent')
@@ -1764,6 +1842,8 @@ axs[1,1].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=co
 axs[1,1].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.15)
 axs[1,1].fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color=colorss[0], alpha=0.3)
 axs[1,1].fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color=colorss[0], alpha=0.15)
+#
+axs[1,1].axvspan(319, 406, alpha=0.15, color='k')
 #
 # Plot the medians for the two mass bins (low-mass)
 axs[1,1].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.5, label='Recent') # Recent, M < 1e7
@@ -2106,7 +2186,7 @@ mask_mult = (N_sim_tot > 1)
 mask_mult_no_out = (np.abs((d_min_tot[mask_mult]-d_sim_tot[mask_mult])/d_sim_tot[mask_mult]) == 0)
 
 f, (ax1, ax2) = plt.subplots(2, 1, figsize=(10.5,12))
-colorss = ['#000080', '#006400', '#8b0000']
+colorss = ['#8b0000', '#3579DC', '#000000']
 binedges = None
 binsize = 0.5
 binedges = (4.5, 9.5)
@@ -2176,13 +2256,13 @@ for j in range(0, len(x)):
     half_bins.append(half_bin)
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.3)
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.5)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='Total Sample')
-ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='$N_{\\rm peri}$ > 1, growing pericenters')
-ax1.plot(10**(binss[2][:-1]+half_bins[2]), medians[2], color=colorss[2], markersize=10, alpha=0.5, label='$N_{\\rm peri}$ > 1, shrinking pericenters')
+ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7, label='Total Sample')
+ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.7, label='$N_{\\rm peri}$ > 1, growing pericenters')
+ax1.plot(10**(binss[2][:-1]+half_bins[2]), medians[2], color=colorss[2], markersize=10, alpha=0.7, label='$N_{\\rm peri}$ > 1, shrinking pericenters')
 #
 ax1.set_xscale('log')
 ax1.set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
@@ -2286,13 +2366,13 @@ for j in range(0, len(x)):
     half_bins.append(half_bin)
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.3)
+ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.5)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax2.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='Total Sample')
-ax2.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='Outliers')
-ax2.plot(10**(binss[2][:-1]+half_bins[2]), medians[2], color=colorss[2], markersize=10, alpha=0.5, label='N > 1, no outliers')
+ax2.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7, label='Total Sample')
+ax2.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.7, label='Outliers')
+ax2.plot(10**(binss[2][:-1]+half_bins[2]), medians[2], color=colorss[2], markersize=10, alpha=0.7, label='N > 1, no outliers')
 #
 ax2.set_xscale('log')
 ax2.set_xlim(10**(limits_2[0][0]), 10**(limits_2[0][1]))
@@ -2321,7 +2401,7 @@ plt.savefig(directory+'/outlier_props_vs_mstar_1.pdf')
 ############
 #
 f, (ax1, ax2) = plt.subplots(2, 1, figsize=(10.5,12))
-colorss = ['#000080', '#006400', '#8b0000']
+colorss = ['#8b0000', '#3579DC', '#000000']
 binedges = None
 binsize = 0.5
 binedges = (4.5, 9.5)
@@ -2408,13 +2488,13 @@ for j in range(0, len(x)):
     half_bins.append(half_bin)
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.3)
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.5)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='Total Sample')
-ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='Outliers')
-ax1.plot(10**(binss[2][:-1]+half_bins[2]), medians[2], color=colorss[2], markersize=10, alpha=0.5, label='N > 1, no outliers')
+ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7, label='Total Sample')
+ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.7, label='Outliers')
+ax1.plot(10**(binss[2][:-1]+half_bins[2]), medians[2], color=colorss[2], markersize=10, alpha=0.7, label='N > 1, no outliers')
 #
 ax1.set_xscale('log')
 ax1.set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
@@ -2503,13 +2583,13 @@ for j in range(0, len(x)):
     half_bins.append(half_bin)
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.3)
+ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.5)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax2.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='Total Sample')
-ax2.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='Outliers')
-ax2.plot(10**(binss[2][:-1]+half_bins[2]), medians[2], color=colorss[2], markersize=10, alpha=0.5, label='N > 1, no outliers')
+ax2.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7, label='Total Sample')
+ax2.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.7, label='Outliers')
+ax2.plot(10**(binss[2][:-1]+half_bins[2]), medians[2], color=colorss[2], markersize=10, alpha=0.7, label='N > 1, no outliers')
 #
 ax2.set_xscale('log')
 ax2.set_xlim(10**(limits_2[0][0]), 10**(limits_2[0][1]))
@@ -2552,7 +2632,7 @@ vz0_tot_all = summary.v_z0(data_total_all, masks_infall_all, oversample=True, ho
 L_tot_all = summary.L_z0(data_total_all, masks_infall_all, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon_all')
 #
 f, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10.5,16))
-colorss = ['#000080', '#006400']
+colorss = ['#000080', '#3579DC']
 binedges = (8,11.5)
 binsize = 0.5
 limits_1 = ((8,11.5),(0,300))
@@ -2622,11 +2702,11 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5)
+ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7)
 #
 ax1.set_xscale('log')
 ax1.set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
@@ -2694,11 +2774,11 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
+ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax2.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5)
+ax2.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7)
 #
 ax2.set_xscale('log')
 ax2.set_xlim(10**(limits_2[0][0]), 10**(limits_2[0][1]))
@@ -2770,11 +2850,11 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-ax3.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-ax3.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
+ax3.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax3.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax3.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5)
+ax3.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7)
 #
 ax3.set_xscale('log')
 ax3.set_xlim(10**(limits_3[0][0]), 10**(limits_3[0][1]))
@@ -2816,7 +2896,7 @@ t_in_any_tot_all = summary.first_infall_any(data_total_all, masks_infall_all, ov
 Mhalo_peak_tot_all = summary.mhalo(data_total_all, masks_infall_all, selection='peak', oversample=True, hosts='all_no_z', sim_type='baryon_all')
 #
 f, (ax1, ax2) = plt.subplots(2, 1, figsize=(10.5,12))
-colorss = ['#000080', '#006400']
+colorss = ['#000000', '#ff4900']
 binedges = (8,11.5)
 binsize = 0.5
 limits_1 = ((8,11.5),(0,11.5))
@@ -2890,8 +2970,8 @@ ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=c
 ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.15)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='MW-mass halo')
-ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='Any halo')
+ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.6, label='MW-mass halo')
+ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.6, label='Any halo')
 #
 ax1.set_xscale('log')
 ax1.set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
@@ -2925,6 +3005,8 @@ y = [t_sim_tot_all, t_min_tot_all]
 #
 xtype = ['M.halo.peak', 'M.halo.peak']
 ytype = ['t.peri.text','t.peri.text']
+colorss = ['#000080', '#006400']
+
 #
 medians = []
 lowers = []
@@ -3047,7 +3129,7 @@ N_sim_tot_all = summary.nperi(data_total_all, masks_infall_all, oversample=True,
 Mhalo_peak_tot_all = summary.mhalo(data_total_all, masks_infall_all, selection='peak', oversample=True, hosts='all_no_z', sim_type='baryon_all')
 #
 f, ax1 = plt.subplots(1, 1, figsize=(10,8))
-colorss = ['#000080', '#006400']
+colorss = ['#A02422']
 binedges = (8,11.5)
 binsize = 0.5
 limits_1 = ((8,11.5),(0,4))
@@ -3120,11 +3202,11 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[0], alpha=0.5)
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[0], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5)
+ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[0], markersize=10, alpha=0.7)
 #
 ax1.set_xscale('log')
 ax1.set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
@@ -3161,7 +3243,7 @@ masks_infall_dmo = summary.data_mask(data_total_dmo, peri_sim=False, peri_model=
 masks_infall_dmo_peri = summary.data_mask(data_total_dmo, peri_sim=True, peri_model=False, hosts='iso_no_z')
 #
 f, (ax1, ax2) = plt.subplots(2, 1, figsize=(10.5,12))
-colorss = ['#000080', '#006400']
+colorss = ['#2b2031', '#AB0B23']
 binedges = (8,11.5)
 binsize = 0.5
 limits_1 = ((8, 11.5),(0,13))
@@ -3233,14 +3315,14 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
-ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.3)
-ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.15)
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.3)
+ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.5)
+ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='Baryonic')
-ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='DMO')
+ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7, label='Baryonic')
+ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.7, label='DMO')
 #
 ax1.set_xscale('log')
 ax1.set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
@@ -3331,14 +3413,14 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
-ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.3)
-ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.15)
+ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.3)
+ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.5)
+ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax2.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='Baryonic')
-ax2.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='DMO')
+ax2.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7, label='Baryonic')
+ax2.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.7, label='DMO')
 #
 ax2.set_xscale('log')
 ax2.set_xlim(10**(limits_2[0][0]), 10**(limits_2[0][1]))
@@ -3372,7 +3454,6 @@ Mhalo_peak_tot_dmo = summary.mhalo(data_total_dmo, masks_infall_dmo, selection='
 L_tot_dmo = summary.L_z0(data_total_dmo, masks_infall_dmo, selection='sim', oversample=True, hosts='iso_no_z', sim_type='dmo')
 #
 f, (ax1, ax2) = plt.subplots(2, 1, figsize=(10.5,12))
-colorss = ['#000080', '#006400']
 binedges = (8,11.5)
 binsize = 0.5
 limits_1 = ((8, 11.5),(0,3))
@@ -3440,14 +3521,14 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
-ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.3)
-ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.15)
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.3)
+ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.5)
+ax1.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='Baryonic')
-ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='DMO')
+ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7, label='Baryonic')
+ax1.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.7, label='DMO')
 #
 ax1.set_xscale('log')
 ax1.set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
@@ -3525,14 +3606,14 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.3)
-ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.15)
-ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.3)
-ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.15)
+ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax2.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.3)
+ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), uppers[1], lowers[1], color=colorss[0], alpha=0.5)
+ax2.fill_between(10**(binss[1][:-1]+half_bins[1]), highests[1], lowests[1], color=colorss[0], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-ax2.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.5, label='Baryonic')
-ax2.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.5, label='DMO')
+ax2.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7, label='Baryonic')
+ax2.plot(10**(binss[1][:-1]+half_bins[1]), medians[1], color=colorss[0], markersize=10, alpha=0.7, label='DMO')
 #
 ax2.set_xscale('log')
 ax2.set_xlim(10**(limits_2[0][0]), 10**(limits_2[0][1]))
