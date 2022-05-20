@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=m12m_mass_profile
+#SBATCH --job-name=m12r_mass_profile
 ##SBATCH --partition=high2    # peloton node: 32 cores, 7.8 GB per core, 250 GB total
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=480G
@@ -7,8 +7,8 @@
 ##SBATCH --ntasks-per-node=4    # MPI tasks per node
 #SBATCH --ntasks=8    # processes total
 ##SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
-#SBATCH --time=6:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/m12m_mass_profile_%j.txt
+#SBATCH --time=4:00:00
+#SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/m12r_mass_profile_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -36,7 +36,7 @@ import orbit_io
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12m', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12r', location='peloton')
 print('Set paths')
 
 # Set up snapshot array to loop through
