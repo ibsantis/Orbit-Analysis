@@ -206,9 +206,22 @@ plt.savefig(directory+'/smhm_w_comparisons.pdf')
     Figure 2:
         Dynamics vs Mstar, d(z = 0), and t_infall
 """
-f, axs = plt.subplots(3, 3, figsize=(24,16))
+#f, axs = plt.subplots(3, 3, figsize=(24,16))
+f = plt.figure(figsize=(28,16))
 colorss = ['#000080', '#3579DC']
-#gs = gridspec.GridSpec(4, 3, height_ratios=[1,5,5,5]) 
+gs = gridspec.GridSpec(4, 3, height_ratios=[1,4.5,4.5,4.5])
+ax00 = plt.subplot(gs[0,0])
+ax01 = plt.subplot(gs[0,1])
+ax02 = plt.subplot(gs[0,2])
+ax10 = plt.subplot(gs[1,0])
+ax11 = plt.subplot(gs[1,1])
+ax12 = plt.subplot(gs[1,2])
+ax20 = plt.subplot(gs[2,0])
+ax21 = plt.subplot(gs[2,1])
+ax22 = plt.subplot(gs[2,2])
+ax30 = plt.subplot(gs[3,0])
+ax31 = plt.subplot(gs[3,1])
+ax32 = plt.subplot(gs[3,2])
 #
 """
     Plotting versus t_infall
@@ -216,6 +229,11 @@ colorss = ['#000080', '#3579DC']
 t_in_tot = summary.first_infall(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
 vz0_tot = summary.v_z0(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
 L_tot = summary.L_z0(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+ts = summary.first_infall(data_total, masks_infall, oversample=False, hosts='all_no_z', sim_type='baryon')
+tbins = summary_plot.binning_scheme(ts, 't.infall', binsize=0.5)[0]
+ax00.hist(ts, bins=tbins, density=False, color=colorss[1], alpha=0.7)
+ax00.set_xlim([0,13])
 #
 binedges = None
 binsize = 1
@@ -286,16 +304,16 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[0,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
-axs[0,0].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
+ax10.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax10.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[0,0].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
-axs[0,0].axvspan(2.85, 3.01, alpha=0.15, color='k')
-axs[0,0].text(3.1,180,'Free-fall time',fontsize=24,rotation=90)
+ax10.plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
+ax10.axvspan(2.85, 3.01, alpha=0.15, color='k')
+ax10.text(3.1,160,'Free-fall time',fontsize=24,rotation=90)
 #
-axs[0,0].set_xlim(limits_1[0])
-axs[0,0].set_ylim(limits_1[1])
+ax10.set_xlim(limits_1[0])
+ax10.set_ylim(limits_1[1])
 #
 x = [t_in_tot]
 y = [L_tot/1e4]
@@ -359,15 +377,15 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[1,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
-axs[1,0].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
+ax20.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax20.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[1,0].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
-axs[1,0].axvspan(2.85, 3.01, alpha=0.15, color='k')
+ax20.plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
+ax20.axvspan(2.85, 3.01, alpha=0.15, color='k')
 #
-axs[1,0].set_xlim(limits_2[0])
-axs[1,0].set_ylim(limits_2[1])
+ax20.set_xlim(limits_2[0])
+ax20.set_ylim(limits_2[1])
 #
 potential_tot = summary.potential(data_potentials, masks_infall, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
 ke_z0_tot = summary.kinetic_energy(data_total, masks_infall, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
@@ -435,15 +453,15 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[2,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
-axs[2,0].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
+ax30.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax30.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[2,0].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
-axs[2,0].axvspan(2.85, 3.01, alpha=0.15, color='k')
+ax30.plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
+ax30.axvspan(2.85, 3.01, alpha=0.15, color='k')
 #
-axs[2,0].set_xlim(limits_3[0])
-axs[2,0].set_ylim(limits_3[1])
+ax30.set_xlim(limits_3[0])
+ax30.set_ylim(limits_3[1])
 
 """
     Plotting versus d(z = 0)
@@ -452,6 +470,11 @@ dz0_tot = summary.d_z0(data_total, masks_infall, oversample=True, hosts='all_no_
 Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
 vz0_tot = summary.v_z0(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
 L_tot = summary.L_z0(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+dzs = summary.d_z0(data_total, masks_infall, oversample=False, hosts='all_no_z', sim_type='baryon')
+dbins = summary_plot.binning_scheme(dzs, 't.infall', binsize=20)[0]
+ax01.hist(dzs, bins=dbins, density=False, color=colorss[1], alpha=0.7)
+ax01.set_xlim([0,415])
 #
 binedges = None
 binsize = 50
@@ -533,21 +556,21 @@ for i in range(0, len(ds)):
     vcirc_nfw_median[i] = vc_nfw(416798929010.74097, 20.0940230187877, ds[i])
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[0,1].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
-axs[0,1].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
+ax11.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax11.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[0,1].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
-axs[0,1].plot(ds, vcirc, color='k', linestyle='dotted', alpha=0.8, label='$\\upsilon_{\\rm c}$: point mass')
-axs[0,1].plot(ds, vcirc_nfw_mean, color='b', linestyle='dotted', alpha=0.8, label='$\\upsilon_{\\rm c}$: NFW mean')
-axs[0,1].plot(ds, vcirc_nfw_median, color='r', linestyle='dotted', alpha=0.8, label='$\\upsilon_{\\rm c}$: NFW median')
-axs[0,1].axvspan(319, 406, alpha=0.15, color='k')
-axs[0,1].text(330,300,'$R_{\\rm 200m}$', fontsize=30)
+ax11.plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
+ax11.plot(ds, vcirc, color='k', linestyle='dotted', alpha=0.8, label='$\\upsilon_{\\rm c}$: point mass')
+ax11.plot(ds, vcirc_nfw_mean, color='b', linestyle='dotted', alpha=0.8, label='$\\upsilon_{\\rm c}$: NFW mean')
+ax11.plot(ds, vcirc_nfw_median, color='r', linestyle='dotted', alpha=0.8, label='$\\upsilon_{\\rm c}$: NFW median')
+ax11.axvspan(319, 406, alpha=0.15, color='k')
+ax11.text(330,300,'$R_{\\rm 200m}$', fontsize=30)
 #
-axs[0,1].set_xscale('linear')
-axs[0,1].set_xlim(limits_1[0])
-axs[0,1].set_ylim(limits_1[1])
-axs[0,1].legend(prop={'size': 20}, loc='best')
+ax11.set_xscale('linear')
+ax11.set_xlim(limits_1[0])
+ax11.set_ylim(limits_1[1])
+ax11.legend(prop={'size': 20}, loc='best')
 #
 ############
 #
@@ -622,20 +645,20 @@ for i in range(0, len(ds)):
     lcirc_median_nfw[i] = lc_nfw(416798929010.74097, 20.0940230187877, ds[i])
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[1,1].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
-axs[1,1].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
+ax21.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax21.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[1,1].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
-axs[1,1].plot(ds, lcirc/1e4, color='k', linestyle='dotted', label='$\\ell_{\\rm c}$: point mass')
-axs[1,1].plot(ds, lcirc_mean_nfw/1e4, color='b', linestyle='dotted', label='$\\ell_{\\rm c}$: NFW mean')
-axs[1,1].plot(ds, lcirc_median_nfw/1e4, color='r', linestyle='dotted', label='$\\ell_{\\rm c}$: NFW median')
-axs[1,1].axvspan(319, 406, alpha=0.15, color='k')
+ax21.plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
+ax21.plot(ds, lcirc/1e4, color='k', linestyle='dotted', label='$\\ell_{\\rm c}$: point mass')
+ax21.plot(ds, lcirc_mean_nfw/1e4, color='b', linestyle='dotted', label='$\\ell_{\\rm c}$: NFW mean')
+ax21.plot(ds, lcirc_median_nfw/1e4, color='r', linestyle='dotted', label='$\\ell_{\\rm c}$: NFW median')
+ax21.axvspan(319, 406, alpha=0.15, color='k')
 #
-axs[1,1].set_xscale('linear')
-axs[1,1].set_xlim(limits_2[0])
-axs[1,1].set_ylim(limits_2[1])
-axs[1,1].legend(prop={'size': 20}, loc='best')
+ax21.set_xscale('linear')
+ax21.set_xlim(limits_2[0])
+ax21.set_ylim(limits_2[1])
+ax21.legend(prop={'size': 20}, loc='best')
 #
 potential_tot = summary.potential(data_potentials, masks_infall, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
 ke_z0_tot = summary.kinetic_energy(data_total, masks_infall, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
@@ -719,21 +742,21 @@ for i in range(0, len(ds)):
     phi_median[i] = phi_nfw(416798929010.74097, 20.0940230187877, ds[i])
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[2,1].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
-axs[2,1].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
+ax31.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax31.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[2,1].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
-axs[2,1].plot(ds, phi_point/1e4, color='k', linestyle='dotted', alpha=0.7, label='$\\Phi$: point mass')
-axs[2,1].plot(ds, phi_mean/1e4, color='b', linestyle='dotted', alpha=0.7, label='$\\Phi$: NFW mean')
-axs[2,1].plot(ds, phi_median/1e4, color='r', linestyle='dotted', alpha=0.7, label='$\\Phi$: NFW median')
-axs[2,1].plot(binss[1][:-1]+half_bins[1], medians[1], color='g', linestyle='dotted', markersize=10, alpha=0.7, label='$\\Phi$: Simulations')
-axs[2,1].axvspan(319, 406, alpha=0.15, color='k')
+ax31.plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[1], markersize=10, alpha=0.7)
+ax31.plot(ds, phi_point/1e4, color='k', linestyle='dotted', alpha=0.7, label='$\\Phi$: point mass')
+ax31.plot(ds, phi_mean/1e4, color='b', linestyle='dotted', alpha=0.7, label='$\\Phi$: NFW mean')
+ax31.plot(ds, phi_median/1e4, color='r', linestyle='dotted', alpha=0.7, label='$\\Phi$: NFW median')
+ax31.plot(binss[1][:-1]+half_bins[1], medians[1], color='g', linestyle='dotted', markersize=10, alpha=0.7, label='$\\Phi$: Simulations')
+ax31.axvspan(319, 406, alpha=0.15, color='k')
 #
-axs[2,1].set_xscale('linear')
-axs[2,1].set_xlim(limits_3[0])
-axs[2,1].set_ylim(limits_3[1])
-axs[2,1].legend(prop={'size': 20}, loc='best')
+ax31.set_xscale('linear')
+ax31.set_xlim(limits_3[0])
+ax31.set_ylim(limits_3[1])
+ax31.legend(prop={'size': 20}, loc='best')
 
 """
     Plotting versus Mstar
@@ -741,6 +764,12 @@ axs[2,1].legend(prop={'size': 20}, loc='best')
 Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
 vz0_tot = summary.v_z0(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
 L_tot = summary.L_z0(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+mms = summary.mstar(data_total, masks_infall, selection='z0', oversample=False, hosts='all_no_z', sim_type='baryon')
+mbins = summary_plot.binning_scheme(mms, 'M.star.z0', binsize=0.5, binedges=(4.5,9.5))[0]
+ax02.hist(mms, bins=10**mbins, density=False, color=colorss[1], alpha=0.7)
+ax02.set_xlim([10**(4.5),10**(9.5)])
+ax02.set_xscale('log')
 #
 binedges = (4.5, 9.5)
 binsize = 0.5
@@ -810,15 +839,15 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[0,2].fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
-axs[0,2].fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.3)
+ax12.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax12.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[0,2].plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7)
+ax12.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7)
 #
-axs[0,2].set_xscale('log')
-axs[0,2].set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
-axs[0,2].set_ylim(limits_1[1])
+ax12.set_xscale('log')
+ax12.set_xlim(10**(limits_1[0][0]), 10**(limits_1[0][1]))
+ax12.set_ylim(limits_1[1])
 #
 x = [Mstar_z0_tot]
 y = [L_tot/1e4]
@@ -882,15 +911,15 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[1,2].fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
-axs[1,2].fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.3)
+ax22.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax22.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[1,2].plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7)
+ax22.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7)
 #
-axs[1,2].set_xscale('log')
-axs[1,2].set_xlim(10**(limits_2[0][0]), 10**(limits_2[0][1]))
-axs[1,2].set_ylim(limits_2[1])
+ax22.set_xscale('log')
+ax22.set_xlim(10**(limits_2[0][0]), 10**(limits_2[0][1]))
+ax22.set_ylim(limits_2[1])
 #
 potential_tot = summary.potential(data_potentials, masks_infall, oversample=True, hosts='all_energy', sim_type='baryon', norm='kinetic')
 ke_z0_tot = summary.kinetic_energy(data_total, masks_infall, ke_type='z0', oversample=True, hosts='all_energy', sim_type='baryon')
@@ -959,63 +988,68 @@ for j in range(0, len(x)):
 #
 # PLOTTING
 # Plot the scatter for the recent and minimum pericenters
-axs[2,2].fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
-axs[2,2].fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.3)
+ax32.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[1], alpha=0.5)
+ax32.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[1], alpha=0.3)
 #
 # Plot the medians for the two mass bins (low-mass)
-axs[2,2].plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7)
+ax32.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[1], markersize=10, alpha=0.7)
 #
-axs[2,2].set_xscale('log')
-axs[2,2].set_xlim(10**(limits_3[0][0]), 10**(limits_3[0][1]))
-axs[2,2].set_ylim(limits_3[1])
+ax32.set_xscale('log')
+ax32.set_xlim(10**(limits_3[0][0]), 10**(limits_3[0][1]))
+ax32.set_ylim(limits_3[1])
 #
-axs[0,1].get_yaxis().set_label_coords(-0.14,0.5)
-axs[1,1].get_yaxis().set_label_coords(-0.14,0.5)
-axs[0,1].set_ylabel(' ', fontsize=28)
-axs[1,1].set_ylabel(' ', fontsize=28)
-axs[2,1].set_ylabel(' ', fontsize=28)
-axs[2,1].get_yaxis().set_label_coords(-0.14,0.5)
+ax11.get_yaxis().set_label_coords(-0.14,0.5)
+ax21.get_yaxis().set_label_coords(-0.14,0.5)
+ax11.set_ylabel(' ', fontsize=28)
+ax21.set_ylabel(' ', fontsize=28)
+ax31.set_ylabel(' ', fontsize=28)
+ax31.get_yaxis().set_label_coords(-0.14,0.5)
 #
-axs[0,2].get_yaxis().set_label_coords(-0.14,0.5)
-axs[1,2].get_yaxis().set_label_coords(-0.14,0.5)
-axs[2,2].get_yaxis().set_label_coords(-0.14,0.5)
-axs[0,2].set_ylabel(' ', fontsize=24)
-axs[1,2].set_ylabel(' ', fontsize=24)
-axs[2,2].set_ylabel(' ', fontsize=24)
+ax12.get_yaxis().set_label_coords(-0.14,0.5)
+ax22.get_yaxis().set_label_coords(-0.14,0.5)
+ax32.get_yaxis().set_label_coords(-0.14,0.5)
+ax12.set_ylabel(' ', fontsize=24)
+ax22.set_ylabel(' ', fontsize=24)
+ax32.set_ylabel(' ', fontsize=24)
 #
-axs[0,2].xaxis.set_major_locator(LogLocator(base=10))
-axs[0,2].xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
-axs[1,2].xaxis.set_major_locator(LogLocator(base=10))
-axs[1,2].xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
-axs[2,2].xaxis.set_major_locator(LogLocator(base=10))
-axs[2,2].xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
-axs[0,2].set_xticks([1e5, 1e6, 1e7, 1e8, 1e9])
-axs[1,2].set_xticks([1e5, 1e6, 1e7, 1e8, 1e9])
-axs[2,2].set_xticks([1e5, 1e6, 1e7, 1e8, 1e9])
+ax12.xaxis.set_major_locator(LogLocator(base=10))
+ax12.xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
+ax22.xaxis.set_major_locator(LogLocator(base=10))
+ax22.xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
+ax32.xaxis.set_major_locator(LogLocator(base=10))
+ax32.xaxis.set_minor_locator(LogLocator(base=10,subs=[2,3,4,5,6,7,8,9]))
+ax12.set_xticks([1e5, 1e6, 1e7, 1e8, 1e9])
+ax22.set_xticks([1e5, 1e6, 1e7, 1e8, 1e9])
+ax32.set_xticks([1e5, 1e6, 1e7, 1e8, 1e9])
 #
-axs[0,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=False)
-axs[1,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=False)
-axs[2,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28)
-axs[0,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=False, labelbottom=False)
-axs[1,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=False, labelbottom=False)
-axs[2,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=False)
-axs[0,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=False, labelbottom=False)
-axs[1,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=False, labelbottom=False)
-axs[2,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=False)
+ax00.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False)
+ax01.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False)
+ax02.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False)
+ax10.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=False)
+ax20.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=False)
+ax30.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28)
+ax11.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=False, labelbottom=False)
+ax21.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=False, labelbottom=False)
+ax31.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=False)
+ax12.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=False, labelbottom=False)
+ax22.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=False, labelbottom=False)
+ax32.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=False)
 #
-axs[2,0].set_xlabel('Infall lookback time [Gyr]', fontsize=30)
-axs[2,1].set_xlabel('Host distance $d$ [kpc]', fontsize=30)
-axs[2,2].set_xlabel('$M_{\\rm star} [M_{\\odot}]$', fontsize=30)
+ax30.set_xlabel('Infall lookback time [Gyr]', fontsize=30)
+ax31.set_xlabel('Host distance $d$ [kpc]', fontsize=30)
+ax32.set_xlabel('$M_{\\rm star} [M_{\\odot}]$', fontsize=30)
 #
-axs[0,0].set_ylabel('Total velocity [km s$^{-1}$]', fontsize=28)
-axs[0,0].get_yaxis().set_label_coords(-0.14,0.5)
-axs[1,0].set_ylabel('$\\ell$ [10$^4$ kpc km s$^{-1}$]', fontsize=30)
-axs[1,0].get_yaxis().set_label_coords(-0.14,0.5)
-axs[2,0].set_ylabel('$E$ [10$^4$ km$^2$ s$^{-2}$]', fontsize=30)
-axs[2,0].get_yaxis().set_label_coords(-0.14,0.5)
+ax00.set_ylabel('$N_{\\rm sat}$', fontsize=24)
+ax00.get_yaxis().set_label_coords(-0.08,0.5)
+ax10.set_ylabel('Total velocity [km s$^{-1}$]', fontsize=28)
+ax10.get_yaxis().set_label_coords(-0.14,0.5)
+ax20.set_ylabel('$\\ell$ [10$^4$ kpc km s$^{-1}$]', fontsize=30)
+ax20.get_yaxis().set_label_coords(-0.14,0.5)
+ax30.set_ylabel('$E$ [10$^4$ km$^2$ s$^{-2}$]', fontsize=30)
+ax30.get_yaxis().set_label_coords(-0.14,0.5)
 #
 plt.tight_layout()
-plt.subplots_adjust(wspace=0.06, hspace=0)
+plt.subplots_adjust(wspace=0.1, hspace=0)
 #plt.show()
 plt.savefig(directory+'/dynamics.pdf')
 
@@ -1478,6 +1512,7 @@ axs[0,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=co
 axs[0,0].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[0], alpha=0.3)
 #
 axs[0,0].axvspan(2.85, 3.01, alpha=0.15, color='k')
+axs[0,0].text(3.2, 5.8, 'Free-fall time', fontsize=28, rotation=90)
 #
 # Plot the medians for the two mass bins (low-mass)
 axs[0,0].plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[0], markersize=10, alpha=0.7)
@@ -1590,6 +1625,7 @@ axs[0,1].fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=co
 axs[0,1].fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[0], alpha=0.3)
 #
 axs[0,1].axvspan(319, 406, alpha=0.15, color='k')
+axs[0,1].text(325, 6, '$R_{\\rm 200m}$', fontsize=30)
 #
 # Plot the medians for the two mass bins (low-mass)
 axs[0,1].plot(binss[1][:-1]+half_bins[1], medians[1], color=colorss[0], markersize=10, alpha=0.7, label='$M_{\\rm star} < 10^7 M_{\\odot}$')
@@ -2140,6 +2176,11 @@ axs[1,0].xaxis.set_major_locator(ticker.FixedLocator(majors))
 axs[1,1].xaxis.set_major_locator(ticker.FixedLocator(majors))
 axs[1,2].xaxis.set_major_locator(ticker.FixedLocator(majors))
 axs[1,3].xaxis.set_major_locator(ticker.FixedLocator(majors))
+#
+axs[1,0].text(1.5,0.25,'A',fontsize=28)
+axs[1,1].text(1.5,0.25,'B',fontsize=28)
+axs[1,2].text(1.5,0.25,'C',fontsize=28)
+axs[1,3].text(1.5,0.25,'D',fontsize=28)
 #
 axs[0,0].set_ylabel('Host Distance $d$ [kpc]', fontsize=24)
 axs[0,0].set_xlabel('Lookback time [Gyr]', fontsize=24)
