@@ -5,9 +5,9 @@
 #SBATCH --mem=480G
 #SBATCH --nodes=1
 ##SBATCH --ntasks-per-node=4    # MPI tasks per node
-#SBATCH --ntasks=8    # processes total
+#SBATCH --ntasks=4    # processes total
 ##SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
-#SBATCH --time=24:00:00
+#SBATCH --time=48:00:00
 #SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/RJ_mass_profile_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
@@ -101,7 +101,7 @@ args_list = [
     (snapshot, sim_data, rs) for snapshot in snaps
     ]
 
-ut.io.run_in_parallel(mass_evolution, args_list, proc_number=8) # ADD VERBOSE
+ut.io.run_in_parallel(mass_evolution, args_list, proc_number=4) # ADD VERBOSE
 # Try 4 at first, then try 8
 # How many snaps can I read in simultaneously? Divide total mem by snapshots to get proc number
 #
