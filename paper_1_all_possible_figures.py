@@ -810,3 +810,119 @@ summary_plot.median_plot_mult(x=[t_in_tot, t_in_apo_only], y=[d_apo_tot, d_apo_o
 
 # Apocenter vs t_infall (any host)
 summary_plot.median_plot_mult(x=[t_in_any_tot, t_in_any_apo_only], y=[d_apo_tot, d_apo_only], xtype=['t.infall.text', 't.infall.text'], ytype=['d.apo.text', 'd.apo.text'], labels=['Including no apocenters', 'Real Apocenters'], binsize=1, limits=((0,14),(0,800)), file_path_and_name=directory+'/d_apo_vs_t_infall_any_comp.pdf')
+
+
+
+# Checking correlations between pericenter properties with infall time and merger times
+t90star = np.array([1.27, 0.98, 1.19, 1.45, 1.49, 0.83, 0.92, 2.13, 1.57, 1.08, 1.52, 1.38, 1.89])
+t10halo = np.array([11.57, 10.57, 11.65, 11.79, 11.29, 0, 11.65, 12.54, 12.49, 10.85, 12.23, 11.57, 12.14])
+t15in = np.array([10.99, 10.24, 12.04, 11.65, 9.4, 0, 11.29, 12.82, 12.66, 9.86, 12.54, 12.66, 12.04])
+
+rec = np.zeros(len(summary.host_names['all_no_z']))
+minn = np.zeros(len(summary.host_names['all_no_z']))
+for i, name in enumerate(summary.host_names['all_no_z']):
+    rec[i] = np.median(t_sim_tot[np.where(name == names['host'])[0]])
+    minn[i] = np.median(t_min_tot[np.where(name == names['host'])[0]])
+
+####
+
+mergers_b = 13.78-np.array([10.96, 3.94, 3.33, 3.21, 2.77])
+mergers_c = 13.78-np.array([5.47, 5.34, 5.09, 4.81, 3.68])
+mergers_f = 13.78-np.array([12.38, 7.51, 7.27, 4.94, 3.14, 2.73, 2.27, 2.23])
+mergers_i = 13.78-np.array([8.19, 8.11, 5.60, 3.80, 3.30, 2.49, 2.27])
+mergers_m = 13.78-np.array([4.96, 4.94, 4.24, 3.19, 3.16, 2.93, 2.82])
+mergers_r = 13.78-np.array([13.19, 8.03, 3.80])
+mergers_w = 13.78-np.array([8.55, 8.34, 5.63, 3.51, 2.66])
+mergers_juliet = 13.78-np.array([13.78, 13.42])
+mergers_thelma = 13.78-np.array([9.10, 8.06, 6.07, 5.76, 5.19, 5.16, 4.99, 3.87, 3.25, 2.69])
+mergers_louise = 13.78-np.array([4.73, 3.19, 3.05])
+mergers_romulus = 13.78-np.array([7.93, 6.20, 5.27, 2.49, 2.47, 2.38])
+mergers_remus = 13.78-np.array([5.45, 5.01, 3.25, 2.21])
+t_in_tot = summary.first_infall(data_total, masks_infall, oversample=False, hosts='all_no_z', sim_type='baryon')
+t_in_any_tot = summary.first_infall_any(data_total, masks_infall, oversample=False, hosts='all_no_z', sim_type='baryon')
+
+
+#
+name = 'Remus'
+mergers = mergers_remus
+#
+rec = t_sim_tot[np.where(name == names['host'])[0]]
+minn = t_min_tot[np.where(name == names['host'])[0]]
+
+f, ax1 = plt.subplots(1, 1, figsize=(10,8))
+binss, asdf = summary_plot.binning_scheme(rec, binsize=0.5, xtype='t.infall.text')
+ax1.hist(x=rec, bins=binss, color=summary_plot.colors[3], alpha=0.5, edgecolor='k', label='MW-mass halo')
+binss, asdf = summary_plot.binning_scheme(minn, binsize=0.5, xtype='t.infall.text')
+ax1.hist(x=minn, bins=binss, color=summary_plot.colors[2], alpha=0.5, edgecolor='k', label='Any halo')
+#ax1.set_xlim(0,11)
+#ax1.set_ylim(-0.005,1.01)
+ax1.set_xlabel('Infall lookback time [Gyr]', fontsize=32)
+ax1.set_ylabel('N', fontsize=24)
+ax1.set_title(name, fontsize=24)
+ax1.legend(prop={'size': 20}, loc='best')
+for i in range(0, len(mergers)):
+    plt.vlines(x=mergers[i], ymin=0, ymax=13, alpha=0.5)
+ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
+plt.tight_layout()
+#plt.show()
+plt.savefig(directory+'/'+name+'_mergers_and_tinfall.pdf')
+plt.close()
+
+
+
+
+# Checking the ell difference at infall vs ell at z = 0
+# plotting vs infall time and Mstar
+t_in_tot = summary.first_infall(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
+Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
+L_tot = summary.L_z0(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+L_in = summary.L_infall(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
+#
+summary_plot.median_plot(x=t_in_tot, y=(L_tot-L_in)/1e4, xtype='t.infall.text', ytype='L.diff', binsize=1, limits=((0,13),None), file_path_and_name=directory+'/delta_ell_infall.pdf')
+summary_plot.median_plot(x=t_in_tot, y=(L_tot-L_in)/1e4, xtype='t.infall.text', ytype='L.diff', binsize=1, limits=((0,13),(-2,2)), file_path_and_name=directory+'/delta_ell_infall_zoom.pdf')
+#
+summary_plot.median_plot(x=Mstar_z0_tot, y=(L_tot-L_in)/1e4, xtype='M.star.z0', ytype='L.diff', binsize=0.5, limits=((4.5,9.5),None), file_path_and_name=directory+'/delta_ell_mstar.pdf')
+summary_plot.median_plot(x=Mstar_z0_tot, y=(L_tot-L_in)/1e4, xtype='M.star.z0', ytype='L.diff', binsize=0.5, limits=((4.5,9.5),(-1.5,1.5)), file_path_and_name=directory+'/delta_ell_mstar_zoom.pdf')
+#
+summary_plot.median_plot(x=t_in_tot, y=(L_tot-L_in)/L_in, xtype='t.infall.text', ytype='L.frac', binsize=1, limits=((0,13),None), file_path_and_name=directory+'/delta_ell_frac_infall.pdf')
+summary_plot.median_plot(x=t_in_tot, y=(L_tot-L_in)/L_in, xtype='t.infall.text', ytype='L.frac', binsize=1, limits=((0,13),(-1,4)), file_path_and_name=directory+'/delta_ell_frac_infall_zoom.pdf')
+#
+summary_plot.median_plot(x=Mstar_z0_tot, y=(L_tot-L_in)/L_in, xtype='M.star.z0', ytype='L.frac', binsize=0.5, limits=((4.5,9.5),None), file_path_and_name=directory+'/delta_ell_frac_mstar.pdf')
+summary_plot.median_plot(x=Mstar_z0_tot, y=(L_tot-L_in)/L_in, xtype='M.star.z0', ytype='L.frac', binsize=0.5, limits=((4.5,9.5),(-1.5,1.5)), file_path_and_name=directory+'/delta_ell_frac_mstar_zoom.pdf')
+
+
+
+# Checking pericenter properties of high-mass vs low-mass hosts
+d_sim_hi = summary.dperi_recent(data_total, masks_infall, selection='sim', oversample=True, hosts='high-mass', sim_type='baryon')
+d_min_hi = summary.dperi_min(data_total, masks_infall, oversample=True, hosts='high-mass', sim_type='baryon')
+dz0_hi = summary.d_z0(data_total, masks_infall, oversample=True, hosts='high-mass', sim_type='baryon')
+t_sim_hi = summary.tperi_recent(data_total, masks_infall, selection='sim', oversample=True, hosts='high-mass', sim_type='baryon')
+t_min_hi = summary.tperi_min(data_total, masks_infall, oversample=True, hosts='high-mass', sim_type='baryon')
+t_in_hi = summary.first_infall(data_total, masks_infall, oversample=True, hosts='high-mass', sim_type='baryon')
+t_in_any_hi = summary.first_infall_any(data_total, masks_infall, oversample=True, hosts='high-mass', sim_type='baryon')
+Mstar_z0_hi = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='high-mass', sim_type='baryon')
+#
+d_sim_lo = summary.dperi_recent(data_total, masks_infall, selection='sim', oversample=True, hosts='low-mass', sim_type='baryon')
+d_min_lo = summary.dperi_min(data_total, masks_infall, oversample=True, hosts='low-mass', sim_type='baryon')
+dz0_lo = summary.d_z0(data_total, masks_infall, oversample=True, hosts='low-mass', sim_type='baryon')
+t_sim_lo = summary.tperi_recent(data_total, masks_infall, selection='sim', oversample=True, hosts='low-mass', sim_type='baryon')
+t_min_lo = summary.tperi_min(data_total, masks_infall, oversample=True, hosts='low-mass', sim_type='baryon')
+t_in_lo = summary.first_infall(data_total, masks_infall, oversample=True, hosts='low-mass', sim_type='baryon')
+t_in_any_lo = summary.first_infall_any(data_total, masks_infall, oversample=True, hosts='low-mass', sim_type='baryon')
+Mstar_z0_lo = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='low-mass', sim_type='baryon')
+
+# Recent pericenter
+summary_plot.median_plot_mult(x=[Mstar_z0_hi,Mstar_z0_lo], y=[d_sim_hi,d_sim_lo], binsize=0.5, limits=((4.5,9.5),None), xtype=['M.star.z0','M.star.z0'], ytype=['d.peri.text','d.peri.text'], labels=['High-mass', 'Low-mass'], title='Recent Pericenter', file_path_and_name=directory+'/drec_vs_mstar_hinlo.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_hi,Mstar_z0_lo], y=[d_sim_hi,d_sim_lo], binsize=0.5, limits=((4.5,9.5),(0,250)), xtype=['M.star.z0','M.star.z0'], ytype=['d.peri.text','d.peri.text'], labels=['High-mass', 'Low-mass'], title='Recent Pericenter', file_path_and_name=directory+'/drec_vs_mstar_hinlo_zoom.pdf')
+summary_plot.median_plot_mult(x=[t_in_hi,t_in_lo], y=[d_sim_hi,d_sim_lo], binsize=1, limits=((0,14),None), xtype=['t.infall.text','t.infall.text'], ytype=['d.peri.text','d.peri.text'], labels=['High-mass', 'Low-mass'], title='Recent Pericenter', file_path_and_name=directory+'/drec_vs_tinmw_hinlo.pdf')
+summary_plot.median_plot_mult(x=[t_in_hi,t_in_lo], y=[d_sim_hi,d_sim_lo], binsize=1, limits=((0,14),(0,300)), xtype=['t.infall.text','t.infall.text'], ytype=['d.peri.text','d.peri.text'], labels=['High-mass', 'Low-mass'], title='Recent Pericenter', file_path_and_name=directory+'/drec_vs_tinmw_hinlo_zoom.pdf')
+#
+# Minimum pericenter
+summary_plot.median_plot_mult(x=[Mstar_z0_hi,Mstar_z0_lo], y=[d_min_hi,d_min_lo], binsize=0.5, limits=((4.5,9.5),None), xtype=['M.star.z0','M.star.z0'], ytype=['d.peri.text','d.peri.text'], labels=['High-mass', 'Low-mass'], title='Minimum Pericenter', file_path_and_name=directory+'/dmin_vs_mstar_hinlo.pdf')
+summary_plot.median_plot_mult(x=[Mstar_z0_hi,Mstar_z0_lo], y=[d_min_hi,d_min_lo], binsize=0.5, limits=((4.5,9.5),(0,250)), xtype=['M.star.z0','M.star.z0'], ytype=['d.peri.text','d.peri.text'], labels=['High-mass', 'Low-mass'], title='Minimum Pericenter', file_path_and_name=directory+'/dmin_vs_mstar_hinlo_zoom.pdf')
+summary_plot.median_plot_mult(x=[t_in_hi,t_in_lo], y=[d_min_hi,d_min_lo], binsize=1, limits=((0,14),None), xtype=['t.infall.text','t.infall.text'], ytype=['d.peri.text','d.peri.text'], labels=['High-mass', 'Low-mass'], title='Minimum Pericenter', file_path_and_name=directory+'/dmin_vs_tinmw_hinlo.pdf')
+summary_plot.median_plot_mult(x=[t_in_hi,t_in_lo], y=[d_min_hi,d_min_lo], binsize=1, limits=((0,14),(0,300)), xtype=['t.infall.text','t.infall.text'], ytype=['d.peri.text','d.peri.text'], labels=['High-mass', 'Low-mass'], title='Minimum Pericenter', file_path_and_name=directory+'/dmin_vs_tinmw_hinlo_zoom.pdf')
+#
+mask_hi = (np.abs((d_min_hi - d_sim_hi)/d_sim_hi) > 0)
+mask_lo = (np.abs((d_min_lo - d_sim_lo)/d_sim_lo) > 0)
+summary_plot.plot_hist_mult(x=[((d_min_hi-d_sim_hi)/d_sim_hi)[mask_hi], ((d_min_lo-d_sim_lo)/d_sim_lo)[mask_lo]], xtype=['delta_d_frac','delta_d_frac'], labels=['High-mass', 'Low-mass'], binsize=0.05, binedges=(-1,0), pdf=True, xlimits=(-1,0), file_path_and_name=directory+'/delta_d_frac_hinlo.pdf')
