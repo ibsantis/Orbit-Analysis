@@ -56,6 +56,10 @@ class SummaryDataSort:
                            #
                            'lg': ['Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus'], \
                            #
+                           'high-mass': ['Romulus', 'm12f', 'm12m', 'm12b', 'Thelma', 'Romeo'], \
+                           #
+                           'low-mass': ['m12c', 'm12i', 'Remus', 'Louise', 'm12w', 'Juliet', 'm12r'], \
+                           #
                            'lg_no_RR': ['Romeo', 'Juliet', 'Thelma', 'Louise']}
         #
         # Oversampling factors
@@ -1957,6 +1961,27 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    def L_infall(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
+        """
+        Add dox
+        """
+        # Set up empty list to save to
+        data = []
+        #
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            #
+            lb = np.flip(data_dict[name]['time.sim'][-1]-data_dict[name]['time.sim'])
+            #
+            for i in range(0, len(data_dict[name]['infall.check'][mask_dict[name]])):
+                if (data_dict[name]['first.infall.time.lb'][mask_dict[name]][i] != -1):
+                    if oversample:
+                        data.append(np.repeat(data_dict[name]['L.tot.sim'][mask_dict[name]][i][np.argmin(np.abs(data_dict[name]['first.infall.time.lb'][mask_dict[name]][i]-lb))], self.oversample[sim_type][name]))
+                    else:
+                        data.append(data_dict[name]['L.tot.sim'][mask_dict[name]][i][np.argmin(np.abs(data_dict[name]['first.infall.time.lb'][mask_dict[name]][i]-lb))])
+        #
+        return np.hstack(data)
+
     # Needs more dox
     # Should probably re-run the data and change the keys to include "sim"
     def eccentricity(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
@@ -2209,6 +2234,8 @@ class SummaryDataPlot(SummaryDataSort):
                        'L.tot': '$\\ell$ [10$^4$ kpc km s$^{-1}$]',\
                        'L.tot.sim': 'L$_{\\rm sim}(z = 0)$ [10$^4$ kpc km s$^{-1}$]',\
                        'L.tot.model': 'L$_{\\rm model}(z = 0)$ [10$^4$ kpc km s$^{-1}$]',\
+                       'L.diff': '$L(z=0) - L_{\\rm infall,MW}$ [10$^4$ kpc km s$^{-1}$]',\
+                       'L.frac': '($L(z=0) - L_{\\rm infall,MW}$)/$L_{\\rm infall,MW}$',\
                        'ecc': 'Eccentricity',\
                        'ecc.model': 'Model Ecccentricity',\
                        'period': 'Orbital Period [Gyr]',\
@@ -2258,7 +2285,10 @@ class SummaryDataPlot(SummaryDataSort):
             elif 'N.' in xtype:
                 minn = int(binsize*np.floor(np.min(x)/binsize))-0.5
                 maxx = int(binsize*np.ceil(np.max(x)/binsize))+0.5
-                bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
+                if minn < 0:
+                    bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
+                else:
+                    bin_num = int((np.abs(maxx)-np.abs(minn))/binsize+1)
                 bins = np.linspace(minn, maxx, bin_num)
                 #
                 half_bin = (bins[1]-bins[0])/2
@@ -2610,7 +2640,7 @@ class SummaryDataPlot(SummaryDataSort):
         if legend_on:
             ax.legend(prop={'size': 24}, loc='best')
         if title:
-            plt.title(self.titles[title], fontsize=24)
+            plt.title(title, fontsize=24)
         ax.tick_params(axis='both', which='major', labelsize=28)
         plt.tight_layout()
         plt.savefig(file_path_and_name)
@@ -2826,7 +2856,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def plot_hist(self, x, xtype, binsize, file_path_and_name, pdf=False, xlimits=None, title=None):
+    def plot_hist(self, x, xtype, binsize, file_path_and_name, pdf=False, xlimits=None, title=None, binedges=None):
         """
         DESCRIPTION:
             Plots a histogram of a given property.
@@ -2854,17 +2884,14 @@ class SummaryDataPlot(SummaryDataSort):
         #
         if 'M.' in xtype:
             x = np.log10(x)
+        #
+        # Create the bins to use in finding the median + scatter and for plotting
+        binss, half_binss = self.binning_scheme(x=x, xtype=xtype, binedges=binedges, binsize=binsize)
+        #
         # Plot the data
         plt.figure(figsize=(10, 8))
         #
         if 'N.' not in xtype:
-            minn = binsize*np.floor(np.min(x)/binsize)
-            maxx = binsize*np.ceil(np.max(x)/binsize)
-            if minn < 0:
-                bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
-            else:
-                bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize)+1)
-            bin_array = np.linspace(minn, maxx, bin_num)
             #
             # Calculate the scatter
             onesigp = 84.13
@@ -2872,22 +2899,18 @@ class SummaryDataPlot(SummaryDataSort):
             sigma_one_op = np.nanpercentile(x, onesigp)
             sigma_one_om = np.nanpercentile(x, onesigm)
             #
-            y_med = np.max(np.histogram(x, bin_array, density=pdf)[0])*1.1
+            y_med = np.max(np.histogram(x, binss, density=pdf)[0])*1.1
             #
-            plt.hist(x, bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
+            plt.hist(x, binss, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
             plt.errorbar(np.median(x), y_med, xerr=np.array([[np.median(x)-sigma_one_om],[sigma_one_op-np.median(x)]]), color='k', lw=5, capsize=0)
             plt.scatter(np.median(x), y_med, s=250, marker='s', c='k')
         #
         elif 'N.' in xtype:
-            minn = int(binsize*np.floor(np.min(x)/binsize))-0.5
-            maxx = int(binsize*np.ceil(np.max(x)/binsize))+0.5
-            bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
-            bin_array = np.linspace(minn, maxx, bin_num)
             #
-            y_mean = np.max(np.histogram(x, bin_array, density=pdf)[0])*1.1
+            y_mean = np.max(np.histogram(x, binss, density=pdf)[0])*1.1
             #
-            plt.hist(x, bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
-            plt.errorbar(np.mean(x), y_mean, xerr=np.array([[2*np.std(x)],[2*np.std(x)]]), color='k', lw=5, capsize=0, alpha=0.3)
+            plt.hist(x, binss, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=self.colors[3], alpha=0.4)
+            #plt.errorbar(np.mean(x), y_mean, xerr=np.array([[2*np.std(x)],[2*np.std(x)]]), color='k', lw=5, capsize=0, alpha=0.3)
             plt.errorbar(np.mean(x), y_mean, xerr=np.array([[np.std(x)],[np.std(x)]]), color='k', lw=5, capsize=0)
             plt.scatter(np.mean(x), y_mean, s=250, marker='s', c='k')
         #
@@ -2901,7 +2924,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def plot_hist_mult(self, x, xtype, labels, binsize, file_path_and_name, med_location=None, pdf=False, xlimits=None, title=None, legend_on=True):
+    def plot_hist_mult(self, x, xtype, labels, binsize, file_path_and_name, med_location=None, pdf=False, xlimits=None, title=None, legend_on=True, binedges=None):
         """
         DESCRIPTION:
             Plots a histogram of a given property.
@@ -2937,16 +2960,14 @@ class SummaryDataPlot(SummaryDataSort):
         plt.figure(figsize=(10, 8))
         #
         for i in range(0, len(x)):
+            #
             if 'M.' in xtype[i]:
                 x[i] = np.log10(x[i])
+            #
+            # Create the bins to use in finding the median + scatter and for plotting
+            binss, half_binss = self.binning_scheme(x=x[i], xtype=xtype[i], binedges=binedges, binsize=binsize)
+            #
             if 'N.' not in xtype[i]:
-                minn = binsize*np.floor(np.min(x[i])/binsize)
-                maxx = binsize*np.ceil(np.max(x[i])/binsize)
-                if minn < 0:
-                    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize)-1)
-                else:
-                    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize)+1)
-                bin_array = np.linspace(minn, maxx, bin_num)
                 #
                 # Calculate the scatter
                 onesigp = 84.13
@@ -2957,25 +2978,21 @@ class SummaryDataPlot(SummaryDataSort):
                 if med_location:
                     y_med = med_location[i]
                 else:
-                    y_med = np.max(np.histogram(x[i], bin_array, density=pdf)[0])*1.1
+                    y_med = np.max(np.histogram(x[i], binss, density=pdf)[0])*1.1
                 #
-                plt.hist(x[i], bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=colorss[i], alpha=0.4, label=labels[i])
+                plt.hist(x[i], binss, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=colorss[i], alpha=0.4, label=labels[i])
                 plt.errorbar(np.median(x[i]), y_med, xerr=np.array([[np.median(x[i])-sigma_one_om],[sigma_one_op-np.median(x[i])]]), c=colorss[i], lw=5, capsize=0, alpha=0.8)
                 plt.scatter(np.median(x[i]), y_med, s=250, marker='s', c=colorss[i], alpha=0.8)
             #
             elif 'N.' in xtype[i]:
-                minn = int(binsize*np.floor(np.min(x[i])/binsize))-0.5
-                maxx = int(binsize*np.ceil(np.max(x[i])/binsize))+0.5
-                bin_num = int((np.abs(minn)+np.abs(maxx))/binsize+1)
-                bin_array = np.linspace(minn, maxx, bin_num)
                 #
                 if med_location:
                     y_mean = med_location[i]
                 else:
-                    y_mean = np.max(np.histogram(x[i], bin_array, density=pdf)[0])*1.1
+                    y_mean = np.max(np.histogram(x[i], binss, density=pdf)[0])*1.1
                 #
-                plt.hist(x[i], bin_array, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=colorss[i], alpha=0.4, label=labels[i])
-                plt.errorbar(np.mean(x[i]), y_mean, xerr=np.array([[2*np.std(x[i])],[2*np.std(x[i])]]), c=colorss[i], lw=5, capsize=0, alpha=0.3)
+                plt.hist(x[i], binss, density=pdf, linestyle='solid', linewidth=2, histtype='stepfilled', color=colorss[i], alpha=0.4, label=labels[i])
+                #plt.errorbar(np.mean(x[i]), y_mean, xerr=np.array([[2*np.std(x[i])],[2*np.std(x[i])]]), c=colorss[i], lw=5, capsize=0, alpha=0.3)
                 plt.errorbar(np.mean(x[i]), y_mean, xerr=np.array([[np.std(x[i])],[np.std(x[i])]]), c=colorss[i], lw=5, capsize=0, alpha=0.8)
                 plt.scatter(np.mean(x[i]), y_mean, s=250, marker='s', c=colorss[i])
         #
