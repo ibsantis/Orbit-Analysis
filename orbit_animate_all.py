@@ -88,23 +88,23 @@ for j in range(1,traj_X.shape[1]+1):
 for j in range(1,traj_X.shape[1]+1):
     #
     # Projectile's trajectory
-    xs = traj_X[:,:j]
-    ys = traj_Y[:,:j]
-    zs = traj_Z[:,:j]
+    xs = traj_X[data['infall.check']][:,:j]
+    ys = traj_Y[data['infall.check']][:,:j]
+    zs = traj_Z[data['infall.check']][:,:j]
     #
     ax[0].plot(0, 0, marker='x', markersize=10, markeredgecolor='k', markerfacecolor='k', alpha=0.5)
     ax[1].plot(0, 0, marker='x', markersize=10, markeredgecolor='k', markerfacecolor='k', alpha=0.5)
     #
     ax[0].text(-200, 250, 't = '+str(np.around(data['time.sim'][j], 2))+' Gyr')
     #
-    for i in range(0, len(traj_X)):
+    for i in range(0, len(traj_X[data['infall.check']])):
         # Show Projectile's location
-        ax[0].plot(xs[i][-1], ys[i][-1], marker='o', markersize=3, markeredgecolor='b', markerfacecolor='b', alpha=0.5)
-        ax[1].plot(xs[i][-1], zs[i][-1], marker='o', markersize=3, markeredgecolor='b', markerfacecolor='b', alpha=0.5)
+        ax[0].plot(xs[data['infall.check']][i][-1], ys[data['infall.check']][i][-1], marker='o', markersize=3, markeredgecolor='b', markerfacecolor='b', alpha=0.5)
+        ax[1].plot(xs[data['infall.check']][i][-1], zs[data['infall.check']][i][-1], marker='o', markersize=3, markeredgecolor='b', markerfacecolor='b', alpha=0.5)
         #
         # Show Projectile's trajectory
-        ax[0].plot(xs[i], ys[i], color='k', lw=1, linestyle='--', alpha=0.2)
-        ax[1].plot(xs[i], zs[i], color='k', lw=1, linestyle='--', alpha=0.2)
+        ax[0].plot(xs[data['infall.check']][i], ys[data['infall.check']][i], color='k', lw=1, linestyle='--', alpha=0.2)
+        ax[1].plot(xs[data['infall.check']][i], zs[data['infall.check']][i], color='k', lw=1, linestyle='--', alpha=0.2)
         #
         # Capture frame
         camera.snap()
