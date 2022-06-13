@@ -31,6 +31,7 @@ traj_X = np.flip(data['d.sim'][:,:,0], axis=1)
 traj_Y = np.flip(data['d.sim'][:,:,1], axis=1)
 traj_Z = np.flip(data['d.sim'][:,:,2], axis=1)
 
+print('Finished setting plotting arrays')
 
 # Display a single trajectory
 R200m = data['host.radius'][0]+5
@@ -44,6 +45,7 @@ ax[1].set_xlabel('X', fontsize=15)
 ax[1].set_ylabel('Z', fontsize=15)
 plt.title(sim_data.galaxy, fontsize=28)
 
+print('Finished setting up axes')
 
 # Initiate camera
 camera = Camera(fig)
@@ -85,6 +87,8 @@ for j in range(1,traj_X.shape[1]+1):
     camera.snap()
 """
 
+print('Going to start looping through each snapshot, get ready...')
+
 for j in range(1,traj_X.shape[1]+1):
     #
     # Projectile's trajectory
@@ -110,6 +114,7 @@ for j in range(1,traj_X.shape[1]+1):
         camera.snap()
     print('Done with t = {}'.format(str(np.around(data['time.sim'][j], 2))))
 
+print('Done with the loop, whew...')
 
 # Create animation
 anim = camera.animate(interval = 50, repeat = True, repeat_delay = 500)
@@ -118,6 +123,8 @@ plt.subplots_adjust(wspace=0.15, hspace=0)
 
 writergif = animation.PillowWriter(fps=60)
 anim.save(sim_data.home_dir+'/orbit_data/animations/test_m12i.gif',writer=writergif)
+
+print('All done (hopefully!)')
 
 # Inline display
 #HTML(anim.to_html5_video())
