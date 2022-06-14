@@ -3,7 +3,7 @@
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=480G
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=2    # OpenMP threads per MPI task
+#SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
 #SBATCH --time=2:00:00
 #SBATCH --output=/home/ibsantis/scripts/jobs/animations/m12i_orbits_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
