@@ -5,7 +5,7 @@
 #SBATCH --partition=skx-normal
 ##SBATCH --mem=480G
 #SBATCH --nodes=1
-#SBATCH --tasks-per-node=4    # MPI tasks per node
+#SBATCH --tasks-per-node=2    # MPI tasks per node
 ##SBATCH --ntasks=4    # processes total
 #SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
 #SBATCH --time=48:00:00
@@ -56,7 +56,7 @@ def mass_evolution(snap, sim_data, rs):
         mass_array = np.zeros(len(rs)-1)
         #
         # Read in the data
-        part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'snapshot', snap, simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
+        part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'snapshot', snap, properties=['mass', 'position'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
         #print('Particles at snapshot {0} read in.'.format(snap))
         #
         # Find the enclosed mass of all particles within 0.1 < R < 500 kpc
@@ -78,7 +78,7 @@ def mass_evolution(snap, sim_data, rs):
         mass_array_2 = np.zeros(len(rs)-1)
         #
         # Read in the data
-        part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'snapshot', snap, simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
+        part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'snapshot', snap, properties=['mass', 'position'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
         #print('Particles at snapshot {0} read in.'.format(snap))
         #
         # Find the enclosed mass of all particles within 0.1 < R < 500 kpc
