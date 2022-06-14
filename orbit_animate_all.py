@@ -36,17 +36,28 @@ traj_Z = np.flip(data['d.sim'][:,:,2], axis=1)
 print('Finished setting up plotting arrays')
 
 # Display a single trajectory
-R200m = data['host.radius'][0]+5
+R200m = data['host.radius'][0]+10
 fig, ax = plt.subplots(1, 2, figsize=(16,8))
 ax[0].set(xlim=((-1)*R200m, R200m), ylim=((-1)*R200m, R200m))
-ax[0].set_xlabel('X', fontsize=15)
-ax[0].set_ylabel('Y', fontsize=15)
+ax[0].set_xlabel('X [kpc]', fontsize=20)
+ax[0].set_ylabel('Y [kpc]', fontsize=20)
 #
 ax[1].set(xlim=((-1)*R200m, R200m), ylim=((-1)*R200m, R200m))
-ax[1].set_xlabel('X', fontsize=15)
-ax[1].set_ylabel('Z', fontsize=15)
-plt.title(sim_data.galaxy, fontsize=28)
-
+ax[1].set_xlabel('X [kpc]', fontsize=20)
+ax[1].set_ylabel('Z [kpc]', fontsize=20)
+plt.suptitle(sim_data.galaxy+' satellites', fontsize=28)
+#
+# Set up the colors
+colorss = np.array(['#ff0000','#c71585','#40e0d0','#00ff00','#0000ff','#1e90ff'])
+#
+ax[0].plot(np.nan, np.nan, marker='o', markersize=3, markeredgecolor=colorss[0], markerfacecolor=colorss[0], alpha=0.5, label='$M_{\\rm star} < 10^5 M_{\\odot}$')
+ax[0].plot(np.nan, np.nan, marker='o', markersize=4, markeredgecolor=colorss[1], markerfacecolor=colorss[1], alpha=0.5, label='$M_{\\rm star} = [10^5,10^6] M_{\\odot}$')
+ax[0].plot(np.nan, np.nan, marker='o', markersize=5, markeredgecolor=colorss[2], markerfacecolor=colorss[2], alpha=0.5, label='$M_{\\rm star} = [10^6,10^7] M_{\\odot}$')
+ax[0].plot(np.nan, np.nan, marker='o', markersize=6, markeredgecolor=colorss[3], markerfacecolor=colorss[3], alpha=0.5, label='$M_{\\rm star} = [10^7,10^8] M_{\\odot}$')
+ax[0].plot(np.nan, np.nan, marker='o', markersize=7, markeredgecolor=colorss[4], markerfacecolor=colorss[4], alpha=0.5, label='$M_{\\rm star} = [10^8,10^9] M_{\\odot}$')
+ax[0].plot(np.nan, np.nan, marker='o', markersize=8, markeredgecolor=colorss[5], markerfacecolor=colorss[5], alpha=0.5, label='$M_{\\rm star} = [10^9,10^{10}] M_{\\odot}$')
+ax[0].plot(np.nan, np.nan, marker='o', markersize=9, markeredgecolor='k', markerfacecolor='k', alpha=0.5, label='$M_{\\rm star} > 10^{10} M_{\\odot}$')
+ax[0].legend(prop={'size': 16}, loc='best')
 print('Finished setting up axes')
 
 # Initiate camera
@@ -104,24 +115,47 @@ for j in range(1,traj_X.shape[1]+1):
     ax[0].text(-200, 250, 't = '+str(np.around(data['time.sim'][j], 2))+' Gyr')
     #
     for i in range(0, len(xs)):
+        if (data['M.star.z0'][data['infall.check']][i] < 1e5):
+            cc = colorss[0]
+            ss = 3
+        elif (data['M.star.z0'][data['infall.check']][i] > 1e5)&(data['M.star.z0'][data['infall.check']][i] < 1e6):
+            cc = colorss[1]
+            ss = 4
+        elif (data['M.star.z0'][data['infall.check']][i] > 1e6)&(data['M.star.z0'][data['infall.check']][i] < 1e7):
+            cc = colorss[2]
+            ss = 5
+        elif (data['M.star.z0'][data['infall.check']][i] > 1e7)&(data['M.star.z0'][data['infall.check']][i] < 1e8):
+            cc = colorss[3]
+            ss = 6
+        elif (data['M.star.z0'][data['infall.check']][i] > 1e8)&(data['M.star.z0'][data['infall.check']][i] < 1e9):
+            cc = colorss[4]
+            ss = 7
+        elif (data['M.star.z0'][data['infall.check']][i] > 1e9)&(data['M.star.z0'][data['infall.check']][i] < 1e10):
+            cc = colorss[5]
+            ss = 8
+        else:
+            cc = 'k'
+            ss = 9
         # Show Projectile's location
-        ax[0].plot(xs[i][-1], ys[i][-1], marker='o', markersize=3, markeredgecolor='b', markerfacecolor='b', alpha=0.5)
-        ax[1].plot(xs[i][-1], zs[i][-1], marker='o', markersize=3, markeredgecolor='b', markerfacecolor='b', alpha=0.5)
+        ax[0].plot(xs[i][-1], ys[i][-1], marker='o', markersize=ss, markeredgecolor=cc, markerfacecolor=cc, alpha=0.5)
+        ax[1].plot(xs[i][-1], zs[i][-1], marker='o', markersize=ss, markeredgecolor=cc, markerfacecolor=cc, alpha=0.5)
         #
         # Show Projectile's trajectory
-        ax[0].plot(xs[i], ys[i], color='k', lw=1, linestyle='--', alpha=0.2)
-        ax[1].plot(xs[i], zs[i], color='k', lw=1, linestyle='--', alpha=0.2)
+        ax[0].plot(xs[i], ys[i], color='k', lw=1, linestyle='--', alpha=0.15)
+        ax[1].plot(xs[i], zs[i], color='k', lw=1, linestyle='--', alpha=0.15)
         #
-        # Capture frame
-        camera.snap()
+    # Capture frame
+    camera.snap()
     print('Done with t = {}'.format(str(np.around(data['time.sim'][j], 2))))
 
 print('Done with the loop, whew...')
 
 # Create animation
 anim = camera.animate(interval = 50, repeat = True, repeat_delay = 500)
+ax[0].tick_params(axis='both', which='both', bottom=True, labelsize=20)
+ax[1].tick_params(axis='both', which='both', bottom=True, labelsize=20)
 plt.tight_layout()
-plt.subplots_adjust(wspace=0.15, hspace=0)
+plt.subplots_adjust(wspace=0.3, hspace=0)
 
 writergif = animation.PillowWriter(fps=60)
 anim.save(sim_data.home_dir+'/orbit_data/animations/test_m12i.gif',writer=writergif)
