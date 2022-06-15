@@ -27,3 +27,12 @@ print('Set paths')
 
 data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_m12i')
 print('Read in the data')
+data['d.sim'][data['d.sim'] == -1] = np.nan
+print('Done converting null values')
+for i in range(0, len(data['d.sim'])):
+    data['d.sim'][i][(data['first.infall.snap'][i]+1):] = np.nan
+print('Done setting null values prior to infall')
+traj_X = np.flip(data['d.sim'][:,:,0], axis=1)
+traj_Y = np.flip(data['d.sim'][:,:,1], axis=1)
+traj_Z = np.flip(data['d.sim'][:,:,2], axis=1)
+print('Finished setting up plotting arrays')
