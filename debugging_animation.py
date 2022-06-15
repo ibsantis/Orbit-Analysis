@@ -127,9 +127,10 @@ ax[1].tick_params(axis='both', which='both', bottom=True, labelsize=20)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.3, hspace=0)
 anim = camera.animate(interval = 50, repeat = True, repeat_delay = 500)
-"""
+print('made animation?')
 
-writergif = animation.PillowWriter(fps=60)
+writergif = animation.PillowWriter(fps=30)
+"""
 anim.save(sim_data.home_dir+'/orbit_data/animations/test_m12i.gif',writer=writergif)
 
 print('All done (hopefully!)')
