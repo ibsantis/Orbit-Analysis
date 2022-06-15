@@ -109,8 +109,8 @@ for j in range(1,10):
     #
     for i in range(0, 2):
         # Show Projectile's location
-        ax[0].plot(xs[i][-1], ys[i][-1], marker='o', markersize=ss, markeredgecolor=cc, markerfacecolor=cc, alpha=0.5)
-        ax[1].plot(xs[i][-1], zs[i][-1], marker='o', markersize=ss, markeredgecolor=cc, markerfacecolor=cc, alpha=0.5)
+        ax[0].plot(xs[i][-1], ys[i][-1], marker='o', markersize=ss[i], markeredgecolor=cc[i], markerfacecolor=cc[i], alpha=0.5)
+        ax[1].plot(xs[i][-1], zs[i][-1], marker='o', markersize=ss[i], markeredgecolor=cc[i], markerfacecolor=cc[i], alpha=0.5)
         #
         # Show Projectile's trajectory
         ax[0].plot(xs[i], ys[i], color='k', lw=1, linestyle='--', alpha=0.15)
