@@ -131,6 +131,6 @@ print('made animation?')
 
 writergif = animation.PillowWriter(fps=30)
 
-anim.save(filename='/home/ibsantis/scripts/orbit_data/animations/test_m12i.gif',writer=writergif)
+#anim.save(filename='/home/ibsantis/scripts/orbit_data/animations/test_m12i.gif',writer=writergif)
 
 print('All done (hopefully!)')
