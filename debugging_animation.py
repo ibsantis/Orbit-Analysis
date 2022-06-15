@@ -93,6 +93,7 @@ for i in range(0, traj_X[data['infall.check']].shape[0]):
 
 print('Going to start looping through each snapshot, get ready...')
 
+"""
 for j in range(1,traj_X.shape[1]+1):
     #
     # Projectile's trajectory
@@ -131,3 +132,4 @@ writergif = animation.PillowWriter(fps=60)
 anim.save(sim_data.home_dir+'/orbit_data/animations/test_m12i.gif',writer=writergif)
 
 print('All done (hopefully!)')
+"""
