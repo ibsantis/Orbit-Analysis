@@ -65,6 +65,32 @@ print('Finished setting up axes')
 # Initiate camera
 camera = Camera(fig)
 
+print('Setting up color and size arrays')
+cc = []
+ss = []
+for i in range(0, traj_X[data['infall.check']].shape[0]):
+    if (data['M.star.z0'][data['infall.check']][i] < 1e5):
+        cc.append(colorss[0])
+        ss.append(3)
+    elif (data['M.star.z0'][data['infall.check']][i] > 1e5)&(data['M.star.z0'][data['infall.check']][i] < 1e6):
+        cc.append(colorss[1])
+        ss.append(4)
+    elif (data['M.star.z0'][data['infall.check']][i] > 1e6)&(data['M.star.z0'][data['infall.check']][i] < 1e7):
+        cc.append(colorss[2])
+        ss.append(5)
+    elif (data['M.star.z0'][data['infall.check']][i] > 1e7)&(data['M.star.z0'][data['infall.check']][i] < 1e8):
+        cc.append(colorss[3])
+        ss.append(6)
+    elif (data['M.star.z0'][data['infall.check']][i] > 1e8)&(data['M.star.z0'][data['infall.check']][i] < 1e9):
+        cc.append(colorss[4])
+        ss.append(7)
+    elif (data['M.star.z0'][data['infall.check']][i] > 1e9)&(data['M.star.z0'][data['infall.check']][i] < 1e10):
+        cc.append(colorss[5])
+        ss.append(8)
+    else:
+        cc.append('k')
+        ss.append(9)
+
 print('Going to start looping through each snapshot, get ready...')
 
 for j in range(1,10):
@@ -82,27 +108,6 @@ for j in range(1,10):
     print('Plotted host x')
     #
     for i in range(0, 2):
-        if (data['M.star.z0'][data['infall.check']][i] < 1e5):
-            cc = colorss[0]
-            ss = 3
-        elif (data['M.star.z0'][data['infall.check']][i] > 1e5)&(data['M.star.z0'][data['infall.check']][i] < 1e6):
-            cc = colorss[1]
-            ss = 4
-        elif (data['M.star.z0'][data['infall.check']][i] > 1e6)&(data['M.star.z0'][data['infall.check']][i] < 1e7):
-            cc = colorss[2]
-            ss = 5
-        elif (data['M.star.z0'][data['infall.check']][i] > 1e7)&(data['M.star.z0'][data['infall.check']][i] < 1e8):
-            cc = colorss[3]
-            ss = 6
-        elif (data['M.star.z0'][data['infall.check']][i] > 1e8)&(data['M.star.z0'][data['infall.check']][i] < 1e9):
-            cc = colorss[4]
-            ss = 7
-        elif (data['M.star.z0'][data['infall.check']][i] > 1e9)&(data['M.star.z0'][data['infall.check']][i] < 1e10):
-            cc = colorss[5]
-            ss = 8
-        else:
-            cc = 'k'
-            ss = 9
         # Show Projectile's location
         ax[0].plot(xs[i][-1], ys[i][-1], marker='o', markersize=ss, markeredgecolor=cc, markerfacecolor=cc, alpha=0.5)
         ax[1].plot(xs[i][-1], zs[i][-1], marker='o', markersize=ss, markeredgecolor=cc, markerfacecolor=cc, alpha=0.5)
