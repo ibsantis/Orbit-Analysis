@@ -62,6 +62,9 @@ ax[0].plot(np.nan, np.nan, marker='o', markersize=9, markeredgecolor='k', marker
 ax[0].legend(prop={'size': 16}, loc='best')
 print('Finished setting up axes')
 
+# Initiate camera
+camera = Camera(fig)
+
 print('Going to start looping through each snapshot, get ready...')
 
 for j in range(1,traj_X.shape[1]+1):
@@ -107,7 +110,7 @@ for j in range(1,traj_X.shape[1]+1):
         ax[1].plot(xs[i], zs[i], color='k', lw=1, linestyle='--', alpha=0.15)
         #
     # Capture frame
-    Camera.snap()
+    camera.snap()
     print('Done with t = {}'.format(str(np.around(data['time.sim'][j], 2))))
 
 print('Done with the loop, whew...')
