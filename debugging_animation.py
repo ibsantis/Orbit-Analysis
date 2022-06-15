@@ -120,9 +120,10 @@ for j in range(1,traj_X.shape[1]+1):
     print('Done with t = {}'.format(str(np.around(data['time.sim'][j], 2))))
 
 print('Done with the loop, whew...')
-"""
+
 # Create animation
 anim = camera.animate(interval = 50, repeat = True, repeat_delay = 500)
+"""
 ax[0].tick_params(axis='both', which='both', bottom=True, labelsize=20)
 ax[1].tick_params(axis='both', which='both', bottom=True, labelsize=20)
 plt.tight_layout()
