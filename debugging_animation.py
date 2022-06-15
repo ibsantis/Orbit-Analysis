@@ -130,8 +130,6 @@ anim = camera.animate(interval = 50, repeat = True, repeat_delay = 500)
 print('made animation?')
 
 writergif = animation.PillowWriter(fps=30)
-"""
-anim.save(sim_data.home_dir+'/orbit_data/animations/test_m12i.gif',writer=writergif)
+anim.save(sim_data.home_dir+'/home/ibsantis/scripts/orbit_data/animations/test_m12i.gif',writer=writergif)
 
 print('All done (hopefully!)')
-"""
