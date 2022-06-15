@@ -93,7 +93,7 @@ for i in range(0, traj_X[data['infall.check']].shape[0]):
 
 print('Going to start looping through each snapshot, get ready...')
 
-for j in range(1,10):
+for j in range(1,traj_X.shape[1]+1):
     #
     # Projectile's trajectory
     xs = traj_X[data['infall.check']][:,:j]
@@ -104,8 +104,6 @@ for j in range(1,10):
     ax[1].plot(0, 0, marker='x', markersize=10, markeredgecolor='k', markerfacecolor='k', alpha=0.5)
     #
     ax[0].text(-200, 250, 't = '+str(np.around(data['time.sim'][j], 2))+' Gyr')
-    #
-    print('Plotted host x')
     #
     for i in range(0, 2):
         # Show Projectile's location
@@ -121,3 +119,15 @@ for j in range(1,10):
     print('Done with t = {}'.format(str(np.around(data['time.sim'][j], 2))))
 
 print('Done with the loop, whew...')
+
+# Create animation
+anim = camera.animate(interval = 50, repeat = True, repeat_delay = 500)
+ax[0].tick_params(axis='both', which='both', bottom=True, labelsize=20)
+ax[1].tick_params(axis='both', which='both', bottom=True, labelsize=20)
+plt.tight_layout()
+plt.subplots_adjust(wspace=0.3, hspace=0)
+
+writergif = animation.PillowWriter(fps=60)
+anim.save(sim_data.home_dir+'/orbit_data/animations/test_m12i.gif',writer=writergif)
+
+print('All done (hopefully!)')
