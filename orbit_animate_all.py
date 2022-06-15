@@ -12,6 +12,8 @@
 #SBATCH --mail-type=begin
 
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib import animation
 #from IPython.display import HTML
