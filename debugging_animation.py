@@ -13,7 +13,7 @@
 
 import numpy as np
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib import animation
 #from IPython.display import HTML
@@ -130,6 +130,7 @@ anim = camera.animate(interval = 50, repeat = True, repeat_delay = 500)
 print('made animation?')
 
 writergif = animation.PillowWriter(fps=30)
+
 anim.save(filename='/home/ibsantis/scripts/orbit_data/animations/test_m12i.gif',writer=writergif)
 
 print('All done (hopefully!)')
