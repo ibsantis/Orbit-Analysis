@@ -107,7 +107,7 @@ for j in range(1,traj_X.shape[1]+1):
         ax[1].plot(xs[i], zs[i], color='k', lw=1, linestyle='--', alpha=0.15)
         #
     # Capture frame
-    camera.snap()
+    Camera.snap()
     print('Done with t = {}'.format(str(np.around(data['time.sim'][j], 2))))
 
 print('Done with the loop, whew...')
