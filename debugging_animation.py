@@ -93,7 +93,7 @@ for i in range(0, traj_X[data['infall.check']].shape[0]):
 
 print('Going to start looping through each snapshot, get ready...')
 
-"""
+
 for j in range(1,traj_X.shape[1]+1):
     #
     # Projectile's trajectory
@@ -120,7 +120,7 @@ for j in range(1,traj_X.shape[1]+1):
     print('Done with t = {}'.format(str(np.around(data['time.sim'][j], 2))))
 
 print('Done with the loop, whew...')
-
+"""
 # Create animation
 anim = camera.animate(interval = 50, repeat = True, repeat_delay = 500)
 ax[0].tick_params(axis='both', which='both', bottom=True, labelsize=20)
