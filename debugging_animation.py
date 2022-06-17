@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 from matplotlib import animation
 from IPython.display import HTML
 from celluloid import Camera
-%matplotlib qt
+#%matplotlib qt
 import utilities as ut
 import orbit_io
 import time
