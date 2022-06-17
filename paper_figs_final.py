@@ -1173,6 +1173,7 @@ ax1.set_ylim(limits_1[1])
 #
 ax1.axvspan(2.85, 3.01, alpha=0.1, color='k')
 ax1.text(3.1,0.7,'Free-fall time',fontsize=24,rotation=90)
+ax1.hlines(y=0, xmin=0, xmax=13, color='k', linestyle='dotted', alpha=0.3)
 #
 if 't.' in xtype[0]:
     # Instantiate the cosmology class and run this method first to set up scalefactors
@@ -1268,6 +1269,8 @@ ax2.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[0], markers
 ax2.set_xscale('log')
 ax2.set_xlim(10**(limits_2[0][0]), 10**(limits_2[0][1]))
 ax2.set_ylim(limits_2[1])
+#
+ax2.hlines(y=0, xmin=10**(4.5), xmax=10**(9.5), color='k', linestyle='dotted', alpha=0.3)
 #
 ax1.set_ylabel('($\\ell(z=0) - \\ell_{\\rm infall,MW}$)/$\\ell_{\\rm infall,MW}$', fontsize=28)
 ax1.set_xlabel('Infall lookback time [Gyr]', fontsize=28)
