@@ -4,7 +4,7 @@
 #SBATCH --mem=50G
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
-#SBATCH --time=0:05:00
+#SBATCH --time=0:10:00
 #SBATCH --output=/home/ibsantis/scripts/jobs/animations/checking_data_read_in_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
@@ -12,15 +12,14 @@
 #SBATCH --mail-type=begin
 
 import numpy as np
-import matplotlib
-#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib import animation
-#from IPython.display import HTML
+from IPython.display import HTML
 from celluloid import Camera
-#%matplotlib qt
+%matplotlib qt
 import utilities as ut
 import orbit_io
+import time
 
 sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
 print('Set paths')
@@ -37,34 +36,8 @@ traj_Y = np.flip(data['d.sim'][:,:,1], axis=1)
 traj_Z = np.flip(data['d.sim'][:,:,2], axis=1)
 print('Finished setting up plotting arrays')
 
-# Display a single trajectory
-R200m = data['host.radius'][0]+10
-fig, ax = plt.subplots(1, 2, figsize=(16,8))
-ax[0].set(xlim=((-1)*R200m, R200m), ylim=((-1)*R200m, R200m))
-ax[0].set_xlabel('X [kpc]', fontsize=20)
-ax[0].set_ylabel('Y [kpc]', fontsize=20)
-#
-ax[1].set(xlim=((-1)*R200m, R200m), ylim=((-1)*R200m, R200m))
-ax[1].set_xlabel('X [kpc]', fontsize=20)
-ax[1].set_ylabel('Z [kpc]', fontsize=20)
-plt.suptitle(sim_data.galaxy+' satellites', fontsize=28)
-#
 # Set up the colors
 colorss = np.array(['#ff0000','#c71585','#40e0d0','#00ff00','#0000ff','#1e90ff'])
-#
-ax[0].plot(np.nan, np.nan, marker='o', markersize=3, markeredgecolor=colorss[0], markerfacecolor=colorss[0], alpha=0.5, label='$M_{\\rm star} < 10^5 M_{\\odot}$')
-ax[0].plot(np.nan, np.nan, marker='o', markersize=4, markeredgecolor=colorss[1], markerfacecolor=colorss[1], alpha=0.5, label='$M_{\\rm star} = [10^5,10^6] M_{\\odot}$')
-ax[0].plot(np.nan, np.nan, marker='o', markersize=5, markeredgecolor=colorss[2], markerfacecolor=colorss[2], alpha=0.5, label='$M_{\\rm star} = [10^6,10^7] M_{\\odot}$')
-ax[0].plot(np.nan, np.nan, marker='o', markersize=6, markeredgecolor=colorss[3], markerfacecolor=colorss[3], alpha=0.5, label='$M_{\\rm star} = [10^7,10^8] M_{\\odot}$')
-ax[0].plot(np.nan, np.nan, marker='o', markersize=7, markeredgecolor=colorss[4], markerfacecolor=colorss[4], alpha=0.5, label='$M_{\\rm star} = [10^8,10^9] M_{\\odot}$')
-ax[0].plot(np.nan, np.nan, marker='o', markersize=8, markeredgecolor=colorss[5], markerfacecolor=colorss[5], alpha=0.5, label='$M_{\\rm star} = [10^9,10^{10}] M_{\\odot}$')
-ax[0].plot(np.nan, np.nan, marker='o', markersize=9, markeredgecolor='k', markerfacecolor='k', alpha=0.5, label='$M_{\\rm star} > 10^{10} M_{\\odot}$')
-ax[0].legend(prop={'size': 16}, loc='best')
-print('Finished setting up axes')
-
-# Initiate camera
-camera = Camera(fig)
-
 print('Setting up color and size arrays')
 cc = []
 ss = []
@@ -91,49 +64,59 @@ for i in range(0, traj_X[data['infall.check']].shape[0]):
         cc.append('k')
         ss.append(9)
 
-print('Going to start looping through each snapshot, get ready...')
+# Set up the graph using Matplotlib
+start = time.time()
+R200m = data['host.radius'][0]+10
+fig, ax = plt.subplots(1,1,figsize=(10,10))
+ax.set(xlim=((-1)*R200m, R200m), ylim=((-1)*R200m, R200m))
+ax.set_xlabel('X [kpc]', fontsize=28)
+ax.set_ylabel('Y [kpc]', fontsize=28)
+#ax[1].set(xlim=((-1)*R200m, R200m), ylim=((-1)*R200m, R200m))
+#ax[1].set_xlabel('X [kpc]', fontsize=28)
+#ax[1].set_ylabel('Z [kpc]', fontsize=28)
 
+# Initiate camera
+camera = Camera(fig)
 
+# Create individual frames
 for j in range(1,traj_X.shape[1]+1):
-    #
-    # Projectile's trajectory
-    xs = traj_X[data['infall.check']][:,:j]
-    ys = traj_Y[data['infall.check']][:,:j]
-    zs = traj_Z[data['infall.check']][:,:j]
-    #
-    ax[0].plot(0, 0, marker='x', markersize=10, markeredgecolor='k', markerfacecolor='k', alpha=0.5)
-    ax[1].plot(0, 0, marker='x', markersize=10, markeredgecolor='k', markerfacecolor='k', alpha=0.5)
-    #
-    ax[0].text(-200, 250, 't = '+str(np.around(data['time.sim'][j], 2))+' Gyr')
-    #
-    for i in range(0, 2):
+    for i in range(0, traj_X[data['infall.check']].shape[0]):
+        pick_traj = i
+        # Projectile's trajectory
+        x = traj_X[data['infall.check']][pick_traj][0:j]
+        y = traj_Y[data['infall.check']][pick_traj][0:j]
+        z = traj_Z[data['infall.check']][pick_traj][0:j]
+        #
+        #Plot the host position
+        ax.plot(0, 0, marker='x', color='k', markersize=9, alpha=0.5)
+        #
         # Show Projectile's location
-        ax[0].plot(xs[i][-1], ys[i][-1], marker='o', markersize=ss[i], markeredgecolor=cc[i], markerfacecolor=cc[i], alpha=0.5)
-        ax[1].plot(xs[i][-1], zs[i][-1], marker='o', markersize=ss[i], markeredgecolor=cc[i], markerfacecolor=cc[i], alpha=0.5)
-        #
+        ax.plot(x[-1], y[-1], marker='o', markersize=ss[i], markeredgecolor=cc[i], markerfacecolor=cc[i], alpha=0.5)
+
         # Show Projectile's trajectory
-        ax[0].plot(xs[i], ys[i], color='k', lw=1, linestyle='--', alpha=0.15)
-        ax[1].plot(xs[i], zs[i], color='k', lw=1, linestyle='--', alpha=0.15)
-        #
+        ax.plot(x, y, color='b', lw=1, linestyle='--', alpha=0.15)
+
     # Capture frame
     camera.snap()
-    print('Done with t = {}'.format(str(np.around(data['time.sim'][j], 2))))
 
-print('Done with the loop, whew...')
+end = time.time()
+print('Finished the loop in {0} seconds'.format(end-start))
 
 # Create animation
-ax[0].tick_params(axis='both', which='both', bottom=True, labelsize=20)
-ax[1].tick_params(axis='both', which='both', bottom=True, labelsize=20)
-plt.tight_layout()
-plt.subplots_adjust(wspace=0.3, hspace=0)
-#anim = camera.animate(interval = 50, repeat = True, repeat_delay = 500)
+start = end
+ax.tick_params(axis='both', which='both', bottom=True, labelsize=20)
+#ax[1].tick_params(axis='both', which='both', bottom=True, labelsize=20)
+#plt.tight_layout()
+#plt.subplots_adjust(wspace=0.3, hspace=0)
+anim = camera.animate(interval = 40, repeat = True, repeat_delay = 500)
+end = time.time()
+print('Finished animating in {0} seconds'.format(end-start))
 
-animation = camera.animate()
-animation.save(filename='/home/ibsantis/scripts/orbit_data/animations/test_m12i.gif')
-print('made animation?')
 
-#writergif = animation.PillowWriter(fps=30)
-
-#anim.save(filename='/home/ibsantis/scripts/orbit_data/animations/test_m12i.gif',writer=writergif)
-
-print('All done (hopefully!)')
+# Inline display
+start = end
+writergif = animation.PillowWriter(fps=30)
+anim.save(sim_data.home_dir+'/orbit_data/animations/test_m12i.gif', writer=writergif)
+end = time.time()
+print('Finished saving the file in {0} seconds'.format(end-start))
+#HTML(anim.to_html5_video())
