@@ -506,6 +506,33 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    def nperi_model(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
+        """
+        DESCRIPTION:
+            ...
+
+        VARIABLES:
+            ...
+
+        NOTES:
+            ...
+        """
+        # Set up an empty list to save values to
+        data = []
+        #
+        # Loop over the hosts
+        for name in self.host_names[hosts]:
+            # Loop over each satellite
+            for i in range(0, len(data_dict[name]['pericenter.time.lb.model'][mask_dict])):
+                m = (data_dict[name]['pericenter.time.lb.model'][mask_dict][i] != -1)
+
+            if oversample:
+                data.append(np.repeat(data_dict[name]['N.peri.'+selection][mask_dict[name]], self.oversample[sim_type][name]))
+            else:
+                data.append(data_dict[name]['N.peri.'+selection][mask_dict[name]])
+        #
+        return np.hstack(data)
+
     # optimized
     def dperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
@@ -1053,7 +1080,7 @@ class SummaryDataSort:
         return np.hstack(data)
 
     # optimized
-    def first_infall(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
+    def first_infall(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
             Groups the lookback times of satellite first infall into their MW-mass
@@ -1088,13 +1115,17 @@ class SummaryDataSort:
         # Set up empty array to save to
         data = []
         #
+        if selection == 'model':
+            infall_str = 'first.infall.time.lb.'+selection
+        else:
+            infall_str = 'first.infall.time.lb'
         # Loop through each host
         for name in self.host_names[hosts]:
             # Oversample if needed and save to the list
             if oversample:
-                data.append(np.repeat(data_dict[name]['first.infall.time.lb'][mask_dict[name]], self.oversample[sim_type][name]))
+                data.append(np.repeat(data_dict[name][infall_str][mask_dict[name]], self.oversample[sim_type][name]))
             else:
-                data.append(data_dict[name]['first.infall.time.lb'][mask_dict[name]])
+                data.append(data_dict[name][infall_str][mask_dict[name]])
         #
         return np.hstack(data)
 
@@ -2924,7 +2955,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def plot_hist_mult(self, x, xtype, labels, binsize, file_path_and_name, med_location=None, pdf=False, xlimits=None, title=None, legend_on=True, binedges=None):
+    def plot_hist_mult(self, x, xtype, labels, binsize, file_path_and_name, med_location=None, pdf=False, xlimits=None, title=None, legend_on=True, leg_loc=None, binedges=None):
         """
         DESCRIPTION:
             Plots a histogram of a given property.
@@ -3000,7 +3031,10 @@ class SummaryDataPlot(SummaryDataSort):
         plt.xlabel(self.labels[xtype[0]], fontsize=28)
         plt.ylabel(y_label, fontsize=28)
         if legend_on:
-            plt.legend(prop={'size': 18}, loc='center right')
+            if leg_loc:
+                plt.legend(prop={'size': 18}, loc=leg_loc)
+            else:
+                plt.legend(prop={'size': 18}, loc='best')
         if title:
             plt.title(self.titles[title], fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
