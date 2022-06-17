@@ -114,9 +114,9 @@ print('Finished animating in {0} seconds'.format(end-start))
 
 
 # Inline display
-start = end
-writergif = animation.PillowWriter(fps=30)
-anim.save(sim_data.home_dir+'/orbit_data/animations/test_m12i.gif', writer=writergif)
-end = time.time()
-print('Finished saving the file in {0} seconds'.format(end-start))
+#start = end
+#writergif = animation.PillowWriter(fps=30)
+#anim.save(sim_data.home_dir+'/orbit_data/animations/test_m12i.gif', writer=writergif)
+#end = time.time()
+#print('Finished saving the file in {0} seconds'.format(end-start))
 #HTML(anim.to_html5_video())
