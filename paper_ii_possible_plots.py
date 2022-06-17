@@ -48,6 +48,19 @@ masks_infall_apo['m12f'][59] = False
 directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2'
 
 
+"""
+    Infall time comparisons
+"""
+t_in_sim = summary.first_infall(data_total, masks_infall, selection='sim', oversample=True, hosts='all', sim_type='baryon')
+t_in_mod = summary.first_infall(data_total, masks_infall, selection='model', oversample=True, hosts='all', sim_type='baryon')
+t_in_mod_R200m = summary.infall_diagnostics(data_total, masks_infall, selection='R200m', oversample=True, hosts='all', sim_type='baryon')
+mask_finite = np.isfinite(t_in_mod)
+mask_finite_R200m = np.isfinite(t_in_mod_R200m)
+#
+summary_plot.plot_hist(x=(t_in_mod_R200m[mask_finite_R200m]-t_in_sim[mask_finite_R200m]), xtype='t.infall.text', binsize=0.5, pdf=True, xlimits=(-10,13), title='$t_{\\rm infall,model}$ w/ $R_{\\rm 200m}(z=0)$', file_path_and_name=directory+'/infall_comp_Rz0.pdf')
+summary_plot.plot_hist(x=(t_in_mod[mask_finite]-t_in_sim[mask_finite]), xtype='t.infall.text', binsize=0.5, pdf=True, xlimits=(-10,10), title='$t_{\\rm infall,model}$ w/ $R_{\\rm 200m}(z)$', file_path_and_name=directory+'/infall_comp_Rz.pdf')
+summary_plot.plot_hist_mult(x=[(t_in_mod[mask_finite]-t_in_sim[mask_finite]),(t_in_mod_R200m[mask_finite_R200m]-t_in_sim[mask_finite_R200m])], xtype=['t.infall.text','t.infall.text'], labels=['$t_{\\rm infall,model}$ w/ $R_{\\rm 200m}(z)$','$t_{\\rm infall,model}$ w/ $R_{\\rm 200m}(z=0)$'], binsize=0.5, pdf=True, xlimits=(-10,10), leg_loc='center left', med_location=[0.38,0.35], file_path_and_name=directory+'/infall_comp_both.pdf')
+
 
 """
     Properties vs Mstar
