@@ -27,60 +27,81 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='m12b', location='mac')
 #sim_data.galaxy = 'Remus' # this is only necessary for LG pairs
 print('Set paths')
 
 # Read in the data
-mass_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.galaxy+'/'+sim_data.galaxy+'_full_mass_profile')
-
-#inds = np.concatenate((np.arange(len(mass_data['time']))[:21], np.arange(len(mass_data['time']))[21::2]))
-inds = np.arange(len(mass_data['time']))[::2]
-times = np.around(13.8-mass_data['time'], decimals=2)
-
-# Cumulatively sum each array, then take the average over all of them
-mass_prof_avg_500M = np.average(np.cumsum(mass_data['mass.profile'][:6], axis=1), axis=0)
-mass_prof_avg_1G = np.average(np.cumsum(mass_data['mass.profile'][:11], axis=1), axis=0)
-
-# Plot each snapshot mass profile to the average mass profile
+mass_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.galaxy+'_full_mass_profile')
 rs = np.logspace(np.log10(0.1), np.log10(500), 100)
-#colors = ['#800000', '#9A6324', '#808000', '#469990', '#000075', '#e6194B', '#f58231', '#3cb44b', '#42d4f4', '#911eb4', '#f032e6']
 
-def color_cycle(cycle_length=len(mass_data['time']), cmap_name='plasma', low=0, high=1):
+
+"""
+    Average over the last 2 Gyrs
+"""
+mass_prof_avg_2G = np.average(np.cumsum(mass_data['mass.profile'][:21], axis=1), axis=0)
+
+inds = np.arange(len(mass_data['time'][:21]))
+times = np.around(13.8-mass_data['time'][:21], decimals=2)
+
+def color_cycle(cycle_length=len(mass_data['time'][:21]), cmap_name='plasma', low=0, high=1):
     cmap=plt.get_cmap(cmap_name)
     colors = cmap(np.linspace(low, high, cycle_length))
     return colors
-colorss = color_cycle(len(mass_data['time']), cmap_name='plasma', low=0, high=1)
+colorss = color_cycle(len(mass_data['time'][:21]), cmap_name='plasma', low=0, high=1)
 
 plt.rcParams["font.family"] = "serif"
-plt.figure(figsize=(10, 12))
+plt.figure(figsize=(10, 8))
 for i in inds:
-    plt.plot(rs[1:], np.cumsum(mass_data['mass.profile'][i])/mass_prof_avg_500M, color=colorss[i], label=str(times[i])+' Gyr ago')
+    plt.plot(rs[1:], np.cumsum(mass_data['mass.profile'][i])/mass_prof_avg_2G, color=colorss[i])
 plt.xlim(5, 350)
-#plt.ylim(0.97, 1.04)
+plt.ylim(0.95, 1.06)
+#plt.ylim(0.96,1.07)
 plt.hlines(1, 0.1, 500, color='k', alpha=0.8, linestyles='dotted', zorder=100)
 plt.xscale('log')
 plt.xlabel('r [kpc]', fontsize=32)
-plt.ylabel('$M$(<r) / $M_{\\rm avg, 500\ Myr}$(<r)', fontsize=32)
-plt.title(sim_data.galaxy, fontsize=32)
-plt.legend(prop={'size': 12}, ncol=4)
+plt.ylabel('$M$(<r) / $M_{\\rm avg, 2\ Gyr}$(<r)', fontsize=32)
+plt.title(sim_data.galaxy+', 0.1 Gyr spacing', fontsize=32)
+cmap = plt.get_cmap('plasma', len(mass_data['time']))
+norm = matplotlib.colors.Normalize(vmin=times[-1], vmax=times[0])
+sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+cbar = plt.colorbar(sm)
+cbar.set_label('Lookback time [Gyr]', fontsize=28)
 plt.tight_layout()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/mass_profiles/'+sim_data.galaxy+'_mass_profile_evolution_500Myr_avg.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/mass_profiles/individual/'+sim_data.galaxy+'_mass_profile_evolution_2Gyr_avg.pdf')
+plt.close()
 
+
+"""
+    Snapshots relative to z = 0
+"""
+inds = np.concatenate((np.arange(len(mass_data['time']))[:21][::5], np.arange(len(mass_data['time']))[21:39]))
+times = np.around(13.8-np.concatenate((mass_data['time'][:21][::5], mass_data['time'][21:39])), decimals=2)
+
+def color_cycle(cycle_length=len(inds), cmap_name='plasma', low=0, high=1):
+    cmap=plt.get_cmap(cmap_name)
+    colors = cmap(np.linspace(low, high, cycle_length))
+    return colors
+colorss = color_cycle(len(inds), cmap_name='plasma', low=0, high=1)
 
 plt.rcParams["font.family"] = "serif"
-plt.figure(figsize=(10, 12))
-for i in inds:
-    plt.plot(rs[1:], np.cumsum(mass_data['mass.profile'][i])/np.cumsum(mass_data['mass.profile'][0]), color=colorss[i], label=str(times[i])+' Gyr ago')
+plt.figure(figsize=(10, 8))
+for i in range(0, len(inds)):
+    plt.plot(rs[1:], np.cumsum(mass_data['mass.profile'][inds[i]])/np.cumsum(mass_data['mass.profile'][0]), color=colorss[i])
 plt.xlim(5, 350)
-#plt.ylim(0.95, 1.02)
+plt.ylim(0, 1.2)
 plt.xscale('log')
 plt.xlabel('r [kpc]', fontsize=32)
 plt.ylabel('$M$(<r) / $M_{\\rm z = 0}$(<r)', fontsize=32)
-plt.title(sim_data.galaxy, fontsize=32)
-plt.legend(prop={'size': 12}, ncol=4)
+plt.title(sim_data.galaxy+', 0.5 Gyr spacing', fontsize=32)
+cmap = plt.get_cmap('plasma', len(mass_data['time']))
+norm = matplotlib.colors.Normalize(vmin=times[-1], vmax=times[0])
+sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+cbar = plt.colorbar(sm)
+cbar.set_label('Lookback time [Gyr]', fontsize=28)
 plt.tight_layout()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/mass_profiles/'+sim_data.galaxy+'_mass_profile_evolution_z0.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/mass_profiles/individual/'+sim_data.galaxy+'_mass_profile_evolution_z0.pdf')
+plt.close()
 
 
 #####################################################################################
@@ -117,80 +138,118 @@ mass_Thelma = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_pro
 mass_Louise = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/Louise_full_mass_profile')
 mass_Romulus = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/Romulus_full_mass_profile')
 mass_Remus = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/Remus_full_mass_profile')
+rs = np.logspace(np.log10(0.1), np.log10(500), 100)
+
+
+"""
+    Plot the median at each snapshot relative to the z = 0 mass profile
+        - Want to take the ratio for each host before taking the medians
+"""
 
 # Cumulatively sum each and put them all in one array
-mass_prof_all = np.array([np.cumsum(mass_m12b['mass.profile'],axis=1),\
-                          np.cumsum(mass_m12c['mass.profile'],axis=1),\
-                          np.cumsum(mass_m12f['mass.profile'],axis=1),\
-                          np.cumsum(mass_m12i['mass.profile'],axis=1),\
-                          np.cumsum(mass_m12m['mass.profile'],axis=1),\
-                          np.cumsum(mass_m12r['mass.profile'],axis=1),\
-                          np.cumsum(mass_m12w['mass.profile'],axis=1),\
-                          np.cumsum(mass_m12z['mass.profile'],axis=1),\
-                          np.cumsum(mass_Romeo['mass.profile'],axis=1),\
-                          np.cumsum(mass_Juliet['mass.profile'],axis=1),\
-                          np.cumsum(mass_Thelma['mass.profile'],axis=1),\
-                          np.cumsum(mass_Louise['mass.profile'],axis=1),\
-                          np.cumsum(mass_Romulus['mass.profile'],axis=1),\
-                          np.cumsum(mass_Remus['mass.profile'],axis=1)])
+mass_prof_all = np.array([np.cumsum(mass_m12b['mass.profile'],axis=1)/np.cumsum(mass_m12b['mass.profile'][0]),\
+                          np.cumsum(mass_m12c['mass.profile'],axis=1)/np.cumsum(mass_m12c['mass.profile'][0]),\
+                          np.cumsum(mass_m12f['mass.profile'],axis=1)/np.cumsum(mass_m12f['mass.profile'][0]),\
+                          np.cumsum(mass_m12i['mass.profile'],axis=1)/np.cumsum(mass_m12i['mass.profile'][0]),\
+                          np.cumsum(mass_m12m['mass.profile'],axis=1)/np.cumsum(mass_m12m['mass.profile'][0]),\
+                          np.cumsum(mass_m12r['mass.profile'],axis=1)/np.cumsum(mass_m12r['mass.profile'][0]),\
+                          np.cumsum(mass_m12w['mass.profile'],axis=1)/np.cumsum(mass_m12w['mass.profile'][0]),\
+                          np.cumsum(mass_m12z['mass.profile'],axis=1)/np.cumsum(mass_m12z['mass.profile'][0]),\
+                          np.cumsum(mass_Romeo['mass.profile'],axis=1)/np.cumsum(mass_Romeo['mass.profile'][0]),\
+                          np.cumsum(mass_Juliet['mass.profile'],axis=1)/np.cumsum(mass_Juliet['mass.profile'][0]),\
+                          np.cumsum(mass_Thelma['mass.profile'],axis=1)/np.cumsum(mass_Thelma['mass.profile'][0]),\
+                          np.cumsum(mass_Louise['mass.profile'],axis=1)/np.cumsum(mass_Louise['mass.profile'][0]),\
+                          np.cumsum(mass_Romulus['mass.profile'],axis=1)/np.cumsum(mass_Romulus['mass.profile'][0]),\
+                          np.cumsum(mass_Remus['mass.profile'],axis=1)/np.cumsum(mass_Remus['mass.profile'][0])])
 
+mass_prof_all_med = np.median(mass_prof_all, axis=0)
 
-mass_prof_all = np.array([np.cumsum(mass_m12f['mass.profile'],axis=1),\
-                          np.cumsum(mass_m12i['mass.profile'],axis=1),\
-                          np.cumsum(mass_m12m['mass.profile'],axis=1),\
-                          ])
+inds = np.concatenate((np.arange(len(mass_m12b['time']))[:21][::5], np.arange(len(mass_m12b['time']))[21:39]))
+times = np.around(13.8-np.concatenate((mass_m12b['time'][:21][::5], mass_m12b['time'][21:39])), decimals=2)
 
-
-# Take the average
-mass_prof_med_all = np.median(mass_prof_all, axis=0)
-mass_prof_avg_all = np.average(mass_prof_med_all, axis=0) # average over all snapshots
-mass_prof_avg_500M = np.average(mass_prof_med_all[:6], axis=0) # average over last 500 Myr
-mass_prof_avg_1G = np.average(mass_prof_med_all[:11], axis=0) # average over last 1 Gyr
-
-# Plot each snapshot mass profile to the average mass profile
-rs = np.logspace(np.log10(0.1), np.log10(500), 100)
-#
-def color_cycle(cycle_length=len(mass_m12b['time']), cmap_name='plasma', low=0, high=1):
+def color_cycle(cycle_length=len(inds), cmap_name='plasma', low=0, high=1):
     cmap=plt.get_cmap(cmap_name)
     colors = cmap(np.linspace(low, high, cycle_length))
     return colors
-colorss = color_cycle(len(mass_m12b['time']), cmap_name='plasma', low=0, high=1)
-#
-inds = np.arange(len(mass_m12b['time']))[::2]
-times = np.around(13.8-mass_m12b['time'], decimals=2)
-#
+colorss = color_cycle(len(inds), cmap_name='plasma', low=0, high=1)
+
 plt.rcParams["font.family"] = "serif"
 plt.figure(figsize=(10, 8))
-for i in inds:
-    #plt.plot(rs[1:], mass_prof_med_all[i]/mass_prof_avg_1G, color=colorss[i], label=str(times[i])+' Gyr ago')
-    plt.plot(rs[1:], mass_prof_med_all[i]/mass_prof_med_all[0], color=colorss[i], label=str(times[i])+' Gyr ago')
+for i in range(0, len(inds)):
+    plt.plot(rs[1:], mass_prof_all_med[i], color=colorss[i])
 plt.xlim(5, 350)
-plt.ylim(0, 1.2)
-plt.hlines(1, 0.1, 500, color='k', alpha=0.8, linestyles='dotted', zorder=100)
+plt.ylim(0.85, 1.03)
 plt.xscale('log')
 plt.xlabel('r [kpc]', fontsize=32)
-#plt.ylabel('$M$(<r) / $M_{\\rm avg}$(<r)', fontsize=32)
-plt.ylabel('$M$(<r) / $M_{z=0}$(<r)', fontsize=32)
-#plt.title('Average over last 11.5 Gyr', fontsize=32)
-#plt.title('Average over last 500 Myr', fontsize=32)
-#plt.title('Average over last 1 Gyr', fontsize=32)
-plt.title(' ', fontsize=32)
-#
+plt.ylabel('$M_{\\rm median}(<r)$ / $M_{\\rm z = 0, median}$(<r)', fontsize=32)
 cmap = plt.get_cmap('plasma', len(mass_m12b['time']))
 norm = matplotlib.colors.Normalize(vmin=times[-1], vmax=times[0])
 sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
-#sm.set_array([])
 cbar = plt.colorbar(sm)
 cbar.set_label('Lookback time [Gyr]', fontsize=28)
-#
 plt.tight_layout()
-#plt.savefig(sim_data.home_dir+'/orbit_data/plots/mass_profiles/mass_profile_evolution_avg_all.pdf')
-#plt.savefig(sim_data.home_dir+'/orbit_data/plots/mass_profiles/mass_profile_evolution_avg_500Myr.pdf')
-#plt.savefig(sim_data.home_dir+'/orbit_data/plots/mass_profiles/mass_profile_evolution_avg_1Gyr.pdf')
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/mass_profiles/mass_profile_evolution_z0.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/mass_profiles/mass_profile_evolution_z0_median.pdf')
 plt.close()
 
 
+
+"""
+    Plot the median at each snapshot relative to the average profile over the last 2 Gyr
+        - Want to take the ratio for each host before taking the medians
+"""
+
+# Cumulatively sum each and put them all in one array
+mass_prof_avg_all = np.array([np.cumsum(mass_m12b['mass.profile'][:21],axis=1)/np.average(np.cumsum(mass_m12b['mass.profile'][:21], axis=1), axis=0),\
+                              np.cumsum(mass_m12c['mass.profile'][:21],axis=1)/np.average(np.cumsum(mass_m12c['mass.profile'][:21], axis=1), axis=0),\
+                              np.cumsum(mass_m12f['mass.profile'][:21],axis=1)/np.average(np.cumsum(mass_m12f['mass.profile'][:21], axis=1), axis=0),\
+                              np.cumsum(mass_m12i['mass.profile'][:21],axis=1)/np.average(np.cumsum(mass_m12i['mass.profile'][:21], axis=1), axis=0),\
+                              np.cumsum(mass_m12m['mass.profile'][:21],axis=1)/np.average(np.cumsum(mass_m12m['mass.profile'][:21], axis=1), axis=0),\
+                              np.cumsum(mass_m12r['mass.profile'][:21],axis=1)/np.average(np.cumsum(mass_m12r['mass.profile'][:21], axis=1), axis=0),\
+                              np.cumsum(mass_m12w['mass.profile'][:21],axis=1)/np.average(np.cumsum(mass_m12w['mass.profile'][:21], axis=1), axis=0),\
+                              np.cumsum(mass_m12z['mass.profile'][:21],axis=1)/np.average(np.cumsum(mass_m12z['mass.profile'][:21], axis=1), axis=0),\
+                              np.cumsum(mass_Romeo['mass.profile'][:21],axis=1)/np.average(np.cumsum(mass_Romeo['mass.profile'][:21], axis=1), axis=0),\
+                              np.cumsum(mass_Juliet['mass.profile'][:21],axis=1)/np.average(np.cumsum(mass_Juliet['mass.profile'][:21], axis=1), axis=0),\
+                              np.cumsum(mass_Thelma['mass.profile'][:21],axis=1)/np.average(np.cumsum(mass_Thelma['mass.profile'][:21], axis=1), axis=0),\
+                              np.cumsum(mass_Louise['mass.profile'][:21],axis=1)/np.average(np.cumsum(mass_Louise['mass.profile'][:21], axis=1), axis=0),\
+                              np.cumsum(mass_Romulus['mass.profile'][:21],axis=1)/np.average(np.cumsum(mass_Romulus['mass.profile'][:21], axis=1), axis=0),\
+                              np.cumsum(mass_Remus['mass.profile'][:21],axis=1)/np.average(np.cumsum(mass_Remus['mass.profile'][:21], axis=1), axis=0)])
+
+mass_prof_avg_all_med = np.median(mass_prof_avg_all, axis=0)
+
+inds = np.arange(len(mass_m12b['time'][:21]))
+times = np.around(13.8-mass_m12b['time'][:21], decimals=2)
+
+def color_cycle(cycle_length=len(mass_m12b['time'][:21]), cmap_name='plasma', low=0, high=1):
+    cmap=plt.get_cmap(cmap_name)
+    colors = cmap(np.linspace(low, high, cycle_length))
+    return colors
+colorss = color_cycle(len(mass_m12b['time'][:21]), cmap_name='plasma', low=0, high=1)
+
+plt.rcParams["font.family"] = "serif"
+plt.figure(figsize=(10, 8))
+for i in inds:
+    plt.plot(rs[1:], mass_prof_avg_all_med[i], color=colorss[i])
+plt.xlim(5, 350)
+plt.ylim(0.95, 1.05)
+plt.hlines(1, 0.1, 500, color='k', alpha=0.8, linestyles='dotted', zorder=100)
+plt.xscale('log')
+plt.xlabel('r [kpc]', fontsize=32)
+plt.ylabel('$M_{\\rm median}(<r)$ / $M_{\\rm avg, 2\ Gyr}$(<r)', fontsize=32)
+cmap = plt.get_cmap('plasma', len(mass_m12b['time']))
+norm = matplotlib.colors.Normalize(vmin=times[-1], vmax=times[0])
+sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+cbar = plt.colorbar(sm)
+cbar.set_label('Lookback time [Gyr]', fontsize=28)
+plt.tight_layout()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/mass_profiles/mass_profile_evolution_2Gyr_avg_median.pdf')
+plt.close()
+
+
+
+
+
+
+##### OLD AND DONT WANT TO KEEP ANYMORE BUT TALK TO ANDREW ABOUT THIS FIRST CAUSE HE MIGHT WANT THESE
 # Sigma percents
 onesigp = 84.13
 onesigm = 15.87
