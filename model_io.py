@@ -584,7 +584,7 @@ class Profiles:
         #
         return density_inner + density_outer
 
-    def disk_radial_mass(self, distances, gal):
+    def disk_radial_mass(self, distances, gal, custom_param=False):
         """
         DESCRIPTION:
             Model the disk as the sum of two exponentials, one for the inner
@@ -606,12 +606,20 @@ class Profiles:
             - Uses values for the amplitudes, scale lengths, and scale height
               from data that was already compiled.
         """
-        # Set all of the parameters
-        A_disk_in = self.fitting_data['A_disk_in'][gal]
-        r_in = self.fitting_data['r_in'][gal]
-        A_disk_out = self.fitting_data['A_disk_out'][gal]
-        r_out = self.fitting_data['r_out'][gal]
-        h_z = self.fitting_data['h_z'][gal]
+        if custom_param:
+            # Set all of the parameters
+            A_disk_in = custom_param[0]
+            r_in = custom_param[1]
+            A_disk_out = custom_param[2]
+            r_out = custom_param[3]
+            h_z = custom_param[4]
+        else:
+            # Set all of the parameters
+            A_disk_in = self.fitting_data['A_disk_in'][gal]
+            r_in = self.fitting_data['r_in'][gal]
+            A_disk_out = self.fitting_data['A_disk_out'][gal]
+            r_out = self.fitting_data['r_out'][gal]
+            h_z = self.fitting_data['h_z'][gal]
         #
         # Define the inner and outer enclosed mass profiles
         mass_inner = (4*np.pi*A_disk_in*h_z*r_in)*(r_in-np.exp(-distances/r_in)*(r_in+distances))
@@ -681,7 +689,7 @@ class Profiles:
         """
         pass
 
-    def halo_2p_nfw_mass(self, distances, gal):
+    def halo_2p_nfw_mass(self, distances, gal, custom_param=False):
         """
         DESCRIPTION:
             Model of the generalized dark matter NFW halo mass profile.
@@ -700,9 +708,15 @@ class Profiles:
             - Uses values for the amplitudes, scale lengths, and scale height
               from data that was already compiled.
         """
-        A_halo = self.fitting_data['A_halo'][gal]
-        a_halo = self.fitting_data['a_halo'][gal]
-        alpha = self.fitting_data['alpha'][gal]
-        beta = self.fitting_data['beta'][gal]
+        if custom_param:
+            A_halo = custom_param[0]
+            a_halo = custom_param[1]
+            alpha = custom_param[2]
+            beta = custom_param[3]
+        else:
+            A_halo = self.fitting_data['A_halo'][gal]
+            a_halo = self.fitting_data['a_halo'][gal]
+            alpha = self.fitting_data['alpha'][gal]
+            beta = self.fitting_data['beta'][gal]
         #
         return (A_halo/(3-alpha))*((distances/a_halo)**(3-alpha))*special.hyp2f1(3.-alpha,-alpha+beta,4.-alpha,-distances/a_halo)
