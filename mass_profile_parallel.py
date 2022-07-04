@@ -8,7 +8,7 @@
 #SBATCH --tasks-per-node=2    # MPI tasks per node
 ##SBATCH --ntasks=4    # processes total
 #SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
-#SBATCH --time=24:00:00
+#SBATCH --time=8:00:00
 ##SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/m12z_mass_profile_%j.txt
 #SBATCH --output=/home1/05400/ibsantis/scripts/jobs/mass_profiles/m12z_mass_profile_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
