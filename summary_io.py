@@ -44,6 +44,9 @@ class SummaryDataSort:
                            'all_no_z': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', \
                                         'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus'],
                            #
+                           'all_no_r': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'm12z', \
+                                        'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus'],
+                           #
                            'all_energy': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', \
                                           'Romeo', 'Juliet', 'Thelma', 'Louise'],
                             #
@@ -407,6 +410,13 @@ class SummaryDataSort:
         #
         return data
 
+    def print_keys(self, data_dict, host='m12b'):
+        """
+        TBD
+        """
+        for i in data_dict[host].keys():
+            print(i)
+
     def delta_nperi(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -506,7 +516,7 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    def nperi_model(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
+    def nperi_model(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
             ...
@@ -520,16 +530,28 @@ class SummaryDataSort:
         # Set up an empty list to save values to
         data = []
         #
+        # Set the infall type
+        if selection == 'sim':
+            infall_type = 'first.infall.time.lb'
+        elif selection == 'model':
+            infall_type = 'first.infall.time.lb.model'
+        elif selection == 'model.300':
+            infall_type = 'infall.time.lb.model.300kpc'
+        elif selection == 'model.R200m':
+            infall_type = 'infall.time.lb.model.R200m'
+        else:
+            print('Choose a correct infall type')
+            raise KeyError('non-alphanumeric character in input')
+            pass
         # Loop over the hosts
         for name in self.host_names[hosts]:
             # Loop over each satellite
-            for i in range(0, len(data_dict[name]['pericenter.time.lb.model'][mask_dict])):
-                m = (data_dict[name]['pericenter.time.lb.model'][mask_dict][i] != -1)
-
-            if oversample:
-                data.append(np.repeat(data_dict[name]['N.peri.'+selection][mask_dict[name]], self.oversample[sim_type][name]))
-            else:
-                data.append(data_dict[name]['N.peri.'+selection][mask_dict[name]])
+            for i in range(0, len(data_dict[name]['pericenter.time.lb.model'][mask_dict[name]])):
+                m = (data_dict[name]['pericenter.time.lb.model'][mask_dict[name]][i] != -1)
+                if oversample:
+                    data.append(np.repeat(np.sum((data_dict[name]['pericenter.time.lb.model'][mask_dict[name]][i][m] < data_dict[name][infall_type][mask_dict[name]][i])), self.oversample[sim_type][name]))
+                else:
+                    data.append(np.sum((data_dict[name]['pericenter.time.lb.model'][mask_dict[name]][i][m] < data_dict[name][infall_type][mask_dict[name]][i])))
         #
         return np.hstack(data)
 
@@ -749,6 +771,31 @@ class SummaryDataSort:
                 data.append(temp_array)
         #
         return np.hstack(data)
+
+    def dmax(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
+        """
+        TBD
+        """
+        # Set up an empty list to save values to
+        data = []
+        #
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            #
+            if selection == 'sim':
+                if oversample:
+                    data.append(np.repeat(data_dict[name]['max.dist.sim'][mask_dict[name]], self.oversample[sim_type][name]))
+                else:
+                    data.append(data_dict[name]['max.dist.sim'][mask_dict[name]])
+            #
+            elif selection == 'model':
+                if oversample:
+                    data.append(np.repeat(data_dict[name]['apocenter.dist.model'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
+                else:
+                    data.append(data_dict[name]['apocenter.dist.model'][mask_dict[name]][:,0])
+        #
+        return np.hstack(data)
+
 
     # optimized
     def delta_dperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all', sim_type='baryon'):
@@ -1178,35 +1225,7 @@ class SummaryDataSort:
     # needs dox and optimization
     def recent_infall(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
-        DESCRIPTION:
-            Groups the lookback times of satellite first infall into their MW-mass
-            host together into one array.
-
-        VARIABLES:
-            data_dict  : dictionary
-                         Dictionary of data created by data_read()
-
-            mask_dict  : dictionary
-                         Dictionary of masks created by data_mask(). This is used
-                         on data_dict to mask out the subhalos you want.
-
-            oversample : boolean
-                         Choose whether you want to oversample the subhalos or not.
-
-            hosts      : string
-                         Choose which host galaxies you want to analyze; choices
-                         listed in __init__().
-
-            sim_type   : string
-                         Choose which type of data you are analyzing. This is
-                         only used for oversampling factors and does not matter
-                         if you are not oversampling.
-
-        NOTES:
-            - Returns a 1D array.
-            - Data is arranged in order of self.host_names[hosts]. Subhalos in
-              each host are arranged in the same way they were generated from
-              summary_data.py or summary_data_dmo.py.
+        TBD
         """
         # Set up empty array to save to
         data = []
@@ -2164,8 +2183,8 @@ class SummaryDataSort:
         data = []
         #
         if selection == 'sim':
-            per_type_peri = 'orbit.period.peri'
-            per_type_apo = 'orbit.period.apo'
+            per_type_peri = 'orbit.period.peri.sim'
+            per_type_apo = 'orbit.period.apo.sim'
         else:
             per_type_peri = 'orbit.period.peri.model'
             per_type_apo = 'orbit.period.apo.model'
@@ -2269,8 +2288,10 @@ class SummaryDataPlot(SummaryDataSort):
                        'L.frac': '($L(z=0) - L_{\\rm infall,MW}$)/$L_{\\rm infall,MW}$',\
                        'ecc': 'Eccentricity',\
                        'ecc.model': 'Model Ecccentricity',\
+                       'ecc.delta': '$e_{\\rm model} - e_{\\rm sim}$',\
                        'period': 'Orbital Period [Gyr]',\
                        'period.model': 'Model Orbital Period [Gyr]',\
+                       'period.delta': '$T_{\\rm model} - T_{\\rm sim}$ [Gyr]',\
                        #
                        # I don't really use the ones below here...
                        'delta_dmin_dm_v_star': '(d$_{\\rm min,dm}$ - d$_{\\rm min,star}$) [kpc]',\
@@ -2304,8 +2325,8 @@ class SummaryDataPlot(SummaryDataSort):
         #
         else:
             if 'N.' not in xtype:
-                minn = binsize*np.floor(np.min(x)/binsize)
-                maxx = binsize*np.ceil(np.max(x)/binsize)
+                minn = binsize*np.floor(np.nanmin(x)/binsize)
+                maxx = binsize*np.ceil(np.nanmax(x)/binsize)
                 if minn < 0:
                     bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
                 else:
@@ -2314,8 +2335,8 @@ class SummaryDataPlot(SummaryDataSort):
                 half_bin = (bins[1]-bins[0])/2
             #
             elif 'N.' in xtype:
-                minn = int(binsize*np.floor(np.min(x)/binsize))-0.5
-                maxx = int(binsize*np.ceil(np.max(x)/binsize))+0.5
+                minn = int(binsize*np.floor(np.nanmin(x)/binsize))-0.5
+                maxx = int(binsize*np.ceil(np.nanmax(x)/binsize))+0.5
                 if minn < 0:
                     bin_num = int((np.abs(maxx)+np.abs(minn))/binsize+1)
                 else:
@@ -2437,7 +2458,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.close()
         pass
 
-    def median_plot(self, x, y, xtype, ytype, binsize, file_path_and_name, binedges=None, limits=None, title=None, hl=False):
+    def median_plot(self, x, y, xtype, ytype, binsize, file_path_and_name, binedges=None, limits=None, title=None, hl=False, w_scatter=False):
         """
         DESCRIPTION:
             Bins the x-axis quantity and plots either the mean or median, along
@@ -2471,6 +2492,10 @@ class SummaryDataPlot(SummaryDataSort):
         # Calculate the median or mean + scatters
         med, upper, lower, highest, lowest = self.median_and_scatter(x=x, y=y, xtype=xtype, ytype=ytype, bins=binss)
         #
+        if w_scatter:
+            ls = '-s'
+        else:
+            ls = '-'
         f, ax = plt.subplots(figsize=(11, 8))
         #ax.minorticks_on()
         ax.set_xlabel(self.labels[xtype], fontsize=28)
@@ -2478,7 +2503,7 @@ class SummaryDataPlot(SummaryDataSort):
         if title:
             ax.set_title(title, fontsize=24)
         if 'M.' in xtype and 'M.' not in ytype:
-            plt.plot(10**(binss[:-1]+half_binss), med, color=self.colors[1], markersize=10, alpha=0.5)
+            plt.plot(10**(binss[:-1]+half_binss), med, ls, color=self.colors[1], markersize=10, alpha=0.5)
             plt.fill_between(10**(binss[:-1]+half_binss), upper, lower, color=self.colors[1], alpha=0.3)
             plt.fill_between(10**(binss[:-1]+half_binss), highest, lowest, color=self.colors[1], alpha=0.15)
             ax.set_xscale('log')
@@ -2509,7 +2534,7 @@ class SummaryDataPlot(SummaryDataSort):
                 ax2.tick_params(pad=3)
         #
         elif 'M.' in xtype and 'M.' in ytype:
-            plt.plot(10**(binss[:-1]+half_binss), 10**med, color=self.colors[1], markersize=10, alpha=0.5)
+            plt.plot(10**(binss[:-1]+half_binss), 10**med, ls, color=self.colors[1], markersize=10, alpha=0.5)
             plt.fill_between(10**(binss[:-1]+half_binss), 10**upper, 10**lower, color=self.colors[1], alpha=0.3)
             plt.fill_between(10**(binss[:-1]+half_binss), 10**highest, 10**lowest, color=self.colors[1], alpha=0.15)
             plt.hlines(y=3*10**4, xmin=10**(limits[0][0]), xmax=10**(limits[0][1]), colors='k', linestyles='dotted', alpha=0.5)
@@ -2520,7 +2545,7 @@ class SummaryDataPlot(SummaryDataSort):
             ax.set_yscale('log')
         #
         else:
-            plt.plot(binss[:-1]+half_binss, med, color=self.colors[1], markersize=10, alpha=0.5)
+            plt.plot(binss[:-1]+half_binss, med, ls, color=self.colors[1], markersize=10, alpha=0.5)
             plt.fill_between(binss[:-1]+half_binss, upper, lower, color=self.colors[1], alpha=0.3)
             plt.fill_between(binss[:-1]+half_binss, highest, lowest, color=self.colors[1], alpha=0.15)
             ax.set_xscale('linear')
@@ -2574,7 +2599,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def median_plot_mult(self, x, y, xtype, ytype, labels, binsize, file_path_and_name, binedges=None, limits=None, title=None, legend_on=True):
+    def median_plot_mult(self, x, y, xtype, ytype, labels, binsize, file_path_and_name, binedges=None, limits=None, title=None, legend_on=True, hl=False, w_scatter=False):
         """
         DESCRIPTION:
             Bins the x-axis quantity and plots either the mean or median, along
@@ -2616,21 +2641,29 @@ class SummaryDataPlot(SummaryDataSort):
             # Calculate the median or mean + scatters
             med, upper, lower, highest, lowest = self.median_and_scatter(x=x[j], y=y[j], xtype=xtype[j], ytype=ytype[j], bins=binss)
             #
+            if w_scatter:
+                ls = '-s'
+            else:
+                ls = '-'
             # PLOTTING
             if 'M.' in xtype[j] and 'M.' not in ytype[j]:
-                plt.plot(10**(binss[:-1]+half_binss), med, color=colorss[j], markersize=10, alpha=0.5, label=labels[j])
+                plt.plot(10**(binss[:-1]+half_binss), med, ls, color=colorss[j], markersize=10, alpha=0.5, label=labels[j])
                 plt.fill_between(10**(binss[:-1]+half_binss), upper, lower, color=colorss[j], alpha=0.3)
                 plt.fill_between(10**(binss[:-1]+half_binss), highest, lowest, color=colorss[j], alpha=0.15)
+                if hl:
+                    plt.hlines(y=0, xmin=10**(limits[0][0]), xmax=10**(limits[0][1]), color='k', linestyles='dotted', alpha=0.5)
             elif 'M.' in xtype[j] and 'M.' in ytype[j]:
-                plt.plot(10**(binss[:-1]+half_binss), 10**med, color=colorss[j], markersize=10, alpha=0.5, label=labels[j])
+                plt.plot(10**(binss[:-1]+half_binss), 10**med, ls, color=colorss[j], markersize=10, alpha=0.5, label=labels[j])
                 plt.fill_between(10**(binss[:-1]+half_binss), 10**upper, 10**lower, color=colorss[j], alpha=0.3)
                 plt.fill_between(10**(binss[:-1]+half_binss), 10**highest, 10**lowest, color=colorss[j], alpha=0.15)
                 ax.axhline(y=3*10**7, xmin=10**(8), xmax=10**(9), color='k', linestyle=':')
                 #
             else:
-                plt.plot(binss[:-1]+half_binss, med, color=colorss[j], markersize=10, alpha=0.5, label=labels[j])
+                plt.plot(binss[:-1]+half_binss, med, ls, color=colorss[j], markersize=10, alpha=0.5, label=labels[j])
                 plt.fill_between(binss[:-1]+half_binss, upper, lower, color=colorss[j], alpha=0.3)
                 plt.fill_between(binss[:-1]+half_binss, highest, lowest, color=colorss[j], alpha=0.15)
+                if hl:
+                    plt.hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], color='k', linestyles='dotted', alpha=0.5)
         if 'M.' in xtype[0]:
             plt.xscale('log')
         if 'M.' in ytype[0]:
