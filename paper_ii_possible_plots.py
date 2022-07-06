@@ -36,10 +36,10 @@ print('Set paths')
 # Initialize the classes, read in the data, and create data masks
 summary = summary_io.SummaryDataSort()
 summary_plot = summary_io.SummaryDataPlot()
-data_total = summary.data_read(directory=sim_data.home_dir, hosts='all', sim_type='baryon')
-masks_infall = summary.data_mask(data_total, peri_sim=False, peri_model=False, hosts='all')
-masks_infall_peri = summary.data_mask(data_total, peri_sim=True, peri_model=False, hosts='all')
-masks_infall_apo = summary.data_mask_apo(data_total, hosts='all')
+data_total = summary.data_read(directory=sim_data.home_dir, hosts='all_no_r', sim_type='baryon')
+masks_infall = summary.data_mask(data_total, peri_sim=False, peri_model=False, hosts='all_no_r')
+masks_infall_peri = summary.data_mask(data_total, peri_sim=True, peri_model=False, hosts='all_no_r')
+masks_infall_apo = summary.data_mask_apo(data_total, hosts='all_no_r')
 masks_infall['m12f'][59] = False # used to be satellite 57 in the older data
 masks_infall_peri['m12f'][59] = False
 masks_infall_apo['m12f'][59] = False
@@ -51,9 +51,9 @@ directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2'
 """
     Infall time comparisons
 """
-t_in_sim = summary.first_infall(data_total, masks_infall, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-t_in_mod = summary.first_infall(data_total, masks_infall, selection='model', oversample=True, hosts='all', sim_type='baryon')
-t_in_mod_R200m = summary.infall_diagnostics(data_total, masks_infall, selection='R200m', oversample=True, hosts='all', sim_type='baryon')
+t_in_sim = summary.first_infall(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_mod = summary.first_infall(data_total, masks_infall, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_mod_R200m = summary.infall_diagnostics(data_total, masks_infall, selection='R200m', oversample=True, hosts='all_no_r', sim_type='baryon')
 mask_finite = np.isfinite(t_in_mod)
 mask_finite_R200m = np.isfinite(t_in_mod_R200m)
 #
@@ -65,11 +65,11 @@ summary_plot.plot_hist_mult(x=[(t_in_mod[mask_finite]-t_in_sim[mask_finite]),(t_
 """
     Pericenter distance histograms
 """
-d_rec_sim = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-d_min_sim = summary.dperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-d_min_mod = summary.dperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all', sim_type='baryon')
+d_rec_sim = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+d_min_sim = summary.dperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+d_min_mod = summary.dperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_d
 summary_plot.plot_hist(x=(d_rec_mod-d_rec_sim), xtype='delta.d', pdf=True, xlimits=None, binsize=5, title='Recent Pericenters', file_path_and_name=directory+'/d_peri_recent_hist.pdf')
@@ -108,11 +108,11 @@ summary_plot.median_plot_mult(x=[Mstar_z0, Mstar_z0], y=[(d_rec_mod-d_rec_sim)/d
 """
     Pericenter time histograms
 """
-t_rec_sim = summary.tperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-t_min_sim = summary.tperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-t_rec_mod = summary.tperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-t_min_mod = summary.tperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all', sim_type='baryon')
+t_rec_sim = summary.tperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_min_sim = summary.tperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_rec_mod = summary.tperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_min_mod = summary.tperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_t
 summary_plot.plot_hist(x=(t_rec_mod-t_rec_sim), xtype='delta.t', pdf=True, binsize=0.25, title='Recent Pericenters', file_path_and_name=directory+'/dt_recent_hist.pdf')
@@ -152,11 +152,11 @@ summary_plot.median_plot_mult(x=[Mstar_z0,Mstar_z0], y=[(t_rec_mod-t_rec_sim),(t
 """
     Pericenter velocity histograms
 """
-v_rec_sim = summary.vperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-v_min_sim = summary.vperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-v_rec_mod = summary.vperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-v_min_mod = summary.vperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all', sim_type='baryon')
+v_rec_sim = summary.vperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+v_min_sim = summary.vperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+v_rec_mod = summary.vperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+v_min_mod = summary.vperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_v
 summary_plot.plot_hist(x=(v_rec_mod-v_rec_sim), xtype='delta.v', pdf=True, binsize=10, title='Recent Pericenters', file_path_and_name=directory+'/dv_recent_hist.pdf')
@@ -183,13 +183,13 @@ summary_plot.median_plot_mult(x=[Mstar_z0,Mstar_z0], y=[(v_rec_mod-v_rec_sim),(v
 """
     Apocenter distance histograms
 """
-dapo_rec_sim = summary.dapo_recent(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-dapo_rec_mod = summary.dapo_recent(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all', sim_type='baryon')
-dmax_sim = summary.dmax(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-dmax_mod = summary.dmax(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all', sim_type='baryon')
-tapo_rec_sim = summary.tapo_recent(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-tapo_rec_mod = summary.tapo_recent(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all', sim_type='baryon')
-Mstar_z0 = summary.mstar(data_total, masks_infall_apo, selection='z0', oversample=True, hosts='all', sim_type='baryon')
+dapo_rec_sim = summary.dapo_recent(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+dapo_rec_mod = summary.dapo_recent(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+dmax_sim = summary.dmax(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+dmax_mod = summary.dmax(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+tapo_rec_sim = summary.tapo_recent(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+tapo_rec_mod = summary.tapo_recent(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+Mstar_z0 = summary.mstar(data_total, masks_infall_apo, selection='z0', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_d
 summary_plot.plot_hist(x=(dapo_rec_mod-dapo_rec_sim), xtype='delta.dapo', pdf=True, binsize=10, title='Recent apocenter', file_path_and_name=directory+'/d_dapo_hist.pdf')
@@ -233,9 +233,9 @@ summary_plot.median_plot(x=Mstar_z0, y=(tapo_rec_mod-tapo_rec_sim), xtype='M.sta
 """
     Pericenter number histograms
 """
-N_sim = summary.nperi(data_total, masks_infall_peri, oversample=True, selection='sim', hosts='all', sim_type='baryon')
-N_mod = summary.nperi(data_total, masks_infall_peri, oversample=True, selection='model', hosts='all', sim_type='baryon')
-Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all', sim_type='baryon')
+N_sim = summary.nperi(data_total, masks_infall_peri, oversample=True, selection='sim', hosts='all_no_r', sim_type='baryon')
+N_mod = summary.nperi(data_total, masks_infall_peri, oversample=True, selection='model', hosts='all_no_r', sim_type='baryon')
+Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 summary_plot.plot_hist(x=(N_mod-N_sim), xtype='N.delta', pdf=True, binsize=1, file_path_and_name=directory+'/dN_hist.pdf')
 summary_plot.plot_hist(x=(N_mod-N_sim), xtype='N.delta', pdf=True, xlimits=(-5,5), binsize=1, file_path_and_name=directory+'/dN_hist_zoom.pdf')
@@ -248,12 +248,12 @@ summary_plot.median_plot(x=Mstar_z0, y=(N_mod-N_sim), xtype='M.star.z0', ytype='
 """
     Periceneter distances vs Infall time (simulation)
 """
-d_rec_sim = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-d_min_sim = summary.dperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-d_min_mod = summary.dperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-t_in_sim = summary.first_infall(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-t_in_mod = summary.first_infall(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
+d_rec_sim = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+d_min_sim = summary.dperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+d_min_mod = summary.dperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim = summary.first_infall(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_mod = summary.first_infall(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_d
 summary_plot.median_plot(x=t_in_sim, y=(d_rec_mod-d_rec_sim), xtype='t.infall.text', ytype='delta.d', limits=((0,13.8),None), binsize=0.5, title='Recent pericenter, Simulation infall time', hl=True, file_path_and_name=directory+'/delta_d_recent_vs_t_in_sim.pdf')
@@ -294,12 +294,12 @@ summary_plot.median_plot_mult(x=[t_in_mod,t_in_mod], y=[(d_min_mod-d_min_sim)/d_
 """
     Pericenter times vs Infall time (simulation)
 """
-t_rec_sim = summary.tperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-t_min_sim = summary.tperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-t_rec_mod = summary.tperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-t_min_mod = summary.tperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-t_in_sim = summary.first_infall(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-t_in_mod = summary.first_infall(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
+t_rec_sim = summary.tperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_min_sim = summary.tperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_rec_mod = summary.tperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_min_mod = summary.tperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim = summary.first_infall(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_mod = summary.first_infall(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_t
 summary_plot.median_plot(x=t_in_sim, y=(t_rec_mod-t_rec_sim), xtype='t.infall.text', ytype='delta.t', limits=((0,13.8),(-13.8,13.8)), binsize=0.5, title='Recent Pericenters, Simulation infall time', hl=True, file_path_and_name=directory+'/dt_recent_vs_t_in_sim.pdf')
@@ -340,12 +340,12 @@ summary_plot.median_plot_mult(x=[t_in_mod,t_in_mod], y=[(t_min_mod-t_min_sim),(t
 """
     Pericenter velocities vs Infall time (Simulation)
 """
-v_rec_sim = summary.vperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-v_min_sim = summary.vperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-v_rec_mod = summary.vperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-v_min_mod = summary.vperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-t_in_sim = summary.first_infall(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-t_in_mod = summary.first_infall(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
+v_rec_sim = summary.vperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+v_min_sim = summary.vperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+v_rec_mod = summary.vperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+v_min_mod = summary.vperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim = summary.first_infall(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_mod = summary.first_infall(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_v
 summary_plot.median_plot(x=t_in_sim, y=(v_rec_mod-v_rec_sim), xtype='t.infall.text', ytype='delta.v', limits=((0,13.8),None), binsize=0.5, title='Recent Pericenters, Simulation Infall time', hl=True, file_path_and_name=directory+'/dv_recent_vs_t_in_sim.pdf')
@@ -374,12 +374,12 @@ summary_plot.median_plot_mult(x=[t_in_mod,t_in_mod], y=[(v_min_mod-v_min_sim),(v
 """
     Apocenter distances vs Infall time (Simulation)
 """
-dapo_rec_sim = summary.dapo_recent(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-dapo_rec_mod = summary.dapo_recent(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all', sim_type='baryon')
-dmax_sim = summary.dmax(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-dmax_mod = summary.dmax(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all', sim_type='baryon')
-t_in_sim = summary.first_infall(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-t_in_mod = summary.first_infall(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all', sim_type='baryon')
+dapo_rec_sim = summary.dapo_recent(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+dapo_rec_mod = summary.dapo_recent(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+dmax_sim = summary.dmax(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+dmax_mod = summary.dmax(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim = summary.first_infall(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_mod = summary.first_infall(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_d
 summary_plot.median_plot(x=t_in_sim, y=(dapo_rec_mod-dapo_rec_sim), xtype='t.infall.text', ytype='delta.dapo', limits=((0,13.8),None), binsize=0.5, title='Recent apocenter, Simulation Infall time', hl=True, file_path_and_name=directory+'/d_dapo_vs_t_in_sim.pdf')
@@ -412,10 +412,10 @@ summary_plot.median_plot_mult(x=[t_in_mod,t_in_mod], y=[(dmax_mod-dmax_sim)/dmax
 """
     Apocenter time vs Infall time (simulation)
 """
-tapo_rec_sim = summary.tapo_recent(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-tapo_rec_mod = summary.tapo_recent(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all', sim_type='baryon')
-t_in_sim = summary.first_infall(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-t_in_mod = summary.first_infall(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all', sim_type='baryon')
+tapo_rec_sim = summary.tapo_recent(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+tapo_rec_mod = summary.tapo_recent(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim = summary.first_infall(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_mod = summary.first_infall(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_t
 summary_plot.median_plot(x=t_in_sim, y=(tapo_rec_mod-tapo_rec_sim), xtype='t.infall.text', title='Recent apocenter, Simulation infall time', ytype='delta.tapo', limits=((0,13.8),(-13.8,13.8)), binsize=0.5, hl=True, file_path_and_name=directory+'/d_tapo_vs_t_in_sim.pdf')
@@ -432,11 +432,11 @@ summary_plot.median_plot(x=t_in_mod, y=(tapo_rec_mod-tapo_rec_sim), xtype='t.inf
 """
     Pericenter distance vs d(z = 0)
 """
-d_rec_sim = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-d_min_sim = summary.dperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-d_min_mod = summary.dperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-dz0_tot = summary.d_z0(data_total, masks_infall_peri, oversample=True, hosts='all', sim_type='baryon')
+d_rec_sim = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+d_min_sim = summary.dperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+d_min_mod = summary.dperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+dz0_tot = summary.d_z0(data_total, masks_infall_peri, oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_d
 summary_plot.median_plot(x=dz0_tot, y=(d_rec_mod-d_rec_sim), xtype='d.z0', ytype='delta.d', limits=((0,400),(None)), binsize=50, title='Recent Pericenters', hl=True, file_path_and_name=directory+'/delta_d_recent_vs_dz0.pdf')
@@ -459,11 +459,11 @@ summary_plot.median_plot_mult(x=[dz0_tot,dz0_tot], y=[(d_min_mod-d_min_sim)/d_mi
 """
     Pericenter time vs d(z = 0)
 """
-t_rec_sim = summary.tperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-t_min_sim = summary.tperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-t_rec_mod = summary.tperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-t_min_mod = summary.tperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-dz0_tot = summary.d_z0(data_total, masks_infall_peri, oversample=True, hosts='all', sim_type='baryon')
+t_rec_sim = summary.tperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_min_sim = summary.tperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_rec_mod = summary.tperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_min_mod = summary.tperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+dz0_tot = summary.d_z0(data_total, masks_infall_peri, oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_t
 summary_plot.median_plot(x=dz0_tot, y=(t_rec_mod-t_rec_sim), xtype='d.z0', ytype='delta.t', limits=((0,400),(None)), binsize=50, title='Recent Pericenters', hl=True, file_path_and_name=directory+'/delta_t_recent_vs_dz0.pdf')
@@ -485,11 +485,11 @@ summary_plot.median_plot_mult(x=[dz0_tot,dz0_tot], y=[(t_min_mod-t_min_sim),(t_r
 """
     Pericenter velocity vs d(z = 0)
 """
-v_rec_sim = summary.vperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-v_min_sim = summary.vperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-v_rec_mod = summary.vperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-v_min_mod = summary.vperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
-dz0_tot = summary.d_z0(data_total, masks_infall_peri, oversample=True, hosts='all', sim_type='baryon')
+v_rec_sim = summary.vperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+v_min_sim = summary.vperi_min(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+v_rec_mod = summary.vperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+v_min_mod = summary.vperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+dz0_tot = summary.d_z0(data_total, masks_infall_peri, oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_v
 summary_plot.median_plot(x=dz0_tot, y=(v_rec_mod-v_rec_sim), xtype='d.z0', ytype='delta.v', limits=((0,400),(None)), binsize=50, title='Recent Pericenters', hl=True, file_path_and_name=directory+'/delta_v_recent_vs_dz0.pdf')
@@ -505,11 +505,11 @@ summary_plot.median_plot_mult(x=[dz0_tot,dz0_tot], y=[(v_min_mod-v_min_sim),(v_r
 """
     Apocenter distances vs d(z = 0)
 """
-dapo_rec_sim = summary.dapo_recent(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-dapo_rec_mod = summary.dapo_recent(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all', sim_type='baryon')
-dmax_sim = summary.dmax(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-dmax_mod = summary.dmax(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all', sim_type='baryon')
-dz0_tot = summary.d_z0(data_total, masks_infall_apo, oversample=True, hosts='all', sim_type='baryon')
+dapo_rec_sim = summary.dapo_recent(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+dapo_rec_mod = summary.dapo_recent(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+dmax_sim = summary.dmax(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+dmax_mod = summary.dmax(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+dz0_tot = summary.d_z0(data_total, masks_infall_apo, oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_d
 summary_plot.median_plot(x=dz0_tot, y=(dapo_rec_mod-dapo_rec_sim), xtype='d.z0', ytype='delta.dapo', limits=((0,400),None), binsize=50, title='Recent apocenter', hl=True, file_path_and_name=directory+'/d_dapo_vs_dz0.pdf')
@@ -527,9 +527,9 @@ summary_plot.median_plot_mult(x=[dz0_tot,dz0_tot], y=[(dmax_mod-dmax_sim)/dmax_s
 """
     Apocenter times vs d(z = 0)
 """
-tapo_rec_sim = summary.tapo_recent(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-tapo_rec_mod = summary.tapo_recent(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all', sim_type='baryon')
-dz0_tot = summary.d_z0(data_total, masks_infall_apo, oversample=True, hosts='all', sim_type='baryon')
+tapo_rec_sim = summary.tapo_recent(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+tapo_rec_mod = summary.tapo_recent(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+dz0_tot = summary.d_z0(data_total, masks_infall_apo, oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_t
 summary_plot.median_plot(x=dz0_tot, y=(tapo_rec_mod-tapo_rec_sim), xtype='d.z0', ytype='delta.tapo', limits=((0,400),None), binsize=50, title='Recent apocenter', hl=True, file_path_and_name=directory+'/d_tapo_vs_dz0.pdf')
@@ -540,12 +540,12 @@ summary_plot.median_plot(x=dz0_tot, y=(tapo_rec_mod-tapo_rec_sim), xtype='d.z0',
 """
     Compare the different model pericenter number metrics all on same histogram
 """
-n_sim = summary.nperi(data_total, masks_infall, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-n_mod = summary.nperi(data_total, masks_infall, selection='model', oversample=True, hosts='all', sim_type='baryon')
-n_mod_sim_infall = summary.nperi_model(data_total, masks_infall, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-n_mod_mod_infall = summary.nperi_model(data_total, masks_infall, selection='model', oversample=True, hosts='all', sim_type='baryon')
-n_mod_300 = summary.nperi_model(data_total, masks_infall, selection='model.300', oversample=True, hosts='all', sim_type='baryon')
-n_mod_r200 = summary.nperi_model(data_total, masks_infall, selection='model.R200m', oversample=True, hosts='all', sim_type='baryon')
+n_sim = summary.nperi(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+n_mod = summary.nperi(data_total, masks_infall, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+n_mod_sim_infall = summary.nperi_model(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+n_mod_mod_infall = summary.nperi_model(data_total, masks_infall, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+n_mod_300 = summary.nperi_model(data_total, masks_infall, selection='model.300', oversample=True, hosts='all_no_r', sim_type='baryon')
+n_mod_r200 = summary.nperi_model(data_total, masks_infall, selection='model.R200m', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 summary_plot.plot_hist_mult(x=[n_mod, n_mod_sim_infall, n_mod_mod_infall, n_mod_300, n_mod_r200], xtype=['N.model','N.model','N.model','N.model','N.model'], binsize=1, labels=['No infall','Sim infall time','Model infall time', '300 kpc threshold', 'R200m threshold'], pdf=True, file_path_and_name=directory+'/nperi_model_comparisons.pdf')
 
@@ -554,10 +554,10 @@ summary_plot.plot_hist_mult(x=[n_mod, n_mod_sim_infall, n_mod_mod_infall, n_mod_
 """
     Pericenter number vs Mstar
 """
-n_sim = summary.nperi(data_total, masks_infall, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-n_mod_mod_infall = summary.nperi_model(data_total, masks_infall, selection='model', oversample=True, hosts='all', sim_type='baryon')
-n_mod_r200 = summary.nperi_model(data_total, masks_infall, selection='model.R200m', oversample=True, hosts='all', sim_type='baryon')
-Mstar_z0 = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all', sim_type='baryon')
+n_sim = summary.nperi(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+n_mod_mod_infall = summary.nperi_model(data_total, masks_infall, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+n_mod_r200 = summary.nperi_model(data_total, masks_infall, selection='model.R200m', oversample=True, hosts='all_no_r', sim_type='baryon')
+Mstar_z0 = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_N
 summary_plot.median_plot_mult(x=[Mstar_z0,Mstar_z0], y=[(n_mod_mod_infall-n_sim), (n_mod_r200-n_sim)], xtype=['M.star.z0','M.star.z0'], ytype=['N.delta','N.delta'], binsize=1, binedges=(4.5,10), limits=((4.5,10),None), labels=['Model w/$R_{\\rm 200m}(z)$','Model w/$R_{\\rm 200m}(z=0)$'], file_path_and_name=directory+'/nperi_vs_mstar_both.pdf')
@@ -568,12 +568,12 @@ summary_plot.median_plot_mult(x=[Mstar_z0,Mstar_z0], y=[(n_mod_mod_infall-n_sim)
 """
     Pericenter number vs t_infall
 """
-n_sim = summary.nperi(data_total, masks_infall, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-n_mod_mod_infall = summary.nperi_model(data_total, masks_infall, selection='model', oversample=True, hosts='all', sim_type='baryon')
-n_mod_r200 = summary.nperi_model(data_total, masks_infall, selection='model.R200m', oversample=True, hosts='all', sim_type='baryon')
-t_in_sim = summary.first_infall(data_total, masks_infall, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-t_in_mod = summary.first_infall(data_total, masks_infall, selection='model', oversample=True, hosts='all', sim_type='baryon')
-t_in_mod_R200m = summary.infall_diagnostics(data_total, masks_infall, selection='R200m', oversample=True, hosts='all', sim_type='baryon')
+n_sim = summary.nperi(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+n_mod_mod_infall = summary.nperi_model(data_total, masks_infall, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+n_mod_r200 = summary.nperi_model(data_total, masks_infall, selection='model.R200m', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim = summary.first_infall(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_mod = summary.first_infall(data_total, masks_infall, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_mod_R200m = summary.infall_diagnostics(data_total, masks_infall, selection='R200m', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 summary_plot.median_plot_mult(x=[t_in_sim, t_in_mod], y=[n_sim, n_mod_mod_infall], xtype=['t.infall.text','t.infall.text'], ytype=['N.peri.text','N.peri.text'], w_scatter=True, binsize=0.5, limits=((0,14),None), labels=['Simulation','Model w/$R_{\\rm 200m}(z)$'], file_path_and_name=directory+'/nperi_vs_t_infall_both_mod_infall.pdf')
 summary_plot.median_plot_mult(x=[t_in_sim, t_in_mod_R200m], y=[n_sim, n_mod_r200], xtype=['t.infall.text','t.infall.text'], ytype=['N.peri.text','N.peri.text'], w_scatter=True, binsize=0.5, limits=((0,14),None), labels=['Simulation','Model w/$R_{\\rm 200m}(z=0)$'], file_path_and_name=directory+'/nperi_vs_t_infall_both_mod_infall_r200m.pdf')
@@ -583,10 +583,10 @@ summary_plot.median_plot_mult(x=[t_in_sim, t_in_mod_R200m], y=[n_sim, n_mod_r200
 """
     Pericenter number vs d(z = 0)
 """
-n_sim = summary.nperi(data_total, masks_infall, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-n_mod_mod_infall = summary.nperi_model(data_total, masks_infall, selection='model', oversample=True, hosts='all', sim_type='baryon')
-n_mod_r200 = summary.nperi_model(data_total, masks_infall, selection='model.R200m', oversample=True, hosts='all', sim_type='baryon')
-dz0_tot = summary.d_z0(data_total, masks_infall, oversample=True, hosts='all', sim_type='baryon')
+n_sim = summary.nperi(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+n_mod_mod_infall = summary.nperi_model(data_total, masks_infall, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+n_mod_r200 = summary.nperi_model(data_total, masks_infall, selection='model.R200m', oversample=True, hosts='all_no_r', sim_type='baryon')
+dz0_tot = summary.d_z0(data_total, masks_infall, oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_N
 summary_plot.median_plot_mult(x=[dz0_tot,dz0_tot], y=[(n_mod_mod_infall-n_sim), (n_mod_r200-n_sim)], xtype=['d.z0','d.z0'], ytype=['N.delta','N.delta'], binsize=50, limits=((0,400),None), labels=['Model w/$R_{\\rm 200m}(z)$','Model w/$R_{\\rm 200m}(z=0)$'], file_path_and_name=directory+'/nperi_vs_dz0_both.pdf')
@@ -597,9 +597,9 @@ summary_plot.median_plot_mult(x=[dz0_tot,dz0_tot], y=[(n_mod_mod_infall-n_sim), 
 """
     Eccentricity vs Mstar
 """
-ecc = summary.eccentricity(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-ecc_model = summary.eccentricity(data_total, masks_infall_peri, selection='model.apsis', oversample=True, hosts='all', sim_type='baryon')
-Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all', sim_type='baryon')
+ecc = summary.eccentricity(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+ecc_model = summary.eccentricity(data_total, masks_infall_peri, selection='model.apsis', oversample=True, hosts='all_no_r', sim_type='baryon')
+Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_ecc
 summary_plot.median_plot(x=Mstar_z0, y=(ecc_model-ecc), xtype='M.star.z0', ytype='ecc.delta', w_scatter=True, hl=True, binsize=0.5, binedges=(4.5,10), limits=((4.5,9.5),None), file_path_and_name=directory+'/delta_ecc_vs_mstar.pdf')
@@ -609,10 +609,10 @@ summary_plot.median_plot(x=Mstar_z0, y=(ecc_model-ecc), xtype='M.star.z0', ytype
 """
     Eccentricity vs t_infalls
 """
-ecc = summary.eccentricity(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-ecc_model = summary.eccentricity(data_total, masks_infall_peri, selection='model.apsis', oversample=True, hosts='all', sim_type='baryon')
-t_in_sim = summary.first_infall(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-t_in_mod = summary.first_infall(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
+ecc = summary.eccentricity(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+ecc_model = summary.eccentricity(data_total, masks_infall_peri, selection='model.apsis', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim = summary.first_infall(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_mod = summary.first_infall(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # t_infall (simulation)
 summary_plot.median_plot(x=t_in_sim, y=(ecc_model-ecc), xtype='t.infall.text', ytype='ecc.delta', w_scatter=True, hl=True, binsize=0.5, limits=((0,14),None), file_path_and_name=directory+'/delta_ecc_vs_t_infall_sim.pdf')
@@ -626,9 +626,9 @@ summary_plot.median_plot(x=t_in_mod, y=(ecc_model-ecc), xtype='t.infall.text', y
 """
     Eccentricity vs d(z = 0)
 """
-ecc = summary.eccentricity(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-ecc_model = summary.eccentricity(data_total, masks_infall_peri, selection='model.apsis', oversample=True, hosts='all', sim_type='baryon')
-dz0_tot = summary.d_z0(data_total, masks_infall_peri, oversample=True, hosts='all', sim_type='baryon')
+ecc = summary.eccentricity(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+ecc_model = summary.eccentricity(data_total, masks_infall_peri, selection='model.apsis', oversample=True, hosts='all_no_r', sim_type='baryon')
+dz0_tot = summary.d_z0(data_total, masks_infall_peri, oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 # delta_ecc
 summary_plot.median_plot(x=dz0_tot, y=(ecc_model-ecc), xtype='d.z0', ytype='ecc.delta', hl=True, binsize=50, limits=((0,400),None), file_path_and_name=directory+'/delta_ecc_vs_dz0.pdf')
@@ -638,14 +638,14 @@ summary_plot.median_plot(x=dz0_tot, y=(ecc_model-ecc), xtype='d.z0', ytype='ecc.
 
 # Eccentricity + period histograms
 
-ecc = summary.eccentricity(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all', sim_type='baryon')
-ecc_model = summary.eccentricity(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all', sim_type='baryon')
+ecc = summary.eccentricity(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+ecc_model = summary.eccentricity(data_total, masks_infall_peri, selection='model.apsis', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 summary_plot.plot_hist_mult(x=[ecc, ecc_model], xtype=['ecc', 'ecc.model'], labels=['Simulation', 'Model'], binsize=0.05, file_path_and_name=directory+'/ecc_hist.pdf', pdf=True)
 
 x = []
 y = []
-for name in summary.host_names['all']:
+for name in summary.host_names['all_no_r']:
     for i in range(0, len(data_total[name]['eccentricity.sim'][masks_infall_apo[name]])):
         for j in range(0, np.min((len(data_total[name]['eccentricity.sim'][masks_infall_apo[name]][i]), len(data_total[name]['eccentricity.model.apsis'][masks_infall_apo[name]][i])))):
             if (data_total[name]['eccentricity.sim'][masks_infall_apo[name]][i][j] != -1) & (data_total[name]['eccentricity.model.apsis'][masks_infall_apo[name]][i][j] != -1):
@@ -687,13 +687,13 @@ plt.savefig(directory+'/ecc_comp_vs_phase.pdf')
 plt.close()
 
 
-per = summary.period(data_total, masks_infall_peri, selection='sim', oversample=True)
-per_model = summary.period(data_total, masks_infall_peri, selection='model', oversample=True)
+per = summary.period(data_total, masks_infall_peri, hosts='all_no_r', selection='sim', oversample=True)
+per_model = summary.period(data_total, masks_infall_peri, hosts='all_no_r', selection='model', oversample=True)
 summary_plot.plot_hist_mult(x=[per, per_model], xtype=['period', 'period.model'], labels=['Simulation', 'Model'], binsize=0.5, file_path_and_name=directory+'/period_hist.pdf', pdf=True)
 
 x = []
 y = []
-for name in summary.host_names['all']:
+for name in summary.host_names['all_no_r']:
     for i in range(0, len(data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]])):
         for j in range(0, np.min((len(data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]][i]), len(data_total[name]['orbit.period.peri.model'][masks_infall_peri[name]][i])))):
             if (data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]][i][j] != -1) & (data_total[name]['orbit.period.peri.model'][masks_infall_peri[name]][i][j] != -1):
@@ -704,7 +704,7 @@ y_peri = np.asarray(y)
 #
 x = []
 y = []
-for name in summary.host_names['all']:
+for name in summary.host_names['all_no_r']:
     for i in range(0, len(data_total[name]['orbit.period.apo.sim'][masks_infall_apo[name]])):
         for j in range(0, np.min((len(data_total[name]['orbit.period.apo.sim'][masks_infall_apo[name]][i]), len(data_total[name]['orbit.period.apo.model'][masks_infall_apo[name]][i])))):
             if (data_total[name]['orbit.period.apo.sim'][masks_infall_apo[name]][i][j] != -1) & (data_total[name]['orbit.period.apo.model'][masks_infall_apo[name]][i][j] != -1):
@@ -768,7 +768,7 @@ plt.close()
 
 x = []
 y = []
-for name in summary.host_names['all']:
+for name in summary.host_names['all_no_r']:
     for i in range(0, len(data_total[name]['orbit.period.apo.sim'][masks_infall_apo[name]])):
         for j in range(0, np.min((len(data_total[name]['orbit.period.apo.sim'][masks_infall_apo[name]][i]), len(data_total[name]['orbit.period.apo.model'][masks_infall_apo[name]][i])))):
             if (data_total[name]['orbit.period.apo.sim'][masks_infall_apo[name]][i][j] != -1) & (data_total[name]['orbit.period.apo.model'][masks_infall_apo[name]][i][j] != -1):
@@ -818,7 +818,7 @@ plt.close()
 
 x = []
 y = []
-for name in summary.host_names['all']:
+for name in summary.host_names['all_no_r']:
     for i in range(0, len(data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]])):
         m_sim = (data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]][i] != -1)
         m_mod = (data_total[name]['orbit.period.peri.model'][masks_infall_peri[name]][i] != -1)
@@ -830,7 +830,7 @@ delta_ecc_peri = np.hstack(y)
 #
 x = []
 y = []
-for name in summary.host_names['all']:
+for name in summary.host_names['all_no_r']:
     for i in range(0, len(data_total[name]['orbit.period.apo.sim'][masks_infall_peri[name]])):
         m_sim = (data_total[name]['orbit.period.apo.sim'][masks_infall_peri[name]][i] != -1)
         m_mod = (data_total[name]['orbit.period.apo.model'][masks_infall_peri[name]][i] != -1)
@@ -876,7 +876,7 @@ plt.close()
 
 x = []
 y = []
-for name in summary.host_names['all']:
+for name in summary.host_names['all_no_r']:
     for i in range(0, len(data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]])):
         m_sim = (data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]][i] != -1)
         m_mod = (data_total[name]['orbit.period.peri.model'][masks_infall_peri[name]][i] != -1)
@@ -888,7 +888,7 @@ delta_ecc_peri = np.hstack(y)
 #
 x = []
 y = []
-for name in summary.host_names['all']:
+for name in summary.host_names['all_no_r']:
     for i in range(0, len(data_total[name]['orbit.period.apo.sim'][masks_infall_peri[name]])):
         m_sim = (data_total[name]['orbit.period.apo.sim'][masks_infall_peri[name]][i] != -1)
         m_mod = (data_total[name]['orbit.period.apo.model'][masks_infall_peri[name]][i] != -1)
@@ -934,7 +934,7 @@ plt.close()
 
 x = []
 y = []
-for name in summary.host_names['all']:
+for name in summary.host_names['all_no_r']:
     for i in range(0, len(data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]])):
         m_sim = (data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]][i] != -1)
         m_mod = (data_total[name]['orbit.period.peri.model'][masks_infall_peri[name]][i] != -1)
@@ -946,7 +946,7 @@ delta_ecc_peri = np.hstack(y)
 #
 x = []
 y = []
-for name in summary.host_names['all']:
+for name in summary.host_names['all_no_r']:
     for i in range(0, len(data_total[name]['orbit.period.apo.sim'][masks_infall_peri[name]])):
         m_sim = (data_total[name]['orbit.period.apo.sim'][masks_infall_peri[name]][i] != -1)
         m_mod = (data_total[name]['orbit.period.apo.model'][masks_infall_peri[name]][i] != -1)
@@ -992,7 +992,7 @@ plt.close()
 
 x = []
 y = []
-for name in summary.host_names['all']:
+for name in summary.host_names['all_no_r']:
     for i in range(0, len(data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]])):
         m_sim = (data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]][i] != -1)
         m_mod = (data_total[name]['orbit.period.peri.model'][masks_infall_peri[name]][i] != -1)
@@ -1004,7 +1004,7 @@ delta_ecc_peri = np.hstack(y)
 #
 x = []
 y = []
-for name in summary.host_names['all']:
+for name in summary.host_names['all_no_r']:
     for i in range(0, len(data_total[name]['orbit.period.apo.sim'][masks_infall_peri[name]])):
         m_sim = (data_total[name]['orbit.period.apo.sim'][masks_infall_peri[name]][i] != -1)
         m_mod = (data_total[name]['orbit.period.apo.model'][masks_infall_peri[name]][i] != -1)
