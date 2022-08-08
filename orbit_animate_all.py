@@ -9,7 +9,7 @@ import time
 
 print('Starting the script at {0}'.format(time.strftime("%H:%M:%S", time.localtime())))
 
-sim_data = orbit_io.OrbitRead(gal1='m12c', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='m12r', location='mac')
 print('Set paths')
 
 data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy)
@@ -65,12 +65,12 @@ ax[1].set_ylabel('Z [kpc]', fontsize=28)
 plt.suptitle(sim_data.galaxy+' satellites', fontsize=28)
 #
 """
-ax[0].scatter(np.nan, np.nan, s=3, c=colorss[0], marker='o', label='$M_{\\rm star} < 10^5 M_{\\odot}$')
-ax[0].scatter(np.nan, np.nan, s=4, c=colorss[1], marker='o', label='$M_{\\rm star} = [10^6, 10^7] M_{\\odot}$')
-ax[0].scatter(np.nan, np.nan, s=5, c=colorss[2], marker='o', label='$M_{\\rm star} = [10^7, 10^8] M_{\\odot}$')
-ax[0].scatter(np.nan, np.nan, s=6, c=colorss[3], marker='o', label='$M_{\\rm star} = [10^8, 10^9] M_{\\odot}$')
-ax[0].scatter(np.nan, np.nan, s=7, c=colorss[4], marker='o', label='$M_{\\rm star} = [10^9, 10^10] M_{\\odot}$')
-ax[0].scatter(np.nan, np.nan, s=8, c=colorss[5], marker='o', label='$M_{\\rm star} > 10^{10} M_{\\odot}$')
+ax[0].scatter(np.nan, np.nan, s=3, c=colorss[0], marker='o', label='$M_{\\rm star} < 10^5\ M_{\\odot}$')
+ax[0].scatter(np.nan, np.nan, s=4, c=colorss[1], marker='o', label='$M_{\\rm star} = [10^6, 10^7]\ M_{\\odot}$')
+ax[0].scatter(np.nan, np.nan, s=5, c=colorss[2], marker='o', label='$M_{\\rm star} = [10^7, 10^8]\ M_{\\odot}$')
+ax[0].scatter(np.nan, np.nan, s=6, c=colorss[3], marker='o', label='$M_{\\rm star} = [10^8, 10^9]\ M_{\\odot}$')
+ax[0].scatter(np.nan, np.nan, s=7, c=colorss[4], marker='o', label='$M_{\\rm star} = [10^9, 10^{10}]\ M_{\\odot}$')
+ax[0].scatter(np.nan, np.nan, s=8, c=colorss[5], marker='o', label='$M_{\\rm star} > 10^{10}\ M_{\\odot}$')
 ax[0].scatter(np.nan, np.nan, s=9, c='k', marker='o')
 ax[0].legend(prop={'size': 12}, loc='upper left')
 """
