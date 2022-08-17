@@ -55,6 +55,7 @@ def calc_potential(snap, sim_data, dist, delta):
     if sim_data.num_gal == 1:
         #
         pot_array_med = np.zeros(len(delta))
+        pot_array_mean = np.zeros(len(delta))
         #
         # Read in the data
         part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'snapshot', snap, properties=['mass', 'position', 'potential'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
