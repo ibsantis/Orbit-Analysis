@@ -4,8 +4,8 @@
 #SBATCH --mem=480G
 #SBATCH --nodes=1
 #SBATCH --ntasks=3    # processes total
-#SBATCH --time=8:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/m12i_host_potential_%j.txt
+#SBATCH --time=00:10:00
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/m12i_host_potential_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -44,8 +44,8 @@ print('Set paths')
 # Set up snapshot array to loop through
 #snaps = np.array([600,587,582,578,573,569,564,560,556,551,547,543,538,534,530,525,521,517,513,509,504,486,446,412,382,356,332,312,294,277,262,248,236,225,214,204,195,187,179,172,165,159,153,148,142,137,133,128,124])
 # New snapshot array just for the LG pairs
-snaps = np.array([600,587,582,578,573,569,564,560,556,551,547,544,539,534,530,525,521,517,513,509,504,484,463,443,424,404,385,365,346,327,308,289,270,250,231,211,190,169,147,124,99,72,42])
-times = np.array([13.8,13.7,13.6,13.5,13.4,13.3,13.2,13.1,13.0,12.9,12.8,12.7,12.6,12.5,12.4,12.3,12.2,12.1,12.0,11.9,11.8,11.3,10.8,10.3,9.8,9.3,8.8,8.3,7.8,7.3,6.8,6.3,5.8,5.3,4.8,4.3,3.8,3.3,2.8,2.3,1.8,1.3,0.8])
+snaps = np.array([600,587,582])#,578,573,569,564,560,556,551,547,544,539,534,530,525,521,517,513,509,504,484,463,443,424,404,385,365,346,327,308,289,270,250,231,211,190,169,147,124,99,72,42])
+times = np.array([13.8,13.7,13.6])#,13.5,13.4,13.3,13.2,13.1,13.0,12.9,12.8,12.7,12.6,12.5,12.4,12.3,12.2,12.1,12.0,11.9,11.8,11.3,10.8,10.3,9.8,9.3,8.8,8.3,7.8,7.3,6.8,6.3,5.8,5.3,4.8,4.3,3.8,3.3,2.8,2.3,1.8,1.3,0.8])
 dist = 200
 delta = np.array([5,10,15,20])
 
@@ -72,6 +72,7 @@ def mass_evolution(snap, sim_data, delta):
         data_dict = dict()
         data_dict['potential.median'] = pot_array_med
         data_dict['potential.mean'] = pot_array_mean
+        print('Made the dictionary')
         #
         # Save this data to a file ADD VERBOSE
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/host_potentials/'+sim_data.galaxy+'_host_potential_'+str(snap), dict_or_array_to_write=data_dict, verbose=True)
