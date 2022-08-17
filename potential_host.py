@@ -58,16 +58,17 @@ def mass_evolution(snap, sim_data, delta):
         #
         # Read in the data
         part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'snapshot', snap, properties=['mass', 'position', 'potential'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
-        #print('Particles at snapshot {0} read in.'.format(snap))
+        print('Particles at snapshot {0} read in.'.format(snap))
         #
         # Find the enclosed mass of all particles within 0.1 < R < 500 kpc
+        print('starting the loop')
         for j in range(0, len(delta)):
             star_inds = ut.array.get_indices(part['star'].prop('host.distance.total'), [dist-delta[j], dist+delta[j]])
             gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [dist-delta[j], dist+delta[j]])
             dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [dist-delta[j], dist+delta[j]])
             pot_array_med[j] = np.median(np.hstack((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
             pot_array_mean[j] = np.mean(np.hstack((part['star']['potential'][star_inds], part['gas']['potential'][gas_inds], part['dark']['potential'][dark_inds])))
-            #print('Done with step', j)
+            print('Done with step {0} at snapshot {1}'.format(j, snap))
         #
         data_dict = dict()
         data_dict['potential.median'] = pot_array_med
