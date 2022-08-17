@@ -2078,16 +2078,11 @@ class SummaryDataSort:
         for name in self.host_names[hosts]:
             for i in range(0, len(data_dict[name]['eccentricity.'+selection][mask_dict[name]])):
                 mask = (data_dict[name]['eccentricity.'+selection][mask_dict[name]][i] != -1)
-                if (np.sum(mask) != 0):
+                if (np.sum(mask) > 0):
                     if oversample:
                         data.append(np.repeat(np.average(data_dict[name]['eccentricity.'+selection][mask_dict[name]][i][mask]), self.oversample[sim_type][name]))
                     else:
                         data.append(np.average(data_dict[name]['eccentricity.'+selection][mask_dict[name]][i][mask]))
-                else:
-                    if oversample:
-                        data.append(np.repeat(np.nan, self.oversample[sim_type][name]))
-                    else:
-                        data.append(np.nan)
         #
         return np.hstack(data)
 
@@ -2146,7 +2141,55 @@ class SummaryDataSort:
 
     # Needs more dox
     # Should probably re-run the data and change the keys to include "sim"
-    def period(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
+    def period_recent(self, data_dict, mask_dict, selection='sim', choice='peri', oversample=False, hosts='all', sim_type='baryon'):
+        """
+        DESCRIPTION:
+            Calculates the recent period for a subhalo and stores them
+            all in an array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            selection  : string
+                         Choose whether you want values from simulation data or
+                         data from the model.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            TBD
+        """
+        # Set up an empty list to save values to
+        data = []
+        #
+        period_type = 'orbit.period.'+choice+'.'+selection
+        #
+        for name in self.host_names[hosts]:
+            for i in range(0, len(data_dict[name][period_type][mask_dict[name]])):
+                if (data_dict[name][period_type][mask_dict[name]][i][0] != -1):
+                    if oversample:
+                        data.append(np.repeat(data_dict[name][period_type][mask_dict[name]][i][0], self.oversample[sim_type][name]))
+                    else:
+                        data.append(data_dict[name][period_type][mask_dict[name]][i][0])
+        #
+        return np.hstack(data)
+
+    def period_average(self, data_dict, mask_dict, selection='sim', choice='peri', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
             Calculates the average period for a subhalo and stores them
@@ -2182,26 +2225,41 @@ class SummaryDataSort:
         # Set up an empty list to save values to
         data = []
         #
-        if selection == 'sim':
-            per_type_peri = 'orbit.period.peri.sim'
-            per_type_apo = 'orbit.period.apo.sim'
-        else:
-            per_type_peri = 'orbit.period.peri.model'
-            per_type_apo = 'orbit.period.apo.model'
+        per_type_peri = 'orbit.period.peri.'+selection
+        per_type_apo = 'orbit.period.apo.'+selection
         #
-        for name in self.host_names[hosts]:
-            for i in range(0, len(data_dict[name][per_type_peri][mask_dict[name]])):
-                if (data_dict[name][per_type_peri][mask_dict[name]][i][0] != -1) & (data_dict[name][per_type_apo][mask_dict[name]][i][0] != -1):
-                    if oversample:
-                        data.append(np.repeat(np.average((data_dict[name][per_type_peri][mask_dict[name]][i][0], data_dict[name][per_type_apo][mask_dict[name]][i][0])), self.oversample[sim_type][name]))
-                    else:
-                        data.append(np.average((data_dict[name][per_type_peri][mask_dict[name]][i][0], data_dict[name][per_type_apo][mask_dict[name]][i][0])))
+        if choice == 'both':
+            for name in self.host_names[hosts]:
+                for i in range(0, len(data_dict[name][per_type_peri][mask_dict[name]])):
+                    mask_peri = (data_dict[name][per_type_peri][mask_dict[name]][i] != -1)
+                    mask_apo = (data_dict[name][per_type_apo][mask_dict[name]][i] != -1)
+                    if (np.sum(mask_peri) > 0) & (np.sum(mask_apo) > 0):
+                        if oversample:
+                            data.append(np.repeat(np.average(np.hstack((data_dict[name][per_type_peri][mask_dict[name]][i][mask_peri], data_dict[name][per_type_apo][mask_dict[name]][i][mask_apo]))), self.oversample[sim_type][name]))
+                        else:
+                            data.append(np.average(np.hstack((data_dict[name][per_type_peri][mask_dict[name]][i][mask_peri], data_dict[name][per_type_apo][mask_dict[name]][i][mask_apo]))))
+                    #
+                    elif (np.sum(mask_peri) > 0) & (np.sum(mask_apo) == 0):
+                        if oversample:
+                            data.append(np.repeat(np.average(data_dict[name][per_type_peri][mask_dict[name]][i][mask_peri]), self.oversample[sim_type][name]))
+                        else:
+                            data.append(np.average(data_dict[name][per_type_peri][mask_dict[name]][i][mask_peri]))
+        #
+        else:
+            if choice == 'peri':
+                period_type = per_type_peri
+            elif choice == 'apo':
+                period_type = per_type_apo
                 #
-                elif (data_dict[name][per_type_peri][mask_dict[name]][i][0] != -1) & (data_dict[name][per_type_apo][mask_dict[name]][i][0] == -1):
-                    if oversample:
-                        data.append(np.repeat(np.average(data_dict[name][per_type_peri][mask_dict[name]][i][0]), self.oversample[sim_type][name]))
-                    else:
-                        data.append(np.average(data_dict[name][per_type_peri][mask_dict[name]][i][0]))
+            for name in self.host_names[hosts]:
+                for i in range(0, len(data_dict[name][period_type][mask_dict[name]])):
+                    mask = (data_dict[name][period_type][mask_dict[name]][i] != -1)
+                    if (np.sum(mask) > 0):
+                        if oversample:
+                            data.append(np.repeat(np.average(data_dict[name][period_type][mask_dict[name]][i][mask]), self.oversample[sim_type][name]))
+                        else:
+                            data.append(np.average(data_dict[name][period_type][mask_dict[name]][i][mask]))
+
         #
         return np.hstack(data)
 
@@ -2264,6 +2322,7 @@ class SummaryDataPlot(SummaryDataSort):
                        't.infall.any': 't$_{\\rm infall,any,lb}$ [Gyr]',\
                        't.infall.text': 'Infall lookback time [Gyr]',\
                        't.infall.diff': '(t$_{\\rm infall,any,lb}$ - t$_{\\rm infall,lb}$) [Gyr]',\
+                       'delta_t_infall': '(t$_{\\rm infall,model,lb}$ - t$_{\\rm infall,sim,lb}$) [Gyr]',\
                        'delta.t.frac': '(t$_{\\rm peri,model}$ - t$_{\\rm peri,sim}$)/t$_{\\rm peri,sim}$',\
                        'delta.t': '(t$_{\\rm peri,model}$ - t$_{\\rm peri,sim}$) [Gyr]',\
                        'N.sim': 'N$_{\\rm peri,sim}$',\
@@ -2289,6 +2348,7 @@ class SummaryDataPlot(SummaryDataSort):
                        'ecc': 'Eccentricity',\
                        'ecc.model': 'Model Ecccentricity',\
                        'ecc.delta': '$e_{\\rm model} - e_{\\rm sim}$',\
+                       'ecc.frac': '$(e_{\\rm model} - e_{\\rm sim})/e_{\\rm sim}$',\
                        'period': 'Orbital Period [Gyr]',\
                        'period.model': 'Model Orbital Period [Gyr]',\
                        'period.delta': '$T_{\\rm model} - T_{\\rm sim}$ [Gyr]',\
@@ -3016,7 +3076,7 @@ class SummaryDataPlot(SummaryDataSort):
             colorss = self.colors
         #
         if pdf:
-            y_label = 'PDF'
+            y_label = 'Probability'
         else:
             y_label = 'N'
         #
@@ -3069,7 +3129,7 @@ class SummaryDataPlot(SummaryDataSort):
             else:
                 plt.legend(prop={'size': 18}, loc='best')
         if title:
-            plt.title(self.titles[title], fontsize=24)
+            plt.title(title, fontsize=24)
         plt.tick_params(axis='both', which='major', labelsize=24)
         plt.tight_layout()
         plt.savefig(file_path_and_name)
