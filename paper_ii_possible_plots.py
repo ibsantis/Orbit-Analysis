@@ -60,6 +60,17 @@ mask_finite_R200m = np.isfinite(t_in_mod_R200m)
 summary_plot.plot_hist(x=(t_in_mod_R200m[mask_finite_R200m]-t_in_sim[mask_finite_R200m]), xtype='t.infall.text', binsize=0.5, pdf=True, xlimits=(-10,13), title='$t_{\\rm infall,model}$ w/ $R_{\\rm 200m}(z=0)$', file_path_and_name=directory+'/infall_comp_Rz0.pdf')
 summary_plot.plot_hist(x=(t_in_mod[mask_finite]-t_in_sim[mask_finite]), xtype='t.infall.text', binsize=0.5, pdf=True, xlimits=(-10,10), title='$t_{\\rm infall,model}$ w/ $R_{\\rm 200m}(z)$', file_path_and_name=directory+'/infall_comp_Rz.pdf')
 summary_plot.plot_hist_mult(x=[(t_in_mod[mask_finite]-t_in_sim[mask_finite]),(t_in_mod_R200m[mask_finite_R200m]-t_in_sim[mask_finite_R200m])], xtype=['t.infall.text','t.infall.text'], labels=['$t_{\\rm infall,model}$ w/ $R_{\\rm 200m}(z)$','$t_{\\rm infall,model}$ w/ $R_{\\rm 200m}(z=0)$'], binsize=0.5, pdf=True, xlimits=(-10,10), leg_loc='center left', med_location=[0.38,0.35], file_path_and_name=directory+'/infall_comp_both.pdf')
+#
+summary_plot.median_plot_mult(x=(t_in_sim[mask_finite_R200m], t_in_sim[mask_finite]), y=(t_in_mod_R200m[mask_finite_R200m]-t_in_sim[mask_finite_R200m], t_in_mod[mask_finite]-t_in_sim[mask_finite]), xtype=['t.infall.text','t.infall.text'], ytype=['delta_t_infall','delta_t_infall'], binsize=1, limits=((0,13.8),None), labels=['$t_{\\rm infall,model}$ w/ $R_{\\rm 200m}(z=0)$','$t_{\\rm infall,model}$ w/ $R_{\\rm 200m}(z)$'], hl=True, file_path_and_name=directory+'/dt_infall_vs_t_infall.pdf')
+
+t_in_sim = summary.first_infall(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_mod = summary.first_infall(data_total, masks_infall, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_mod_R200m = summary.infall_diagnostics(data_total, masks_infall, selection='R200m', oversample=True, hosts='all_no_r', sim_type='baryon')
+mask_finite = np.isfinite(t_in_mod)
+mask_finite_R200m = np.isfinite(t_in_mod_R200m)
+Mstar_z0 = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_r', sim_type='baryon')
+summary_plot.median_plot_mult(x=(Mstar_z0[mask_finite_R200m], Mstar_z0[mask_finite]), y=(t_in_mod_R200m[mask_finite_R200m]-t_in_sim[mask_finite_R200m], t_in_mod[mask_finite]-t_in_sim[mask_finite]), xtype=['M.star.z0','M.star.z0'], ytype=['delta_t_infall','delta_t_infall'], binsize=0.5, limits=((4,9.5),None), labels=['$t_{\\rm infall,model}$ w/ $R_{\\rm 200m}(z=0)$','$t_{\\rm infall,model}$ w/ $R_{\\rm 200m}(z)$'], hl=True, file_path_and_name=directory+'/dt_infall_vs_Mstar.pdf')
+
 
 
 """
@@ -638,18 +649,43 @@ summary_plot.median_plot(x=dz0_tot, y=(ecc_model-ecc), xtype='d.z0', ytype='ecc.
 
 # Eccentricity + period histograms
 
-ecc = summary.eccentricity(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
-ecc_model = summary.eccentricity(data_total, masks_infall_peri, selection='model.apsis', oversample=True, hosts='all_no_r', sim_type='baryon')
+ecc_rec_sim = summary.eccentricity_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+ecc_rec_mod = summary.eccentricity_recent(data_total, masks_infall_peri, selection='model.apsis', oversample=True, hosts='all_no_r', sim_type='baryon')
+summary_plot.plot_hist_mult(x=[ecc_rec_sim, ecc_rec_mod], xtype=['ecc', 'ecc.model'], labels=['Simulation', 'Model'], title='Recent eccentricities', binsize=0.05, file_path_and_name=directory+'/ecc_comp_recent.pdf', pdf=True)
 #
-summary_plot.plot_hist_mult(x=[ecc, ecc_model], xtype=['ecc', 'ecc.model'], labels=['Simulation', 'Model'], binsize=0.05, file_path_and_name=directory+'/ecc_hist.pdf', pdf=True)
+ecc_avg_sim = summary.eccentricity(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+ecc_avg_mod = summary.eccentricity(data_total, masks_infall_peri, selection='model.apsis', oversample=True, hosts='all_no_r', sim_type='baryon')
+summary_plot.plot_hist_mult(x=[ecc_avg_sim, ecc_avg_mod], xtype=['ecc', 'ecc.model'], labels=['Simulation', 'Model'], title='Average eccentricities', binsize=0.05, file_path_and_name=directory+'/ecc_comp_average.pdf', pdf=True)
+#
+summary_plot.plot_hist_mult(x=[ecc_rec_sim, ecc_avg_sim], xtype=['ecc', 'ecc'], labels=['Recent', 'Average'], title='Simulation eccentricities', binsize=0.05, file_path_and_name=directory+'/ecc_rec_vs_avg_sim.pdf', pdf=True)
+summary_plot.plot_hist_mult(x=[ecc_rec_mod, ecc_avg_mod], xtype=['ecc', 'ecc'], labels=['Recent', 'Average'], title='Model eccentricities', binsize=0.05, file_path_and_name=directory+'/ecc_rec_vs_avg_mod.pdf', pdf=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 x = []
 y = []
+# Loop over hosts
 for name in summary.host_names['all_no_r']:
+    # Loop over satellites
     for i in range(0, len(data_total[name]['eccentricity.sim'][masks_infall_apo[name]])):
+        # Loop over the phase
         for j in range(0, np.min((len(data_total[name]['eccentricity.sim'][masks_infall_apo[name]][i]), len(data_total[name]['eccentricity.model.apsis'][masks_infall_apo[name]][i])))):
+            # Make sure there is an event in both the sim and model
             if (data_total[name]['eccentricity.sim'][masks_infall_apo[name]][i][j] != -1) & (data_total[name]['eccentricity.model.apsis'][masks_infall_apo[name]][i][j] != -1):
+                # Save the difference
                 x.append(data_total[name]['eccentricity.model.apsis'][masks_infall_apo[name]][i][j]-data_total[name]['eccentricity.sim'][masks_infall_apo[name]][i][j])
+                # Save the phase
                 y.append(j+1)
 x = np.asarray(x)
 y = np.asarray(y)
@@ -687,17 +723,83 @@ plt.savefig(directory+'/ecc_comp_vs_phase.pdf')
 plt.close()
 
 
-per = summary.period(data_total, masks_infall_peri, hosts='all_no_r', selection='sim', oversample=True)
-per_model = summary.period(data_total, masks_infall_peri, hosts='all_no_r', selection='model', oversample=True)
-summary_plot.plot_hist_mult(x=[per, per_model], xtype=['period', 'period.model'], labels=['Simulation', 'Model'], binsize=0.5, file_path_and_name=directory+'/period_hist.pdf', pdf=True)
+
+
+
+
+
+
+
+
+
+# Plotting the orbital periods defined by recent peris and apos
+per_peri = summary.period_recent(data_total, masks_infall_peri, selection='sim', choice='peri', hosts='all_no_r', oversample=True)
+per_apo = summary.period_recent(data_total, masks_infall_peri, selection='sim', choice='apo', hosts='all_no_r', oversample=True)
+summary_plot.plot_hist_mult(x=[per_peri, per_apo], xtype=['period', 'period'], labels=['Recent Pericenters', 'Recent Apocenters'], binsize=0.5, xlimits=(0, 10), file_path_and_name=directory+'/period_recent_peri_vs_apo_sim.pdf', pdf=True)
+#
+per_peri_mod = summary.period_recent(data_total, masks_infall_peri, selection='model', choice='peri', hosts='all_no_r', oversample=True)
+per_apo_mod = summary.period_recent(data_total, masks_infall_peri, selection='model', choice='apo', hosts='all_no_r', oversample=True)
+summary_plot.plot_hist_mult(x=[per_peri_mod, per_apo_mod], xtype=['period.model', 'period.model'], labels=['Recent Pericenters', 'Recent Apocenters'], binsize=0.5, xlimits=(0, 10), file_path_and_name=directory+'/period_recent_peri_vs_apo_model.pdf', pdf=True)
+
+
+
+
+
+# Plotting the average orbital periods
+per_peri = summary.period_average(data_total, masks_infall_peri, selection='sim', choice='peri', hosts='all_no_r', oversample=True)
+per_apo = summary.period_average(data_total, masks_infall_peri, selection='sim', choice='apo', hosts='all_no_r', oversample=True)
+per_both = summary.period_average(data_total, masks_infall_peri, selection='sim', choice='both', hosts='all_no_r', oversample=True)
+summary_plot.plot_hist_mult(x=[per_peri, per_apo, per_both], xtype=['period', 'period', 'period'], labels=['Pericenter average', 'Apocenter average', 'All average'], binsize=0.5, xlimits=(0, 10), file_path_and_name=directory+'/period_average_comp_sim.pdf', pdf=True)
+#
+per_peri_mod = summary.period_average(data_total, masks_infall_peri, selection='model', choice='peri', hosts='all_no_r', oversample=True)
+per_apo_mod = summary.period_average(data_total, masks_infall_peri, selection='model', choice='apo', hosts='all_no_r', oversample=True)
+per_both_mod = summary.period_average(data_total, masks_infall_peri, selection='model', choice='both', hosts='all_no_r', oversample=True)
+summary_plot.plot_hist_mult(x=[per_peri_mod, per_apo_mod, per_both_mod], xtype=['period.model', 'period.model', 'period.model'], labels=['Pericenter average', 'Apocenter average', 'All average'], binsize=0.5, xlimits=(0, 10), file_path_and_name=directory+'/period_average_comp_model.pdf', pdf=True)
+#
+summary_plot.plot_hist_mult(x=[per_peri, per_peri_mod], xtype=['period', 'period.model'], labels=['Pericenter average (sim)', 'Pericenter average (model)'], binsize=0.5, xlimits=(0, 10), file_path_and_name=directory+'/period_average_peri_comp.pdf', pdf=True)
+summary_plot.plot_hist_mult(x=[per_apo, per_apo_mod], xtype=['period', 'period.model'], labels=['Apocenter average (sim)', 'Apocenter average (model)'], binsize=0.5, xlimits=(0, 10), file_path_and_name=directory+'/period_average_apo_comp.pdf', pdf=True)
+summary_plot.plot_hist_mult(x=[per_both, per_both_mod], xtype=['period', 'period.model'], labels=['All average (sim)', 'All average (model)'], binsize=0.5, xlimits=(0, 10), file_path_and_name=directory+'/period_average_all_comp.pdf', pdf=True)
+
+
+
+
+# Plot the recent vs average in simulation
+per_peri_rec = summary.period_recent(data_total, masks_infall_peri, selection='sim', choice='peri', hosts='all_no_r', oversample=True)
+per_peri_avg = summary.period_average(data_total, masks_infall_peri, selection='sim', choice='peri', hosts='all_no_r', oversample=True)
+summary_plot.plot_hist_mult(x=[per_peri_rec, per_peri_avg], xtype=['period', 'period'], labels=['Recent Pericenters', 'Average Pericenters'], binsize=0.5, xlimits=(0, 10), file_path_and_name=directory+'/period_peri_recent_vs_average_sim.pdf', pdf=True)
+#
+per_apo_rec = summary.period_recent(data_total, masks_infall_peri, selection='sim', choice='apo', hosts='all_no_r', oversample=True)
+per_apo_avg = summary.period_average(data_total, masks_infall_peri, selection='sim', choice='apo', hosts='all_no_r', oversample=True)
+summary_plot.plot_hist_mult(x=[per_apo_rec, per_apo_avg], xtype=['period', 'period'], labels=['Recent Apocenters', 'Average Apocenters'], binsize=0.5, xlimits=(0, 10), file_path_and_name=directory+'/period_apo_recent_vs_average_sim.pdf', pdf=True)
+
+# Plot the recent vs average in model
+per_peri_rec = summary.period_recent(data_total, masks_infall_peri, selection='model', choice='peri', hosts='all_no_r', oversample=True)
+per_peri_avg = summary.period_average(data_total, masks_infall_peri, selection='model', choice='peri', hosts='all_no_r', oversample=True)
+summary_plot.plot_hist_mult(x=[per_peri_rec, per_peri_avg], xtype=['period.model', 'period.model'], labels=['Recent Pericenters', 'Average Pericenters'], binsize=0.5, xlimits=(0, 10), file_path_and_name=directory+'/period_peri_recent_vs_average_model.pdf', pdf=True)
+#
+per_apo_rec = summary.period_recent(data_total, masks_infall_peri, selection='model', choice='apo', hosts='all_no_r', oversample=True)
+per_apo_avg = summary.period_average(data_total, masks_infall_peri, selection='model', choice='apo', hosts='all_no_r', oversample=True)
+summary_plot.plot_hist_mult(x=[per_apo_rec, per_apo_avg], xtype=['period.model', 'period.model'], labels=['Recent Apocenters', 'Average Apocenters'], binsize=0.5, xlimits=(0, 10), file_path_and_name=directory+'/period_apo_recent_vs_average_model.pdf', pdf=True)
+
+
+
+# OLD, this was only plotting the recent periods I think
+#per_model = summary.period(data_total, masks_infall_peri, hosts='all_no_r', selection='model', oversample=True)
+#summary_plot.plot_hist_mult(x=[per, per_model], xtype=['period', 'period.model'], labels=['Simulation', 'Model'], binsize=0.5, file_path_and_name=directory+'/period_hist.pdf', pdf=True)
 
 x = []
 y = []
+# Loop through hosts
 for name in summary.host_names['all_no_r']:
+    # Loop through the subhalos
     for i in range(0, len(data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]])):
+        # Loop through the number of orbits that are in the sim AND model
         for j in range(0, np.min((len(data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]][i]), len(data_total[name]['orbit.period.peri.model'][masks_infall_peri[name]][i])))):
+            # Check to see if they both have values
             if (data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]][i][j] != -1) & (data_total[name]['orbit.period.peri.model'][masks_infall_peri[name]][i][j] != -1):
+                # Save the orbit phase
                 x.append(j+1)
+                # Save the difference in the model and sim
                 y.append(data_total[name]['orbit.period.peri.model'][masks_infall_peri[name]][i][j]-data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]][i][j])
 x_peri = np.asarray(x)
 y_peri = np.asarray(y)
@@ -765,50 +867,6 @@ plt.savefig(directory+'/period_vs_phase_both.pdf')
 plt.close()
 
 
-
-x = []
-y = []
-for name in summary.host_names['all_no_r']:
-    for i in range(0, len(data_total[name]['orbit.period.apo.sim'][masks_infall_apo[name]])):
-        for j in range(0, np.min((len(data_total[name]['orbit.period.apo.sim'][masks_infall_apo[name]][i]), len(data_total[name]['orbit.period.apo.model'][masks_infall_apo[name]][i])))):
-            if (data_total[name]['orbit.period.apo.sim'][masks_infall_apo[name]][i][j] != -1) & (data_total[name]['orbit.period.apo.model'][masks_infall_apo[name]][i][j] != -1):
-                x.append(data_total[name]['orbit.period.apo.model'][masks_infall_apo[name]][i][j]-data_total[name]['orbit.period.apo.sim'][masks_infall_apo[name]][i][j])
-                y.append(j+1)
-x = np.asarray(x)
-y = np.asarray(y)
-#
-#
-onesigp = 84.13
-onesigm = 15.87
-twosigp = 100
-twosigm = 0
-meds = np.zeros(np.max(y))
-upper = np.zeros(np.max(y))
-lower = np.zeros(np.max(y))
-highest = np.zeros(np.max(y))
-lowest = np.zeros(np.max(y))
-for i in range(0, np.max(y)):
-    mask = (y == i+1)
-    meds[i] = np.nanmedian(x[mask])
-    upper[i] = np.nanpercentile(x[mask], onesigp)
-    lower[i] = np.nanpercentile(x[mask], onesigm)
-    highest[i] = np.nanpercentile(x[mask], twosigp)
-    lowest[i] = np.nanpercentile(x[mask], twosigm)
-#
-f, ax = plt.subplots(1, 1, figsize=(10,10))
-plt.scatter(np.arange(np.max(y))+1, meds, s=50., marker='s', color=summary_plot.colors[1])
-for j in range(0, np.max(y)):
-    plt.errorbar(np.arange(np.max(y))[j]+1, meds[j], yerr=np.array([[meds[j]-lowest[j]],[highest[j]-meds[j]]]), alpha=0.3, color=summary_plot.colors[1])
-    plt.errorbar(np.arange(np.max(y))[j]+1, meds[j], yerr=np.array([[meds[j]-lower[j]],[upper[j]-meds[j]]]), alpha=0.7, color=summary_plot.colors[1])
-plt.hlines(0, 0, np.max(y)+1, linestyle='dotted', color='k', alpha=0.5)
-plt.xlim(0.5, np.max(y)+0.5)
-plt.xlabel('Orbit Number')
-plt.ylabel('$T_{\\rm model} - T_{\\rm sim}$')
-plt.title('Apocenter Periods')
-#plt.show()
-plt.tight_layout()
-plt.savefig(directory+'/period_comp_vs_phase_apo.pdf')
-plt.close()
 
 
 
