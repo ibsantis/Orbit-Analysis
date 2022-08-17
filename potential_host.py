@@ -50,7 +50,7 @@ dist = 200
 delta = np.array([5,10,15,20])
 
 # function from first loop down # TRY RUNNING A COUPLE SNAPSHOTS IN A LOOP FIRST TO MAKE SURE IT WORKS
-def mass_evolution(snap, sim_data, delta):
+def calc_potential(snap, sim_data, dist, delta):
     # Check if one or two hosts
     if sim_data.num_gal == 1:
         #
@@ -81,13 +81,9 @@ def mass_evolution(snap, sim_data, delta):
 
 
 args_list = [
-    (snapshot, sim_data, delta) for snapshot in snaps
+    (snapshot, sim_data, dist, delta) for snapshot in snaps
     ]
 
-ut.io.run_in_parallel(mass_evolution, args_list, proc_number=3) # ADD VERBOSE
-# Try 4 at first, then try 8
-# How many snaps can I read in simultaneously? Divide total mem by snapshots to get proc number
-#
-# proc_num and n_tasks in SBATCH stuff must be equal
+ut.io.run_in_parallel(calc_potential, args_list, proc_number=3) # ADD VERBOSE
 
 print('All done?')
