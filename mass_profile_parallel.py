@@ -3,8 +3,8 @@
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=480G
 #SBATCH --nodes=1
-#SBATCH --ntasks=3    # processes total
-#SBATCH --time=08:00:00
+#SBATCH --ntasks=4    # processes total
+#SBATCH --time=05:00:00
 #SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/m12i_mass_profile_all_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
@@ -42,7 +42,7 @@ from numba import jit
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12f', location='peloton')
 print('Set paths')
 
 # Set up snapshot array to loop through
@@ -124,7 +124,7 @@ args_list = [
     (snapshot, sim_data, rs) for snapshot in snaps
     ]
 
-ut.io.run_in_parallel(mass_evolution, args_list, proc_number=3) # ADD VERBOSE
+ut.io.run_in_parallel(mass_evolution, args_list, proc_number=4) # ADD VERBOSE
 # Try 4 at first, then try 8
 # How many snaps can I read in simultaneously? Divide total mem by snapshots to get proc number
 #
