@@ -64,16 +64,20 @@ def mass_evolution(snap, sim_data, rs):
         #
         # Read in the data
         part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'snapshot', snap, properties=['mass', 'position'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
+        d_star_tot = part['star'].prop('host.distance.total')
+        d_gas_tot = part['gas'].prop('host.distance.total')
+        d_dark_tot = part['dark'].prop('host.distance.total')
         #print('Particles at snapshot {0} read in.'.format(snap))
         #
         # Find the enclosed mass of all particles within 0.1 < R < 500 kpc
         for j in range(0, len(rs)-1):
-            star_inds = ut.array.get_indices(part['star'].prop('host.distance.total'), [rs[j], rs[j+1]])
-            gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [rs[j], rs[j+1]])
-            dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [rs[j], rs[j+1]])
+            star_inds = ut.array.get_indices(d_star_tot, [rs[j], rs[j+1]])
+            gas_inds = ut.array.get_indices(d_gas_tot, [rs[j], rs[j+1]])
+            dark_inds = ut.array.get_indices(d_dark_tot, [rs[j], rs[j+1]])
             mass_array[j] = np.sum(part['star']['mass'][star_inds]) + np.sum(part['gas']['mass'][gas_inds]) + np.sum(part['dark']['mass'][dark_inds])
             #print('Done with step', j)
         #
+        mass_array = np.cumsum(mass_array)
         # Save this data to a file ADD VERBOSE
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/all_snapshots/'+sim_data.galaxy+'/'+sim_data.galaxy+'_mass_profile_'+str(snap), dict_or_array_to_write=mass_array, verbose=True)
         print('Done with snapshot {0}'.format(snap))
@@ -86,21 +90,30 @@ def mass_evolution(snap, sim_data, rs):
         #
         # Read in the data
         part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'snapshot', snap, properties=['mass', 'position'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
+        d_star_tot = part['star'].prop('host.distance.total')
+        d_gas_tot = part['gas'].prop('host.distance.total')
+        d_dark_tot = part['dark'].prop('host.distance.total')
+        #
+        d2_star_tot = part['star'].prop('host2.distance.total')
+        d2_gas_tot = part['gas'].prop('host2.distance.total')
+        d2_dark_tot = part['dark'].prop('host2.distance.total')
         #print('Particles at snapshot {0} read in.'.format(snap))
         #
         # Find the enclosed mass of all particles within 0.1 < R < 500 kpc
         for j in range(0, len(rs)-1):
-            star_inds_1 = ut.array.get_indices(part['star'].prop('host.distance.total'), [rs[j], rs[j+1]])
-            gas_inds_1 = ut.array.get_indices(part['gas'].prop('host.distance.total'), [rs[j], rs[j+1]])
-            dark_inds_1 = ut.array.get_indices(part['dark'].prop('host.distance.total'), [rs[j], rs[j+1]])
+            star_inds_1 = ut.array.get_indices(d_star_tot, [rs[j], rs[j+1]])
+            gas_inds_1 = ut.array.get_indices(d_gas_tot, [rs[j], rs[j+1]])
+            dark_inds_1 = ut.array.get_indices(d_dark_tot, [rs[j], rs[j+1]])
             mass_array_1[j] = np.sum(part['star']['mass'][star_inds_1]) + np.sum(part['gas']['mass'][gas_inds_1]) + np.sum(part['dark']['mass'][dark_inds_1])
             #
-            star_inds_2 = ut.array.get_indices(part['star'].prop('host2.distance.total'), [rs[j], rs[j+1]])
-            gas_inds_2 = ut.array.get_indices(part['gas'].prop('host2.distance.total'), [rs[j], rs[j+1]])
-            dark_inds_2 = ut.array.get_indices(part['dark'].prop('host2.distance.total'), [rs[j], rs[j+1]])
+            star_inds_2 = ut.array.get_indices(d2_star_tot, [rs[j], rs[j+1]])
+            gas_inds_2 = ut.array.get_indices(d2_gas_tot, [rs[j], rs[j+1]])
+            dark_inds_2 = ut.array.get_indices(d2_dark_tot, [rs[j], rs[j+1]])
             mass_array_2[j] = np.sum(part['star']['mass'][star_inds_2]) + np.sum(part['gas']['mass'][gas_inds_2]) + np.sum(part['dark']['mass'][dark_inds_2])
             #print('Done with step', j)
         #
+        mass_array_1 = np.cumsum(mass_array_1)
+        mass_array_2 = np.cumsum(mass_array_2)
         # Save this data to a file ADD VERBOSE
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/all_snapshots/'+sim_data.gal_1+'/'+sim_data.gal_1+'_mass_profile_'+str(snap), dict_or_array_to_write=mass_array_1, verbose=True)
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/all_snapshots/'+sim_data.gal_2+'/'+sim_data.gal_2+'_mass_profile_'+str(snap), dict_or_array_to_write=mass_array_2, verbose=True)
