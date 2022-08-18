@@ -53,7 +53,7 @@ print('Set paths')
 #rs = np.logspace(np.log10(0.1), np.log10(500), 100)
 # These new arrays are for a very coarse mass profile at every snapshot
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir)
-snaps = snaps['index'][590:]
+snaps = snaps['index']
 rs = np.logspace(np.log10(5), np.log10(500), 25)
 
 @jit
