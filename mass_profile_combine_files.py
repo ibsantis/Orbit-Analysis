@@ -29,8 +29,8 @@ print('Set paths')
 #times = np.array([13.8,13.7,13.6,13.5,13.4,13.3,13.2,13.1,13.0,12.9,12.8,12.7,12.6,12.5,12.4,12.3,12.2,12.1,12.0,11.9,11.8,11.3,10.8,10.3,9.8,9.3,8.8,8.3,7.8,7.3,6.8,6.3,5.8,5.3,4.8,4.3,3.8,3.3,2.8,2.3,1.8,1.3,0.8])
 #rs = np.logspace(np.log10(0.1), np.log10(500), 100)
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir)
-times = snaps['time']
-snaps = snaps['index']
+times = snaps['time'][2:]
+snaps = snaps['index'][2:]
 rs = np.logspace(np.log10(5), np.log10(500), 25)
 
 
