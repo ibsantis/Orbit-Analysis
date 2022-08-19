@@ -417,56 +417,6 @@ class SummaryDataSort:
         for i in data_dict[host].keys():
             print(i)
 
-    def delta_nperi(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
-        """
-        DESCRIPTION:
-            Calculates the difference in the number of pericenters a subhalo
-            experiences between the model and the simulation.
-
-        VARIABLES:
-            data_dict  : dictionary
-                         Dictionary of data created by data_read()
-
-            mask_dict  : dictionary
-                         Dictionary of masks created by data_mask(). This is used
-                         on data_dict to mask out the subhalos you want.
-
-            oversample : boolean
-                         Choose whether you want to oversample the subhalos or not.
-
-            hosts      : string
-                         Choose which host galaxies you want to analyze; choices
-                         listed in __init__().
-
-            sim_type   : string
-                         Choose which type of data you are analyzing. This is
-                         only used for oversampling factors and does not matter
-                         if you are not oversampling.
-
-        NOTES:
-            - Returns a 1D array.
-            - Data is arranged in order of self.host_names[hosts]. Subhalos in
-              each host are arranged in the same way they were generated from
-              summary_data.py or summary_data_dmo.py.
-        """
-        # Set up an empty list to append values to.
-        data = []
-        #
-        if oversample == True:
-            # Loop through hosts and append data to the list
-            for name in self.host_names[hosts]:
-                data.append(np.repeat(data_dict[name]['N.peri.galpy'][mask_dict[name]],self.oversample[sim_type][name]) - \
-                             np.repeat(data_dict[name]['N.peri.sim'][mask_dict[name]],self.oversample[sim_type][name]))
-        #
-        elif oversample == False:
-            # Loop through hosts and append data to the list
-            for name in self.host_names[hosts]:
-                data.append(data_dict[name]['N.peri.galpy'][mask_dict[name]] - \
-                            data_dict[name]['N.peri.sim'][mask_dict[name]])
-        #
-        return np.hstack(data)
-
-    # optimized
     def nperi(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -519,13 +469,42 @@ class SummaryDataSort:
     def nperi_model(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
-            ...
+            Retrieve the number of pericenters a subhalo experienced since a given
+            definition of infall into the host galaxy.
 
         VARIABLES:
-            ...
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            selection  : string
+                         Choose the key associated with the infall definition
+                         you're interested in.
+                         - sim         : infall time defined from simulation data with evolving R200m
+                         - model       : infall time defined from model data with evolving R200m
+                         - model.300   : infall time defined from model data of when sat first crossed 300 kpc
+                         - model.R200m : infall time defined from model data of when sat first crossed R200m
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
 
         NOTES:
-            ...
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
         """
         # Set up an empty list to save values to
         data = []
@@ -543,11 +522,14 @@ class SummaryDataSort:
             print('Choose a correct infall type')
             raise KeyError('non-alphanumeric character in input')
             pass
+        #
         # Loop over the hosts
         for name in self.host_names[hosts]:
             # Loop over each satellite
             for i in range(0, len(data_dict[name]['pericenter.time.lb.model'][mask_dict[name]])):
+                # Mask out all of the null values
                 m = (data_dict[name]['pericenter.time.lb.model'][mask_dict[name]][i] != -1)
+                # Determine whether or not oversampling, then save the data to the list
                 if oversample:
                     data.append(np.repeat(np.sum((data_dict[name]['pericenter.time.lb.model'][mask_dict[name]][i][m] < data_dict[name][infall_type][mask_dict[name]][i])), self.oversample[sim_type][name]))
                 else:
@@ -555,7 +537,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # optimized
     def dperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -613,7 +594,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # optimized
     def dperi_min(self, data_dict, mask_dict, oversample=False, selection='sim', hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -711,7 +691,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # optimized
     def dapo_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -774,7 +753,40 @@ class SummaryDataSort:
 
     def dmax(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
-        TBD
+        DESCRIPTION:
+            Finds the largest distance a satellite ever experienced was.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            selection  : string
+                         Choose whether you want values from simulation data or
+                         data from the model.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
+            - Does not require the satellite to have fell into the host
+              galaxy/halo.
         """
         # Set up an empty list to save values to
         data = []
@@ -782,12 +794,14 @@ class SummaryDataSort:
         # Loop through each host
         for name in self.host_names[hosts]:
             #
+            # If selecting simulation data, get the max distance from the data file
             if selection == 'sim':
                 if oversample:
                     data.append(np.repeat(data_dict[name]['max.dist.sim'][mask_dict[name]], self.oversample[sim_type][name]))
                 else:
                     data.append(data_dict[name]['max.dist.sim'][mask_dict[name]])
             #
+            # If selecting model data, just get the most recent apocenter distance since they are all the same
             elif selection == 'model':
                 if oversample:
                     data.append(np.repeat(data_dict[name]['apocenter.dist.model'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
@@ -796,8 +810,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-
-    # optimized
     def delta_dperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -868,7 +880,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # optimized
     def tperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -926,7 +937,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # optimized
     def tperi_min(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -988,7 +998,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # optimized
     def delta_tperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -1068,7 +1077,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # Needs documentation
     def tapo_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -1126,7 +1134,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # optimized
     def first_infall(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -1279,7 +1286,6 @@ class SummaryDataSort:
                 #
         return np.hstack(data)
 
-    # optimized
     def mstar(self, data_dict, mask_dict, selection='z0', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -1329,7 +1335,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # optimized
     def mhalo(self, data_dict, mask_dict, selection='z0', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -1379,7 +1384,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # optimized
     def d_z0(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -1474,11 +1478,10 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # Need to document this...
     def vperi_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
-            Groups the recent pericenter distances a subhalo experiences, either
+            Groups the recent pericenter velocities a subhalo experiences, either
             in the simulation or model, together into one array.
 
         VARIABLES:
@@ -1511,7 +1514,7 @@ class SummaryDataSort:
               each host are arranged in the same way they were generated from
               summary_data.py or summary_data_dmo.py.
             - If a subhalo has not experienced a pericenter, sets the most recent
-              pericenter distance equal to the present-day distance.
+              pericenter velocity equal to the present-day velocity.
         """
         # Set up an empty list to save values to
         data = []
@@ -1522,7 +1525,7 @@ class SummaryDataSort:
             temp_array = data_dict[name]['pericenter.vel.'+selection][mask_dict[name]][:,0]
             # Mask out the cases where there are no pericenters
             mask_temp = (temp_array == -1)
-            # For the null values, replace with present-day distances
+            # For the null values, replace with present-day velocities
             temp_array[mask_temp] = data_dict[name]['v.tot.sim'][mask_dict[name]][:,0][mask_temp]
             # Determine oversampling and save to list
             if oversample:
@@ -1532,11 +1535,10 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # Needs docs
     def vperi_min(self, data_dict, mask_dict, oversample=False, selection='sim', hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
-            Groups the minimum pericenter distances a subhalo experiences, either
+            Groups the velocities at minimum pericenter, from either
             in the simulation or model, together into one array.
 
         VARIABLES:
@@ -1565,9 +1567,9 @@ class SummaryDataSort:
               each host are arranged in the same way they were generated from
               summary_data.py or summary_data_dmo.py.
             - If a subhalo has not experienced a pericenter, sets the minimum
-              pericenter distance equal to the present-day distance.
+              pericenter velocity equal to the present-day velocity.
             - In the model, for a subhalo that experiences multiple pericenters,
-              the pericenter distances are always going to be the same, so the
+              the pericenter velocities are always going to be the same, so the
               minimum will be the same in the model.
         """
         # Set up an empty list to save values to
@@ -1579,13 +1581,13 @@ class SummaryDataSort:
             for i in range(0, len(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]])):
                 # Mask out the null pericenter values
                 mask_temp = (data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i] != -1)
-                # If there are no pericenters, append the present-day distance as the minimum
+                # If there are no pericenters, append the present-day velocity as the minimum
                 if np.sum(mask_temp) == 0:
                     if oversample:
                         data.append(np.repeat(data_dict[name]['v.tot.sim'][mask_dict[name]][i][0], self.oversample[sim_type][name]))
                     else:
                         data.append(data_dict[name]['v.tot.sim'][mask_dict[name]][i][0])
-                # If there are pericenters, append the minimum value to the list
+                # If there are pericenters, append the value of the velocity at minimum to the list
                 else:
                     index = np.where(np.min(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask_temp]) \
                                      == data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask_temp])[0][0]
@@ -1596,7 +1598,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # optimized
     def potential(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon', norm='potential'):
         """
         DESCRIPTION:
@@ -1661,7 +1662,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # optimized
     def kinetic_energy(self, data_dict, mask_dict, ke_type, oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -1843,7 +1843,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # optimized
     def L_z0(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -1895,7 +1894,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # optimized
     def L_rec(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -1950,7 +1948,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # optimized
     def L_min(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -2013,18 +2010,57 @@ class SummaryDataSort:
 
     def L_infall(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
-        Add dox
+        DESCRIPTION:
+            Groups the specific angular momenta of satellites at their infall,
+            either in the simulation or model, together into one array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            mask_dict  : dictionary
+                         Dictionary of masks created by data_mask(). This is used
+                         on data_dict to mask out the subhalos you want.
+
+            selection  : string
+                         Choose whether you want values from simulation data or
+                         data from the model.
+                         ** Right now, only works with simulation data **
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
+            - Only works if there are actual pericenters, will not work on all
+              satellites.
+              ** Only works with the simulation data right now, not the model
+                 data... **
         """
         # Set up empty list to save to
         data = []
         #
         # Loop through each host
         for name in self.host_names[hosts]:
-            #
+            # Set up lookback time array
             lb = np.flip(data_dict[name]['time.sim'][-1]-data_dict[name]['time.sim'])
-            #
+            # Loop through each satellite
             for i in range(0, len(data_dict[name]['infall.check'][mask_dict[name]])):
+                # Check if the satellite fell into the host
                 if (data_dict[name]['first.infall.time.lb'][mask_dict[name]][i] != -1):
+                    # Find the angular momentum of the satellite at infall, oversample if needed, and append save to the list
                     if oversample:
                         data.append(np.repeat(data_dict[name]['L.tot.sim'][mask_dict[name]][i][np.argmin(np.abs(data_dict[name]['first.infall.time.lb'][mask_dict[name]][i]-lb))], self.oversample[sim_type][name]))
                     else:
@@ -2189,6 +2225,7 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    # Needs dox
     def period_average(self, data_dict, mask_dict, selection='sim', choice='peri', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
