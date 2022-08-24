@@ -1021,12 +1021,21 @@ class OrbitAnalysis:
             if (peri_dict['pericenter.check'][n] & apo_dict['apocenter.check'][n]):
                 mask_peri = (peri_dict['pericenter.dist'][n] != -1)
                 mask_apo = (apo_dict['apocenter.dist'][n] != -1)
-                ecc_ind.append((apo_dict['apocenter.dist'][n][mask_apo][0]-peri_dict['pericenter.dist'][n][mask_peri][0])/(apo_dict['apocenter.dist'][n][mask_apo][0]+peri_dict['pericenter.dist'][n][mask_peri][0]))
+                #
                 if (np.sum(mask_apo) >= 1):
-                    for j in range(1, len(peri_dict['pericenter.dist'][n][mask_peri])):
-                        for i in range(0, len(apo_dict['apocenter.dist'][n][mask_apo])):
-                            if ((j-i == 1) or (j-i == 0)):
-                                ecc_ind.append((apo_dict['apocenter.dist'][n][mask_apo][i]-peri_dict['pericenter.dist'][n][mask_peri][j])/(apo_dict['apocenter.dist'][n][mask_apo][i]+peri_dict['pericenter.dist'][n][mask_peri][j]))
+                    # Check if pericenter was more recent than the apocenter
+                    if (peri_dict['pericenter.time.lb'][n][mask_peri][0] < apo_dict['apocenter.time.lb'][n][mask_apo][0]):
+                        for j in range(0, len(peri_dict['pericenter.dist'][n][mask_peri])):
+                            for i in range(0, len(apo_dict['apocenter.dist'][n][mask_apo])):
+                                if ((j-i == 1) or (j-i == 0)):
+                                    ecc_ind.append((apo_dict['apocenter.dist'][n][mask_apo][i]-peri_dict['pericenter.dist'][n][mask_peri][j])/(apo_dict['apocenter.dist'][n][mask_apo][i]+peri_dict['pericenter.dist'][n][mask_peri][j]))
+                    #
+                    # Check if pericenter was more recent than the apocenter
+                    if (peri_dict['pericenter.time.lb'][n][mask_peri][0] > apo_dict['apocenter.time.lb'][n][mask_apo][0]):
+                        for j in range(0, len(peri_dict['pericenter.dist'][n][mask_peri])):
+                            for i in range(0, len(apo_dict['apocenter.dist'][n][mask_apo])):
+                                if ((i-j == 1) or (i-j == 0)):
+                                    ecc_ind.append((apo_dict['apocenter.dist'][n][mask_apo][i]-peri_dict['pericenter.dist'][n][mask_peri][j])/(apo_dict['apocenter.dist'][n][mask_apo][i]+peri_dict['pericenter.dist'][n][mask_peri][j]))
         #
             ecc.append(ecc_ind)
         N = np.max([len(ecc[i]) for i in range(0, len(ecc))])
