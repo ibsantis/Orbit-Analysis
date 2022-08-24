@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -49,6 +49,7 @@ if sim_data.num_gal == 1:
     halt_rad_vels = orbits.halo_velocities(halt, vel_type='rad')
     halt_tan_vels = orbits.halo_velocities(halt, vel_type='tan')
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
+    host_mstar = halt['star.mass'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
     infall_info_any = orbits.first_infall_any(halt, snaps)
@@ -234,6 +235,7 @@ if sim_data.num_gal == 1:
     #
     # Save the host radius
     data_dict['host.radius'] = host_radii
+    data_dict['host.star.mass'] = host_mstar
 
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
@@ -253,6 +255,7 @@ if sim_data.num_gal == 2:
     halt_rad_vels = orbits.halo_velocities(halt, vel_type='rad')
     halt_tan_vels = orbits.halo_velocities(halt, vel_type='tan')
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
+    host_mstar = halt['star.mass'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
     infall_info_any = orbits.first_infall_any(halt, snaps)
@@ -435,8 +438,9 @@ if sim_data.num_gal == 2:
     data_dict['L.z.model'] = galpy_orbits.Lz(ts)
     data_dict['time.model'] = ts
     #
-    # Save the host radius
+    # Save the host radius and Mstar
     data_dict['host.radius'] = host_radii
+    data_dict['host.star.mass'] = host_mstar
     #
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1, dict_or_array_to_write=data_dict, verbose=True)
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
@@ -455,6 +459,7 @@ if sim_data.num_gal == 2:
     halt_rad_vels = orbits.halo_velocities(halt, host=2, vel_type='rad')
     halt_tan_vels = orbits.halo_velocities(halt, host=2, vel_type='tan')
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host2.index'][0])]
+    host_mstar = halt['star.mass'][halt.prop('progenitor.main.indices', halt['host2.index'][0])]
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
     infall_info_any = orbits.first_infall_any(halt, snaps)
@@ -639,6 +644,7 @@ if sim_data.num_gal == 2:
     #
     # Save the host radius
     data_dict['host.radius'] = host_radii
+    data_dict['host.star.mass'] = host_mstar
 
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2, dict_or_array_to_write=data_dict, verbose=True)
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
