@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
