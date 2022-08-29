@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=m12w_mass_profile_all
+#SBATCH --job-name=m12z_mass_profile_all
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=480G
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
 #SBATCH --time=06:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/m12w_mass_profile_all_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/m12z_mass_profile_all_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -35,7 +35,7 @@ from numba import jit
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12w', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12z', location='peloton')
 print('Set paths')
 
 # Set up snapshot array to loop through
