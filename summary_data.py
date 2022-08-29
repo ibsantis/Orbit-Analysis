@@ -35,8 +35,12 @@ print('Set paths')
 # Read in the snapshot dictionary and the entire tree
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
 halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal)
+part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'snapshot', 600, simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
 
 if sim_data.num_gal == 1:
+    # Find the mass ratio to multiply the host radius
+    mass_ratio = ut.particle.get_halo_properties(part)['mass']/halt['mass'][halt['host.index'][0]]
+    #
     # This initializes the classes and makes sure they inherit from the OrbitRead class
     orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=False)
     orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=False)
@@ -48,9 +52,11 @@ if sim_data.num_gal == 1:
     halt_vels = orbits.halo_velocities(halt, vel_type='total')
     halt_rad_vels = orbits.halo_velocities(halt, vel_type='rad')
     halt_tan_vels = orbits.halo_velocities(halt, vel_type='tan')
+    #
+    host_mhalo = halt['mass'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
-    host_mstar = halt['star.mass'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
-    halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
+    #
+    halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii*mass_ratio)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
     infall_info_any = orbits.first_infall_any(halt, snaps)
     peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
@@ -234,13 +240,16 @@ if sim_data.num_gal == 1:
     data_dict['time.model'] = ts
     #
     # Save the host radius
-    data_dict['host.radius'] = host_radii
-    data_dict['host.star.mass'] = host_mstar
+    data_dict['host.radius'] = host_radii*mass_ratio
+    data_dict['host.mass'] = host_mhalo*mass_ratio
 
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
 
 if sim_data.num_gal == 2:
+    #
+    # Find the mass ratio to multiply the host radius
+    mass_ratio = ut.particle.get_halo_properties(part)['mass']/halt['mass'][halt['host.index'][0]]
     #
     ### GALAXY 1
     # This initializes the classes and makes sure they inherit from the OrbitRead class
@@ -254,9 +263,11 @@ if sim_data.num_gal == 2:
     halt_vels = orbits.halo_velocities(halt)
     halt_rad_vels = orbits.halo_velocities(halt, vel_type='rad')
     halt_tan_vels = orbits.halo_velocities(halt, vel_type='tan')
+    #
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
-    host_mstar = halt['star.mass'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
-    halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
+    host_mhalo = halt['mass'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
+    #
+    halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii*mass_ratio)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
     infall_info_any = orbits.first_infall_any(halt, snaps)
     peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
@@ -439,14 +450,17 @@ if sim_data.num_gal == 2:
     data_dict['time.model'] = ts
     #
     # Save the host radius and Mstar
-    data_dict['host.radius'] = host_radii
-    data_dict['host.star.mass'] = host_mstar
+    data_dict['host.radius'] = host_radii*mass_ratio
+    data_dict['host.mass'] = host_mhalo*mass_ratio
     #
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1, dict_or_array_to_write=data_dict, verbose=True)
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
     #
     #
     ### GALAXY 2
+    # Find the mass ratio to multiply the host radius
+    mass_ratio = ut.particle.get_halo_properties(part, host_index=1)['mass']/halt['mass'][halt['host2.index'][0]]
+    #
     # This initializes the classes and makes sure they inherit from the OrbitRead class
     orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=False)
     orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=False)
@@ -458,9 +472,11 @@ if sim_data.num_gal == 2:
     halt_vels = orbits.halo_velocities(halt, host=2)
     halt_rad_vels = orbits.halo_velocities(halt, host=2, vel_type='rad')
     halt_tan_vels = orbits.halo_velocities(halt, host=2, vel_type='tan')
+    #
     host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host2.index'][0])]
-    host_mstar = halt['star.mass'][halt.prop('progenitor.main.indices', halt['host2.index'][0])]
-    halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii)
+    host_mhalo = halt['mass'][halt.prop('progenitor.main.indices', halt['host2.index'][0])]
+    #
+    halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii*mass_ratio)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
     infall_info_any = orbits.first_infall_any(halt, snaps)
     peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
@@ -643,8 +659,8 @@ if sim_data.num_gal == 2:
     data_dict['time.model'] = ts
     #
     # Save the host radius
-    data_dict['host.radius'] = host_radii
-    data_dict['host.star.mass'] = host_mstar
+    data_dict['host.radius'] = host_radii*mass_ratio
+    data_dict['host.mass'] = host_mhalo*mass_ratio
 
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2, dict_or_array_to_write=data_dict, verbose=True)
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
