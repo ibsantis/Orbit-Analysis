@@ -5,7 +5,7 @@
 #SBATCH --mem=250G
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
-#SBATCH --time=01:00:00
+#SBATCH --time=02:00:00
 #SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/m12b_summary_data_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
@@ -42,6 +42,7 @@ print('Read in the tools')
 
 ### Set path and initial parameters
 sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
+plotting = True
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -103,7 +104,6 @@ if sim_data.num_gal == 1:
     print(np.sum(poles))
 
     galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vx(ts), galpy_orbits.vy(ts), galpy_orbits.vz(ts))
-    tts = (-1)*np.flip(snaps['time'] - snaps['time'][-1])
     peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
     apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
     eccs_galpy_pot = galpy_orbits.e(pot=potential_two_power)
@@ -257,6 +257,9 @@ if sim_data.num_gal == 1:
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
 
+    if plotting:
+        orbit_plot.multi_plot(host_rads=host_radii, infall_dict=infall_info, peri_dict=peris, time_dict=snaps, sim_dist=halt_dists, sim_vel=halt_vels, sim_ell=angs, model_orbits=galpy_orbits, model_times=ts)
+
 if sim_data.num_gal == 2:
     #
     # Find the mass ratio to multiply the host radius
@@ -313,7 +316,6 @@ if sim_data.num_gal == 2:
     print(np.sum(poles))
 
     galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vx(ts), galpy_orbits.vy(ts), galpy_orbits.vz(ts))
-    tts = (-1)*np.flip(snaps['time'] - snaps['time'][-1])
     peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
     apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
     eccs_galpy_pot = galpy_orbits.e(pot=potential_two_power)
@@ -467,6 +469,9 @@ if sim_data.num_gal == 2:
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1, dict_or_array_to_write=data_dict, verbose=True)
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
     #
+    if plotting:
+        orbit_plot.multi_plot(host_rads=host_radii, infall_dict=infall_info, peri_dict=peris, time_dict=snaps, sim_dist=halt_dists, sim_vel=halt_vels, sim_ell=angs, model_orbits=galpy_orbits, model_times=ts, host=1)
+
     #
     ### GALAXY 2
     # Find the mass ratio to multiply the host radius
@@ -522,7 +527,6 @@ if sim_data.num_gal == 2:
     print(np.sum(poles))
 
     galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vx(ts), galpy_orbits.vy(ts), galpy_orbits.vz(ts))
-    tts = (-1)*np.flip(snaps['time'] - snaps['time'][-1])
     peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
     apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
     eccs_galpy_pot = galpy_orbits.e(pot=potential_two_power)
@@ -675,3 +679,6 @@ if sim_data.num_gal == 2:
 
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2, dict_or_array_to_write=data_dict, verbose=True)
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
+
+    if plotting:
+        orbit_plot.multi_plot(host_rads=host_radii, infall_dict=infall_info, peri_dict=peris, time_dict=snaps, sim_dist=halt_dists, sim_vel=halt_vels, sim_ell=angs, model_orbits=galpy_orbits, model_times=ts, host=2)
