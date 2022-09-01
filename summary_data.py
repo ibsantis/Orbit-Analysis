@@ -6,7 +6,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
 #SBATCH --time=02:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/m12b_summary_data_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/summary/m12b_summary_data_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
