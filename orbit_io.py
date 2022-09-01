@@ -1119,15 +1119,16 @@ class OrbitGalpy(OrbitAnalysis):
         """
         pass
 
-    def galpy_velocities(self, vrad, vtan):
+    def galpy_velocities(self, vx, vy, vz):
         """
         DESCRIPTION:
             Takes the radial and tangential velocities given by galpy and computes
             the total scalar velocity.
 
         VARIABLES:
-            vrad : 2D array
-            vtan : 2D array
+            vx : 2D array
+            vy : 2D array
+            vz : 2D array
 
         NOTES:
             - Returns a 2D array
@@ -1137,7 +1138,7 @@ class OrbitGalpy(OrbitAnalysis):
             - These are used in galpy_pericenter_interp & galpy_apocenter_interp
               to return pericenter and apocenter velocities.
         """
-        return np.sqrt(vrad**2 + vtan**2)
+        return np.sqrt(vx**2 + vy**2 + vz**2)
 
     def galpy_pericenter_interp(self, distances, velocities, time_array, reach=20):
         """
