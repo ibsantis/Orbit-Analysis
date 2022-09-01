@@ -1,4 +1,15 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
+#SBATCH --job-name=m12b_summary_data
+#SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
+#SBATCH --mem=480G
+#SBATCH --nodes=1
+#SBATCH --ntasks=4    # processes total
+#SBATCH --time=01:00:00
+#SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/m12b_summary_data_%j.txt
+#SBATCH --mail-user=ibsantistevan@ucdavis.edu
+#SBATCH --mail-type=fail
+#SBATCH --mail-type=end
+#SBATCH --mail-type=begin
 
 """
 
@@ -29,7 +40,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12b', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -90,17 +101,15 @@ if sim_data.num_gal == 1:
     print(poles)
     print(np.sum(poles))
 
-    galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vR(ts), galpy_orbits.vT(ts))
+    galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vx(ts), galpy_orbits.vy(ts), galpy_orbits.vz(ts))
     tts = (-1)*np.flip(snaps['time'] - snaps['time'][-1])
     peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
     apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
     eccs_galpy_pot = galpy_orbits.e(pot=potential_two_power)
     eccs_galpy_apsis = orbits.eccentricity(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
 
-    galpy_orbits_norm = galpy_orbits.r(ts)[:,:len(host_radii)]/host_radii
+    galpy_orbits_norm = galpy_orbits.r(ts)[:,:len(host_radii*mass_ratio)]/host_radii*mass_ratio
     infall_info_galpy = orbits.infall_times(galpy_orbits_norm, snaps)
-    infall_info_galpy_static_300 = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=300)
-    infall_info_galpy_static_400 = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=400)
     infall_info_galpy_static_R200m = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=host_radii[0])
     periods_galpy = orbits.orbit_period(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info_galpy)
 
@@ -147,12 +156,6 @@ if sim_data.num_gal == 1:
     data_dict['all.infall.time.model'] = infall_info_galpy['all.infall.time']
     data_dict['all.infall.time.lb.model'] = infall_info_galpy['all.infall.time.lb']
     #
-    data_dict['infall.snap.model.300kpc'] = infall_info_galpy_static_300['infall.snap']
-    data_dict['infall.time.model.300kpc'] = infall_info_galpy_static_300['infall.time']
-    data_dict['infall.time.lb.model.300kpc'] = infall_info_galpy_static_300['infall.time.lb']
-    data_dict['infall.snap.model.400kpc'] = infall_info_galpy_static_400['infall.snap']
-    data_dict['infall.time.model.400kpc'] = infall_info_galpy_static_400['infall.time']
-    data_dict['infall.time.lb.model.400kpc'] = infall_info_galpy_static_400['infall.time.lb']
     data_dict['infall.snap.model.R200m'] = infall_info_galpy_static_R200m['infall.snap']
     data_dict['infall.time.model.R200m'] = infall_info_galpy_static_R200m['infall.time']
     data_dict['infall.time.lb.model.R200m'] = infall_info_galpy_static_R200m['infall.time.lb']
@@ -242,6 +245,13 @@ if sim_data.num_gal == 1:
     # Save the host radius
     data_dict['host.radius'] = host_radii*mass_ratio
     data_dict['host.mass'] = host_mhalo*mass_ratio
+    data_dict['host.mass.ratio'] = mass_ratio
+    #
+    print('The host mass at z=0 without the mass ratio is:', halt['mass'][halt['host.index'][0]])
+    print('The host radius at z=0 without the mass ratio is:', halt['radius'][halt['host.index'][0]])
+    print('The host mass at z=0 with the mass ratio is:', halt['mass'][halt['host.index'][0]]*mass_ratio)
+    print('The host radius at z=0 with the mass ratio is:', halt['radius'][halt['host.index'][0]]*mass_ratio)
+    print('The mass ratio is:', mass_ratio)
 
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
@@ -301,17 +311,15 @@ if sim_data.num_gal == 2:
     print(poles)
     print(np.sum(poles))
 
-    galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vR(ts), galpy_orbits.vT(ts))
+    galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vx(ts), galpy_orbits.vy(ts), galpy_orbits.vz(ts))
     tts = (-1)*np.flip(snaps['time'] - snaps['time'][-1])
     peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
     apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
     eccs_galpy_pot = galpy_orbits.e(pot=potential_two_power)
     eccs_galpy_apsis = orbits.eccentricity(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
 
-    galpy_orbits_norm = galpy_orbits.r(ts)[:,:len(host_radii)]/host_radii
+    galpy_orbits_norm = galpy_orbits.r(ts)[:,:len(host_radii*mass_ratio)]/host_radii*mass_ratio
     infall_info_galpy = orbits.infall_times(galpy_orbits_norm, snaps)
-    infall_info_galpy_static_300 = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=300)
-    infall_info_galpy_static_400 = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=400)
     infall_info_galpy_static_R200m = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=host_radii[0])
     periods_galpy = orbits.orbit_period(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info_galpy)
 
@@ -358,12 +366,6 @@ if sim_data.num_gal == 2:
     data_dict['all.infall.time.model'] = infall_info_galpy['all.infall.time']
     data_dict['all.infall.time.lb.model'] = infall_info_galpy['all.infall.time.lb']
     #
-    data_dict['infall.snap.model.300kpc'] = infall_info_galpy_static_300['infall.snap']
-    data_dict['infall.time.model.300kpc'] = infall_info_galpy_static_300['infall.time']
-    data_dict['infall.time.lb.model.300kpc'] = infall_info_galpy_static_300['infall.time.lb']
-    data_dict['infall.snap.model.400kpc'] = infall_info_galpy_static_400['infall.snap']
-    data_dict['infall.time.model.400kpc'] = infall_info_galpy_static_400['infall.time']
-    data_dict['infall.time.lb.model.400kpc'] = infall_info_galpy_static_400['infall.time.lb']
     data_dict['infall.snap.model.R200m'] = infall_info_galpy_static_R200m['infall.snap']
     data_dict['infall.time.model.R200m'] = infall_info_galpy_static_R200m['infall.time']
     data_dict['infall.time.lb.model.R200m'] = infall_info_galpy_static_R200m['infall.time.lb']
@@ -452,6 +454,14 @@ if sim_data.num_gal == 2:
     # Save the host radius and Mstar
     data_dict['host.radius'] = host_radii*mass_ratio
     data_dict['host.mass'] = host_mhalo*mass_ratio
+    data_dict['host.mass.ratio'] = mass_ratio
+    #
+    print('The host mass at z=0 without the mass ratio is:', halt['mass'][halt['host.index'][0]])
+    print('The host radius at z=0 without the mass ratio is:', halt['radius'][halt['host.index'][0]])
+    print('The host mass at z=0 with the mass ratio is:', halt['mass'][halt['host.index'][0]]*mass_ratio)
+    print('The host radius at z=0 with the mass ratio is:', halt['radius'][halt['host.index'][0]]*mass_ratio)
+    print('The mass ratio is:', mass_ratio)
+
     #
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1, dict_or_array_to_write=data_dict, verbose=True)
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
@@ -510,17 +520,15 @@ if sim_data.num_gal == 2:
     print(poles)
     print(np.sum(poles))
 
-    galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vR(ts), galpy_orbits.vT(ts))
+    galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vx(ts), galpy_orbits.vy(ts), galpy_orbits.vz(ts))
     tts = (-1)*np.flip(snaps['time'] - snaps['time'][-1])
     peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
     apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
     eccs_galpy_pot = galpy_orbits.e(pot=potential_two_power)
     eccs_galpy_apsis = orbits.eccentricity(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
 
-    galpy_orbits_norm = galpy_orbits.r(ts)[:,:len(host_radii)]/host_radii
+    galpy_orbits_norm = galpy_orbits.r(ts)[:,:len(host_radii*mass_ratio)]/host_radii*mass_ratio
     infall_info_galpy = orbits.infall_times(galpy_orbits_norm, snaps)
-    infall_info_galpy_static_300 = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=300)
-    infall_info_galpy_static_400 = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=400)
     infall_info_galpy_static_R200m = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=host_radii[0])
     periods_galpy = orbits.orbit_period(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info_galpy)
 
@@ -567,12 +575,6 @@ if sim_data.num_gal == 2:
     data_dict['all.infall.time.model'] = infall_info_galpy['all.infall.time']
     data_dict['all.infall.time.lb.model'] = infall_info_galpy['all.infall.time.lb']
     #
-    data_dict['infall.snap.model.300kpc'] = infall_info_galpy_static_300['infall.snap']
-    data_dict['infall.time.model.300kpc'] = infall_info_galpy_static_300['infall.time']
-    data_dict['infall.time.lb.model.300kpc'] = infall_info_galpy_static_300['infall.time.lb']
-    data_dict['infall.snap.model.400kpc'] = infall_info_galpy_static_400['infall.snap']
-    data_dict['infall.time.model.400kpc'] = infall_info_galpy_static_400['infall.time']
-    data_dict['infall.time.lb.model.400kpc'] = infall_info_galpy_static_400['infall.time.lb']
     data_dict['infall.snap.model.R200m'] = infall_info_galpy_static_R200m['infall.snap']
     data_dict['infall.time.model.R200m'] = infall_info_galpy_static_R200m['infall.time']
     data_dict['infall.time.lb.model.R200m'] = infall_info_galpy_static_R200m['infall.time.lb']
@@ -661,6 +663,14 @@ if sim_data.num_gal == 2:
     # Save the host radius
     data_dict['host.radius'] = host_radii*mass_ratio
     data_dict['host.mass'] = host_mhalo*mass_ratio
+    data_dict['host.mass.ratio'] = mass_ratio
+    #
+    print('The host mass at z=0 without the mass ratio is:', halt['mass'][halt['host2.index'][0]])
+    print('The host radius at z=0 without the mass ratio is:', halt['radius'][halt['host2.index'][0]])
+    print('The host mass at z=0 with the mass ratio is:', halt['mass'][halt['host2.index'][0]]*mass_ratio)
+    print('The host radius at z=0 with the mass ratio is:', halt['radius'][halt['host2.index'][0]]*mass_ratio)
+    print('The mass ratio is:', mass_ratio)
+
 
     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2, dict_or_array_to_write=data_dict, verbose=True)
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
