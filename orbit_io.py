@@ -1696,7 +1696,7 @@ class OrbitPlot(OrbitAnalysis):
                 #
                 # Plot the distances
                 ax1.plot(times, d_data, 'k', label='Simulation')
-                ax1.plot(-1*model_times, d_model, label='Model', alpha=0.5)
+                ax1.plot(-1*model_times, d_model[i], label='Model', alpha=0.5)
                 ax1.plot(times, host_rads[:len(times)], 'k', alpha=0.3)
                 ax1.set_xlim(times[-1], times[0])
                 #
@@ -1721,7 +1721,7 @@ class OrbitPlot(OrbitAnalysis):
                 #
                 # Plot the velocity data
                 ax2.plot(times, v_data, 'k')
-                ax2.plot(-1*ts, v_model, alpha=0.5)
+                ax2.plot(-1*ts, v_model[i], alpha=0.5)
                 ax2.set_xlim(times[-1], times[0])
                 ax2.label_outer()
                 if infall == True:
@@ -1735,7 +1735,7 @@ class OrbitPlot(OrbitAnalysis):
                 #
                 # Plot the velocity data
                 ax3.plot(times, L_data/1000, 'k')
-                ax3.plot(-1*ts, L_model/1000, alpha=0.5)
+                ax3.plot(-1*ts, L_model[i]/1000, alpha=0.5)
                 ax3.set_xlim(times[-1], times[0])
                 ax3.set_ylabel('$\\ell$ [$10^3$ kpc km s$^{-1}$]', fontsize=20)
                 if infall == True:
