@@ -43,7 +43,7 @@ print('Read in the tools')
 
 ### Set path and initial parameters
 sim_data = orbit_io.OrbitRead(gal1='m12r', location='peloton')
-plotting = True
+plotting = False
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
