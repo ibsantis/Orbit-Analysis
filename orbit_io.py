@@ -1735,7 +1735,7 @@ class OrbitPlot(OrbitAnalysis):
                 #
                 # Plot the velocity data
                 ax3.plot(times, L_data/1000, 'k')
-                ax3.plot(-1*model_times, L_model[i]/1000, alpha=0.5)
+                ax3.plot(-1*model_times, np.linalg.norm(L_model[i], axis=1)/1000, alpha=0.5)
                 ax3.set_xlim(times[-1], times[0])
                 ax3.set_ylabel('$\\ell$ [$10^3$ kpc km s$^{-1}$]', fontsize=20)
                 if infall == True:
