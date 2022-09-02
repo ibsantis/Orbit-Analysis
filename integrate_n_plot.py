@@ -29,7 +29,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -80,7 +80,8 @@ if sim_data.num_gal == 1:
     print(poles)
     print(np.sum(poles))
 
-    galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vR(ts), galpy_orbits.vT(ts))
+    #galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vR(ts), galpy_orbits.R(ts)*galpy_orbits.vphi(ts))
+    galpy_vels = np.sqrt(galpy_orbits.vx(ts)**2+galpy_orbits.vy(ts)**2+galpy_orbits.vz(ts)**2)
     galpy_angs = np.linalg.norm(galpy_orbits.L(ts), axis=2)
 
 
@@ -90,8 +91,8 @@ if sim_data.num_gal == 1:
             d_model = galpy_orbits[i]._parse_plot_quantity(quant='r')
             #v_model = galpy_orbits[i]._parse_plot_quantity(quant='vR')
             #Lz_model = galpy_orbits[i]._parse_plot_quantity(quant='Lz')
-            #v_model = galpy_vels[i]
-            v_model = galpy_orbits.vT(ts)[i]
+            v_model = galpy_vels[i]
+            #v_model = galpy_orbits.vT(ts)[i]
             L_model = galpy_angs[i]
             #
             # Set up the distances and times to plot
@@ -100,8 +101,8 @@ if sim_data.num_gal == 1:
             lookback_time = np.flip(snaps['time'][-1] - snaps['time'])
             times = lookback_time[:len(d_data)]
             #v_data = halt.prop('host.velocity.principal.spherical', orbits.sub_inds[i][orbits.sub_inds[i]>=0])[:,0][:len(times)]
-            #v_data = halt_vels[i][:len(times)]
-            v_data = halt_tan_vels[i][:len(times)]
+            v_data = halt_vels[i][:len(times)]
+            #v_data = halt_tan_vels[i][:len(times)]
             #Lz_data = angs['ang.mom.vector'][i][:,2][:len(times)]
             L_data = angs['ang.mom.total'][i][:len(times)]
             #
@@ -152,7 +153,7 @@ if sim_data.num_gal == 1:
                 for j in peris['pericenter.time.lb'][i][peris['pericenter.time.lb'][i] != -1]:
                     ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
 
-            ax2.set_ylabel('Tangential velocity [km s$^{-1}$]', fontsize=20)
+            ax2.set_ylabel('Total velocity [km s$^{-1}$]', fontsize=20)
             #
             # Plot the velocity data
             ax3.plot(times, L_data/1000, 'k')
