@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=m12c_summary_data
+#SBATCH --job-name=m12f_summary_data
 ##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --partition=high2    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=250G
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
 #SBATCH --time=02:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/summary/m12c_summary_data_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/summary/m12f_summary_data_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -41,7 +41,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12c', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12f', location='peloton')
 plotting = True
 print('Set paths')
 
