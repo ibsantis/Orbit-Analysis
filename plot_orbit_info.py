@@ -29,13 +29,21 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
-data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy)
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='mac')
+host = 2
+#
+if sim_data.num_gal == 1:
+    data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy)
+elif sim_data.num_gal == 2:
+    if host == 1:
+        data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1)
+    if host == 2:
+        data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2)
 
 # Loop over the number of subhalos
 for i in range(0, len(data['indices.z0'][:,0])):
     # Check to see if the subhalo fell in and experienced a pericenter
-    if (data['infall.check'][i]) & (data['pericenter.check.sim'][i]):
+    if (data['infall.check'][i]):# & (data['pericenter.check.sim'][i]):
         #
         d_model = data['d.tot.model'][i]
         v_model = data['v.tot.model'][i]
@@ -47,6 +55,7 @@ for i in range(0, len(data['indices.z0'][:,0])):
         #
         lookback_time = np.flip(data['time.sim'][-1] - data['time.sim'])
         times = lookback_time[:len(d_data)]
+        times_model = lookback_time
         #
         v_data = data['v.tot.sim'][i][:len(times)]
         L_data = data['L.tot.sim'][i][:len(times)]
@@ -60,7 +69,7 @@ for i in range(0, len(data['indices.z0'][:,0])):
         #
         # Plot the distances
         ax1.plot(times, d_data, 'k', label='Simulation')
-        ax1.plot(times, d_model[i], label='Model', alpha=0.5)
+        ax1.plot(times_model, d_model, label='Model', alpha=0.5)
         ax1.plot(times, data['host.radius'][:len(times)], 'k', alpha=0.3) # NEED TO CHECK IF I SHOULD DIVIDE BY MASS RATIO
         ax1.set_xlim(times[-1], times[0])
         #
@@ -85,7 +94,7 @@ for i in range(0, len(data['indices.z0'][:,0])):
         #
         # Plot the velocity data
         ax2.plot(times, v_data, 'k')
-        ax2.plot(times, v_model[i], alpha=0.5)
+        ax2.plot(times_model, v_model, alpha=0.5)
         ax2.set_xlim(times[-1], times[0])
         ax2.label_outer()
         if infall == True:
@@ -99,7 +108,7 @@ for i in range(0, len(data['indices.z0'][:,0])):
         #
         # Plot the velocity data
         ax3.plot(times, L_data/1000, 'k')
-        ax3.plot(times, Lmodel/1000, alpha=0.5)
+        ax3.plot(times_model, L_model/1000, alpha=0.5)
         ax3.set_xlim(times[-1], times[0])
         ax3.set_ylabel('$\\ell$ [$10^3$ kpc km s$^{-1}$]', fontsize=20)
         if infall == True:
