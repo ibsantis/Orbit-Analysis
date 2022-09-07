@@ -6,7 +6,7 @@
 #SBATCH --nodes=1
 ##SBATCH --ntasks=4    # processes total
 #SBATCH --tasks-per-node=4
-#SBATCH --time=48:00:00
+#SBATCH --time=12:00:00
 ##SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/TL_mass_profile_all_%j.txt
 #SBATCH --output=/home1/05400/ibsantis/scripts/jobs/mass_profiles/TL_mass_profile_all_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
@@ -44,7 +44,7 @@ print('Set paths')
 # Set up snapshot array to loop through
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir)
 snaps = snaps['index']
-#snaps = snaps[371:] # this is where the first job left off
+snaps = snaps[547:] # this is where the first job left off
 
 # Create a distance array to loop through
 rs = np.logspace(np.log10(5), np.log10(500), 25)
