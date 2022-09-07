@@ -24,6 +24,9 @@ import model_io
 from scipy import interpolate
 import pandas as pd
 from matplotlib import patches
+from matplotlib import gridspec
+import matplotlib.patches as mpatches
+import matplotlib.ticker as ticker
 print('Read in the tools')
 
 ### Set path and initial parameters
@@ -43,7 +46,8 @@ masks_infall_peri['m12f'][59] = False
 masks_infall_apo['m12f'][59] = False
 
 # Select which mask you want to use and the corresponding directory
-directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2'
+#directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2'
+directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2_fix'
 
 
 """
@@ -113,7 +117,7 @@ plt.xlabel('Host distance, $r$ [kpc]', fontsize=30)
 plt.ylabel('$M_{\\rm model}(<r)\ /\ M_{\\rm sim}(<r)$', fontsize=30)
 plt.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_2/mass_profile_fits/mass_ratio_fit_median.pdf')
+plt.savefig(directory+'/mass_ratio_fit_median.pdf')
 plt.close()
 
 
@@ -231,13 +235,13 @@ ax2.set_ylim(limits_2[1])
 ax2.set_xscale('log')
 #
 ax2.set_xlabel('Host distance, $r$ [kpc]', fontsize=26)
-ax1.set_ylabel('$M(z, <r)$ / $M(z = 0, <r)$', fontsize=26)
-ax2.set_ylabel('$M(z, <r)$ / $M_{\\rm 2\ Gyr\ avg}(<r)$', fontsize=26)
-ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
-ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
+ax1.set_ylabel('$M(t_{\\rm lb}, <r)$ / $M(t_{\\rm lb} = 0, <r)$', fontsize=24)
+ax2.set_ylabel('$M(t_{\\rm lb}, <r)$ / $M_{\\rm 2\ Gyr\ avg}(<r)$', fontsize=24)
+ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
+ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
-plt.savefig(directory+'/mass_profile_evolution/long_short_evolution.pdf')
+plt.savefig(directory+'/long_short_evolution.pdf')
 #plt.show()
 plt.close()
 
@@ -344,9 +348,9 @@ ax2 = ax1.twiny()
 ax2.set_xscale('linear')
 ax2.set_yscale('linear')
 ax2.set_xticks(axis_2_tick_locations)
-ax2.set_xticklabels(axis_2_tick_labels, fontsize=24)
+ax2.set_xticklabels(axis_2_tick_labels, fontsize=26)
 ax2.set_xlim(13,0)
-ax2.set_xlabel(axis_2_label, fontsize=24, labelpad=9)
+ax2.set_xlabel(axis_2_label, fontsize=32, labelpad=9)
 ax2.tick_params(pad=3)
 #
 ax1.hlines(1, 13, 0, color='k', alpha=0.8, linestyles='dotted', zorder=100)
@@ -355,11 +359,11 @@ ax1.set_xlim(13, 0)
 ax1.set_xscale('linear')
 ax1.set_yscale('linear')
 ax1.set_xlabel('Lookback time [Gyr]', fontsize=32)
-ax1.set_ylabel('$M(z, <r)$ / $M(z = 0, <r)$', fontsize=32)
-ax1.tick_params(axis='both', which='both', bottom=True, top=False, labelsize=24)
+ax1.set_ylabel('$M(t_{\\rm lb}, <r)$ / $M(t_{\\rm lb} = 0, <r)$', fontsize=32)
+ax1.tick_params(axis='both', which='both', bottom=True, top=False, labelsize=26)
 ax1.legend(prop={'size': 24}, loc='lower right')
 plt.tight_layout()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_2/mass_profile_evolution/mass_profile_evolution_enclosed.pdf')
+plt.savefig(directory+'/mass_profile_evolution_enclosed.pdf')
 plt.close()
 
 
@@ -367,18 +371,22 @@ plt.close()
     Figure 4:
         Satellite orbits
 """
-d_rec_sim = summary.dperi_recent(data_total, masks_infall, selection='sim', oversample=False, hosts='all_no_r', sim_type='baryon')
-d_min_sim = summary.dperi_min(data_total, masks_infall, selection='sim', oversample=False, hosts='all_no_r', sim_type='baryon')
-d_rec_mod = summary.dperi_recent(data_total, masks_infall, selection='model', oversample=False, hosts='all_no_r', sim_type='baryon')
-d_min_mod = summary.dperi_min(data_total, masks_infall, selection='model', oversample=False, hosts='all_no_r', sim_type='baryon')
+d_rec_sim = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=False, hosts='all_no_r', sim_type='baryon')
+d_min_sim = summary.dperi_min(data_total, masks_infall_peri, selection='sim', oversample=False, hosts='all_no_r', sim_type='baryon')
+d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model', oversample=False, hosts='all_no_r', sim_type='baryon')
+d_min_mod = summary.dperi_min(data_total, masks_infall_peri, selection='model', oversample=False, hosts='all_no_r', sim_type='baryon')
 frac_d = np.abs((d_rec_mod-d_rec_sim)/d_rec_sim)
-names = summary.halo_id(data_total, masks_infall, hosts='all_no_r')
+names = summary.halo_id(data_total, masks_infall_peri, hosts='all_no_r')
+
+#m1 = (frac_d > 0.75)#*(frac_d < 0.75)
+#halo_index = np.random.randint(low=0, high=np.sum(m1))
+#print(names['host'][m1][halo_index], names['ids'][m1][halo_index], frac_d[m1][halo_index])
 
 peri_color, apo_color = '#337422', '#D994F8'
 
-halo_ids = [34-1, 118-1, 26-1, 53-1]
+halo_ids = [59-1, 49-1, 125-1, 48-1] # 16%, 40%, 62%, 102%
 #
-hosts = ['m12i', 'Romulus', 'm12f', 'm12b']
+hosts = ['Louise', 'm12f', 'Remus', 'm12z']
 
 # First column
 plt.rcParams["font.family"] = "serif"
@@ -417,7 +425,7 @@ for i in range(0, len(halo_ids)):
         #axs[0,i].plot([], [], ' ', label='Recent $d_{\\rm peri,sim}$: '+str(np.around(d_rec_sim[np.where((halo_ids[i]+1 == names['ids'])&(hosts[i] == names['host']))[0][0]], decimals=2))+' kpc')
         axs[0,i].plot([], [], ' ', label='$\\Delta d_{\\rm peri}/d_{\\rm peri}$: '+str(np.around(frac_d[np.where((halo_ids[i]+1 == names['ids'])&(hosts[i] == names['host']))[0][0]], decimals=2)))
     axs[0,i].plot(times, data_total[hosts[i]]['host.radius'][:len(times)], 'k', alpha=0.3)
-    axs[0,i].set_xlim(times[-1], times[0])
+    #axs[0,i].set_xlim(times[-1], times[0])
     #
     # Check to see if there were infall, pericenter, or apocenter events
     infall = data_total[hosts[i]]['infall.check'][halo_ids[i]]
@@ -430,12 +438,12 @@ for i in range(0, len(halo_ids)):
     #
     if peri:
         for j in data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]][data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]] != -1]:
-            axs[0,i].axvline(x=j, ymin=0, ymax=1, color=peri_color, linestyle=':')
+            axs[0,i].axvline(x=j, ymin=0, ymax=1, color=peri_color, linestyle=':', alpha=0.3)
     #
     # Set the labels and save the figure
-    axs[0,i].set_ylim(top=np.nanmax(d_sim)+100)
+    #axs[0,i].set_ylim(top=np.nanmax(d_sim)+50)
     axs[0,i].label_outer()
-    axs[0,i].legend(prop={'size': 24}, loc='upper center', framealpha=1)
+    #axs[0,i].legend(prop={'size': 24}, loc='upper right', framealpha=1)
     #
     # Plot the velocity
     axs[1,i].plot(times, v_sim, 'k')
@@ -447,10 +455,10 @@ for i in range(0, len(halo_ids)):
     #
     if peri:
         for j in data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]][data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]] != -1]:
-            axs[1,i].axvline(x=j, ymin=0, ymax=1, color=peri_color, linestyle=':')
+            axs[1,i].axvline(x=j, ymin=0, ymax=1, color=peri_color, linestyle=':', alpha=0.3)
     #
     # Set the labels and save the figure
-    axs[1,i].set_ylim(top=np.nanmax(v_sim)+100)
+    axs[1,i].set_ylim(top=np.nanmax(v_sim)+50)
     axs[1,i].label_outer()
     #
     # Plot the angular momentum
@@ -463,10 +471,10 @@ for i in range(0, len(halo_ids)):
     #
     if peri:
         for j in data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]][data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]] != -1]:
-            axs[2,i].axvline(x=j, ymin=0, ymax=1, color=peri_color, linestyle=':')
+            axs[2,i].axvline(x=j, ymin=0, ymax=1, color=peri_color, linestyle=':', alpha=0.3)
     #
     # Set the labels and save the figure
-    axs[2,i].set_ylim(top=np.nanmax(L_sim)+1)
+    axs[2,i].set_ylim(top=np.nanmax(L_sim)+0.3)
     axs[2,i].label_outer()
     #
 axs[0,0].set_xlim(13.8,0)
@@ -481,6 +489,24 @@ axs[2,2].set_xlim(13.8,0)
 axs[0,3].set_xlim(13.8,0)
 axs[1,3].set_xlim(13.8,0)
 axs[2,3].set_xlim(13.8,0)
+#
+axs[0,0].set_ylim(0,490)
+axs[0,1].set_ylim(0,330)
+axs[0,2].set_ylim(0,330)
+axs[0,3].set_ylim(0,300)
+axs[1,0].set_ylim(0,330)
+axs[1,1].set_ylim(0,430)
+axs[1,2].set_ylim(0,430)
+axs[1,3].set_ylim(0,340)
+axs[2,0].set_ylim(0,3.6)
+axs[2,1].set_ylim(0,2.75)
+axs[2,2].set_ylim(0,3.4)
+axs[2,3].set_ylim(0,1.9)
+#
+axs[0,0].legend(prop={'size': 24}, loc='upper right', framealpha=1)
+axs[0,1].legend(prop={'size': 24}, loc='upper right', framealpha=1)
+axs[0,2].legend(prop={'size': 24}, loc='upper right', framealpha=1)
+axs[0,3].legend(prop={'size': 24}, loc='upper right', framealpha=1)
 #
 axs[2,0].set_xlabel('Lookback time [Gyr]', fontsize=32)
 axs[2,1].set_xlabel('Lookback time [Gyr]', fontsize=32)
@@ -504,16 +530,29 @@ axs[2,3].tick_params(axis='both', which='both', bottom=True, top=True, labelsize
 #
 #plt.tight_layout()
 axs[0,0].set_ylabel('Host distance, r [kpc]', fontsize=26)
-axs[0,0].get_yaxis().set_label_coords(-0.12,0.5)
+axs[0,0].get_yaxis().set_label_coords(-0.13,0.5)
 axs[1,0].set_ylabel('Total Velocity [km s$^{-1}$]', fontsize=26)
-axs[1,0].get_yaxis().set_label_coords(-0.12,0.5)
+axs[1,0].get_yaxis().set_label_coords(-0.13,0.5)
 axs[2,0].set_ylabel('$\\ell$ [10$^4$ kpc km s$^{-1}$]', fontsize=26)
-axs[2,0].get_yaxis().set_label_coords(-0.12,0.5)
+axs[2,0].get_yaxis().set_label_coords(-0.13,0.5)
+#
+r1 = mpatches.Rectangle(xy=(12.9,400),width=-1.35,height=65, color='k', alpha=0.2)
+r2 = mpatches.Rectangle(xy=(12.9,275),width=-1.35,height=40, color='k', alpha=0.2)
+r3 = mpatches.Rectangle(xy=(12.9,275),width=-1.35,height=40, color='k', alpha=0.2)
+r4 = mpatches.Rectangle(xy=(12.9,245),width=-1.35,height=40, color='k', alpha=0.2)
+axs[0,0].text(12.5,418,'A',fontsize=28)
+axs[0,1].text(12.5,285,'B',fontsize=28)
+axs[0,2].text(12.5,285,'C',fontsize=28)
+axs[0,3].text(12.5,257,'D',fontsize=28)
+axs[0,0].add_patch(r1)
+axs[0,1].add_patch(r2)
+axs[0,2].add_patch(r3)
+axs[0,3].add_patch(r4)
 #
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.15, hspace=0)
 #
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_2/orbits/multiplot_orbit_properties.pdf')
+plt.savefig(directory+'/multiplot_orbit_properties.pdf')
 plt.close()
 
 
@@ -524,11 +563,13 @@ plt.close()
 t_in_sim = summary.first_infall(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
 t_in_mod = summary.first_infall(data_total, masks_infall, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 t_in_mod_R200m = summary.infall_diagnostics(data_total, masks_infall, selection='R200m', oversample=True, hosts='all_no_r', sim_type='baryon')
-mask_finite = np.isfinite(t_in_mod)
-mask_finite_R200m = np.isfinite(t_in_mod_R200m)
+Mstar_z0 = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
-summary_plot.plot_hist_mult(x=[(t_in_mod[mask_finite]-t_in_sim[mask_finite]),(t_in_mod_R200m[mask_finite_R200m]-t_in_sim[mask_finite_R200m])], xtype=['t.infall.text','t.infall.text'], labels=['First crossing $R_{\\rm 200m}(z)$','First crossing $R_{\\rm 200m}(z=0)$'], binsize=0.5, pdf=True, xlimits=(-10,10), leg_loc='center left', med_location=[0.38,0.365], file_path_and_name=directory+'/infall_comp_both.pdf')
+mask_finite = np.isfinite(t_in_mod)*(t_in_mod != -1)
+mask_finite_R200m = np.isfinite(t_in_mod_R200m)*(t_in_mod_R200m != -1)
 
+summary_plot.median_plot_mult(x=(t_in_sim[mask_finite_R200m], t_in_sim[mask_finite]), y=(t_in_mod_R200m[mask_finite_R200m]-t_in_sim[mask_finite_R200m], t_in_mod[mask_finite]-t_in_sim[mask_finite]), xtype=['t.infall.text','t.infall.text'], ytype=['delta_t_infall','delta_t_infall'], binsize=1, binedges=(0,14), limits=((0,13.8),None), labels=['$R_{\\rm 200m}(t_{\\rm lb}=0)$','$R_{\\rm 200m}(t_{\\rm lb})$'], hl=True, file_path_and_name=directory+'/dt_infall_vs_t_infall.pdf')
+summary_plot.median_plot_mult(x=(Mstar_z0[mask_finite_R200m], Mstar_z0[mask_finite]), y=(t_in_mod_R200m[mask_finite_R200m]-t_in_sim[mask_finite_R200m], t_in_mod[mask_finite]-t_in_sim[mask_finite]), xtype=['M.star.z0','M.star.z0'], ytype=['delta_t_infall','delta_t_infall'], binsize=0.5, limits=((4,9.5),None), labels=['$R_{\\rm 200m}(t_{\\rm lb}=0)$','$R_{\\rm 200m}(t_{\\rm lb})$'], hl=True, file_path_and_name=directory+'/dt_infall_vs_Mstar.pdf')
 
 
 """
@@ -555,7 +596,7 @@ labels = ['Recent', 'Minimum']
 peri_d_colors = ['#457f44', '#6365ac']
 #
 binsize = 1
-limits = ((0,13),(-1.1,10))
+limits = ((0,13),(-1.1,3.5))
 #
 axs[0,0].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -617,7 +658,7 @@ labels = ['Recent', 'Minimum']
 peri_v_colors = ['#7c263e', '#263e7c']
 #
 binsize = 1
-limits = ((0,13),(-210,99))
+limits = ((0,13),(-170,60))
 #
 axs[2,0].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -646,11 +687,11 @@ ys = [n_mod_mod_infall-n_sim, n_mod_r200-n_sim]
 #
 xtypes = ['t.infall.text', 't.infall.text']
 ytypes = ['N.delta', 'N.delta']
-labels = ['$R_{\\rm 200m}(z)$', '$R_{\\rm 200m}(z=0)$']
+labels = ['$R_{\\rm 200m}(t_{\\rm lb})$', '$R_{\\rm 200m}(t_{\\rm lb}=0)$']
 peri_n_colors = ['#356b84', '#844e35']
 #
 binsize = 1
-limits = ((0,13),(-5,7.9))
+limits = ((0,13),(-3,3))
 #
 axs[3,0].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -738,7 +779,7 @@ xtypes = ['d.z0', 'd.z0']
 ytypes = ['delta.v', 'delta.v']
 #
 binsize = 50
-limits = ((0,400),(-150,100))
+limits = ((0,400),(-150,70))
 #
 axs[2,1].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -856,7 +897,7 @@ xtypes = ['M.star.z0', 'M.star.z0']
 ytypes = ['delta.v', 'delta.v']
 #
 binsize = 0.5
-limits = ((4.5,9.5),(-150,190))
+limits = ((4.5,9.5),(-150,50))
 #
 axs[2,2].hlines(y=0, xmin=10**limits[0][0], xmax=10**limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -914,13 +955,13 @@ axs[1,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize
 axs[2,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26, labelbottom=False)
 axs[3,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26, labelbottom=True)
 #
-axs[0,0].set_ylabel('Pericenter distance [kpc]', fontsize=26)
+axs[0,0].set_ylabel('$(d_{\\rm peri,model}-d_{\\rm peri,sim})/d_{\\rm peri,sim}$', fontsize=26)
 axs[0,0].get_yaxis().set_label_coords(-0.15,0.5)
-axs[1,0].set_ylabel('Pericenter lookback time [Gyr]', fontsize=26)
+axs[1,0].set_ylabel('$t_{\\rm peri,model}-t_{\\rm peri,sim}$ [Gyr]', fontsize=26)
 axs[1,0].get_yaxis().set_label_coords(-0.15,0.5)
-axs[2,0].set_ylabel('Pericenter velocity [km s$^{-1}$]', fontsize=26)
+axs[2,0].set_ylabel('$v_{\\rm peri,model}-v_{\\rm peri,sim}$ [km s$^{-1}$]', fontsize=26)
 axs[2,0].get_yaxis().set_label_coords(-0.15,0.5)
-axs[3,0].set_ylabel('Pericenter Number', fontsize=26)
+axs[3,0].set_ylabel('$N_{\\rm peri,model}-N_{\\rm peri,sim}$', fontsize=26)
 axs[3,0].get_yaxis().set_label_coords(-0.15,0.5)
 #
 axs[3,0].set_xlabel('Infall Lookback Time [Gyr]', fontsize=32)
@@ -940,7 +981,7 @@ plt.savefig(directory+'/pericenter_properties.pdf')
         Apocenter + Period + eccentricity
 """
 plt.rcParams["font.family"] = "serif"
-f, axs = plt.subplots(3, 3, figsize=(24,18))
+f, axs = plt.subplots(3, 3, figsize=(28,18))
 #
 # Apocenter distance vs t_infall
 dapo_rec_sim = summary.dapo_recent(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
@@ -956,8 +997,9 @@ ytypes = ['delta.dapo.frac']
 apo_color = ['#652782']
 #
 binsize = 1
-limits = ((0,13),(-0.5,2))
+limits = ((0,13),(-0.5,0.7))
 #
+axs[0,0].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
     binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=binsize)
     med, upper, lower, highest, lowest = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
@@ -993,6 +1035,7 @@ period_color = ['#ca2a21']
 binsize = 1
 limits = ((0,13),(-1.9,2.9))
 #
+axs[1,0].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
     binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=binsize)
     med, upper, lower, highest, lowest = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
@@ -1019,15 +1062,16 @@ ecc_sim = np.hstack(ecc_sim)
 t_in_sim = np.hstack(t_in_sim)
 #
 xs = [t_in_sim]
-ys = [(ecc_mod-ecc_sim)/ecc_sim]
+ys = [ecc_mod-ecc_sim]
 #
 xtypes = ['t.infall.text']
-ytypes = ['ecc.frac']
+ytypes = ['ecc.delta']
 ecc_color = ['#1d5fee']
 #
 binsize = 1
-limits = ((0,13),(-1,1))
+limits = ((0,13),(-0.15,0.25))
 #
+axs[2,0].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
     binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=binsize)
     med, upper, lower, highest, lowest = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
@@ -1053,8 +1097,9 @@ ytypes = ['delta.dapo.frac']
 colors = apo_color
 #
 binsize = 50
-limits = ((0,400),(-0.5,2.5))
+limits = ((0,400),(-0.2,0.2))
 #
+axs[0,1].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
     binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=binsize)
     med, upper, lower, highest, lowest = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
@@ -1088,8 +1133,9 @@ ytypes = ['period.delta']
 colors = period_color
 #
 binsize = 50
-limits = ((0,400),(-1.9,2.9))
+limits = ((0,400),(-1.5,2.4))
 #
+axs[1,1].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
     binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=binsize)
     med, upper, lower, highest, lowest = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
@@ -1116,15 +1162,16 @@ ecc_sim = np.hstack(ecc_sim)
 dz0_tot = np.hstack(dz0_tot)
 #
 xs = [dz0_tot]
-ys = [(ecc_mod-ecc_sim)/ecc_sim]
+ys = [ecc_mod-ecc_sim]
 #
 xtypes = ['d.z0']
-ytypes = ['ecc.frac']
+ytypes = ['ecc.delta']
 colors = ecc_color
 #
 binsize = 50
-limits = ((0,400),(-1,1))
+limits = ((0,400),(-0.25,0.5))
 #
+axs[2,1].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
     binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=binsize)
     med, upper, lower, highest, lowest = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
@@ -1150,8 +1197,9 @@ ytypes = ['delta.dapo.frac']
 colors = apo_color
 #
 binsize = 0.5
-limits = ((4,9.5),(-0.5,1))
+limits = ((4,9.5),(-0.25,0.1))
 #
+axs[0,2].hlines(y=0, xmin=10**limits[0][0], xmax=10**limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
     binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=binsize)
     med, upper, lower, highest, lowest = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
@@ -1186,8 +1234,9 @@ ytypes = ['period.delta']
 colors = period_color
 #
 binsize = 0.5
-limits = ((4,9.5),(-1.9,2.9))
+limits = ((4,9.5),(-1.9,1.4))
 #
+axs[1,2].hlines(y=0, xmin=10**limits[0][0], xmax=10**limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
     binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=binsize)
     med, upper, lower, highest, lowest = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
@@ -1215,15 +1264,16 @@ ecc_sim = np.hstack(ecc_sim)
 Mstar_z0 = np.hstack(Mstar_z0)
 #
 xs = [Mstar_z0]
-ys = [(ecc_mod-ecc_sim)/ecc_sim]
+ys = [ecc_mod-ecc_sim]
 #
 xtypes = ['M.star.z0']
-ytypes = ['ecc.frac']
+ytypes = ['ecc.delta']
 colors = ecc_color
 #
 binsize = 0.5
-limits = ((4,9.5),(-1,1))
+limits = ((4,9.5),(-0.15,0.25))
 #
+axs[2,2].hlines(y=0, xmin=10**limits[0][0], xmax=10**limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
     binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=binsize)
     med, upper, lower, highest, lowest = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
@@ -1247,11 +1297,11 @@ axs[0,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize
 axs[1,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26, labelbottom=False)
 axs[2,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26, labelbottom=True)
 #
-axs[0,0].set_ylabel('Apocenter distance [kpc]', fontsize=30)
+axs[0,0].set_ylabel('$(d_{\\rm apo,model}-d_{\\rm apo,sim})/d_{\\rm apo,sim}$', fontsize=30)
 axs[0,0].get_yaxis().set_label_coords(-0.15,0.5)
-axs[1,0].set_ylabel('Orbital Period [Gyr]', fontsize=30)
+axs[1,0].set_ylabel('$T_{\\rm model}-T_{\\rm sim}$ [Gyr]', fontsize=30)
 axs[1,0].get_yaxis().set_label_coords(-0.15,0.5)
-axs[2,0].set_ylabel('Eccentricity', fontsize=30)
+axs[2,0].set_ylabel('$e_{\\rm model}-e_{\\rm sim}$', fontsize=34)
 axs[2,0].get_yaxis().set_label_coords(-0.15,0.5)
 #
 axs[2,0].set_xlabel('Infall Lookback Time [Gyr]', fontsize=34)
@@ -1261,9 +1311,7 @@ axs[2,2].set_xlabel('$M_{\\rm star} [M_{\\odot}]$', fontsize=34)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.18, hspace=0)
 #plt.show()
-plt.savefig(directory+'/apo_et_al_properties.pdf')
-
-
+plt.savefig(directory+'/other_orbit_properties.pdf')
 
 
 
@@ -1315,16 +1363,25 @@ for i in range(0, np.max(x)):
     highests[i] = np.nanpercentile(y[mask], thrsigp)
     lowests[i] = np.nanpercentile(y[mask], thrsigm)
 #
-f, ax = plt.subplots(2, 1, figsize=(8,12))
-ax[0].scatter(np.arange(np.max(x))+1, meds, s=50., marker='s', c=peri_d_colors[0])
+f, ax = plt.subplots(2, 1, figsize=(12,14))
+gs = gridspec.GridSpec(3, 1, height_ratios=[1,4,4])
+ax0 = plt.subplot(gs[0])
+ax1 = plt.subplot(gs[1])
+ax2 = plt.subplot(gs[2])
+#
+xbins = summary_plot.binning_scheme(x, 'N.peri', binsize=1)[0]
+ax0.hist(x, bins=xbins, density=False, color='k', alpha=0.35)
+#
+ax1.scatter(np.arange(np.max(x))+1, meds, s=75., marker='s', c=peri_d_colors[0])
+ax1.scatter(np.arange(np.max(x))+1, upper-lower, s=150., marker='*', c='k')
 for j in range(0, np.max(x)):
-    ax[0].errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowests[j]],[highests[j]-meds[j]]]), alpha=0.1, color=peri_d_colors[0])
-    ax[0].errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowest[j]],[highest[j]-meds[j]]]), alpha=0.3, color=peri_d_colors[0])
-    ax[0].errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lower[j]],[upper[j]-meds[j]]]), alpha=0.7, color=peri_d_colors[0])
-ax[0].hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
+    ax1.errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowests[j]],[highests[j]-meds[j]]]), alpha=0.3, color=peri_d_colors[0])
+    #ax[0].errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowest[j]],[highest[j]-meds[j]]]), alpha=0.3, color=peri_d_colors[0])
+    ax1.errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lower[j]],[upper[j]-meds[j]]]), alpha=0.7, color=peri_d_colors[0])
+ax1.hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
 #ax[0].hlines(0.69, -0.5, np.max(x)+1, linestyle='solid', color='k', linewidths=2, alpha=0.1)
 #ax[0].hlines(1.42, -0.5, np.max(x)+1, linestyle='solid', color='k', linewidths=2, alpha=0.1)
-ax[0].fill_between(x=(-0.5,10), y1=0.69, y2=1.42, color='k', alpha=0.1)
+#ax[0].fill_between(x=(-0.5,10), y1=0.69, y2=1.42, color='k', alpha=0.1)
 #
 x = []
 y = []
@@ -1367,30 +1424,332 @@ for i in range(0, np.max(x)):
     highests[i] = np.nanpercentile(y[mask], thrsigp)
     lowests[i] = np.nanpercentile(y[mask], thrsigm)
 #
-ax[1].scatter(np.arange(np.max(x))+1, meds, s=50., marker='s', c=peri_t_colors[1])
+ax2.scatter(np.arange(np.max(x))+1, meds, s=75., marker='s', c=peri_t_colors[1])
+ax2.scatter(np.arange(np.max(x))+1, upper-lower, s=150., marker='*', c='k')
 for j in range(0, np.max(x)):
-    ax[1].errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowests[j]],[highests[j]-meds[j]]]), alpha=0.1, color=peri_t_colors[1])
-    ax[1].errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowest[j]],[highest[j]-meds[j]]]), alpha=0.3, color=peri_t_colors[1])
-    ax[1].errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lower[j]],[upper[j]-meds[j]]]), alpha=0.7, color=peri_t_colors[1])
-ax[1].hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
-ax[1].fill_between(x=(-0.5,10), y1=0.87, y2=8.65, color='k', alpha=0.1)
+    ax2.errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowests[j]],[highests[j]-meds[j]]]), alpha=0.3, color=peri_t_colors[1])
+    #ax[1].errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowest[j]],[highest[j]-meds[j]]]), alpha=0.3, color=peri_t_colors[1])
+    ax2.errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lower[j]],[upper[j]-meds[j]]]), alpha=0.7, color=peri_t_colors[1])
+ax2.hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
+#ax[1].fill_between(x=(-0.5,10), y1=0.87, y2=8.65, color='k', alpha=0.1)
 #
-ax[0].set_xticks([0,1,2,3,4,5,6,7,8,9,10])
-ax[1].set_xticks([0,1,2,3,4,5,6,7,8,9,10])
-ax[0].set_xlim(-0.5, np.max(x)+0.5)
-ax[1].set_xlim(-0.5, np.max(x)+0.5)
-ax[0].set_ylim(-1.1, 3)
-ax[1].set_ylim(-3, 5.9)
-ax[1].set_xlabel('Orbit Number', fontsize=24)
-ax[0].set_ylabel('($d_{\\rm peri,model}-d_{\\rm peri,sim}$)/$d_{\\rm peri,sim}$', fontsize=24)
-ax[1].set_ylabel('$t_{\\rm peri,model}-t_{\\rm peri,sim}$ [Gyr]', fontsize=24)
-ax[0].get_yaxis().set_label_coords(-0.075,0.5)
-ax[1].get_yaxis().set_label_coords(-0.075,0.5)
-ax[0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
-ax[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
-ax[0].tick_params(axis='both', which='minor', bottom=False, top=False, labelsize=22)
-ax[1].tick_params(axis='both', which='minor', bottom=False, top=False, labelsize=22)
+ax0.set_xticks([0,1,2,3,4,5,6,7,8,9,10])
+ax1.set_xticks([0,1,2,3,4,5,6,7,8,9,10])
+ax2.set_xticks([0,1,2,3,4,5,6,7,8,9,10])
+ax0.set_xticks(np.arange(0.5, 10.5, 1), minor=True)
+ax1.set_xticks(np.arange(0.5, 10.5, 1), minor=True)
+ax2.set_xticks(np.arange(0.5, 10.5, 1), minor=True)
+ax0.set_xlim(0, np.max(x)+0.5)
+ax1.set_xlim(0, np.max(x)+0.5)
+ax2.set_xlim(0, np.max(x)+0.5)
+ax1.set_ylim(-1.1, 2.9)
+ax2.set_ylim(-3, 3.8)
+ax0.set_yscale('log')
+ax2.set_xlabel('Lookback $N_{\\rm peri}$', fontsize=28)
+ax0.set_ylabel('N', fontsize=22)
+ax1.set_ylabel('($d_{\\rm peri,model}-d_{\\rm peri,sim}$)/$d_{\\rm peri,sim}$', fontsize=22)
+ax2.set_ylabel('$t_{\\rm peri,model}-t_{\\rm peri,sim}$ [Gyr]', fontsize=22)
+ax1.get_yaxis().set_label_coords(-0.1,0.5)
+ax2.get_yaxis().set_label_coords(-0.1,0.5)
+ax0.tick_params(axis='both', which='both', bottom=True, top=True, labelbottom=False, labelsize=24)
+ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelbottom=False, labelsize=24)
+ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
+#
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 plt.savefig(directory+'/peri_info_vs_phase_zoom.pdf')
+plt.close()
+
+
+"""
+    Other phase plots
+"""
+peri_d_colors = ['#337422']
+peri_t_colors = ['#476258', '#624751']
+#
+x = []
+y = []
+# Loop through hosts
+for name in summary.host_names['all_no_r']:
+    # Loop through the subhalos
+    for i in range(0, len(data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]])):
+        # Loop through the number of orbits that are in the sim AND model
+        for j in range(0, np.min((len(data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]][i]), len(data_total[name]['orbit.period.peri.model'][masks_infall_peri[name]][i])))):
+            # Check to see if they both have values
+            if (data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]][i][j] != -1) & (data_total[name]['orbit.period.peri.model'][masks_infall_peri[name]][i][j] != -1):
+                # Save the orbit phase
+                x.append(j+1)
+                # Save the difference in the model and sim
+                y.append(data_total[name]['orbit.period.peri.model'][masks_infall_peri[name]][i][j]-data_total[name]['orbit.period.peri.sim'][masks_infall_peri[name]][i][j])
+x = np.asarray(x)
+y = np.asarray(y)
+#
+onesigp = 84.13
+onesigm = 15.87
+twosigp = 100
+twosigm = 0
+#
+meds = np.zeros(np.max(x))
+upper = np.zeros(np.max(x))
+lower = np.zeros(np.max(x))
+highest = np.zeros(np.max(x))
+lowest = np.zeros(np.max(x))
+for i in range(0, np.max(x)):
+    mask = (x == i+1)
+    meds[i] = np.nanmedian(y[mask])
+    upper[i] = np.nanpercentile(y[mask], onesigp)
+    lower[i] = np.nanpercentile(y[mask], onesigm)
+    highest[i] = np.nanpercentile(y[mask], twosigp)
+    lowest[i] = np.nanpercentile(y[mask], twosigm)
+#
+f, ax = plt.subplots(2, 1, figsize=(12,14))
+gs = gridspec.GridSpec(3, 1, height_ratios=[1,4,4])
+ax0 = plt.subplot(gs[0])
+ax1 = plt.subplot(gs[1])
+ax2 = plt.subplot(gs[2])
+#
+ax1.scatter(np.arange(np.max(x))+1, meds, s=75., marker='s', c=peri_t_colors[0])
+ax1.scatter(np.arange(np.max(x))+1, upper-lower, s=150., marker='*', c='k')
+for j in range(0, np.max(x)):
+    ax1.errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowest[j]],[highest[j]-meds[j]]]), alpha=0.3, color=peri_t_colors[1])
+    ax1.errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lower[j]],[upper[j]-meds[j]]]), alpha=0.7, color=peri_t_colors[1])
+#
+x = []
+y = []
+# Loop over hosts
+for name in summary.host_names['all_no_r']:
+    # Loop over satellites
+    for i in range(0, len(data_total[name]['eccentricity.sim'][masks_infall[name]])):
+        # Loop over the phase
+        for j in range(0, np.min((len(data_total[name]['eccentricity.sim'][masks_infall[name]][i]), len(data_total[name]['eccentricity.model.apsis'][masks_infall[name]][i])))):
+            # Make sure there is an event in both the sim and model
+            if (data_total[name]['eccentricity.sim'][masks_infall[name]][i][j] != -1) & (data_total[name]['eccentricity.model.apsis'][masks_infall[name]][i][j] != -1):
+                # Save the difference
+                y.append(data_total[name]['eccentricity.model.apsis'][masks_infall[name]][i][j]-data_total[name]['eccentricity.sim'][masks_infall[name]][i][j])
+                # Save the phase
+                x.append(j+1)
+x = np.asarray(x)
+y = np.asarray(y)
+#
+# THINK MORE ABOUT WHAT TO REALLY PLOT AGAINST
+onesigp = 84.13
+onesigm = 15.87
+twosigp = 100
+twosigm = 0
+meds = np.zeros(np.max(x))
+upper = np.zeros(np.max(x))
+lower = np.zeros(np.max(x))
+highest = np.zeros(np.max(x))
+lowest = np.zeros(np.max(x))
+for i in range(0, np.max(x)):
+    mask = (x == i+1)
+    meds[i] = np.nanmedian(y[mask])
+    upper[i] = np.nanpercentile(y[mask], onesigp)
+    lower[i] = np.nanpercentile(y[mask], onesigm)
+    highest[i] = np.nanpercentile(y[mask], twosigp)
+    lowest[i] = np.nanpercentile(y[mask], twosigm)
+#
+x_points = np.arange(1, x.max()/2+1, 0.5)
+#
+#xbins = summary_plot.binning_scheme(x/2, 'dperi', binsize=0.25)[0]
+ax0.hist(x/2, bins=np.arange(0.25, 9.8, 0.5), density=False, color='k', alpha=0.35)
+#
+ax2.scatter(x_points-0.5, meds, s=75., marker='s', c=peri_d_colors[0])
+ax2.scatter(x_points-0.5, upper-lower, s=150., marker='*', c='k')
+for j in range(0, len(x_points)):
+    ax2.errorbar(x_points[j]-0.5, meds[j], yerr=np.array([[meds[j]-lowest[j]],[highest[j]-meds[j]]]), alpha=0.3, color=peri_d_colors[0])
+    ax2.errorbar(x_points[j]-0.5, meds[j], yerr=np.array([[meds[j]-lower[j]],[upper[j]-meds[j]]]), alpha=0.7, color=peri_d_colors[0])
+#
+ax1.hlines(0, -0.5, np.max(np.arange(1, x.max()/2+1, 0.5))+1, linestyle='dotted', color='k', alpha=0.5)
+ax2.hlines(0, -0.5, np.max(np.arange(1, x.max()/2+1, 0.5))+1, linestyle='dotted', color='k', alpha=0.5)
+#
+ax0.set_xticks([0,1,2,3,4,5,6,7,8,9,10])
+ax0.set_xticks(np.arange(0.5, 10.5, 1), minor=True)
+ax1.set_xticks([0,1,2,3,4,5,6,7,8,9,10])
+ax1.set_xticks(np.arange(0.5, 10.5, 1), minor=True)
+ax2.set_xticks([0,1,2,3,4,5,6,7,8,9,10])
+ax2.set_xticks(np.arange(0.5, 10.5, 1), minor=True)
+ax0.set_xlim(0,10)
+ax1.set_xlim(0,10)
+ax2.set_xlim(0,10)
+ax0.set_yscale('log')
+ax2.set_xlabel('Lookback $N_{\\rm peri}$', fontsize=28)
+ax0.set_ylabel('N', fontsize=22)
+ax1.set_ylabel('$T_{\\rm model} - T_{\\rm sim}$', fontsize=28)
+ax2.set_ylabel('$e_{\\rm model} - e_{\\rm sim}$', fontsize=28)
+ax1.get_yaxis().set_label_coords(-0.12,0.5)
+ax2.get_yaxis().set_label_coords(-0.12,0.5)
+#
+ax0.tick_params(axis='both', which='both', bottom=True, top=True, labelbottom=False, labelsize=24)
+ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelbottom=False, labelsize=24)
+ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
+plt.tight_layout()
+plt.subplots_adjust(wspace=0, hspace=0)
+#
+plt.savefig(directory+'/period_vs_phase_both.pdf')
+plt.close()
+
+
+
+
+"""
+    Plotting a 2x2 figure with the host mass and radius vs time
+"""
+
+masses = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
+radii = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
+i = 0
+for name in summary.host_names['all_no_r']:
+    mask = (data_total[name]['host.mass'] != -1)*np.isfinite(data_total[name]['host.mass'])
+    masses[i][:np.sum(mask)] = data_total[name]['host.mass'][mask]
+    radii[i][:np.sum(mask)] = data_total[name]['host.radius'][mask]
+    i += 1
+#
+lookback = data_total['m12b']['time.sim'][-1]-np.flip(data_total['m12b']['time.sim'])
+#
+masses_norm = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
+radii_norm = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
+for i in range(0, masses.shape[0]):
+    mask = (masses[i] != -1)
+    masses_norm[i][mask] = masses[i][mask]/masses[i][0]
+    radii_norm[i][mask] = radii[i][mask]/radii[i][0]
+
+binedges = None
+binsize = 0.1
+limits=((13.5, 0),None)
+#
+x = [lookback, lookback, lookback, lookback]
+y = [masses, masses_norm, radii, radii_norm]
+#
+medians = []
+lowers = []
+uppers = []
+lowests = []
+highests = []
+binss = []
+half_bins = []
+#
+for j in range(0, len(x)):
+    #
+    if binedges:
+        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+        bins = np.linspace(binedges[0], binedges[1], bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    else:
+        minn = binsize*np.floor(np.min(x[j])/binsize)
+        maxx = binsize*np.ceil(np.max(x[j])/binsize)
+        if minn < 0:
+            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+        else:
+            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+        bins = np.linspace(minn, maxx, bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    #
+    onesigp = 84.13
+    onesigm = 15.87
+    twosigp = 100
+    twosigm = 0
+    #
+    med = np.zeros(len(bins)-1)
+    lower = np.zeros(len(bins)-1)
+    upper = np.zeros(len(bins)-1)
+    lowest = np.zeros(len(bins)-1)
+    highest = np.zeros(len(bins)-1)
+    #
+    for i in range(0, len(bins)-1):
+        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+        temp_med = []
+        for k in range(0, y[j].shape[0]):
+            mask2 = (y[j][k] != -1)
+            temp_med.append(y[j][k][mask*mask2])
+        med[i] = np.nanmedian(np.hstack(temp_med))
+        upper[i] = np.nanpercentile(np.hstack(temp_med), onesigp)
+        lower[i] = np.nanpercentile(np.hstack(temp_med), onesigm)
+        highest[i] = np.nanpercentile(np.hstack(temp_med), twosigp)
+        lowest[i] = np.nanpercentile(np.hstack(temp_med), twosigm)
+        if j == 1:
+            print(np.hstack(temp_med))
+    medians.append(med)
+    lowers.append(lower)
+    uppers.append(upper)
+    lowests.append(lowest)
+    highests.append(highest)
+    binss.append(bins)
+    half_bins.append(half_bin)
+#
+# PLOTTING
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(2, 2, figsize=(18,10))
+# Plot the scatter for the recent and minimum pericenters
+axs[0,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0]/1e12, lowers[0]/1e12, color='g', alpha=0.3)
+axs[0,0].fill_between(binss[0][:-1]+half_bins[0], highests[0]/1e12, lowests[0]/1e12, color='g', alpha=0.15)
+axs[0,0].plot(binss[0][:-1]+half_bins[0], medians[0]/1e12, 'k', alpha=0.5, lw=4)
+#
+axs[1,0].fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color='g', alpha=0.3)
+axs[1,0].fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color='g', alpha=0.15)
+axs[1,0].plot(binss[1][:-1]+half_bins[1], medians[1], 'k', alpha=0.5, lw=4)
+#
+axs[0,1].fill_between(binss[2][:-1]+half_bins[2], uppers[2], lowers[2], color='g', alpha=0.3)
+axs[0,1].fill_between(binss[2][:-1]+half_bins[2], highests[2], lowests[2], color='g', alpha=0.15)
+axs[0,1].plot(binss[2][:-1]+half_bins[2], medians[2], 'k', alpha=0.5, lw=4)
+#
+axs[1,1].fill_between(binss[3][:-1]+half_bins[3], uppers[3], lowers[3], color='g', alpha=0.3)
+axs[1,1].fill_between(binss[3][:-1]+half_bins[3], highests[3], lowests[3], color='g', alpha=0.15)
+axs[1,1].plot(binss[3][:-1]+half_bins[3], medians[3], 'k', alpha=0.5, lw=4)
+#
+cc = ut.cosmology.CosmologyClass()
+red = np.array([0, 1])
+cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+#
+axis_z_label = 'redshift'
+axis_z_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+axis_z_tick_values = [float(v) for v in axis_z_tick_labels]
+axis_z_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_z_tick_values)
+axz = axs[0,0].twiny()
+axz.set_xscale('linear')
+axz.set_yscale('linear')
+axz.set_xticks(axis_z_tick_locations)
+axz.set_xticklabels(axis_z_tick_labels, fontsize=22)
+axz.set_xlim(13.5,0)
+axz.set_xlabel(axis_z_label, fontsize=26, labelpad=9)
+axz.tick_params(pad=3)
+#
+axis_z2_label = 'redshift'
+axis_z2_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+axis_z2_tick_values = [float(v) for v in axis_z2_tick_labels]
+axis_z2_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_z2_tick_values)
+axz2 = axs[0,1].twiny()
+axz2.set_xscale('linear')
+axz2.set_yscale('linear')
+axz2.set_xticks(axis_z2_tick_locations)
+axz2.set_xticklabels(axis_z2_tick_labels, fontsize=22)
+axz2.set_xlim(13.5,0)
+axz2.set_xlabel(axis_z_label, fontsize=26, labelpad=9)
+axz2.tick_params(pad=3)
+#
+axs[0,0].set_xlim(13.5,0)
+axs[1,0].set_xlim(13.5,0)
+axs[1,1].set_xlim(13.5,0)
+axs[0,1].set_xlim(13.5,0)
+#
+axs[0,0].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=22, labelbottom=False)
+axs[1,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True)
+axs[0,1].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=22, labelbottom=False)
+axs[1,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True)
+#
+axs[0,0].set_ylabel('$M_{\\rm 200m}(t_{\\rm lb})\ [10^{12}\ M_{\\odot}]$', fontsize=24)
+axs[0,0].get_yaxis().set_label_coords(-0.13,0.5)
+axs[1,0].set_ylabel('$M_{\\rm 200m}(t_{\\rm lb})\ /\ M_{\\rm 200m}(t_{\\rm lb}=0)$', fontsize=24)
+axs[1,0].get_yaxis().set_label_coords(-0.13,0.5)
+axs[0,1].set_ylabel('$R_{\\rm 200m}(t_{\\rm lb})\ [\\rm kpc]$', fontsize=24)
+axs[0,1].get_yaxis().set_label_coords(-0.13,0.5)
+axs[1,1].set_ylabel('$R_{\\rm 200m}(t_{\\rm lb})\ /\ R_{\\rm 200m}(t_{\\rm lb}=0)$', fontsize=24)
+axs[1,1].get_yaxis().set_label_coords(-0.13,0.5)
+#
+axs[1,0].set_xlabel('Lookback Time [Gyr]', fontsize=26)
+axs[1,1].set_xlabel('Lookback Time [Gyr]', fontsize=26)
+#
+plt.tight_layout()
+plt.subplots_adjust(wspace=0.2, hspace=0)
+plt.savefig(directory+'/host_mass_and_radius_scatter.pdf')
 plt.close()
