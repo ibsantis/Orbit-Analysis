@@ -320,7 +320,7 @@ class SummaryDataSort:
         #
         return mask_dict
 
-    def data_mask_nperi(self, dictionary, nperi, hosts='all'):
+    def data_mask_nperi(self, dictionary, nperi, select='both', hosts='all'):
         """
         OLD METHOD:
         ===========
@@ -334,24 +334,22 @@ class SummaryDataSort:
         #
         # Depending on the pericenter number you are interested in, create a
         # dictionary of masks, similar to data_mask and data_mask_apo
-        if nperi == 0:
-            for name in self.host_names[hosts]:
-                mask_dict[name] = dictionary[name]['infall.check']*(~dictionary[name]['pericenter.check.sim'])
         #
-        if nperi == 1:
-            for name in self.host_names[hosts]:
-                mask_dict[name] = np.zeros(len(dictionary[name]['infall.check']), bool)
-                for i in range(0, len(mask_dict[name])):
-                    peri_mask = (dictionary[name]['pericenter.dist.sim'][i] != -1)
-                    if (dictionary[name]['infall.check'][i]) and (np.sum(peri_mask) == 1):
+        for name in self.host_names[hosts]:
+            mask_dict[name] = np.zeros(len(dictionary[name]['infall.check']), bool)
+            for i in range(0, len(mask_dict[name])):
+                if select == 'both':
+                    peri_mask_sim = (dictionary[name]['pericenter.dist.sim'][i] != -1)
+                    peri_mask_mod = (dictionary[name]['pericenter.dist.model'][i] != -1)
+                    if (dictionary[name]['infall.check'][i]) and (np.sum(peri_mask_sim) >= nperi)  and (np.sum(peri_mask_mod) >= nperi):
                         mask_dict[name][i] = True
-        #
-        if nperi > 1:
-            for name in self.host_names[hosts]:
-                mask_dict[name] = np.zeros(len(dictionary[name]['infall.check']), bool)
-                for i in range(0, len(mask_dict[name])):
+                elif select == 'sim':
                     peri_mask = (dictionary[name]['pericenter.dist.sim'][i] != -1)
-                    if (dictionary[name]['infall.check'][i]) and (np.sum(peri_mask) > 1):
+                    if (dictionary[name]['infall.check'][i]) and (np.sum(peri_mask) >= nperi):
+                        mask_dict[name][i] = True
+                elif select == 'model':
+                    peri_mask = (dictionary[name]['pericenter.dist.model'][i] != -1)
+                    if (dictionary[name]['infall.check'][i]) and (np.sum(peri_mask) >= nperi):
                         mask_dict[name][i] = True
         #
         return mask_dict
@@ -586,6 +584,63 @@ class SummaryDataSort:
             mask_temp = (temp_array == -1)
             # For the null values, replace with present-day distances
             temp_array[mask_temp] = data_dict[name]['d.tot.sim'][mask_dict[name]][:,0][mask_temp]
+            # Determine oversampling and save to list
+            if oversample:
+                data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
+            else:
+                data.append(temp_array)
+        #
+        return np.hstack(data)
+
+    # New method!
+    def dperi_select(self, data_dict, lb_number=1, mask_selection='both', selection='sim', oversample=False, hosts='all', sim_type='baryon'):
+        """
+        DESCRIPTION:
+            Groups the recent pericenter distances a subhalo experiences, either
+            in the simulation or model, together into one array.
+
+        VARIABLES:
+            data_dict  : dictionary
+                         Dictionary of data created by data_read()
+
+            lb_number  : integer
+                         Lookback pericenter number
+
+            selection  : string
+                         Choose whether you want values from simulation data or
+                         data from the model.
+
+            oversample : boolean
+                         Choose whether you want to oversample the subhalos or not.
+
+            hosts      : string
+                         Choose which host galaxies you want to analyze; choices
+                         listed in __init__().
+
+            sim_type   : string
+                         Choose which type of data you are analyzing. This is
+                         only used for oversampling factors and does not matter
+                         if you are not oversampling.
+
+        NOTES:
+            - Returns a 1D array.
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              summary_data.py or summary_data_dmo.py.
+            - If a subhalo has not experienced a pericenter, sets the most recent
+              pericenter distance equal to the present-day distance.
+        """
+        # Create the data mask from data_mask_nperi() above
+        mask_dict = self.data_mask_nperi(dictionary=data_dict, select=mask_selection, nperi=lb_number, hosts=hosts)
+        #
+        # Set up an empty list to save values to
+        data = []
+        #
+        # Loops through each host
+        for name in self.host_names[hosts]:
+            # Get all of the most recent pericenters
+            temp_array = data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][:, lb_number-1]
+            #
             # Determine oversampling and save to list
             if oversample:
                 data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
