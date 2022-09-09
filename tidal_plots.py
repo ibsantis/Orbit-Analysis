@@ -38,21 +38,24 @@ print('Set paths')
 # Read in the data
 masses = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.galaxy+'_mass_profile_all')
 rs = np.logspace(np.log10(5), np.log10(500), 25)
+rs_new = np.logspace(np.log10(rs[1]), np.log10(rs[-1]), 1000)
 print('Read the data in')
 
 # Set up empty arrays to save to
 tidal_field = np.zeros(masses['mass.profile'].shape)
-da_dr = np.zeros(masses['mass.profile'].shape)
 
 # Loop through each snapshot
 for i in range(0, masses['mass.profile'].shape[0]):
     # Loop through each value of enclosed mass (i.e. loop through distance)
     for j in range(0, masses['mass.profile'].shape[1]):
         # Calculate the tidal acceleration
-        tidal_field[i,j] = (np.cumsum(masses['mass.profile'][i])[j]/rs[j+1]**2)*(6.67*10**(-11))*(2*10**(30))/((1000**2)*(3.086*10**(16))**2)
-        # Calculate the derivative of the tidal acceleration
-        da_dr[i,j] = (np.cumsum(masses['mass.profile'][i])[j]/rs[j+1]**3)*(2*6.67*10**(-11))*(2*10**(30))/((1000**3)*(3.086*10**(16))**3)
+        tidal_field[i,j] = (masses['mass.profile'][i][j]/rs[j+1]**2)*(6.67*10**(-11))*(2*10**(30))/((1000**2)*(3.086*10**(16))**2)
 
+# Probably want to just do the diff version and not the gradient
+da_dr = np.zeros((masses['mass.profile'].shape[0], len(rs_new)-1))
+for i in range(0, masses['mass.profile'].shape[0]):
+    f = interp1d(rs[1:], tidal_field[i], kind='cubic')
+    da_dr[i] = np.diff(f(rs_new))/np.diff(rs_new)
 
 # Create an array of times that I'm interested in
 ts = np.linspace(0.8, 13.8, 66) # every 0.2 Gyr
@@ -68,10 +71,6 @@ for i in range(0, len(ts)):
     times[i] = masses['time'][np.where(np.min(temp) == temp)[0][0]]
     inds[i] = masses['snapshot'][np.where(np.min(temp) == temp)[0][0]]
 times = np.around(times[-1]-times, decimals=2)
-#
-# Flip the arrays so that it starts at early times and ends at z = 0
-times = np.flip(times)
-inds = np.flip(inds)
 
 # Create the color array for all of the curves
 def color_cycle(cycle_length=len(inds), cmap_name='plasma', low=0, high=1):
@@ -81,11 +80,15 @@ def color_cycle(cycle_length=len(inds), cmap_name='plasma', low=0, high=1):
 colorss = color_cycle(len(inds), cmap_name='plasma', low=0, high=1)
 
 # Plot both a and |da/dr| on the same plot
+# Flip the arrays so that it starts at early times and ends at z = 0
+times = np.flip(times)
+inds = np.flip(inds)
+#
 plt.rcParams["font.family"] = "serif"
 f, ax = plt.subplots(2, 1, figsize=(10,8))
 for i in range(0, len(inds)):
     ax[0].plot(rs[1:], tidal_field[inds[i]-2], color=colorss[i])
-    ax[1].plot(rs[1:], da_dr[inds[i]-2], color=colorss[i])
+    ax[1].plot(rs_new[1:], np.abs(da_dr[inds[i]-2]), color=colorss[i])
 ax[0].set_xlim(5, 500)
 ax[1].set_xlim(5, 500)
 ax[0].set_xscale('log')
@@ -104,5 +107,6 @@ sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
 cbar = f.colorbar(sm, ax=ax[:])
 cbar.set_label('Lookback time [Gyr]', fontsize=28)
 #plt.tight_layout() # Can't use tight_layout, it messes up the colorbar
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_2/tidal_field/'+sim_data.galaxy+'_tidal_0.2Gyr.pdf', bbox_inches='tight')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_2_fix/tidal_field/'+sim_data.galaxy+'_tidal_0.2Gyr.pdf', bbox_inches='tight')
 #plt.show()
+plt.close()
