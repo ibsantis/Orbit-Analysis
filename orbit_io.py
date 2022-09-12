@@ -79,25 +79,40 @@ class OrbitRead:
         if gal1 == 'Romeo':
             gal2 = 'Juliet'
             self.galaxy = 'm12_elvis_'+gal1+gal2
-            resolution = '_res3500'
+            if location == 'peloton':
+                resolution = '_r3500'
+            else:
+                resolution = '_res3500'
             self.num_gal = 2
         elif gal1 == 'Thelma':
             gal2 = 'Louise'
             self.galaxy = 'm12_elvis_'+gal1+gal2
-            resolution = '_res4000'
+            if location == 'peloton':
+                resolution = '_r4000'
+            else:
+                resolution = '_res4000'
             self.num_gal = 2
         elif gal1 == 'Romulus':
             gal2 = 'Remus'
             self.galaxy = 'm12_elvis_'+gal1+gal2
-            resolution = '_res4000'
+            if location == 'peloton':
+                resolution = '_r4000'
+            else:
+                resolution = '_res4000'
             self.num_gal = 2
         elif gal1 == 'm12z':
             self.galaxy = gal1
-            resolution = '_res4200'
+            if location == 'peloton':
+                resolution = '_r4200'
+            else:
+                resolution = '_res4200'
             self.num_gal = 1
         else:
             self.galaxy = gal1
-            resolution = '_res7100'
+            if location == 'peloton':
+                resolution = '_r7100'
+            else:
+                resolution = '_res7100'
             self.num_gal = 1
 
         # Set up the important paths
