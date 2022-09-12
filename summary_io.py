@@ -354,6 +354,34 @@ class SummaryDataSort:
         #
         return mask_dict
 
+    # NEW!
+    def data_mask_ninfall(self, dictionary, n_infall, select='both', hosts='all'):
+        """
+        TBD
+        """
+        # Set up a dictionary to save the masks to
+        mask_dict = dict()
+        #
+        for name in self.host_names[hosts]:
+            mask_dict[name] = np.zeros(len(dictionary[name]['infall.check']), bool)
+            for i in range(0, len(mask_dict[name])):
+                if (dictionary[name]['infall.check'][i]):
+                    if select == 'both':
+                        infall_mask_sim = (dictionary[name]['all.infall.time.lb'][i] != -1)
+                        infall_mask_mod = (dictionary[name]['all.infall.time.lb.model'][i] != -1)
+                        if (np.sum(infall_mask_sim) >= n_infall)  and (np.sum(infall_mask_mod) >= n_infall):
+                            mask_dict[name][i] = True
+                    elif select == 'sim':
+                        infall_mask = (dictionary[name]['pericenter.dist.sim'][i] != -1)
+                        if (np.sum(infall_mask) >= n_infall):
+                            mask_dict[name][i] = True
+                    elif select == 'model':
+                        infall_mask = (dictionary[name]['pericenter.dist.model'][i] != -1)
+                        if (np.sum(infall_mask) >= n_infall):
+                            mask_dict[name][i] = True
+        #
+        return mask_dict
+
     def halo_id(self, data_dict, mask_dict, hosts='all'):
         """
         DESCRIPTION:
