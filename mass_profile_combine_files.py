@@ -21,7 +21,7 @@ print('Read in the tools')
 ## FOR ISOLATED HOSTS
 #
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1=str(sys.argv[1]), location='stampede')
+sim_data = orbit_io.OrbitRead(gal1=str(sys.argv[1]), location='peloton')
 print('Set paths')
 
 # Set up snapshot array to loop through
