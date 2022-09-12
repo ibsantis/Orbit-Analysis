@@ -38,10 +38,7 @@ if sim_data.num_gal == 1:
     mass_array = np.zeros((len(snaps),len(rs)-1))
 
     for i in range(0, len(snaps)):
-        if snaps[i] == 456:
-            data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/all_snapshots/'+sim_data.galaxy+'/'+sim_data.galaxy+'_mass_profile_'+str(snaps[i]-1), verbose=True)
-        else:
-            data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/all_snapshots/'+sim_data.galaxy+'/'+sim_data.galaxy+'_mass_profile_'+str(snaps[i]), verbose=True)
+        data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/all_snapshots/'+sim_data.galaxy+'/'+sim_data.galaxy+'_mass_profile_'+str(snaps[i]), verbose=True)
         mass_array[i] = data['array']
 
     data_dict = dict()
