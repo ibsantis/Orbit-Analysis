@@ -587,16 +587,20 @@ d_min_mod = summary.dperi_min(data_total, masks_infall_peri, selection='model', 
 t_in_sim = summary.first_infall(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
 t_in_mod = summary.first_infall(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
-xs = [t_in_sim, t_in_sim]
-ys = [(d_rec_mod-d_rec_sim)/d_rec_sim, (d_min_mod-d_min_sim)/d_min_sim]
+#xs = [t_in_sim, t_in_sim]
+#ys = [(d_rec_mod-d_rec_sim)/d_rec_sim, (d_min_mod-d_min_sim)/d_min_sim]
+xs = [t_in_sim]
+ys = [(d_rec_mod-d_rec_sim)/d_rec_sim]
 #
-xtypes = ['t.infall.text', 't.infall.text']
-ytypes = ['delta.d.frac', 'delta.d.frac']
-labels = ['Recent', 'Minimum']
+#xtypes = ['t.infall.text', 't.infall.text']
+#ytypes = ['delta.d.frac', 'delta.d.frac']
+#labels = ['Recent', 'Minimum']
+xtypes = ['t.infall.text']
+ytypes = ['delta.d.frac']
 peri_d_colors = ['#457f44', '#6365ac']
 #
 binsize = 1
-limits = ((0,13),(-1.1,3.5))
+limits = ((0,13),(-0.5,0.4))
 #
 axs[0,0].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -606,11 +610,12 @@ for i in range(0, len(xs)):
     axs[0,0].fill_between(binss[:-1]+half_binss, highest, lowest, color=peri_d_colors[i], alpha=0.3)
     #
     # Plot the medians for the two mass bins (low-mass)
-    axs[0,0].plot(binss[:-1]+half_binss, med, color=peri_d_colors[i], markersize=10, alpha=0.7, label=labels[i])
+    #axs[0,0].plot(binss[:-1]+half_binss, med, color=peri_d_colors[i], markersize=10, alpha=0.7, label=labels[i])
+    axs[0,0].plot(binss[:-1]+half_binss, med, color=peri_d_colors[i], markersize=10, alpha=0.7)
     #
     axs[0,0].set_xlim(limits[0])
     axs[0,0].set_ylim(limits[1])
-axs[0,0].legend(prop={'size': 22}, loc='best')
+#axs[0,0].legend(prop={'size': 22}, loc='best')
 #
 # Pericenter times
 t_rec_sim = summary.tperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
@@ -618,16 +623,22 @@ t_min_sim = summary.tperi_min(data_total, masks_infall_peri, selection='sim', ov
 t_rec_mod = summary.tperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 t_min_mod = summary.tperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
-xs = [t_in_sim, t_in_sim]
-ys = [t_rec_mod-t_rec_sim, t_min_mod-t_min_sim]
+#xs = [t_in_sim, t_in_sim]
+#ys = [t_rec_mod-t_rec_sim, t_min_mod-t_min_sim]
+#xtypes = ['t.infall.text', 't.infall.text']
+#ytypes = ['delta.t', 'delta.t']
+#labels = ['Recent', 'Minimum']
 #
-xtypes = ['t.infall.text', 't.infall.text']
-ytypes = ['delta.t', 'delta.t']
-labels = ['Recent', 'Minimum']
+xs = [t_in_sim]
+ys = [t_rec_mod-t_rec_sim]
+#
+xtypes = ['t.infall.text']
+ytypes = ['delta.t']
+labels = ['Recent']
 peri_t_colors = ['#2c8ca9','#a36952']
 #
 binsize = 1
-limits = ((0,13),(-11,9.9))
+limits = ((0,13),(-2,5))
 #
 axs[1,0].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -637,11 +648,12 @@ for i in range(0, len(xs)):
     axs[1,0].fill_between(binss[:-1]+half_binss, highest, lowest, color=peri_t_colors[i], alpha=0.3)
     #
     # Plot the medians for the two mass bins (low-mass)
-    axs[1,0].plot(binss[:-1]+half_binss, med, color=peri_t_colors[i], markersize=10, alpha=0.7, label=labels[i])
+    #axs[1,0].plot(binss[:-1]+half_binss, med, color=peri_t_colors[i], markersize=10, alpha=0.7, label=labels[i])
+    axs[1,0].plot(binss[:-1]+half_binss, med, color=peri_t_colors[i], markersize=10, alpha=0.7)
     #
     axs[1,0].set_xlim(limits[0])
     axs[1,0].set_ylim(limits[1])
-axs[1,0].legend(prop={'size': 22}, loc='best')
+#axs[1,0].legend(prop={'size': 22}, loc='best')
 #
 # Pericenter velocities
 v_rec_sim = summary.vperi_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
@@ -649,16 +661,22 @@ v_min_sim = summary.vperi_min(data_total, masks_infall_peri, selection='sim', ov
 v_rec_mod = summary.vperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 v_min_mod = summary.vperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
-xs = [t_in_sim, t_in_sim]
-ys = [v_rec_mod-v_rec_sim, v_min_mod-v_min_sim]
+#xs = [t_in_sim, t_in_sim]
+#ys = [v_rec_mod-v_rec_sim, v_min_mod-v_min_sim]
+#xtypes = ['t.infall.text', 't.infall.text']
+#ytypes = ['delta.v', 'delta.v']
+#labels = ['Recent', 'Minimum']
 #
-xtypes = ['t.infall.text', 't.infall.text']
-ytypes = ['delta.v', 'delta.v']
-labels = ['Recent', 'Minimum']
+xs = [t_in_sim]
+ys = [v_rec_mod-v_rec_sim]
+#
+xtypes = ['t.infall.text']
+ytypes = ['delta.v']
+labels = ['Recent']
 peri_v_colors = ['#7c263e', '#263e7c']
 #
 binsize = 1
-limits = ((0,13),(-170,60))
+limits = ((0,13),(-50,90))
 #
 axs[2,0].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -668,11 +686,12 @@ for i in range(0, len(xs)):
     axs[2,0].fill_between(binss[:-1]+half_binss, highest, lowest, color=peri_v_colors[i], alpha=0.15)
     #
     # Plot the medians for the two mass bins (low-mass)
-    axs[2,0].plot(binss[:-1]+half_binss, med, color=peri_v_colors[i], markersize=10, alpha=0.7, label=labels[i])
+    #axs[2,0].plot(binss[:-1]+half_binss, med, color=peri_v_colors[i], markersize=10, alpha=0.7, label=labels[i])
+    axs[2,0].plot(binss[:-1]+half_binss, med, color=peri_v_colors[i], markersize=10, alpha=0.7)
     #
     axs[2,0].set_xlim(limits[0])
     axs[2,0].set_ylim(limits[1])
-axs[2,0].legend(prop={'size': 22}, loc='best')
+#axs[2,0].legend(prop={'size': 22}, loc='best')
 #
 # Pericenter number
 n_sim = summary.nperi(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
@@ -691,7 +710,7 @@ labels = ['$R_{\\rm 200m}(t_{\\rm lb})$', '$R_{\\rm 200m}(t_{\\rm lb}=0)$']
 peri_n_colors = ['#356b84', '#844e35']
 #
 binsize = 1
-limits = ((0,13),(-3,3))
+limits = ((0,13),(-1.1,3.1))
 #
 axs[3,0].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -714,14 +733,19 @@ d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model
 d_min_mod = summary.dperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 dz0_tot = summary.d_z0(data_total, masks_infall_peri, oversample=True, hosts='all_no_r', sim_type='baryon')
 #
-xs = [dz0_tot, dz0_tot]
-ys = [(d_rec_mod-d_rec_sim)/d_rec_sim, (d_min_mod-d_min_sim)/d_min_sim]
+#xs = [dz0_tot, dz0_tot]
+#ys = [(d_rec_mod-d_rec_sim)/d_rec_sim, (d_min_mod-d_min_sim)/d_min_sim]
+#xtypes = ['d.z0', 'd.z0']
+#ytypes = ['delta.d.frac', 'delta.d.frac']
 #
-xtypes = ['d.z0', 'd.z0']
-ytypes = ['delta.d.frac', 'delta.d.frac']
+xs = [dz0_tot]
+ys = [(d_rec_mod-d_rec_sim)/d_rec_sim]
+#
+xtypes = ['d.z0']
+ytypes = ['delta.d.frac']
 #
 binsize = 50
-limits = ((0,400),(-1.1,2))
+limits = ((0,400),(-0.5,0.7))
 #
 axs[0,1].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -743,14 +767,19 @@ t_rec_mod = summary.tperi_recent(data_total, masks_infall_peri, selection='model
 t_min_mod = summary.tperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 dz0_tot = summary.d_z0(data_total, masks_infall_peri, oversample=True, hosts='all_no_r', sim_type='baryon')
 #
-xs = [dz0_tot, dz0_tot]
-ys = [t_rec_mod-t_rec_sim, t_min_mod-t_min_sim]
+#xs = [dz0_tot, dz0_tot]
+#ys = [t_rec_mod-t_rec_sim, t_min_mod-t_min_sim]
+#xtypes = ['d.z0', 'd.z0']
+#ytypes = ['delta.t', 'delta.t']
 #
-xtypes = ['d.z0', 'd.z0']
-ytypes = ['delta.t', 'delta.t']
+xs = [dz0_tot]
+ys = [t_rec_mod-t_rec_sim]
+#
+xtypes = ['d.z0']
+ytypes = ['delta.t']
 #
 binsize = 50
-limits = ((0,400),(-6,9.9))
+limits = ((0,400),(-0.8,0.4))
 #
 axs[1,1].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -772,14 +801,19 @@ v_rec_mod = summary.vperi_recent(data_total, masks_infall_peri, selection='model
 v_min_mod = summary.vperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 dz0_tot = summary.d_z0(data_total, masks_infall_peri, oversample=True, hosts='all_no_r', sim_type='baryon')
 #
-xs = [dz0_tot, dz0_tot]
-ys = [v_rec_mod-v_rec_sim, v_min_mod-v_min_sim]
+#xs = [dz0_tot, dz0_tot]
+#ys = [v_rec_mod-v_rec_sim, v_min_mod-v_min_sim]
+#xtypes = ['d.z0', 'd.z0']
+#ytypes = ['delta.v', 'delta.v']
 #
-xtypes = ['d.z0', 'd.z0']
-ytypes = ['delta.v', 'delta.v']
+xs = [dz0_tot]
+ys = [v_rec_mod-v_rec_sim]
+#
+xtypes = ['d.z0']
+ytypes = ['delta.v']
 #
 binsize = 50
-limits = ((0,400),(-150,70))
+limits = ((0,400),(-30,90))
 #
 axs[2,1].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -808,7 +842,7 @@ ytypes = ['N.delta', 'N.delta']
 colors = peri_n_colors
 #
 binsize = 50
-limits = ((0,400),(-3,3.9))
+limits = ((0,400),(-1.1,5))
 #
 axs[3,1].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -830,14 +864,19 @@ d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model
 d_min_mod = summary.dperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
-xs = [Mstar_z0, Mstar_z0]
-ys = [(d_rec_mod-d_rec_sim)/d_rec_sim, (d_min_mod-d_min_sim)/d_min_sim]
+#xs = [Mstar_z0, Mstar_z0]
+#ys = [(d_rec_mod-d_rec_sim)/d_rec_sim, (d_min_mod-d_min_sim)/d_min_sim]
+#xtypes = ['M.star.z0', 'M.star.z0']
+#ytypes = ['delta.d.frac', 'delta.d.frac']
 #
-xtypes = ['M.star.z0', 'M.star.z0']
-ytypes = ['delta.d.frac', 'delta.d.frac']
+xs = [Mstar_z0]
+ys = [(d_rec_mod-d_rec_sim)/d_rec_sim]
+#
+xtypes = ['M.star.z0']
+ytypes = ['delta.d.frac']
 #
 binsize = 0.5
-limits = ((4.5,9.5),(-1.1,2))
+limits = ((4.5,9.5),(-0.8,0.5))
 #
 axs[0,2].hlines(y=0, xmin=10**limits[0][0], xmax=10**limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -860,14 +899,19 @@ t_rec_mod = summary.tperi_recent(data_total, masks_infall_peri, selection='model
 t_min_mod = summary.tperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
-xs = [Mstar_z0, Mstar_z0]
-ys = [t_rec_mod-t_rec_sim, t_min_mod-t_min_sim]
+#xs = [Mstar_z0, Mstar_z0]
+#ys = [t_rec_mod-t_rec_sim, t_min_mod-t_min_sim]
+#xtypes = ['M.star.z0', 'M.star.z0']
+#ytypes = ['delta.t', 'delta.t']
 #
-xtypes = ['M.star.z0', 'M.star.z0']
-ytypes = ['delta.t', 'delta.t']
+xs = [Mstar_z0]
+ys = [t_rec_mod-t_rec_sim]
+#
+xtypes = ['M.star.z0']
+ytypes = ['delta.t']
 #
 binsize = 0.5
-limits = ((4.5,9.5),(-5,9.9))
+limits = ((4.5,9.5),(-0.6,0.35))
 #
 axs[1,2].hlines(y=0, xmin=10**limits[0][0], xmax=10**limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -890,14 +934,19 @@ v_rec_mod = summary.vperi_recent(data_total, masks_infall_peri, selection='model
 v_min_mod = summary.vperi_min(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
-xs = [Mstar_z0, Mstar_z0]
-ys = [v_rec_mod-v_rec_sim, v_min_mod-v_min_sim]
+#xs = [Mstar_z0, Mstar_z0]
+#ys = [v_rec_mod-v_rec_sim, v_min_mod-v_min_sim]
+#xtypes = ['M.star.z0', 'M.star.z0']
+#ytypes = ['delta.v', 'delta.v']
 #
-xtypes = ['M.star.z0', 'M.star.z0']
-ytypes = ['delta.v', 'delta.v']
+xs = [Mstar_z0]
+ys = [v_rec_mod-v_rec_sim]
+#
+xtypes = ['M.star.z0']
+ytypes = ['delta.v']
 #
 binsize = 0.5
-limits = ((4.5,9.5),(-150,50))
+limits = ((4.5,9.5),(-30,120))
 #
 axs[2,2].hlines(y=0, xmin=10**limits[0][0], xmax=10**limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -926,7 +975,7 @@ xtypes = ['M.star.z0', 'M.star.z0']
 ytypes = ['N.delta', 'N.delta']
 #
 binsize = 0.5
-limits = ((4.5,9.5),(-2,5.9))
+limits = ((4.5,9.5),(-1.1,7))
 #
 axs[3,2].hlines(y=0, xmin=10**limits[0][0], xmax=10**limits[0][1], linestyle='dotted', color='k', alpha=0.5)
 for i in range(0, len(xs)):
@@ -969,7 +1018,7 @@ axs[3,1].set_xlabel('Host distance, $r$ [kpc]', fontsize=32)
 axs[3,2].set_xlabel('$M_{\\rm star} [M_{\\odot}]$', fontsize=32)
 #
 plt.tight_layout()
-plt.subplots_adjust(wspace=0.15, hspace=0)
+plt.subplots_adjust(wspace=0.17, hspace=0)
 #plt.show()
 plt.savefig(directory+'/pericenter_properties.pdf')
 
