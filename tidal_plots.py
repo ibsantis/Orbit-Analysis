@@ -32,7 +32,8 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12m', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='mac')
+sim_data.galaxy = sim_data.gal_2
 print('Set paths')
 
 # Read in the data
@@ -51,11 +52,13 @@ for i in range(0, masses['mass.profile'].shape[0]):
         # Calculate the tidal acceleration
         tidal_field[i,j] = (masses['mass.profile'][i][j]/rs[j+1]**2)*(6.67*10**(-11))*(2*10**(30))/((1000**2)*(3.086*10**(16))**2)
 
-# Probably want to just do the diff version and not the gradient
-da_dr = np.zeros((masses['mass.profile'].shape[0], len(rs_new)-1))
+# Calculate the tidal acceleration
+da_dr = np.zeros((masses['mass.profile'].shape[0], len(rs_new)))
 for i in range(0, masses['mass.profile'].shape[0]):
-    f = interp1d(rs[1:], tidal_field[i], kind='cubic')
-    da_dr[i] = np.diff(f(rs_new))/np.diff(rs_new)
+    #f = interp1d(rs[1:], tidal_field[i], kind='cubic')
+    #da_dr[i] = (np.diff(f(rs_new))/np.diff(rs_new))*(1/1000)*(1/(3.086*10**(16))) # Needed to convert the denominator to meters
+    spline_fit = splrep(x=rs[1:], y=tidal_field[i])
+    da_dr[i] = splev(rs_new, spline_fit, der=1)*(1/1000)*(1/(3.086*10**(16))) # Needed to convert the denominator to meters
 
 # Create an array of times that I'm interested in
 ts = np.linspace(0.8, 13.8, 66) # every 0.2 Gyr
@@ -88,7 +91,7 @@ plt.rcParams["font.family"] = "serif"
 f, ax = plt.subplots(2, 1, figsize=(10,8))
 for i in range(0, len(inds)):
     ax[0].plot(rs[1:], tidal_field[inds[i]-2], color=colorss[i])
-    ax[1].plot(rs_new[1:], np.abs(da_dr[inds[i]-2]), color=colorss[i])
+    ax[1].plot(rs_new, np.abs(da_dr[inds[i]-2]), color=colorss[i])
 ax[0].set_xlim(5, 500)
 ax[1].set_xlim(5, 500)
 ax[0].set_xscale('log')
