@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=RR_summary_data
+#SBATCH --job-name=m12i_summary_data
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 ##SBATCH --partition=high2    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 ##SBATCH --mem=250G
 #SBATCH --mem=480G
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
-#SBATCH --time=06:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/summary/RR_summary_data_%j.txt
+#SBATCH --time=00:30:00
+#SBATCH --output=/home/ibsantis/scripts/jobs/summary/m12i_summary_data_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -42,7 +42,8 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
+loc = 'peloton'
+sim_data = orbit_io.OrbitRead(gal1='m12i', location=loc)
 plotting = False
 print('Set paths')
 
@@ -56,9 +57,9 @@ if sim_data.num_gal == 1:
     mass_ratio = ut.particle.get_halo_properties(part)['mass']/halt['mass'][halt['host.index'][0]]
     #
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=False)
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=False)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=False)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location=loc, host=1, dmo=False)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location=loc, host=1, dmo=False)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location=loc, host=1, dmo=False)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
@@ -105,8 +106,8 @@ if sim_data.num_gal == 1:
     print(np.sum(poles))
 
     galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vx(ts), galpy_orbits.vy(ts), galpy_orbits.vz(ts))
-    peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
-    apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
+    peris_galpy = orbit_gal.galpy_pericenter_interp(distances=galpy_orbits.r(ts), velocities=galpy_vels, time_array=snaps, virial_radii=host_radii)
+    apos_galpy = orbit_gal.galpy_apocenter_interp(distances=galpy_orbits.r(ts), velocities=galpy_vels, time_array=snaps, infall_array=infall_info)
     eccs_galpy_pot = galpy_orbits.e(pot=potential_two_power)
     eccs_galpy_apsis = orbits.eccentricity(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
 
@@ -259,7 +260,7 @@ if sim_data.num_gal == 1:
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
 
     if plotting:
-        orbit_plot.multi_plot(host_rads=host_radii, infall_dict=infall_info, peri_dict=peris, time_dict=snaps, sim_dist=halt_dists, sim_vel=halt_vels, sim_ell=angs, model_orbits=galpy_orbits, model_times=ts)
+        orbit_plot.multi_plot(host_rads=host_radii*mass_ratio, infall_dict=infall_info, peri_dict=peris, time_dict=snaps, sim_dist=halt_dists, sim_vel=halt_vels, sim_ell=angs, model_orbits=galpy_orbits, model_times=ts)
 
 if sim_data.num_gal == 2:
     #
@@ -268,9 +269,9 @@ if sim_data.num_gal == 2:
     #
     ### GALAXY 1
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=False)
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=False)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton', host=1, dmo=False)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location=loc, host=1, dmo=False)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location=loc, host=1, dmo=False)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location=loc, host=1, dmo=False)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
@@ -479,9 +480,9 @@ if sim_data.num_gal == 2:
     mass_ratio = ut.particle.get_halo_properties(part, host_index=1)['mass']/halt['mass'][halt['host2.index'][0]]
     #
     # This initializes the classes and makes sure they inherit from the OrbitRead class
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=False)
-    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=False)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location='peloton', host=2, dmo=False)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location=loc, host=2, dmo=False)
+    orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location=loc, host=2, dmo=False)
+    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location=loc, host=2, dmo=False)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt, host=2) # set host=1 for the first host, host=2 for the other
