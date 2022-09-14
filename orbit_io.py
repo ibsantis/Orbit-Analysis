@@ -1396,6 +1396,7 @@ class OrbitGalpy(OrbitAnalysis):
                 else:
                     left_ind = i-reach
                 #
+                temp_apo_time = np.flip(time_array['time'])[i]
                 # Check to make sure that this is the local maximum
                 if (infall_array['first.infall.time'][k] != -1) and (all(temp_apo > temp_halo_d[left_ind:i])) and (all(temp_apo > temp_halo_d[i+1:i+1+reach])) and (temp_apo_time > infall_array['first.infall.time'][k]):
                     temp_check[i] = 1
@@ -1403,8 +1404,10 @@ class OrbitGalpy(OrbitAnalysis):
                     temp_apo_vel_spl.append(temp_halo_v[left_ind:i+reach])
                     temp_time_spl.append(np.flip(time_array['time'])[left_ind:i+reach])
                     temp_apo = temp_halo_d[i+1]
+                    temp_apo_time = np.flip(time_array['time'])[i+1]
                 else:
                     temp_apo = temp_halo_d[i+1]
+                    temp_apo_time = np.flip(time_array['time'])[i+1]
             #
             check.append(temp_check)
             apo_spl.append(temp_apo_spl)
