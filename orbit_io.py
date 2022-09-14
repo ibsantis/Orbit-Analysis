@@ -1693,7 +1693,7 @@ class OrbitPlot(OrbitAnalysis):
         # Loop over the number of subhalos
         for i in range(0, self.shape[0]):
             # Check to see if the subhalo fell in and experienced a pericenter
-            if (infall_dict['check'][i]) & (peri_dict['pericenter.check'][i]):
+            if (infall_dict['check'][i]):
                 #
                 # Set up the distances and times to plot
                 d_mask = (sim_dist[i] >= 0)
