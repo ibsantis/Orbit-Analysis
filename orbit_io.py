@@ -1153,7 +1153,7 @@ class OrbitGalpy(OrbitAnalysis):
         """
         return np.sqrt(vx**2 + vy**2 + vz**2)
 
-    def galpy_pericenter_interp(self, distances, velocities, time_array, reach=20):
+    def galpy_pericenter_interp(self, distances, velocities, time_array, virial_radii, reach=20):
         """
         DESCRIPTION:
             Reads in subhalo distances, velocites, host virial radii across time,
@@ -1233,7 +1233,7 @@ class OrbitGalpy(OrbitAnalysis):
                     left_ind = i-reach
                 #
                 # Check its neighbors
-                if (all(temp_peri < temp_halo_d[left_ind:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])):
+                if (all(temp_peri < temp_halo_d[left_ind:i])) and (all(temp_peri < temp_halo_d[i+1:i+1+reach])) and (temp_peri/virial_radii[i] < 1):
                     temp_check[i] = 1
                     temp_peri_spl.append(temp_halo_d[left_ind:i+reach])
                     temp_peri_vel_spl.append(temp_halo_v[left_ind:i+reach])
@@ -1323,7 +1323,7 @@ class OrbitGalpy(OrbitAnalysis):
         #
         return d
 
-    def galpy_apocenter_interp(self, distances, velocities, time_array, reach=20):
+    def galpy_apocenter_interp(self, distances, velocities, time_array, infall_array, reach=20):
         """
         DESCRIPTION:
             Reads in a list of integrated subhalo distances and velocities, and
@@ -1397,7 +1397,7 @@ class OrbitGalpy(OrbitAnalysis):
                     left_ind = i-reach
                 #
                 # Check to make sure that this is the local maximum
-                if (all(temp_apo > temp_halo_d[left_ind:i])) and (all(temp_apo > temp_halo_d[i+1:i+1+reach])):
+                if (infall_array['first.infall.time'][k] != -1) and (all(temp_apo > temp_halo_d[left_ind:i])) and (all(temp_apo > temp_halo_d[i+1:i+1+reach])) and (temp_apo_time > infall_array['first.infall.time'][k]):
                     temp_check[i] = 1
                     temp_apo_spl.append(temp_halo_d[left_ind:i+reach])
                     temp_apo_vel_spl.append(temp_halo_v[left_ind:i+reach])
