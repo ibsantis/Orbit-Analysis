@@ -318,8 +318,8 @@ if sim_data.num_gal == 2:
     print(np.sum(poles))
 
     galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vx(ts), galpy_orbits.vy(ts), galpy_orbits.vz(ts))
-    peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
-    apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
+    peris_galpy = orbit_gal.galpy_pericenter_interp(distances=galpy_orbits.r(ts), velocities=galpy_vels, time_array=snaps, virial_radii=host_radii)
+    apos_galpy = orbit_gal.galpy_apocenter_interp(distances=galpy_orbits.r(ts), velocities=galpy_vels, time_array=snaps, infall_array=infall_info)
     eccs_galpy_pot = galpy_orbits.e(pot=potential_two_power)
     eccs_galpy_apsis = orbits.eccentricity(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
 
@@ -529,8 +529,8 @@ if sim_data.num_gal == 2:
     print(np.sum(poles))
 
     galpy_vels = orbit_gal.galpy_velocities(galpy_orbits.vx(ts), galpy_orbits.vy(ts), galpy_orbits.vz(ts))
-    peris_galpy = orbit_gal.galpy_pericenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
-    apos_galpy = orbit_gal.galpy_apocenter_interp(galpy_orbits.r(ts), galpy_vels, snaps)
+    peris_galpy = orbit_gal.galpy_pericenter_interp(distances=galpy_orbits.r(ts), velocities=galpy_vels, time_array=snaps, virial_radii=host_radii)
+    apos_galpy = orbit_gal.galpy_apocenter_interp(distances=galpy_orbits.r(ts), velocities=galpy_vels, time_array=snaps, infall_array=infall_info)
     eccs_galpy_pot = galpy_orbits.e(pot=potential_two_power)
     eccs_galpy_apsis = orbits.eccentricity(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
 
