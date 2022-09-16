@@ -1099,3 +1099,312 @@ plt.legend(prop={'size': 24}, loc='best')
 plt.tight_layout()
 plt.savefig(directory+'/delta_period_vs_dz0_both_zoom.pdf')
 plt.close()
+
+
+
+
+
+
+dperi_1 = summary.dperi_select(data_total, lb_number=1, mask_selection='sim', selection='sim', oversample=True, hosts='all_no_r')
+dperi_2 = summary.dperi_select(data_total, lb_number=2, mask_selection='sim', selection='sim', oversample=True, hosts='all_no_r')
+dperi_3 = summary.dperi_select(data_total, lb_number=3, mask_selection='sim', selection='sim', oversample=True, hosts='all_no_r')
+#
+nperi_mask_1 = summary.data_mask_nperi(data_total, nperi=1, select='sim', hosts='all_no_r')
+nperi_mask_2 = summary.data_mask_nperi(data_total, nperi=2, select='sim', hosts='all_no_r')
+nperi_mask_3 = summary.data_mask_nperi(data_total, nperi=3, select='sim', hosts='all_no_r')
+#
+t_in_sim_1 = summary.first_infall(data_total, nperi_mask_1, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim_2 = summary.first_infall(data_total, nperi_mask_2, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim_3 = summary.first_infall(data_total, nperi_mask_3, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+#
+summary_plot.median_plot_mult(x=[t_in_sim_1, t_in_sim_2, t_in_sim_3], y=[dperi_1, dperi_2, dperi_3], xtype=['t.infall.text','t.infall.text','t.infall.text'], ytype=['d.peri.text','d.peri.text','d.peri.text'], labels=['N=1','N=2','N=3'], binsize=1, limits=((0,13.5),None), file_path_and_name=directory+'/diagnostics/dperi_comp_sim.pdf')
+
+
+
+dperi_1 = summary.dperi_select(data_total, lb_number=1, mask_selection='sim', selection='sim', oversample=True, hosts='all_no_r')
+dperi_2 = summary.dperi_select(data_total, lb_number=2, mask_selection='sim', selection='sim', oversample=True, hosts='all_no_r')
+dperi_3 = summary.dperi_select(data_total, lb_number=3, mask_selection='sim', selection='sim', oversample=True, hosts='all_no_r')
+dperi_4 = summary.dperi_select(data_total, lb_number=4, mask_selection='sim', selection='sim', oversample=True, hosts='all_no_r')
+dperi_5 = summary.dperi_select(data_total, lb_number=5, mask_selection='sim', selection='sim', oversample=True, hosts='all_no_r')
+#
+nperi_mask_1 = summary.data_mask_nperi(data_total, nperi=1, select='sim', hosts='all_no_r')
+nperi_mask_2 = summary.data_mask_nperi(data_total, nperi=2, select='sim', hosts='all_no_r')
+nperi_mask_3 = summary.data_mask_nperi(data_total, nperi=3, select='sim', hosts='all_no_r')
+nperi_mask_4 = summary.data_mask_nperi(data_total, nperi=4, select='sim', hosts='all_no_r')
+nperi_mask_5 = summary.data_mask_nperi(data_total, nperi=5, select='sim', hosts='all_no_r')
+#
+t_in_sim_1 = summary.first_infall(data_total, nperi_mask_1, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim_2 = summary.first_infall(data_total, nperi_mask_2, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim_3 = summary.first_infall(data_total, nperi_mask_3, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim_4 = summary.first_infall(data_total, nperi_mask_4, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim_5 = summary.first_infall(data_total, nperi_mask_5, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+
+xs = [t_in_sim_1, t_in_sim_2, t_in_sim_3, t_in_sim_4, t_in_sim_5]
+ys = [dperi_1, dperi_2, dperi_3, dperi_4, dperi_5]
+#
+xtypes = ['t.infall.text','t.infall.text','t.infall.text','t.infall.text','t.infall.text']
+ytypes = ['d.peri.text','d.peri.text','d.peri.text','d.peri.text','d.peri.text']
+labels = ['$N_{\\rm peri} = 1$','$N_{\\rm peri} = 2$','$N_{\\rm peri} = 3$','$N_{\\rm peri} = 4$','$N_{\\rm peri} = 5$']
+#
+plt.rcParams["font.family"] = "serif"
+f, ax = plt.subplots(1, 1, figsize=(11,8))
+for i in range(0, len(xs)):
+    binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=1)
+    meds, up1, low1, up2, low2 = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
+    ax.plot(binss[:-1]+half_binss, meds, label=labels[i])
+    if i == 0:
+        ax.fill_between(binss[:-1]+half_binss, up1, low1, color='k', alpha=0.3)
+        ax.fill_between(binss[:-1]+half_binss, up2, low2, color='k', alpha=0.15)
+ax.set_xlim(0, 13.5)
+ax.legend(prop={'size': 24})
+ax.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
+ax.set_xlabel('Lookback Time [Gyr]', fontsize=26)
+ax.set_ylabel('Simulation Pericenter Distance [kpc]', fontsize=24)
+#
+plt.tight_layout()
+plt.savefig(directory+'/diagnostics/dperi_mult_one_scatter.pdf')
+plt.close()
+
+
+
+
+
+
+
+
+dperi_1 = summary.dperi_select(data_total, lb_number=1, mask_selection='both', selection='sim', oversample=True, hosts='all_no_r')
+dperi_2 = summary.dperi_select(data_total, lb_number=2, mask_selection='both', selection='sim', oversample=True, hosts='all_no_r')
+dperi_3 = summary.dperi_select(data_total, lb_number=3, mask_selection='both', selection='sim', oversample=True, hosts='all_no_r')
+dperi_4 = summary.dperi_select(data_total, lb_number=4, mask_selection='both', selection='sim', oversample=True, hosts='all_no_r')
+dperi_5 = summary.dperi_select(data_total, lb_number=5, mask_selection='both', selection='sim', oversample=True, hosts='all_no_r')
+#
+dperi_mod_1 = summary.dperi_select(data_total, lb_number=1, mask_selection='both', selection='model', oversample=True, hosts='all_no_r')
+dperi_mod_2 = summary.dperi_select(data_total, lb_number=2, mask_selection='both', selection='model', oversample=True, hosts='all_no_r')
+dperi_mod_3 = summary.dperi_select(data_total, lb_number=3, mask_selection='both', selection='model', oversample=True, hosts='all_no_r')
+dperi_mod_4 = summary.dperi_select(data_total, lb_number=4, mask_selection='both', selection='model', oversample=True, hosts='all_no_r')
+dperi_mod_5 = summary.dperi_select(data_total, lb_number=5, mask_selection='both', selection='model', oversample=True, hosts='all_no_r')
+#
+nperi_mask_1 = summary.data_mask_nperi(data_total, nperi=1, select='both', hosts='all_no_r')
+nperi_mask_2 = summary.data_mask_nperi(data_total, nperi=2, select='both', hosts='all_no_r')
+nperi_mask_3 = summary.data_mask_nperi(data_total, nperi=3, select='both', hosts='all_no_r')
+nperi_mask_4 = summary.data_mask_nperi(data_total, nperi=4, select='both', hosts='all_no_r')
+nperi_mask_5 = summary.data_mask_nperi(data_total, nperi=5, select='both', hosts='all_no_r')
+nperi_mask_1['m12f'][59] = False
+nperi_mask_2['m12f'][59] = False
+nperi_mask_3['m12f'][59] = False
+nperi_mask_4['m12f'][59] = False
+nperi_mask_5['m12f'][59] = False
+#
+t_in_sim_1 = summary.first_infall(data_total, nperi_mask_1, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim_2 = summary.first_infall(data_total, nperi_mask_2, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim_3 = summary.first_infall(data_total, nperi_mask_3, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim_4 = summary.first_infall(data_total, nperi_mask_4, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_sim_5 = summary.first_infall(data_total, nperi_mask_5, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+
+xs = [t_in_sim_1, t_in_sim_2, t_in_sim_3, t_in_sim_4, t_in_sim_5]
+ys = [(dperi_mod_1-dperi_1)/dperi_1, (dperi_mod_2-dperi_2)/dperi_2, (dperi_mod_3-dperi_3)/dperi_3, (dperi_mod_4-dperi_4)/dperi_4, (dperi_mod_5-dperi_5)/dperi_5]
+#
+xtypes = ['t.infall.text','t.infall.text','t.infall.text','t.infall.text','t.infall.text']
+ytypes = ['d.peri.text','d.peri.text','d.peri.text','d.peri.text','d.peri.text']
+labels = ['$N_{\\rm peri} = 1$','$N_{\\rm peri} = 2$','$N_{\\rm peri} = 3$','$N_{\\rm peri} = 4$','$N_{\\rm peri} = 5$']
+#
+plt.rcParams["font.family"] = "serif"
+f, ax = plt.subplots(1, 1, figsize=(11,8))
+for i in range(0, len(xs)):
+    binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=1)
+    meds, up1, low1, up2, low2 = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
+    ax.plot(binss[:-1]+half_binss, meds, label=labels[i])
+    if i == 0:
+        print(binss)
+        print(meds)
+        print(ys[i])
+        print(len(ys[i]))
+        ax.fill_between(binss[:-1]+half_binss, up1, low1, color='k', alpha=0.3)
+        ax.fill_between(binss[:-1]+half_binss, up2, low2, color='k', alpha=0.15)
+ax.set_xlim(0,13.5)
+ax.set_ylim(-1, 1)
+ax.legend(prop={'size': 24})
+ax.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
+ax.set_xlabel('Lookback Time [Gyr]', fontsize=26)
+ax.set_ylabel('$(d_{\\rm peri, model} - d_{\\rm peri,sim})/d_{\\rm peri,sim}$', fontsize=24)
+#
+plt.tight_layout()
+plt.savefig(directory+'/diagnostics/dperi_frac_mult.pdf')
+plt.close()
+
+
+
+
+in_mask_1 = summary.data_mask_ninfall(data_total, 1, select='both', hosts='all_no_r')
+d_rec_sim_1 = summary.dperi_recent(data_total, in_mask_1, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+d_rec_mod_1 = summary.dperi_recent(data_total, in_mask_1, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+in_mask_2 = summary.data_mask_ninfall(data_total, 2, select='both', hosts='all_no_r')
+d_rec_sim_2 = summary.dperi_recent(data_total, in_mask_2, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+d_rec_mod_2 = summary.dperi_recent(data_total, in_mask_2, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+#
+summary_plot.plot_hist_mult(x=[d_rec_sim_1, d_rec_sim_2], xtype=['d.peri.text','d.peri.text'], labels=['$N_{\\rm infall}=1$','$N_{\\rm infall}=2$'], binsize=20, xlimits=(0, 250), pdf=True, file_path_and_name=directory+'/diagnostics/dperi_infall_hist.pdf')
+summary_plot.plot_hist_mult(x=[(d_rec_mod_1-d_rec_sim_1)/d_rec_sim_1, (d_rec_mod_2-d_rec_sim_2)/d_rec_sim_2], xtype=['delta.d.frac','delta.d.frac'], labels=['$N_{\\rm infall}=1$','$N_{\\rm infall}=2$'], xlimits=(-1,1), binsize=0.05, pdf=True, file_path_and_name=directory+'/diagnostics/dperi_comp_infall_hist.pdf')
+
+
+
+"""
+    Plotting a 2x2 figure with the host mass and radius vs time
+"""
+
+masses = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
+radii = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
+i = 0
+for name in summary.host_names['all_no_r']:
+    mask = (data_total[name]['host.mass'] != -1)*np.isfinite(data_total[name]['host.mass'])
+    masses[i][:np.sum(mask)] = data_total[name]['host.mass'][mask]
+    radii[i][:np.sum(mask)] = data_total[name]['host.radius'][mask]
+    i += 1
+#
+lookback = data_total['m12b']['time.sim'][-1]-np.flip(data_total['m12b']['time.sim'])
+#
+masses_norm = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
+radii_norm = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
+for i in range(0, masses.shape[0]):
+    mask = (masses[i] != -1)
+    masses_norm[i][mask] = masses[i][mask]/masses[i][0]
+    radii_norm[i][mask] = radii[i][mask]/radii[i][0]
+
+binedges = None
+binsize = 0.1
+limits=((13.5, 0),None)
+#
+x = [lookback, lookback, lookback, lookback]
+y = [masses, masses_norm, radii, radii_norm]
+#
+medians = []
+lowers = []
+uppers = []
+lowests = []
+highests = []
+binss = []
+half_bins = []
+#
+for j in range(0, len(x)):
+    #
+    if binedges:
+        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+        bins = np.linspace(binedges[0], binedges[1], bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    else:
+        minn = binsize*np.floor(np.min(x[j])/binsize)
+        maxx = binsize*np.ceil(np.max(x[j])/binsize)
+        if minn < 0:
+            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+        else:
+            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+        bins = np.linspace(minn, maxx, bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    #
+    onesigp = 84.13
+    onesigm = 15.87
+    twosigp = 100
+    twosigm = 0
+    #
+    med = np.zeros(len(bins)-1)
+    lower = np.zeros(len(bins)-1)
+    upper = np.zeros(len(bins)-1)
+    lowest = np.zeros(len(bins)-1)
+    highest = np.zeros(len(bins)-1)
+    #
+    for i in range(0, len(bins)-1):
+        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+        temp_med = []
+        for k in range(0, y[j].shape[0]):
+            mask2 = (y[j][k] != -1)
+            temp_med.append(y[j][k][mask*mask2])
+        med[i] = np.nanmedian(np.hstack(temp_med))
+        upper[i] = np.nanpercentile(np.hstack(temp_med), onesigp)
+        lower[i] = np.nanpercentile(np.hstack(temp_med), onesigm)
+        highest[i] = np.nanpercentile(np.hstack(temp_med), twosigp)
+        lowest[i] = np.nanpercentile(np.hstack(temp_med), twosigm)
+        if j == 1:
+            print(np.hstack(temp_med))
+    medians.append(med)
+    lowers.append(lower)
+    uppers.append(upper)
+    lowests.append(lowest)
+    highests.append(highest)
+    binss.append(bins)
+    half_bins.append(half_bin)
+#
+# PLOTTING
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(2, 2, figsize=(18,10))
+# Plot the scatter for the recent and minimum pericenters
+axs[0,0].fill_between(binss[0][:-1]+half_bins[0], uppers[0]/1e12, lowers[0]/1e12, color='g', alpha=0.3)
+axs[0,0].fill_between(binss[0][:-1]+half_bins[0], highests[0]/1e12, lowests[0]/1e12, color='g', alpha=0.15)
+axs[0,0].plot(binss[0][:-1]+half_bins[0], medians[0]/1e12, 'k', alpha=0.5, lw=4)
+#
+axs[1,0].fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color='g', alpha=0.3)
+axs[1,0].fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color='g', alpha=0.15)
+axs[1,0].plot(binss[1][:-1]+half_bins[1], medians[1], 'k', alpha=0.5, lw=4)
+#
+axs[0,1].fill_between(binss[2][:-1]+half_bins[2], uppers[2], lowers[2], color='g', alpha=0.3)
+axs[0,1].fill_between(binss[2][:-1]+half_bins[2], highests[2], lowests[2], color='g', alpha=0.15)
+axs[0,1].plot(binss[2][:-1]+half_bins[2], medians[2], 'k', alpha=0.5, lw=4)
+#
+axs[1,1].fill_between(binss[3][:-1]+half_bins[3], uppers[3], lowers[3], color='g', alpha=0.3)
+axs[1,1].fill_between(binss[3][:-1]+half_bins[3], highests[3], lowests[3], color='g', alpha=0.15)
+axs[1,1].plot(binss[3][:-1]+half_bins[3], medians[3], 'k', alpha=0.5, lw=4)
+#
+cc = ut.cosmology.CosmologyClass()
+red = np.array([0, 1])
+cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+#
+axis_z_label = 'redshift'
+axis_z_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+axis_z_tick_values = [float(v) for v in axis_z_tick_labels]
+axis_z_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_z_tick_values)
+axz = axs[0,0].twiny()
+axz.set_xscale('linear')
+axz.set_yscale('linear')
+axz.set_xticks(axis_z_tick_locations)
+axz.set_xticklabels(axis_z_tick_labels, fontsize=22)
+axz.set_xlim(13.5,0)
+axz.set_xlabel(axis_z_label, fontsize=26, labelpad=9)
+axz.tick_params(pad=3)
+#
+axis_z2_label = 'redshift'
+axis_z2_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+axis_z2_tick_values = [float(v) for v in axis_z2_tick_labels]
+axis_z2_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_z2_tick_values)
+axz2 = axs[0,1].twiny()
+axz2.set_xscale('linear')
+axz2.set_yscale('linear')
+axz2.set_xticks(axis_z2_tick_locations)
+axz2.set_xticklabels(axis_z2_tick_labels, fontsize=22)
+axz2.set_xlim(13.5,0)
+axz2.set_xlabel(axis_z_label, fontsize=26, labelpad=9)
+axz2.tick_params(pad=3)
+#
+axs[0,0].set_xlim(13.5,0)
+axs[1,0].set_xlim(13.5,0)
+axs[1,1].set_xlim(13.5,0)
+axs[0,1].set_xlim(13.5,0)
+#
+axs[0,0].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=22, labelbottom=False)
+axs[1,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True)
+axs[0,1].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=22, labelbottom=False)
+axs[1,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True)
+#
+axs[0,0].set_ylabel('$M_{\\rm 200m}(t_{\\rm lb})\ [10^{12}\ M_{\\odot}]$', fontsize=24)
+axs[0,0].get_yaxis().set_label_coords(-0.13,0.5)
+axs[1,0].set_ylabel('$M_{\\rm 200m}(t_{\\rm lb})\ /\ M_{\\rm 200m}(t_{\\rm lb}=0)$', fontsize=24)
+axs[1,0].get_yaxis().set_label_coords(-0.13,0.5)
+axs[0,1].set_ylabel('$R_{\\rm 200m}(t_{\\rm lb})\ [\\rm kpc]$', fontsize=24)
+axs[0,1].get_yaxis().set_label_coords(-0.13,0.5)
+axs[1,1].set_ylabel('$R_{\\rm 200m}(t_{\\rm lb})\ /\ R_{\\rm 200m}(t_{\\rm lb}=0)$', fontsize=24)
+axs[1,1].get_yaxis().set_label_coords(-0.13,0.5)
+#
+axs[1,0].set_xlabel('Lookback Time [Gyr]', fontsize=26)
+axs[1,1].set_xlabel('Lookback Time [Gyr]', fontsize=26)
+#
+plt.tight_layout()
+plt.subplots_adjust(wspace=0.2, hspace=0)
+plt.savefig(directory+'/host_mass_and_radius_scatter.pdf')
+plt.close()
