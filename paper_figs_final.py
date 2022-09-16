@@ -78,6 +78,21 @@ L_in = summary.L_infall(data_total, masks_infall, selection='sim', oversample=Tr
 Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
 Mhalo_peak_tot = summary.mhalo(data_total, masks_infall, selection='peak', oversample=True, hosts='all_no_z', sim_type='baryon')
 #
+# Create the data of satellites that never fell in
+mask_1Mpc = dict()
+for name in summary.host_names['all_no_z']:
+    mask_1Mpc[name] = ~data_total[name]['infall.check']
+#
+Mstar_z0_1Mpc = []
+Mhalo_peak_1Mpc = []
+for name in summary.host_names['all_no_z']:
+    for i in range(0, len(mask_1Mpc[name])):
+        if (mask_1Mpc[name][i]) and (data_total[name]['d.tot.sim'][:,0][i] > 1000):
+            Mstar_z0_1Mpc.append(np.repeat(data_total[name]['M.star.z0'][i], summary.oversample['baryon'][name]))
+            Mhalo_peak_1Mpc.append(np.repeat(data_total[name]['M.halo.peak'][i], summary.oversample['baryon'][name]))
+Mstar_z0_1Mpc = np.hstack(Mstar_z0_1Mpc)
+Mhalo_peak_1Mpc = np.hstack(Mhalo_peak_1Mpc)
+#
 #summary_plot.median_plot(x=Mhalo_peak_tot, y=Mstar_z0_tot, xtype='M.halo.peak', ytype='M.star.z0', binsize=0.5, binedges=(8,12), limits=((7.9,11.5),(4,10)), file_path_and_name=directory+'/smhm.pdf')
 
 # Generate the Behroozi median extrapolation
@@ -111,11 +126,11 @@ binedges = (8,12)
 binsize = 0.5
 limits=((7.99,11.3),(4,10))
 #
-x = [np.log10(Mhalo_peak_tot)]
-y = [np.log10(Mstar_z0_tot)]
+x = [np.log10(Mhalo_peak_tot), np.log10(Mhalo_peak_1Mpc)]
+y = [np.log10(Mstar_z0_tot), np.log10(Mstar_z0_1Mpc)]
 #
-xtype = ['M.halo.peak']
-ytype = ['M.star.z0']
+xtype = ['M.halo.peak', 'M.halo.peak']
+ytype = ['M.star.z0', 'M.star.z0']
 #
 medians = []
 lowers = []
@@ -174,6 +189,7 @@ ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), 10**(highests[0]), 10**(lowes
 #
 # Plot the medians for the two mass bins (low-mass)
 ax1.plot(10**(binss[0][:-1]+half_bins[0]), 10**(medians[0]), color=colorss[1], linewidth=3.5, alpha=0.9, label='This work')
+ax1.plot(10**(binss[1][:-1]+half_bins[1]), 10**(medians[1]), color=colorss[1], linewidth=3.5, linestyle='-.', alpha=0.9, label='This work, non-satellites')
 #
 ax1.set_xlim(10**(limits[0][0]), 10**(limits[0][1]))
 ax1.set_ylim(10**(limits[1][0]), 10**(limits[1][1]))
@@ -185,16 +201,22 @@ ax1.plot(10**(x_sgk), 10**(smhm_sgk_1), color='#006400', linestyle='--', alpha=0
 ax1.plot(10**(x_behroozi), 10**(y_behroozi), color='k', linestyle='--', alpha=0.4)
 ax1.plot(10**(x_behroozi_new), 10**(smhm_behroozi(x_behroozi_new)), linestyle='--', color='k', alpha=0.4, label='Behroozi+ (2020)')
 #
+# Plot Coral's points as stars
+ax1.scatter(x=2.5e9, y=12e3, marker='*', s=150, c='k', label='Wheeler+ (2019)')
+ax1.scatter(x=3.2e9, y=41e3, marker='*', s=150, c='k')
+ax1.scatter(x=9e9, y=330e3, marker='*', s=150, c='k')
+ax1.scatter(x=7.7e9, y=5200e3, marker='*', s=150, c='k')
+#
 plt.hlines(y=3*10**4, xmin=10**(limits[0][0]), xmax=10**(limits[0][1]), colors='k', linestyles='dotted', alpha=0.5)
 #
 ax1.text(5*10**9,4*10**4, '$M_{\\rm star}$-limited selection', fontsize=24)
 #
 ax1.set_xscale('log')
 ax1.set_yscale('log')
-ax1.set_xlabel('$M_{\\rm halo,peak}$ [$M_{\\odot}$]', fontsize=32)
-ax1.set_ylabel('$M_{\\rm star}$ [$M_{\\odot}$]', fontsize=32)
+ax1.set_xlabel('$M_{\\rm halo,peak}$ [$M_{\\odot}$]', fontsize=30)
+ax1.set_ylabel('$M_{\\rm star}$ [$M_{\\odot}$]', fontsize=30)
 ax1.legend(prop={'size': 22}, loc='best')
-ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28)
+ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26)
 plt.tight_layout()
 #plt.show()
 plt.savefig(directory+'/smhm_w_comparisons.pdf')
