@@ -226,7 +226,7 @@ class OrbitAnalysis:
         #
         self.shape = self.sub_inds.shape
 
-    # Pick up here next time when working on cleaning up the code.
+    # Optimized
     def halo_distances(self, tree, dist_type='total', host=1):
         """
         DESCRIPTION:
@@ -251,6 +251,12 @@ class OrbitAnalysis:
                 - If using a LG simulation, need to specify the second host to
                   get distances from that host
         """
+        # Set string for whichever host you're interested in
+        if host == 2:
+            hindex = 'host2'
+        else:
+            hindex = 'host'
+        #
         # If you want to save the full 3D distance
         if dist_type == '3d':
             # Set up null 3D array with the same shape as the subhalo index array in the first two dimensions
@@ -260,21 +266,15 @@ class OrbitAnalysis:
                 # Mask only the subhalos that exist (non-negative elements)
                 mask = (self.sub_inds[i] >= 0)
                 # Loop over the number of snapshots a subhalo exists
-                if host == 1:
-                    for j, val in enumerate(tree.prop('host.distance', self.sub_inds[i][mask])):
-                        # Fill in the null array with 3D distances
-                        distances[i][j] = val
-                elif host == 2:
-                    for j, val in enumerate(tree.prop('host2.distance', self.sub_inds[i][mask])):
-                        # Fill in the null array with 3D distances
-                        distances[i][j] = val
-                else:
-                    print('Choose a valid host.')
-                    sys.exit()
+                for j, val in enumerate(tree.prop(hindex+'.distance', self.sub_inds[i][mask])):
+                    # Fill in the null array with 3D distances
+                    distances[i][j] = val
+                #
                 # There are cases where the subhalo progenitor existed before the host
                 # Replace these nan instances with -1s
                 nan_mask = np.isnan(distances[i])
                 distances[i][nan_mask] = -1
+        #
         else:
             # Set up null 2D array with the same shape as the subhalo index array
             distances = (-1)*np.ones(self.shape)
@@ -283,23 +283,18 @@ class OrbitAnalysis:
                 # Mask only the subhalos that exist (non-negative elements)
                 mask = (self.sub_inds[i] >= 0)
                 # Loop over the number of snapshots a subhalo exists
-                if host == 1:
-                    for j, val in enumerate(tree.prop('host.distance.total', self.sub_inds[i][mask])):
-                        # Fill in the null array with 1D distances
-                        distances[i][j] = val
-                elif host == 2:
-                    for j, val in enumerate(tree.prop('host2.distance.total', self.sub_inds[i][mask])):
-                        # Fill in the null array with 1D distances
-                        distances[i][j] = val
-                else:
-                    print('Choose a valid host.')
-                    sys.exit()
+                for j, val in enumerate(tree.prop(hindex+'.distance.total', self.sub_inds[i][mask])):
+                    # Fill in the null array with 1D distances
+                    distances[i][j] = val
+                #
                 # There are cases where the subhalo progenitor existed before the host
                 # Replace these nan instances with -1s
                 nan_mask = np.isnan(distances[i])
                 distances[i][nan_mask] = -1
+        #
         return distances
 
+    # Optimized
     def halo_distances_norm(self, distances, host_halo_radii):
         """
         DESCRIPTION:
@@ -335,6 +330,7 @@ class OrbitAnalysis:
                 distances_norm[i][j] = val
         return distances_norm
 
+    # Optimized
     def halo_velocities(self, tree, host=1, vel_type='total'):
         """
         DESCRIPTION:
@@ -359,6 +355,12 @@ class OrbitAnalysis:
                 - If using a LG simulation, need to specify the second host to
                   get velocities from that host
         """
+        # Set string for whichever host you're interested in
+        if host == 2:
+            hindex = 'host2'
+        else:
+            hindex = 'host'
+        #
         # Set up null 2D array with the same shape as the subhalo index array
         velocities = (-1)*np.ones(self.shape)
         # Loop over the number of subhalos
@@ -366,19 +368,13 @@ class OrbitAnalysis:
             # Mask only the subhalos that exist (non-negative elements)
             mask = (self.sub_inds[i] >= 0)
             # Loop over the number of snapshots a subhalo exists
-            if host == 1:
-                for j, val in enumerate(tree.prop('host.velocity.'+vel_type, self.sub_inds[i][mask])):
-                    # Fill in the null array with 1D distances
-                    velocities[i][j] = val
-            elif host == 2:
-                for j, val in enumerate(tree.prop('host2.velocity.'+vel_type, self.sub_inds[i][mask])):
-                    # Fill in the null array with 1D distances
-                    velocities[i][j] = val
-            else:
-                print('Choose a valid host.')
-                sys.exit()
+            for j, val in enumerate(tree.prop(hindex+'.velocity.'+vel_type, self.sub_inds[i][mask])):
+                # Fill in the null array with 1D distances
+                velocities[i][j] = val
+        #
         return velocities
 
+    # Optimized
     def infall_times(self, distances_norm, time_array):
         """
         DESCRIPTION:
@@ -388,6 +384,8 @@ class OrbitAnalysis:
         VARIABLES:
             distances_norm : 2D array (given in kpc physical)
             time_array     : dictionary
+                             This is the snapshot time dictionary stored in the
+                             simulations
 
         NOTES:
             - Returns a dictionary
@@ -430,6 +428,7 @@ class OrbitAnalysis:
             temp = []
             # Check to see if the subhalo is within the virial radius of the host
             inds = np.where(np.abs(distances_norm[i]) < 1)[0]
+            #
             # If it is, save all indices of when it fell into the host
             if len(inds) != 0:
                 for j in range(0, len(inds)-1):
@@ -480,6 +479,7 @@ class OrbitAnalysis:
         #
         return d
 
+    # Optimized
     def first_infall_any(self, tree, time_array):
         """
         DESCRIPTION:
@@ -535,6 +535,7 @@ class OrbitAnalysis:
         #
         return d
 
+    # Optmized, but could be improved on sliding window part...
     def pericenter_interp(self, distances, velocities, virial_radii, time_array, infall_array=None, reach=20):
         """
         DESCRIPTION:
@@ -546,8 +547,12 @@ class OrbitAnalysis:
             distances    : 2D array (given in kpc physical)
             velocites    : 2D array (km / s)
             virial radii : 1D array (given in kpc physical)
+                           These are the MW-mass HOST halo radii
             time_array   : dictionary
+                           This is the snapshot dictionary stored in the
+                           simulations
             infall array : dictionary (not used at this time, but will be later)
+                           Created from "infall_times()" method above
             reach        : integer
 
         NOTES:
@@ -733,6 +738,7 @@ class OrbitAnalysis:
         #
         return d
 
+    # Optimized, but could also be improved on sliding window part.
     def apocenter_interp(self, distances, velocities, time_array, infall_array, reach=20):
         """
         DESCRIPTION:
@@ -745,7 +751,11 @@ class OrbitAnalysis:
             distances    : 2D array (given in kpc physical)
             velocites    : 2D array (km / s)
             time_array   : dictionary
+                           This is the snapshot dictionary stored in the
+                           simulations
             infall_array : dictionary
+                           This is created from the "infall_times()" method
+                           above
             reach        : integer
 
         NOTES:
@@ -914,6 +924,7 @@ class OrbitAnalysis:
         #
         return d
 
+    # Optimized
     def angular_momentum(self, tree, host=1):
         """
         DESCRIPTION:
@@ -941,6 +952,12 @@ class OrbitAnalysis:
                     - If using a LG simulation, need to specify the second host to
                       get values from that host
         """
+        # Set which host string you're working with
+        if host == 2:
+            hindex = 'host2'
+        else:
+            hindex = 'host'
+        #
         # Initialize a dictionary to save values to and some arrays
         d = dict();
         ang_mom_vec_tot = []
@@ -953,13 +970,9 @@ class OrbitAnalysis:
             #
             # Calculate the different components of angular momentum
             if host == 1:
-                lr = (-1)*tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
-                lphi = (-1)*((tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,2]) - (tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,0]))
-                lz = tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
-            elif host == 2:
-                lr = (-1)*tree.prop('host2.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
-                lphi = (-1)*((tree.prop('host2.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,2]) - (tree.prop('host2.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,0]))
-                lz = tree.prop('host2.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
+                lr = (-1)*tree.prop(hindex+'.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop(hindex+'.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
+                lphi = (-1)*((tree.prop(hindex+'.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop(hindex+'.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,2]) - (tree.prop(hindex+'.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop(hindex+'.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,0]))
+                lz = tree.prop(hindex+'.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop(hindex+'.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
             #
             # Save the values to arrays
             ang_mom_vec_subhalo = np.asarray([(lr[j], lphi[j], lz[j]) for j in range(0, len(lr))])
@@ -990,83 +1003,172 @@ class OrbitAnalysis:
         #
         return d
 
+    # Optimized
     def orbit_period(self, distances, velocities, virial_radii, time_array, infall_array):
         """
-            Calculate orbital period of satellite based on pericenters, and
-            maybe apocenters too.
+        DESCRIPTION:
+            Calculate orbital period of satellite based on pericenters or
+            apocenters.
+
+        VARIABLES:
+            distances    : 2D array (given in kpc physical)
+            velocities   : 2D array (km / s)
+            virial_radii : 1D array (given in kpc physical)
+                           These are the MW-mass HOST halo radii
+            time_array   : dictionary
+                           This is the snapshot dictionary stored in the
+                           simulations
+            infall_array : dictionary (not used at this time, but will be later)
+                           Created from "infall_times()" method above
+
+        NOTES:
+            - Returns a dictionary:
+                - d['pericenter.orbit.period'] is a 2D array
+                    - Each row corresponds to a different subhalo
+                    - Each element corresponds to a different period
+                    - Calculated by taking the pericenter to pericenter times,
+                      which means there are N_peri -1 period calculations
+                - d['apocenter.orbit.check'] is a 2D array
+                    - Similar to d['pericenter.orbit.period']
+                - For a given subhalo, the derived periods refer to orbits going
+                  back in time, i.e. the first element corresponds to the most
+                  recent period, the second is the second-most recent, etc.
+                - Periods are given in Gyr
         """
         # Find the pericenter and apocenter times
         peri_dict = self.pericenter_interp(distances=distances, velocities=velocities, virial_radii=virial_radii, time_array=time_array)
         apo_dict = self.apocenter_interp(distances=distances, velocities=velocities, time_array=time_array, infall_array=infall_array)
         #
+        # Set up empty dictionary to save to
         d = dict()
         #
         # Pericenter periods
+        # Set up empty array to save to
         peri_period = (-1)*np.ones((len(peri_dict['pericenter.dist']), np.max(peri_dict['pericenter.num'])-1))
+        # Loop over each subhalo
         for i in range(0, len(peri_dict['pericenter.time.lb'])):
+            # Check if there are at least 2 pericenters
             if (peri_dict['pericenter.num'][i] > 1):
+                # Loop over the number of pericenters - 1, given how period is calculated
                 for j in range(0, peri_dict['pericenter.num'][i]-1):
                     peri_period[i,j] = peri_dict['pericenter.time.lb'][i][j+1] - peri_dict['pericenter.time.lb'][i][j]
         #
         # Apocenter periods
+        # Set up empty array to save to
         N = np.max([len(apo_dict['apocenter.time.lb'][i]) for i in range(0, len(apo_dict['apocenter.time.lb']))])
         apo_period = (-1)*np.ones((len(apo_dict['apocenter.time.lb']), N-1))
+        # Loop over each subhalo
         for i in range(0, len(apo_dict['apocenter.time.lb'])):
+            # Check if there are apocenter events and more than one of them
             mask = (apo_dict['apocenter.time.lb'][i] != -1)
             if (np.sum(mask) > 1):
+                # Loop over the number of apocenters
                 for j in range(0, np.sum(mask)-1):
                     apo_period[i,j] = apo_dict['apocenter.time.lb'][i][j+1] - apo_dict['apocenter.time.lb'][i][j]
         #
+        # Save to dictionary
         d['pericenter.orbit.period'] = peri_period
         d['apocenter.orbit.period'] = apo_period
+        #
         return d
 
+    # Optimized
     def eccentricity(self, distances, velocities, virial_radii, time_array, infall_array):
         """
-            Calculate the eccentricity based on the apocenters and pericenters.
+        DESCRIPTION:
+            Calculate the eccentricity based on the apocenters and pericenters
+            with the relation below:
+                e = (d_apo - d_peri) / (d_apo + d_peri)
+
+        VARIABLES:
+            distances    : 2D array (given in kpc physical)
+            velocities   : 2D array (km / s)
+            virial_radii : 1D array (given in kpc physical)
+                           These are the MW-mass HOST halo radii
+            time_array   : dictionary
+                           This is the snapshot dictionary stored in the
+                           simulations
+            infall_array : dictionary (not used at this time, but will be later)
+                           Created from "infall_times()" method above
+
+        NOTES:
+            - Returns a 2D array:
+                - Each row corresponds to a different subhalo
+                - Each element corresponds to a different eccentricity
+                - Calculated by taking subsequent peri/apo-center combinations
+                - For a given subhalo, the derived eccentricities refer to orbits
+                  going back in time, i.e. the first element corresponds to the
+                  most recent eccentricity, the second is the second-most
+                  recent, etc.
+                - Unitless
         """
         # Find the pericenter and apocenter times
         peri_dict = self.pericenter_interp(distances=distances, velocities=velocities, virial_radii=virial_radii, time_array=time_array)
         apo_dict = self.apocenter_interp(distances=distances, velocities=velocities, time_array=time_array, infall_array=infall_array)
         #
         # Calculate the eccentricities
+        # Set up empty list to temporarily append to
         ecc = []
+        #
+        # Loop over the number of subhalos
         for n in range(0, len(peri_dict['pericenter.check'])):
+            # Set up temporary array
             ecc_ind = []
+            #
+            # Check if there are pericenters and apocenters, create masks
             if (peri_dict['pericenter.check'][n] & apo_dict['apocenter.check'][n]):
                 mask_peri = (peri_dict['pericenter.dist'][n] != -1)
                 mask_apo = (apo_dict['apocenter.dist'][n] != -1)
                 #
+                # Check if there is at least 1 apocenter event
                 if (np.sum(mask_apo) >= 1):
                     # Check if pericenter was more recent than the apocenter
                     if (peri_dict['pericenter.time.lb'][n][mask_peri][0] < apo_dict['apocenter.time.lb'][n][mask_apo][0]):
+                        # Loop through the number of pericenters
                         for j in range(0, len(peri_dict['pericenter.dist'][n][mask_peri])):
+                            # Loop through the number of apocenters
                             for i in range(0, len(apo_dict['apocenter.dist'][n][mask_apo])):
+                                # Make sure they are adjacent
                                 if ((j-i == 1) or (j-i == 0)):
+                                    # Calculate and append
                                     ecc_ind.append((apo_dict['apocenter.dist'][n][mask_apo][i]-peri_dict['pericenter.dist'][n][mask_peri][j])/(apo_dict['apocenter.dist'][n][mask_apo][i]+peri_dict['pericenter.dist'][n][mask_peri][j]))
                     #
-                    # Check if pericenter was more recent than the apocenter
+                    # Check if apocenter was more recent than the pericenter
                     if (peri_dict['pericenter.time.lb'][n][mask_peri][0] > apo_dict['apocenter.time.lb'][n][mask_apo][0]):
+                        # Loop through the number of pericenters
                         for j in range(0, len(peri_dict['pericenter.dist'][n][mask_peri])):
+                            # Loop through the number of apocenters
                             for i in range(0, len(apo_dict['apocenter.dist'][n][mask_apo])):
+                                # Make sure they are adjacent
                                 if ((i-j == 1) or (i-j == 0)):
+                                    # Calculate and append
                                     ecc_ind.append((apo_dict['apocenter.dist'][n][mask_apo][i]-peri_dict['pericenter.dist'][n][mask_peri][j])/(apo_dict['apocenter.dist'][n][mask_apo][i]+peri_dict['pericenter.dist'][n][mask_peri][j]))
-        #
+            #
+            # Append to main array
             ecc.append(ecc_ind)
+        #
+        # Find the max number of eccentricity values there are in a subhalo population and set up an empty array for the values
         N = np.max([len(ecc[i]) for i in range(0, len(ecc))])
         eccentricity = (-1)*np.ones((len(peri_dict['pericenter.check']), N))
+        #
+        # Loop through the range of values and add to 2D array
         for i in range(0, len(peri_dict['pericenter.check'])):
             for j in range(0, len(ecc[i])):
                 eccentricity[i,j] = ecc[i][j]
+        #
         return eccentricity
 
     def satellite_host_angle(self):
         """
             Calculate the angle between the angular momentum vectors between the
             satellite and host galaxy.
+
+            Never set up or thought of a way to do this, but leaving it in for
+            the time being.
         """
         pass
 
+# Pick up here when documenting again...
 class OrbitGalpy(OrbitAnalysis):
 
     def __init__(self, tree, gal1, location, host, dmo=False):
