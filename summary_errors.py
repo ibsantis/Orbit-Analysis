@@ -58,31 +58,53 @@ t_in_mod = summary.first_infall(data_total, masks_infall, selection='model', ove
 t_in_mod_R200m = summary.infall_diagnostics(data_total, masks_infall, selection='R200m', oversample=True, hosts='all_no_r', sim_type='baryon')
 mask_in_mod = np.isfinite(t_in_mod)
 mask_in_mod_R200m = np.isfinite(t_in_mod_R200m)
-ecc = summary.eccentricity(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
-ecc_model = summary.eccentricity(data_total, masks_infall_peri, selection='model.apsis', oversample=True, hosts='all_no_r', sim_type='baryon')
-mask_finite_sim = np.isfinite(ecc)
-mask_finite_mod = np.isfinite(ecc_model)
-
+#ecc = summary.eccentricity_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+#ecc_model = summary.eccentricity_recent(data_total, masks_infall_peri, selection='model.apsis', oversample=True, hosts='all_no_r', sim_type='baryon')
+#mask_finite_sim = np.isfinite(ecc)
+#mask_finite_mod = np.isfinite(ecc_model)
+#
+ecc = []
+ecc_model = []
+for name in summary.host_names['all_no_r']:
+    for i in range(0, len(data_total[name]['infall.check'])):
+        if data_total[name]['infall.check'][i]:
+            if (data_total[name]['eccentricity.sim'][i][0] != -1) and (data_total[name]['eccentricity.model.apsis'][i][0] != -1):
+                ecc.append(np.repeat(data_total[name]['eccentricity.sim'][i][0], summary.oversample['baryon'][name]))
+                ecc_model.append(np.repeat(data_total[name]['eccentricity.model.apsis'][i][0], summary.oversample['baryon'][name]))
+ecc = np.hstack(ecc)
+ecc_model = np.hstack(ecc_model)
+#
+per = []
+per_model = []
+for name in summary.host_names['all_no_r']:
+    for i in range(0, len(data_total[name]['infall.check'])):
+        if data_total[name]['infall.check'][i]:
+            if (data_total[name]['orbit.period.peri.sim'][i][0] != -1) and (data_total[name]['orbit.period.peri.model'][i][0] != -1):
+                per.append(np.repeat(data_total[name]['orbit.period.peri.sim'][i][0], summary.oversample['baryon'][name]))
+                per_model.append(np.repeat(data_total[name]['orbit.period.peri.model'][i][0], summary.oversample['baryon'][name]))
+per = np.hstack(per)
+per_model = np.hstack(per_model)
 
 
 
 def rmse(sim, mod):
     return np.sqrt(np.sum((sim-mod)**2)/len(sim))
 
-print(rmse(d_rec_sim, d_rec_mod))
-print(rmse(d_min_sim, d_min_mod))
-print(rmse(t_rec_sim, t_rec_mod))
-print(rmse(t_min_sim, t_min_mod))
-print(rmse(n_sim, n_mod_mod_infall))
-print(rmse(n_sim, n_mod_r200))
-print(rmse(v_rec_sim, v_rec_mod))
-print(rmse(v_min_sim, v_min_mod))
-print(rmse(dapo_rec_sim, dapo_rec_mod))
-print(rmse(dmax_sim, dmax_mod))
-print(rmse(tapo_rec_sim, tapo_rec_mod))
-print(rmse(t_in_sim[mask_in_mod], t_in_mod[mask_in_mod]))
-print(rmse(t_in_sim[mask_in_mod_R200m], t_in_mod_R200m[mask_in_mod_R200m]))
-print(rmse(ecc[mask_finite_sim*mask_finite_mod], ecc_model[mask_finite_sim*mask_finite_mod]))
+print('The RMSE of d_rec is {0}'.format(rmse(d_rec_sim, d_rec_mod)))
+print('The RMSE of d_min is {0}'.format(rmse(d_min_sim, d_min_mod)))
+print('The RMSE of t_rec is {0}'.format(rmse(t_rec_sim, t_rec_mod)))
+#print('The RMSE of t_min is {0}'.format(rmse(t_min_sim, t_min_mod)))
+print('The RMSE of N_r is {0}'.format(rmse(n_sim, n_mod_mod_infall)))
+print('The RMSE of N_r200 is {0}'.format(rmse(n_sim, n_mod_r200)))
+print('The RMSE of v_rec is {0}'.format(rmse(v_rec_sim, v_rec_mod)))
+print('The RMSE of v_min is {0}'.format(rmse(v_min_sim, v_min_mod)))
+print('The RMSE of d_apo is {0}'.format(rmse(dapo_rec_sim, dapo_rec_mod)))
+#print('The RMSE of d_max is {0}'.format(rmse(dmax_sim, dmax_mod)))
+#print('The RMSE of t_apo is {0}'.format(rmse(tapo_rec_sim, tapo_rec_mod)))
+print('The RMSE of t_infall is {0}'.format(rmse(t_in_sim[mask_in_mod], t_in_mod[mask_in_mod])))
+print('The RMSE of t_infall,R200m is {0}'.format(rmse(t_in_sim[mask_in_mod_R200m], t_in_mod_R200m[mask_in_mod_R200m])))
+print('The RMSE of eccentricity is {0}'.format(rmse(ecc, ecc_model)))
+print('The RMSE of period is {0}'.format(rmse(per, per_model)))
 
 def rmse_norm(sim, mod):
     results = []
@@ -98,19 +120,19 @@ def rmse_norm(sim, mod):
 
 print(rmse_norm(d_rec_sim, d_rec_mod))
 print(rmse_norm(d_min_sim, d_min_mod))
-print(rmse_norm(t_rec_sim, t_rec_mod))
-print(rmse_norm(t_min_sim, t_min_mod))
-print(rmse_norm(n_sim, n_mod_mod_infall))
-print(rmse_norm(n_sim, n_mod_r200))
-print(rmse_norm(v_rec_sim, v_rec_mod))
-print(rmse_norm(v_min_sim, v_min_mod))
+#print(rmse_norm(t_rec_sim, t_rec_mod))
+#print(rmse_norm(t_min_sim, t_min_mod))
+#print(rmse_norm(n_sim, n_mod_mod_infall))
+#print(rmse_norm(n_sim, n_mod_r200))
+#print(rmse_norm(v_rec_sim, v_rec_mod))
+#print(rmse_norm(v_min_sim, v_min_mod))
 print(rmse_norm(dapo_rec_sim, dapo_rec_mod))
 print(rmse_norm(dmax_sim, dmax_mod))
-print(rmse_norm(tapo_rec_sim, tapo_rec_mod))
-print(rmse_norm(t_in_sim[mask_in_mod], t_in_mod[mask_in_mod]))
-print(rmse_norm(t_in_sim[mask_in_mod_R200m], t_in_mod_R200m[mask_in_mod_R200m]))
-print(rmse_norm(ecc[mask_finite_sim*mask_finite_mod], ecc_model[mask_finite_sim*mask_finite_mod]))
-
+#print(rmse_norm(tapo_rec_sim, tapo_rec_mod))
+#print(rmse_norm(t_in_sim[mask_in_mod], t_in_mod[mask_in_mod]))
+#print(rmse_norm(t_in_sim[mask_in_mod_R200m], t_in_mod_R200m[mask_in_mod_R200m]))
+#print(rmse_norm(ecc, ecc_model))
+#print(rmse_norm(per, per_model))
 
 def width_of_68(x_array):
     onesigp = 84.13
@@ -119,19 +141,21 @@ def width_of_68(x_array):
     upper = np.percentile(x_array, onesigp)
     lower = np.percentile(x_array, onesigm)
     #
-    return (upper-lower, (upper-lower)/2)
+    #return (upper-lower, (upper-lower)/2)
+    return upper-lower
 
-print(width_of_68(x_array=(d_rec_mod-d_rec_sim)/d_rec_sim))
-print(width_of_68(x_array=(d_min_mod-d_min_sim)/d_min_sim))
-print(width_of_68(x_array=(t_rec_mod-t_rec_sim)))
-print(width_of_68(x_array=(t_min_mod-t_min_sim)))
-print(width_of_68(x_array=(n_sim-n_mod_mod_infall)))
-print(width_of_68(x_array=(n_sim-n_mod_r200)))
-print(width_of_68(x_array=(v_rec_mod-v_rec_sim)/v_rec_sim))
-print(width_of_68(x_array=(v_min_mod-v_min_sim)/v_min_sim))
-print(width_of_68(x_array=(dapo_rec_mod-dapo_rec_sim)/dapo_rec_sim))
-print(width_of_68(x_array=(dmax_mod-dmax_sim)/dmax_sim))
-print(width_of_68(x_array=(tapo_rec_mod-tapo_rec_sim)))
-print(width_of_68(x_array=(t_in_mod[mask_in_mod]-t_in_sim[mask_in_mod])))
-print(width_of_68(x_array=(t_in_mod_R200m[mask_in_mod_R200m]-t_in_sim[mask_in_mod_R200m])))
-print(width_of_68(x_array=(ecc_model[mask_finite_sim*mask_finite_mod]-ecc[mask_finite_sim*mask_finite_mod])/ecc[mask_finite_sim*mask_finite_mod]))
+print('The width of the 68-ile for d_rec is {}'.format(width_of_68(x_array=(d_rec_mod-d_rec_sim)/d_rec_sim)))
+print('The width of the 68-ile for d_min is {}'.format(width_of_68(x_array=(d_min_mod-d_min_sim)/d_min_sim)))
+print('The width of the 68-ile for t_rec is {}'.format(width_of_68(x_array=(t_rec_mod-t_rec_sim))))
+#print('The width of the 68-ile for t_min is {}'.format(width_of_68(x_array=(t_min_mod-t_min_sim))))
+print('The width of the 68-ile for N_r is {}'.format(width_of_68(x_array=(n_sim-n_mod_mod_infall))))
+print('The width of the 68-ile for N_r200 is {}'.format(width_of_68(x_array=(n_sim-n_mod_r200))))
+print('The width of the 68-ile for v_rec is {}'.format(width_of_68(x_array=(v_rec_mod-v_rec_sim))))
+print('The width of the 68-ile for v_min is {}'.format(width_of_68(x_array=(v_min_mod-v_min_sim))))
+print('The width of the 68-ile for d_apo is {}'.format(width_of_68(x_array=(dapo_rec_mod-dapo_rec_sim)/dapo_rec_sim)))
+#print('The width of the 68-ile for d_max is {}'.format(width_of_68(x_array=(dmax_mod-dmax_sim)/dmax_sim)))
+#print('The width of the 68-ile for t_apo is {}'.format(width_of_68(x_array=(tapo_rec_mod-tapo_rec_sim))))
+print('The width of the 68-ile for t_infall is {}'.format(width_of_68(x_array=(t_in_mod[mask_in_mod]-t_in_sim[mask_in_mod]))))
+print('The width of the 68-ile for t_infall,R200m is {}'.format(width_of_68(x_array=(t_in_mod_R200m[mask_in_mod_R200m]-t_in_sim[mask_in_mod_R200m]))))
+print('The width of the 68-ile for eccentricity is {}'.format(width_of_68(x_array=(ecc_model-ecc))))
+print('The width of the 68-ile for period is {}'.format(width_of_68(x_array=(per_model-per))))
