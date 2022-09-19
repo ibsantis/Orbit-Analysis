@@ -201,11 +201,15 @@ ax1.plot(10**(x_sgk), 10**(smhm_sgk_1), color='#006400', linestyle='--', alpha=0
 ax1.plot(10**(x_behroozi), 10**(y_behroozi), color='k', linestyle='--', alpha=0.4)
 ax1.plot(10**(x_behroozi_new), 10**(smhm_behroozi(x_behroozi_new)), linestyle='--', color='k', alpha=0.4, label='Behroozi+ (2020)')
 #
+# Plot Fitts points as +s
+x_fitts = np.array([8.16e9, 9.29e9, 8.92e9, 8.43e9, 1.02e10, 7.82e9, 8.56e9, 7.92e9, 1.28e10, 1.06e10, 1.10e10, 1.15e10, 1.06e10, 1.15e10])
+y_fitts = np.array([1e5, 4.56e5, 5.75e5, 1.53e6, 1.98e6, 2.08e6, 4.11e6, 5.70e6, 7.80e6, 8.01e6, 9.74e6, 1.04e7, 1.30e7, 1.44e7])
+ax1.scatter(x=x_fitts, y=y_fitts, marker='+', s=150, c='k', alpha=0.7, label='Fitts+ (2017)')
+#
 # Plot Coral's points as stars
-ax1.scatter(x=2.5e9, y=12e3, marker='*', s=150, c='k', label='Wheeler+ (2019)')
-ax1.scatter(x=3.2e9, y=41e3, marker='*', s=150, c='k')
-ax1.scatter(x=9e9, y=330e3, marker='*', s=150, c='k')
-ax1.scatter(x=7.7e9, y=5200e3, marker='*', s=150, c='k')
+x_wheeler = np.array([2.5e9, 3.2e9, 9e9, 7.7e9])
+y_wheeler = np.array([12e3, 41e3, 330e3, 5200e3])
+ax1.scatter(x=x_wheeler, y=y_wheeler, marker='*', s=150, c='m', alpha=0.7, label='Wheeler+ (2019)')
 #
 plt.hlines(y=3*10**4, xmin=10**(limits[0][0]), xmax=10**(limits[0][1]), colors='k', linestyles='dotted', alpha=0.5)
 #
@@ -215,7 +219,7 @@ ax1.set_xscale('log')
 ax1.set_yscale('log')
 ax1.set_xlabel('$M_{\\rm halo,peak}$ [$M_{\\odot}$]', fontsize=30)
 ax1.set_ylabel('$M_{\\rm star}$ [$M_{\\odot}$]', fontsize=30)
-ax1.legend(prop={'size': 22}, loc='best')
+ax1.legend(prop={'size': 21}, loc='best')
 ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26)
 plt.tight_layout()
 #plt.show()
