@@ -507,7 +507,8 @@ class OrbitAnalysis:
         #
         host_infall_check = np.zeros(self.shape[0], bool)
         any_ind = (-1)*np.ones(self.shape[0], int)
-        any_mass = (-1)*np.ones(self.shape[0])
+        any_star_mass = (-1)*np.ones(self.shape[0])
+        any_halo_mass = (-1)*np.ones(self.shape[0])
         #
         # Set up lookback time array
         lookback = time_array['time'][-1] - time_array['time']
@@ -531,16 +532,19 @@ class OrbitAnalysis:
                     host_infall_check[i] = True
                 else:
                     any_ind[i] = central_inds[central_inds >= 0][-1]
-                    any_mass[i] = tree['star.mass'][central_inds[central_inds >= 0][-1]]
+                    any_star_mass[i] = tree['star.mass'][central_inds[central_inds >= 0][-1]]
+                    any_halo_mass[i] = tree['mass'][central_inds[central_inds >= 0][-1]]
         #
         # Save arrays to a dictionary
         d['first.infall.snap.any'] = first_infall_snap
         d['first.infall.time.any'] = first_infall_times
         d['first.infall.time.lb.any'] = first_infall_times_lookback
         d['infall.check.any'] = infall_check
+        #
         d['host.check'] = host_infall_check
         d['any.host.ind'] = any_ind
-        d['any.host.mass'] = any_mass
+        d['any.host.star.mass'] = any_star_mass
+        d['any.host.halo.mass'] = any_halo_mass
         #
         return d
 
