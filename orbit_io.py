@@ -474,7 +474,7 @@ class OrbitAnalysis:
         #
         return d
 
-    def first_infall_any(self, tree, time_array):
+    def first_infall_any(self, tree, time_array, host=1):
         """
         DESCRIPTION:
             Reads in subhalo indices and halo tree, then finds the first instance
@@ -483,6 +483,7 @@ class OrbitAnalysis:
         VARIABLES:
             tree           : dictionary
             time_array     : dictionary
+            host           : integer
 
         NOTES:
             - Returns a dictionary
@@ -496,6 +497,11 @@ class OrbitAnalysis:
             - Negative elements correspond to subhalos that have not fallen into
               the host galaxy
         """
+        if host == 1:
+            host_str = 'host'
+        else:
+            host_str = 'host2'
+        #
         # Set up a dictionary to store the information you want
         d = dict();
         #
@@ -514,7 +520,7 @@ class OrbitAnalysis:
         lookback = time_array['time'][-1] - time_array['time']
         #
         # Loop over subhalos
-        host_ind = tree.prop('progenitor.main.indices', tree['host.index'][0])
+        host_ind = tree.prop('progenitor.main.indices', tree[host_str+'.index'][0])
         #
         for i in range(0, self.shape[0]):
             # For each subhalo, selects the indices that it existed at
