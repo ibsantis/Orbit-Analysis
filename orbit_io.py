@@ -154,7 +154,6 @@ class OrbitRead:
 
 class OrbitAnalysis:
 
-    # optimized
     def __init__(self, tree, gal1, location, host, dmo=False):
         """
         DESCRIPTION:
@@ -226,7 +225,6 @@ class OrbitAnalysis:
         #
         self.shape = self.sub_inds.shape
 
-    # Optimized
     def halo_distances(self, tree, dist_type='total', host=1):
         """
         DESCRIPTION:
@@ -294,7 +292,6 @@ class OrbitAnalysis:
         #
         return distances
 
-    # Optimized
     def halo_distances_norm(self, distances, host_halo_radii):
         """
         DESCRIPTION:
@@ -330,7 +327,6 @@ class OrbitAnalysis:
                 distances_norm[i][j] = val
         return distances_norm
 
-    # Optimized
     def halo_velocities(self, tree, host=1, vel_type='total'):
         """
         DESCRIPTION:
@@ -374,7 +370,6 @@ class OrbitAnalysis:
         #
         return velocities
 
-    # Optimized
     def infall_times(self, distances_norm, time_array):
         """
         DESCRIPTION:
@@ -479,7 +474,6 @@ class OrbitAnalysis:
         #
         return d
 
-    # Optimized
     def first_infall_any(self, tree, time_array):
         """
         DESCRIPTION:
@@ -511,10 +505,16 @@ class OrbitAnalysis:
         first_infall_times_lookback = (-1)*np.ones(self.shape[0])
         infall_check = np.zeros(self.shape[0], bool)
         #
+        host_infall_check = np.zeros(self.shape[0], bool)
+        any_ind = (-1)*np.ones(self.shape[0], int)
+        any_mass = (-1)*np.ones(self.shape[0])
+        #
         # Set up lookback time array
         lookback = time_array['time'][-1] - time_array['time']
         #
         # Loop over subhalos
+        host_ind = tree.prop('progenitor.main.indices', tree['host.index'][0])
+        #
         for i in range(0, self.shape[0]):
             # For each subhalo, selects the indices that it existed at
             mask = (self.sub_inds[i] >= 0)
@@ -526,12 +526,21 @@ class OrbitAnalysis:
                 first_infall_times[i] = time_array['time'][first_infall_snap[i]]
                 first_infall_times_lookback[i] = lookback[first_infall_snap[i]]
                 infall_check[i] = True
+                #
+                if (central_inds[central_inds >= 0][-1] in host_ind):
+                    host_infall_check[i] = True
+                else:
+                    any_ind[i] = central_inds[central_inds >= 0][-1]
+                    any_mass[i] = tree['star.mass'][central_inds[central_inds >= 0][-1]]
         #
         # Save arrays to a dictionary
         d['first.infall.snap.any'] = first_infall_snap
         d['first.infall.time.any'] = first_infall_times
         d['first.infall.time.lb.any'] = first_infall_times_lookback
         d['infall.check.any'] = infall_check
+        d['host.check'] = host_infall_check
+        d['any.host.ind'] = any_ind
+        d['any.host.mass'] = any_mass
         #
         return d
 
@@ -924,7 +933,6 @@ class OrbitAnalysis:
         #
         return d
 
-    # Optimized
     def angular_momentum(self, tree, host=1):
         """
         DESCRIPTION:
@@ -1003,7 +1011,6 @@ class OrbitAnalysis:
         #
         return d
 
-    # Optimized
     def orbit_period(self, distances, velocities, virial_radii, time_array, infall_array):
         """
         DESCRIPTION:
@@ -1072,7 +1079,6 @@ class OrbitAnalysis:
         #
         return d
 
-    # Optimized
     def eccentricity(self, distances, velocities, virial_radii, time_array, infall_array):
         """
         DESCRIPTION:
@@ -1877,3 +1883,13 @@ class OrbitPlot(OrbitAnalysis):
                     if host == 2:
                         plt.savefig(self.home_dir+'/orbit_data/plots/subhalo_integration/'+self.gal_2+'/'+self.gal_2+'_sub_'+str(i+1)+'.pdf')
                 plt.close()
+
+# Testing out some of what Shea wrote in elvis_analysis.elvis_plot.OrbitPropertyClass().get_subhalos_match()
+class OrbitMatch(OrbitAnalysis):
+
+    def __init__(self, tree, gal1, location, host, dmo=False):
+        """
+        This is required to inherit the subhalo indices defined from
+        OrbitAnalysis.__init__()
+        """
+        OrbitAnalysis.__init__(self, tree, gal1, location, host, dmo=dmo)
