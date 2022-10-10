@@ -17,6 +17,7 @@ import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
 import matplotlib.ticker
+from scipy.interpolate import splrep, splev
 
 
 class SummaryDataSort:
@@ -174,6 +175,50 @@ class SummaryDataSort:
                 data_dict[name] = data
         #
         return data_dict
+
+    def data_mass_profile_read(self, directory, hosts='all'):
+        """
+        Testing how to read in the data
+        """
+        data_dict = dict()
+        #
+        for name in self.host_names[hosts]:
+            data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/mass_profiles/'+name+'_mass_profile_all', verbose=True)
+            data_dict[name] = data['mass.profile']
+        #
+        data_dict['snapshot'] = data['snapshot']
+        data_dict['time'] = data['time']
+        data_dict['rs'] = np.logspace(np.log10(5), np.log10(500), 25)
+        data_dict['rs.interp'] = np.logspace(np.log10(data_dict['rs'][0]), np.log10(data_dict['rs'][-1]), 1000)
+        #
+        return data_dict
+
+    # testing
+    def da_dr(self, mass_profile, hosts='all'):
+        """
+        Testing how to calculate da_dr at d_peri,min
+        """
+        da_dr_all = dict()
+        rs = mass_profile['rs']
+        rs_new = mass_profile['rs.interp']
+        #
+        for name in self.host_names[hosts]:
+            tidal_field_ind = np.zeros(mass_profile[name].shape)
+            da_dr_ind = np.zeros((mass_profile[name].shape[0], len(rs_new)))
+            #
+            # Loop through each snapshot
+            for i in range(0, mass_profile[name].shape[0]):
+                # Loop through each distance, i.e. each value of the enclosed mass
+                for j in range(0, mass_profile[name].shape[1]):
+                    # Calculate the tidal acceleration
+                    tidal_field_ind[i,j] = (mass_profile[name][i][j]/rs[j+1]**2)*(6.67*10**(-11))*(2*10**(30)*100)/((1000**2)*(3.086*10**(16))**2) # in cm/s^2
+            #
+            for i in range(0, mass_profile[name].shape[0]):
+                spline_fit = splrep(x=rs[1:], y=tidal_field_ind[i])
+                da_dr_ind[i] = splev(rs_new, spline_fit, der=1)*(1/1000)*(1/(3.086*10**(18))) # Needed to convert the denominator to cm
+            da_dr_all[name] = da_dr_ind
+        #
+        return da_dr_all
 
     def data_mask(self, dictionary, outliers=False, peri_sim=True, peri_model=False, current_sat=False, either=False, hosts='all'):
         """
@@ -1054,32 +1099,37 @@ class SummaryDataSort:
             - If a subhalo has not experienced a pericenter, sets the most recent
               pericenter time equal to 0 Gyr, i.e. present-day.
         """
-        # Set up an empty list to save the data to
-        data = []
-        #
-        # Loop through each host galaxy
-        for name in self.host_names[hosts]:
-            # Loop through each subhalo
-            for i in range(0, len(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]])):
-                # Mask out the null values
-                mask_temp = (data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i] != -1)
-                # If there are no pericenters, set the lookback time to present-day, oversample if needed and append to the list
-                if np.sum(mask_temp) == 0:
-                    if oversample:
-                        data.append(np.repeat(0.0, self.oversample[sim_type][name]))
+        if selection == 'sim':
+            # Set up an empty list to save the data to
+            data = []
+            #
+            # Loop through each host galaxy
+            for name in self.host_names[hosts]:
+                # Loop through each subhalo
+                for i in range(0, len(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]])):
+                    # Mask out the null values
+                    mask_temp = (data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i] != -1)
+                    # If there are no pericenters, set the lookback time to present-day, oversample if needed and append to the list
+                    if np.sum(mask_temp) == 0:
+                        if oversample:
+                            data.append(np.repeat(0.0, self.oversample[sim_type][name]))
+                        else:
+                            data.append(0.0)
+                    #
+                    # If there pericenters, find the minimum, select the time, oversample if needed and append to the list
                     else:
-                        data.append(0.0)
-                #
-                # If there pericenters, find the minimum, select the time, oversample if needed and append to the list
-                else:
-                    index = np.where(np.min(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask_temp]) \
-                                     == data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask_temp])[0][0]
-                    if oversample:
-                        data.append(np.repeat(data_dict[name]['pericenter.time.lb.'+selection][mask_dict[name]][i][mask_temp][index], self.oversample[sim_type][name]))
-                    else:
-                        data.append(data_dict[name]['pericenter.time.lb.'+selection][mask_dict[name]][i][mask_temp][index])
+                        index = np.where(np.min(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask_temp]) \
+                                         == data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask_temp])[0][0]
+                        if oversample:
+                            data.append(np.repeat(data_dict[name]['pericenter.time.lb.'+selection][mask_dict[name]][i][mask_temp][index], self.oversample[sim_type][name]))
+                        else:
+                            data.append(data_dict[name]['pericenter.time.lb.'+selection][mask_dict[name]][i][mask_temp][index])
+            #
+            return np.hstack(data)
         #
-        return np.hstack(data)
+        else:
+            data = self.tperi_recent(data_dict, mask_dict, selection=selection, oversample=oversample, hosts=hosts, sim_type=sim_type)
+            return data
 
     def delta_tperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all', sim_type='baryon'):
         """
@@ -2383,6 +2433,159 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    # Testing something out
+    def da_dr_dperi_min(self, data_dict, mask_dict, mass_profile_dict, da_dr_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
+        """
+        Finding da_dr at d_peri,min
+        """
+        data = []
+        data_dist = []
+        data_time = []
+        #
+        # Loop through all of the hosts
+        for name in self.host_names[hosts]:
+            #
+            if selection == 'sim':
+                # Loop through each of the satellites in a given host
+                for i in range(0, len(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]])):
+                    #
+                    # Find only real pericenters
+                    mask = (data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i] != -1)
+                    #
+                    # Get the minimum pericenter index and save the distance and time of this event
+                    min_ind = np.where(np.min(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask]) == data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask])[0][0]
+                    d_min = data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask][min_ind]
+                    t_min = data_dict[name]['pericenter.time.'+selection][mask_dict[name]][i][mask][min_ind]
+                    #
+                    # Find the snapshot when this occurred
+                    t_ind = np.where(np.min(np.abs(t_min - mass_profile_dict['time'])) == np.abs(t_min - mass_profile_dict['time']))[0][0]
+                    snapshot_min = mass_profile_dict['snapshot'][t_ind]
+                    #
+                    # Find the index of the minimum pericenter in the interpolated distance array
+                    d_ind = np.where(np.min(np.abs(d_min - mass_profile_dict['rs.interp'])) ==  np.abs(d_min - mass_profile_dict['rs.interp']))[0][0]
+                    #
+                    # Find the dadr value at the right snapshot, at the interpolated distance that corresponds to the minimum pericenter
+                    da_dr_min = np.abs(da_dr_dict[name][snapshot_min-2][d_ind])
+                    #
+                    if oversample:
+                        data.append(np.repeat(da_dr_min, self.oversample[sim_type][name]))
+                        data_dist.append(np.repeat(mass_profile_dict['rs.interp'][d_ind], self.oversample[sim_type][name]))
+                        data_time.append(np.repeat(mass_profile_dict['time'][t_ind], self.oversample[sim_type][name]))
+                    else:
+                        data.append(da_dr_min)
+                        data_dist.append(mass_profile_dict['rs.interp'][d_ind])
+                        data_time.append(mass_profile_dict['time'][t_ind])
+            #
+            elif selection == 'model':
+                # Loop through each of the satellites
+                for i in range(0, len(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]])):
+                    #
+                    # Make sure there is a recent pericenter in the model
+                    if (data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][0] != -1):
+                        #
+                        # Get the minimum pericenter index and save the distance and time of this event
+                        d_min = data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][0]
+                        t_min = data_dict[name]['pericenter.time.'+selection][mask_dict[name]][i][0]
+                        #
+                    else:
+                        d_min = data_dict[name]['d.tot.'+selection][mask_dict[name]][i][0]
+                        t_min = mass_profile_dict['time'][-1]
+                    # Find the snapshot when this occurred
+                    t_ind = np.where(np.min(np.abs(t_min - mass_profile_dict['time'])) == np.abs(t_min - mass_profile_dict['time']))[0][0]
+                    snapshot_min = mass_profile_dict['snapshot'][t_ind]
+                    #
+                    # Find the index of the minimum pericenter in the interpolated distance array
+                    d_ind = np.where(np.min(np.abs(d_min - mass_profile_dict['rs.interp'])) ==  np.abs(d_min - mass_profile_dict['rs.interp']))[0][0]
+                    #
+                    # Find the dadr value at the right snapshot, at the interpolated distance that corresponds to the minimum pericenter
+                    da_dr_min = np.abs(da_dr_dict[name][-1][d_ind]) # want the da/dr field at z = 0 because it doesn't change in the model
+                    #
+                    if oversample:
+                        data.append(np.repeat(da_dr_min, self.oversample[sim_type][name]))
+                        data_dist.append(np.repeat(mass_profile_dict['rs.interp'][d_ind], self.oversample[sim_type][name]))
+                        data_time.append(np.repeat(mass_profile_dict['time'][t_ind], self.oversample[sim_type][name]))
+                    else:
+                        data.append(da_dr_min)
+                        data_dist.append(mass_profile_dict['rs.interp'][d_ind])
+                        data_time.append(mass_profile_dict['time'][t_ind])
+        #
+        d = dict()
+        d['dadr'] = np.hstack(data)
+        d['dadr.dist.interp'] = np.hstack(data_dist)
+        d['dadr.time.interp'] = np.hstack(data_time)
+        d['dadr.time.lb.interp'] = np.hstack(mass_profile_dict['time'][-1] - data_time)
+        #
+        return d
+
+    # Testing another thing out
+    def da_dr_max(self, data_dict, mask_dict, mass_profile_dict, da_dr_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
+        """
+        Finding da_dr at d_peri,min
+        """
+        data = []
+        data_dist = []
+        data_time = []
+        #
+        # Loop through all of the hosts
+        for name in self.host_names[hosts]:
+            #
+            if selection == 'sim':
+                # Loop through each of the satellites in a given host
+                for i in range(0, len(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]])):
+                    mask = (data_dict[name]['d.tot.'+selection][mask_dict[name]][i] != -1)
+                    initial = (-1)*1e6
+                    d_initial = -1
+                    t_initial = -1
+                    #
+                    # Loop through the number of snapshots
+                    for j in range(0, len(data_dict[name]['d.tot.'+selection][mask_dict[name]][i][mask])):
+                        d_ind = np.where(np.min(np.abs(data_dict[name]['d.tot.'+selection][mask_dict[name]][i][mask][j] - mass_profile_dict['rs.interp'])) == np.abs(data_dict[name]['d.tot.'+selection][mask_dict[name]][i][mask][j] - mass_profile_dict['rs.interp']))[0][0]
+                        if (np.flip(np.abs(da_dr_dict[name]), axis=0)[j][d_ind] > initial):
+                            initial = np.flip(np.abs(da_dr_dict[name]), axis=0)[j][d_ind]
+                            d_initial = mass_profile_dict['rs.interp'][d_ind]
+                            t_initial = np.flip(mass_profile_dict['time'], axis=0)[j]
+                    #
+                    if oversample:
+                        data.append(np.repeat(initial, self.oversample[sim_type][name]))
+                        data_dist.append(np.repeat(d_initial, self.oversample[sim_type][name]))
+                        data_time.append(np.repeat(t_initial, self.oversample[sim_type][name]))
+                    else:
+                        data.append(initial)
+                        data_dist.append(d_initial)
+                        data_time.append(t_initial)
+            #
+            elif selection == 'model':
+                # Loop through each of the satellites in a given host
+                for i in range(0, len(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]])):
+                    mask = (data_dict[name]['d.tot.'+selection][mask_dict[name]][i] != -1)
+                    initial = (-1)*1e6
+                    d_initial = -1
+                    t_initial = -1
+                    #
+                    # Loop through the number of snapshots
+                    for j in range(0, len(data_dict[name]['d.tot.'+selection][mask_dict[name]][i][mask])-2): # Need to avoid probing snapshots that don't have da/dr data
+                        d_ind = np.where(np.min(np.abs(data_dict[name]['d.tot.'+selection][mask_dict[name]][i][mask][j] - mass_profile_dict['rs.interp'])) == np.abs(data_dict[name]['d.tot.'+selection][mask_dict[name]][i][mask][j] - mass_profile_dict['rs.interp']))[0][0]
+                        if (np.flip(np.abs(da_dr_dict[name]), axis=0)[0][d_ind] > initial):
+                            initial = np.flip(np.abs(da_dr_dict[name]), axis=0)[0][d_ind]
+                            d_initial = mass_profile_dict['rs.interp'][d_ind]
+                            t_initial = np.flip(mass_profile_dict['time'], axis=0)[j]
+                    #
+                    if oversample:
+                        data.append(np.repeat(initial, self.oversample[sim_type][name]))
+                        data_dist.append(np.repeat(d_initial, self.oversample[sim_type][name]))
+                        data_time.append(np.repeat(t_initial, self.oversample[sim_type][name]))
+                    else:
+                        data.append(initial)
+                        data_dist.append(d_initial)
+                        data_time.append(t_initial)
+        #
+        d = dict()
+        d['dadr'] = np.hstack(data)
+        d['dadr.dist.interp'] =  np.hstack(data_dist)
+        d['dadr.time.interp'] =  np.hstack(data_time)
+        d['dadr.time.lb.interp'] =  np.hstack(mass_profile_dict['time'][-1] - data_time)
+        #s
+        return d
 
 class SummaryDataPlot(SummaryDataSort):
 
@@ -2442,6 +2645,7 @@ class SummaryDataPlot(SummaryDataSort):
                        't.infall.any': 't$_{\\rm infall,any,lb}$ [Gyr]',\
                        't.infall.text': 'Infall lookback time [Gyr]',\
                        't.infall.diff': '(t$_{\\rm infall,any,lb}$ - t$_{\\rm infall,lb}$) [Gyr]',\
+                       't.lb': 'Lookback time [Gyr]',\
                        'delta_t_infall': '(t$_{\\rm infall,model,lb}$ - t$_{\\rm infall,sim,lb}$) [Gyr]',\
                        'delta.t.frac': '(t$_{\\rm peri,model}$ - t$_{\\rm peri,sim}$)/t$_{\\rm peri,sim}$',\
                        'delta.t': '(t$_{\\rm peri,model}$ - t$_{\\rm peri,sim}$) [Gyr]',\
@@ -2472,6 +2676,16 @@ class SummaryDataPlot(SummaryDataSort):
                        'period': 'Orbital Period [Gyr]',\
                        'period.model': 'Model Orbital Period [Gyr]',\
                        'period.delta': '$T_{\\rm model} - T_{\\rm sim}$ [Gyr]',\
+                       'dadr': '$|da/dr|$ [$s^{-2}$]',\
+                       'dadr.log': 'log$_{\\rm 10}$($|da/dr|$)',\
+                       'dadr.min': '$|da/dr|_{dperi,min}$ [$s^{-2}$]',\
+                       'dadr.max': '$|da/dr|_{max}$ [$s^{-2}$]',\
+                       'dadr.min.t': '$t_{\\rm da/dr, dperi, min}$ [Gyr]',\
+                       'dadr.max.t': '$t_{\\rm da/dr, max}$ [Gyr]',\
+                       'dadr.diff': '$|da/dr|_{dperi,min}-|da/dr|_{max}$ [$s^{-2}$]',\
+                       'dadr.diff.log': 'log $|da/dr|_{dperi,min}$ - log $|da/dr|_{max}$ [$s^{-2}$]',\
+                       'dadr.diff.t': '$t_{\\rm da/dr,dperi,min} - t_{\\rm da/dr,max}$ [Gyr]',\
+                       'dadr.frac': '$(|da/dr|_{dperi,min}-|da/dr|_{max})/|da/dr|_{dperi,min}$',\
                        #
                        # I don't really use the ones below here...
                        'delta_dmin_dm_v_star': '(d$_{\\rm min,dm}$ - d$_{\\rm min,star}$) [kpc]',\
@@ -3159,7 +3373,7 @@ class SummaryDataPlot(SummaryDataSort):
             plt.scatter(np.mean(x), y_mean, s=250, marker='s', c='k')
         #
         plt.xlim(xlimits)
-        plt.xlabel(self.labels[xtype], fontsize=36)
+        plt.xlabel(self.labels[xtype], fontsize=28)
         plt.ylabel(y_label, fontsize=34)
         if title:
             plt.title(title, fontsize=24)
