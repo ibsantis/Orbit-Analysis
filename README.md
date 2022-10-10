@@ -1,6 +1,10 @@
 # Description
 
+---
+
 # Requirements
+
+---
 
 # Contents
 
@@ -10,11 +14,19 @@ Talk about first file
 ## File 2
 Talk about second file...
 
+---
+
 # Units
+
+---
 
 # Installing
 
+---
+
 # Using
+
+---
 
 # License
 Copyright stuff...
