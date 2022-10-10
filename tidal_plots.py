@@ -32,14 +32,14 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location='mac')
-sim_data.galaxy = sim_data.gal_2
+sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
+#sim_data.galaxy = sim_data.gal_2
 print('Set paths')
 
 # Read in the data
 masses = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.galaxy+'_mass_profile_all')
 rs = np.logspace(np.log10(5), np.log10(500), 25)
-rs_new = np.logspace(np.log10(rs[1]), np.log10(rs[-1]), 1000)
+rs_new = np.logspace(np.log10(rs[0]), np.log10(rs[-1]), 1000)
 print('Read the data in')
 
 # Set up empty arrays to save to
