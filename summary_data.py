@@ -42,8 +42,8 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-loc = 'peloton'
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location=loc)
+loc = 'stampede'
+sim_data = orbit_io.OrbitRead(gal1='m12b', location=loc)
 plotting = False
 print('Set paths')
 
@@ -285,7 +285,7 @@ if sim_data.num_gal == 2:
     #
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii*mass_ratio)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
-    infall_info_any = orbits.first_infall_any(halt, snaps)
+    infall_info_any = orbits.first_infall_any(halt, snaps, host=1)
     peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
     apos = orbits.apocenter_interp(distances=halt_dists, velocities=halt_vels, time_array=snaps, infall_array=infall_info)
     angs = orbits.angular_momentum(tree=halt)
@@ -496,7 +496,7 @@ if sim_data.num_gal == 2:
     #
     halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii*mass_ratio)
     infall_info = orbits.infall_times(halt_dists_norm, snaps)
-    infall_info_any = orbits.first_infall_any(halt, snaps)
+    infall_info_any = orbits.first_infall_any(halt, snaps, host=2)
     peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
     apos = orbits.apocenter_interp(distances=halt_dists, velocities=halt_vels, time_array=snaps, infall_array=infall_info)
     angs = orbits.angular_momentum(tree=halt, host=2)
