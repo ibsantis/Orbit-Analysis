@@ -36,7 +36,10 @@ print('Set paths')
 # Initialize the classes, read in the data, and create data masks
 summary = summary_io.SummaryDataSort()
 summary_plot = summary_io.SummaryDataPlot()
+#
 data_total = summary.data_read(directory=sim_data.home_dir, hosts='all_no_r', sim_type='baryon')
+data_mp = summary.data_mass_profile_read(directory=sim_data.home_dir, hosts='all_no_r')
+#
 masks_infall = summary.data_mask(data_total, peri_sim=False, peri_model=False, hosts='all_no_r')
 masks_infall_peri = summary.data_mask(data_total, peri_sim=True, peri_model=False, hosts='all_no_r')
 masks_infall_apo = summary.data_mask_apo(data_total, hosts='all_no_r')
@@ -45,7 +48,7 @@ masks_infall_peri['m12f'][59] = False
 masks_infall_apo['m12f'][59] = False
 
 # Select which mask you want to use and the corresponding directory
-directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2'
+directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2_fix'
 
 
 """
@@ -1408,3 +1411,378 @@ plt.tight_layout()
 plt.subplots_adjust(wspace=0.2, hspace=0)
 plt.savefig(directory+'/host_mass_and_radius_scatter.pdf')
 plt.close()
+
+
+"""
+    Plotting the da/dr stuff
+"""
+dadr = summary.da_dr(mass_profile=data_mp, hosts='all_no_r')
+dadr_dperi_min = summary.da_dr_dperi_min(data_total, masks_infall_peri, data_mp, dadr, oversample=True, hosts='all_no_r')
+dadr_max = summary.da_dr_max(data_total, masks_infall_peri, data_mp, dadr, oversample=True, hosts='all_no_r')
+t_in_sim = summary.first_infall(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all_no_r', sim_type='baryon')
+#
+summary_plot.plot_hist_mult(x=[np.log10(dadr_dperi_min['dadr']), np.log10(dadr_max['dadr'])], xtype=['dadr.log', 'dadr'], labels=['log($|da/dr|_{\\rm dperi,min}$)', 'log($|da/dr|_{\\rm max}$)'], binedges=(-34,-29), binsize=0.1, pdf=True, file_path_and_name=directory+'/diagnostics/dadr/dadr_hist_comp.pdf')
+summary_plot.plot_hist_mult(x=[dadr_dperi_min['dadr.time.lb.interp'], dadr_max['dadr.time.lb.interp']], xtype=['t.lb', 't.lb'], labels=['$t_{\\rm da/dr, dperi, min}$', '$t_{\\rm da/dr, max}$'], binsize=0.5, pdf=True, file_path_and_name=directory+'/diagnostics/dadr/dadr_hist_comp_time.pdf')
+summary_plot.plot_hist(x=np.log10(dadr_dperi_min['dadr'])-np.log10(dadr_max['dadr']), xtype='dadr.diff.log', binsize=0.01, xlimits=(-0.5,0.1), pdf=True, file_path_and_name=directory+'/diagnostics/dadr/dadr_hist_diff.pdf')
+#summary_plot.plot_hist(x=(np.log10(dadr_dperi_min['dadr'])-np.log10(dadr_max['dadr']))/np.log10(dadr_dperi_min['dadr']), xtype='dadr.frac', binsize=0.01, pdf=True, file_path_and_name=directory+'/diagnostics/dadr/dadr_hist_frac.pdf')
+summary_plot.plot_hist(x=(dadr_dperi_min['dadr']-dadr_max['dadr'])/dadr_dperi_min['dadr'], xtype='dadr.frac', binsize=0.01, pdf=True, xlimits=(-0.5,0.5), file_path_and_name=directory+'/diagnostics/dadr/dadr_hist_frac_nolog.pdf')
+summary_plot.plot_hist(x=dadr_dperi_min['dadr.time.lb.interp']-dadr_max['dadr.time.lb.interp'], xtype='dadr.diff.t', binsize=0.05, xlimits=(-1,1), pdf=True, file_path_and_name=directory+'/diagnostics/dadr/dadr_hist_diff_time.pdf')
+#
+f, ax1 = plt.subplots(1, 1, figsize=(10,8))
+colorss = ['#35cddc']
+binedges = (-34,-30)
+binsize = 0.25
+#limits=((0,13.8),None)
+#
+x = [np.log10(dadr_max['dadr'])]
+y = [(dadr_dperi_min['dadr']-dadr_max['dadr'])/dadr_max['dadr']]
+#
+xtype = ['dadr']
+ytype = ['dadr.frac']
+#
+medians = []
+lowers = []
+uppers = []
+lowests = []
+highests = []
+binss = []
+half_bins = []
+#
+for j in range(0, len(x)):
+    #
+    if binedges:
+        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+        bins = np.linspace(binedges[0], binedges[1], bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    else:
+        minn = binsize*np.floor(np.min(x[j])/binsize)
+        maxx = binsize*np.ceil(np.max(x[j])/binsize)
+        if minn < 0:
+            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+        else:
+            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+        bins = np.linspace(minn, maxx, bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    #
+    onesigp = 84.13
+    onesigm = 15.87
+    twosigp = 100
+    twosigm = 0
+    #
+    med = np.zeros(len(bins)-1)
+    lower = np.zeros(len(bins)-1)
+    upper = np.zeros(len(bins)-1)
+    lowest = np.zeros(len(bins)-1)
+    highest = np.zeros(len(bins)-1)
+    #
+    for i in range(0, len(bins)-1):
+        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+        med[i] = np.nanmedian(y[j][mask])
+        upper[i] = np.nanpercentile(y[j][mask], onesigp)
+        lower[i] = np.nanpercentile(y[j][mask], onesigm)
+        highest[i] = np.nanpercentile(y[j][mask], twosigp)
+        lowest[i] = np.nanpercentile(y[j][mask], twosigm)
+    medians.append(med)
+    lowers.append(lower)
+    uppers.append(upper)
+    lowests.append(lowest)
+    highests.append(highest)
+    binss.append(bins)
+    half_bins.append(half_bin)
+#
+# PLOTTING
+# Plot the scatter for the recent and minimum pericenters
+ax1.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[0], alpha=0.3)
+ax1.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[0], alpha=0.15)
+#
+# Plot the medians for the two mass bins (low-mass)
+ax1.plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[0], linewidth=3.5, alpha=0.9)
+#
+#plt.hlines(y=3*10**4, xmin=10**(limits[0][0]), xmax=10**(limits[0][1]), colors='k', linestyles='dotted', alpha=0.5)
+#
+#ax1.set_xscale('log')
+#ax1.set_yscale('log')
+ax1.set_xlabel('$log |da/dr|_{\\rm max}$', fontsize=30)
+ax1.set_ylabel('($|da/dr|_{\\rm peri,min} - |da/dr|_{\\rm max})/ |da/dr|_{\\rm max}$', fontsize=20)
+#ax1.legend(prop={'size': 21}, loc='best')
+#ax1.set_ylim(-2.5,0.5)
+ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26)
+plt.tight_layout()
+#plt.show()
+plt.savefig(directory+'/diagnostics/dadr/dadr_frac_vs_dadr_max.pdf')
+
+
+
+f, ax1 = plt.subplots(1, 1, figsize=(10,8))
+colorss = ['#35cddc']
+binedges = None
+binsize = 1
+limits=((0,13.8),None)
+#
+x = [t_in_sim]
+y = [(dadr_dperi_min['dadr']-dadr_max['dadr'])/dadr_max['dadr']]
+#
+xtype = ['t.infall.text']
+ytype = ['dadr.frac']
+#
+medians = []
+lowers = []
+uppers = []
+lowests = []
+highests = []
+binss = []
+half_bins = []
+#
+for j in range(0, len(x)):
+    #
+    if binedges:
+        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+        bins = np.linspace(binedges[0], binedges[1], bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    else:
+        minn = binsize*np.floor(np.min(x[j])/binsize)
+        maxx = binsize*np.ceil(np.max(x[j])/binsize)
+        if minn < 0:
+            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+        else:
+            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+        bins = np.linspace(minn, maxx, bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    #
+    onesigp = 84.13
+    onesigm = 15.87
+    twosigp = 100
+    twosigm = 0
+    #
+    med = np.zeros(len(bins)-1)
+    lower = np.zeros(len(bins)-1)
+    upper = np.zeros(len(bins)-1)
+    lowest = np.zeros(len(bins)-1)
+    highest = np.zeros(len(bins)-1)
+    #
+    for i in range(0, len(bins)-1):
+        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+        med[i] = np.nanmedian(y[j][mask])
+        upper[i] = np.nanpercentile(y[j][mask], onesigp)
+        lower[i] = np.nanpercentile(y[j][mask], onesigm)
+        highest[i] = np.nanpercentile(y[j][mask], twosigp)
+        lowest[i] = np.nanpercentile(y[j][mask], twosigm)
+    medians.append(med)
+    lowers.append(lower)
+    uppers.append(upper)
+    lowests.append(lowest)
+    highests.append(highest)
+    binss.append(bins)
+    half_bins.append(half_bin)
+#
+# PLOTTING
+# Plot the scatter for the recent and minimum pericenters
+ax1.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[0], alpha=0.3)
+ax1.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[0], alpha=0.15)
+#
+# Plot the medians for the two mass bins (low-mass)
+ax1.plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[0], linewidth=3.5, alpha=0.9)
+#
+#plt.hlines(y=3*10**4, xmin=10**(limits[0][0]), xmax=10**(limits[0][1]), colors='k', linestyles='dotted', alpha=0.5)
+#
+#ax1.set_xscale('log')
+#ax1.set_yscale('log')
+ax1.set_xlabel('Lookback infall time [Gyr]', fontsize=30)
+ax1.set_ylabel('($|da/dr|_{\\rm peri,min} - |da/dr|_{\\rm max})/ |da/dr|_{\\rm max}$', fontsize=20)
+#ax1.legend(prop={'size': 21}, loc='best')
+ax1.set_ylim(-1,0.5)
+ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26)
+plt.tight_layout()
+#plt.show()
+plt.savefig(directory+'/diagnostics/dadr/dadr_frac_vs_t_infall.pdf')
+
+
+
+f, ax1 = plt.subplots(1, 1, figsize=(10,8))
+colorss = ['#35cddc']
+binedges = None
+binsize = 0.5
+limits=(None,None)
+#
+x = [np.log10(Mstar_z0)]
+y = [(dadr_dperi_min['dadr']-dadr_max['dadr'])/dadr_max['dadr']]
+#
+xtype = ['t.infall.text']
+ytype = ['dadr.frac']
+#
+medians = []
+lowers = []
+uppers = []
+lowests = []
+highests = []
+binss = []
+half_bins = []
+#
+for j in range(0, len(x)):
+    #
+    if binedges:
+        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+        bins = np.linspace(binedges[0], binedges[1], bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    else:
+        minn = binsize*np.floor(np.min(x[j])/binsize)
+        maxx = binsize*np.ceil(np.max(x[j])/binsize)
+        if minn < 0:
+            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+        else:
+            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+        bins = np.linspace(minn, maxx, bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    #
+    onesigp = 84.13
+    onesigm = 15.87
+    twosigp = 100
+    twosigm = 0
+    #
+    med = np.zeros(len(bins)-1)
+    lower = np.zeros(len(bins)-1)
+    upper = np.zeros(len(bins)-1)
+    lowest = np.zeros(len(bins)-1)
+    highest = np.zeros(len(bins)-1)
+    #
+    for i in range(0, len(bins)-1):
+        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+        med[i] = np.nanmedian(y[j][mask])
+        upper[i] = np.nanpercentile(y[j][mask], onesigp)
+        lower[i] = np.nanpercentile(y[j][mask], onesigm)
+        highest[i] = np.nanpercentile(y[j][mask], twosigp)
+        lowest[i] = np.nanpercentile(y[j][mask], twosigm)
+    medians.append(med)
+    lowers.append(lower)
+    uppers.append(upper)
+    lowests.append(lowest)
+    highests.append(highest)
+    binss.append(bins)
+    half_bins.append(half_bin)
+#
+# PLOTTING
+# Plot the scatter for the recent and minimum pericenters
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[0], alpha=0.3)
+ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[0], alpha=0.15)
+#
+# Plot the medians for the two mass bins (low-mass)
+ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[0], linewidth=3.5, alpha=0.9)
+#
+#plt.hlines(y=3*10**4, xmin=10**(limits[0][0]), xmax=10**(limits[0][1]), colors='k', linestyles='dotted', alpha=0.5)
+#
+ax1.set_xscale('log')
+#ax1.set_yscale('log')
+ax1.set_xlabel('$M_{\\rm star}$ [$M_{\\odot}$]]', fontsize=30)
+ax1.set_ylabel('($|da/dr|_{\\rm peri,min} - |da/dr|_{\\rm max})/ |da/dr|_{\\rm max}$', fontsize=20)
+#ax1.legend(prop={'size': 21}, loc='best')
+ax1.set_ylim(-0.5,0.2)
+ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26)
+plt.tight_layout()
+#plt.show()
+plt.savefig(directory+'/diagnostics/dadr/dadr_frac_vs_mstar.pdf')
+
+
+
+"""
+    Comparing da/dr stuff between the model and simulation
+"""
+dadr = summary.da_dr(mass_profile=data_mp, hosts='all_no_r')
+#
+dadr_dperi_min = summary.da_dr_dperi_min(data_total, masks_infall_peri, data_mp, dadr, selection='sim', oversample=True, hosts='all_no_r')
+dadr_dperi_min_mod = summary.da_dr_dperi_min(data_total, masks_infall_peri, data_mp, dadr, selection='model', oversample=True, hosts='all_no_r')
+dadr_max = summary.da_dr_max(data_total, masks_infall_peri, data_mp, dadr, oversample=True, hosts='all_no_r')
+dadr_max_mod = summary.da_dr_max(data_total, masks_infall_peri, data_mp, dadr, selection='model', oversample=True, hosts='all_no_r')
+t_in_sim = summary.first_infall(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+#
+summary_plot.plot_hist_mult(x=[np.log10(dadr_dperi_min['dadr']), np.log10(dadr_dperi_min_mod['dadr'])], xtype=['dadr.log', 'dadr'], labels=['log($|da/dr|_{\\rm dperi,min,sim}$)', 'log($|da/dr|_{\\rm peri,min,model}$)'], binedges=(-34,-29), binsize=0.1, pdf=True, file_path_and_name=directory+'/diagnostics/dadr/dadr_hist_dpmin_sim_v_model_comp.pdf')
+summary_plot.plot_hist_mult(x=[np.log10(dadr_max['dadr']), np.log10(dadr_max_mod['dadr'])], xtype=['dadr.log', 'dadr'], labels=['log($|da/dr|_{\\rm max,sim}$)', 'log($|da/dr|_{\\rm max,model}$)'], binedges=(-34,-29), binsize=0.1, pdf=True, file_path_and_name=directory+'/diagnostics/dadr/dadr_hist_max_sim_v_model_comp.pdf')
+summary_plot.plot_hist_mult(x=[(dadr_dperi_min['dadr']-dadr_max['dadr'])/dadr_max['dadr'], (dadr_dperi_min_mod['dadr']-dadr_max_mod['dadr'])/dadr_max_mod['dadr']], xtype=['dadr.frac', 'dadr'], labels=['Simulation', 'Model'], binsize=0.01, pdf=True, file_path_and_name=directory+'/diagnostics/dadr/dadr_frac_sim_v_model.pdf')
+#summary_plot.plot_hist_mult(x=[dadr_dperi_min['dadr.time.lb.interp'], dadr_dperi_min_mod['dadr.time.lb.interp']], xtype=['t.lb', 't.lb'], labels=['$t_{\\rm dperi,min,sim}$)', '$t_{\\rm peri,min,model}$)'], binsize=0.1, pdf=True, file_path_and_name=directory+'/diagnostics/dadr/dadr_hist_tpmin_sim_v_model_comp.pdf')
+#
+# Plotting vs dadr max
+f, ax1 = plt.subplots(1, 1, figsize=(10,8))
+colorss = ['#006400', '#000080']
+binedges = (-34,-30)
+binsize = 0.5
+#limits=((0,13.8),None)
+#
+x = [np.log10(dadr_max['dadr']), np.log10(dadr_max_mod['dadr'])]
+y = [(dadr_dperi_min['dadr']-dadr_max['dadr'])/dadr_max['dadr'], (dadr_dperi_min_mod['dadr']-dadr_max_mod['dadr'])/dadr_max_mod['dadr']]
+#
+xtype = ['dadr', 'dadr']
+ytype = ['dadr.frac', 'dadr.frac']
+#
+medians = []
+lowers = []
+uppers = []
+lowests = []
+highests = []
+binss = []
+half_bins = []
+#
+for j in range(0, len(x)):
+    #
+    if binedges:
+        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+        bins = np.linspace(binedges[0], binedges[1], bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    else:
+        minn = binsize*np.floor(np.min(x[j])/binsize)
+        maxx = binsize*np.ceil(np.max(x[j])/binsize)
+        if minn < 0:
+            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+        else:
+            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+        bins = np.linspace(minn, maxx, bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    #
+    onesigp = 84.13
+    onesigm = 15.87
+    twosigp = 100
+    twosigm = 0
+    #
+    med = np.zeros(len(bins)-1)
+    lower = np.zeros(len(bins)-1)
+    upper = np.zeros(len(bins)-1)
+    lowest = np.zeros(len(bins)-1)
+    highest = np.zeros(len(bins)-1)
+    #
+    for i in range(0, len(bins)-1):
+        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+        med[i] = np.nanmedian(y[j][mask])
+        upper[i] = np.nanpercentile(y[j][mask], onesigp)
+        lower[i] = np.nanpercentile(y[j][mask], onesigm)
+        highest[i] = np.nanpercentile(y[j][mask], twosigp)
+        lowest[i] = np.nanpercentile(y[j][mask], twosigm)
+    medians.append(med)
+    lowers.append(lower)
+    uppers.append(upper)
+    lowests.append(lowest)
+    highests.append(highest)
+    binss.append(bins)
+    half_bins.append(half_bin)
+#
+# PLOTTING
+# Plot the scatter for the recent and minimum pericenters
+ax1.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[0], alpha=0.3)
+ax1.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[0], alpha=0.15)
+ax1.fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color=colorss[1], alpha=0.3)
+ax1.fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color=colorss[1], alpha=0.15)
+#
+# Plot the medians for the two mass bins (low-mass)
+ax1.plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[0], linewidth=3.5, alpha=0.9, label='Simulation')
+ax1.plot(binss[1][:-1]+half_bins[1], medians[1], color=colorss[1], linewidth=3.5, alpha=0.9, label='Model')
+#
+#plt.hlines(y=3*10**4, xmin=10**(limits[0][0]), xmax=10**(limits[0][1]), colors='k', linestyles='dotted', alpha=0.5)
+#
+#ax1.set_xscale('log')
+#ax1.set_yscale('log')
+ax1.set_xlabel('$log |da/dr|_{\\rm max}$', fontsize=30)
+ax1.set_ylabel('($|da/dr|_{\\rm peri,min} - |da/dr|_{\\rm max})/ |da/dr|_{\\rm max}$', fontsize=20)
+ax1.legend(prop={'size': 21}, loc='best')
+#ax1.set_ylim(-2.5,0.5)
+ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26)
+plt.tight_layout()
+#plt.show()
+plt.savefig(directory+'/diagnostics/dadr/dadr_frac_vs_dadr_max_sim_v_mod.pdf')
