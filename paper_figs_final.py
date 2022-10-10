@@ -204,7 +204,15 @@ ax1.plot(10**(x_behroozi_new), 10**(smhm_behroozi(x_behroozi_new)), linestyle='-
 # Plot Fitts points as +s
 x_fitts = np.array([8.16e9, 9.29e9, 8.92e9, 8.43e9, 1.02e10, 7.82e9, 8.56e9, 7.92e9, 1.28e10, 1.06e10, 1.10e10, 1.15e10, 1.06e10, 1.15e10])
 y_fitts = np.array([1e5, 4.56e5, 5.75e5, 1.53e6, 1.98e6, 2.08e6, 4.11e6, 5.70e6, 7.80e6, 8.01e6, 9.74e6, 1.04e7, 1.30e7, 1.44e7])
-ax1.scatter(x=x_fitts, y=y_fitts, marker='+', s=150, c='k', alpha=0.7, label='Fitts+ (2017)')
+y_fitts_upper = np.percentile(y_fitts, onesigp)
+y_fitts_lower = np.percentile(y_fitts, onesigm)
+y_fitts_highest = np.percentile(y_fitts, twosigp)
+y_fitts_lowest = np.percentile(y_fitts, twosigm)
+#
+ax1.plot((np.min(x_fitts),np.max(x_fitts)), (np.median(y_fitts), np.median(y_fitts)), color='#660066', alpha=0.5, label='Fitts+ (2017)')
+ax1.fill_between(x=(np.min(x_fitts), np.max(x_fitts)), y1=y_fitts_lower, y2=y_fitts_upper, color='#660066', alpha=0.25)
+ax1.fill_between(x=(np.min(x_fitts), np.max(x_fitts)), y1=y_fitts_lowest, y2=y_fitts_highest, color='#660066', alpha=0.15)
+#ax1.scatter(x=x_fitts, y=y_fitts, marker='+', s=150, c='k', alpha=0.7, label='Fitts+ (2017)')
 #
 # Plot Coral's points as stars
 x_wheeler = np.array([2.5e9, 3.2e9, 9e9, 7.7e9])
