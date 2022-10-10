@@ -11,14 +11,14 @@ methods.
 
 This package makes use of:
 
-* Python 3
-* gizmo_analysis
-* halo_analysis
-* utilities
-* numpy
-* scipy
-* astropy
-* matplotlib
+- Python 3
+- gizmo_analysis
+- halo_analysis
+- utilities
+- numpy
+- scipy
+- astropy
+- matplotlib
 
 ---
 
