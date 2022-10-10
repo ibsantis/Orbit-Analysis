@@ -474,7 +474,7 @@ class OrbitAnalysis:
         #
         return d
 
-    def first_infall_any(self, tree, time_array, host=1):
+    def first_infall_any(self, tree, time_array, host=1, indices=None):
         """
         DESCRIPTION:
             Reads in subhalo indices and halo tree, then finds the first instance
@@ -502,6 +502,9 @@ class OrbitAnalysis:
         else:
             host_str = 'host2'
         #
+        if indices == None:
+            indices = self.sub_inds
+        #
         # Set up a dictionary to store the information you want
         d = dict();
         #
@@ -524,9 +527,9 @@ class OrbitAnalysis:
         #
         for i in range(0, self.shape[0]):
             # For each subhalo, selects the indices that it existed at
-            mask = (self.sub_inds[i] >= 0)
+            mask = (indices[i] >= 0)
             # Gets the central halo's index for each subhalo
-            central_inds = tree.prop('central.index', self.sub_inds[i][mask])
+            central_inds = tree.prop('central.index', indices[i][mask])
             # If there was a central halo, save some properties to the empty arrays
             if (len(central_inds[central_inds >= 0]) != 0):
                 first_infall_snap[i] = tree.prop('snapshot', central_inds[central_inds >= 0][-1])
