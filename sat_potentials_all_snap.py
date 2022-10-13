@@ -61,19 +61,19 @@ snaps = np.array([600, 599, 598, 597, 596, 595, 594, 593, 592, 591, 590, 589, 58
 
 def calc_sub_potential(snap, simdata, orbit_class, halo_tree):
     #
-    if sim_data.num_gal == 1:
+    if simdata.num_gal == 1:
         #
         # Read in the snapshot dictionary, halo tree, and z = 0 snapshot
         start = time.time()
         #
         # For luminous & ALL subhalos
-        part = gizmo.io.Read.read_snapshots('dark', 'redshift', snap, properties=['position', 'potential'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
+        part = gizmo.io.Read.read_snapshots('dark', 'redshift', snap, properties=['position', 'potential'], simulation_directory=simdata.simulation_dir, assign_hosts_rotation=True)
         end = time.time()
         print('Particles at snapshot {0} read in in {1} seconds'.format(snap, end-start))
         #
         # Set up the halo inds and KDTree
         start = time.time()
-        orbit_tree = orbit_io.OrbitTree(tree=halo_tree, gal1=sim_data.galaxy, location=loc, host=1, particles=part, subsampling=15)
+        orbit_tree = orbit_io.OrbitTree(tree=halo_tree, gal1=simdata.galaxy, location=loc, host=1, particles=part, subsampling=15)
         end = time.time()
         print('KDTree created in {0} seconds'.format(end-start))
         #
@@ -141,7 +141,7 @@ def calc_sub_potential(snap, simdata, orbit_class, halo_tree):
             end = time.time()
             print('Done with mass bin {0} in {1} seconds'.format(i, end-start))
         #
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/all_snapshots/'+sim_data.galaxy+'/'+sim_data.galaxy+'_potentials_'+snap, dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=simdata.home_dir+'/orbit_data/hdf5_files/potentials/all_snapshots/'+simdata.galaxy+'/'+simdata.galaxy+'_potentials_'+snap, dict_or_array_to_write=data_dict, verbose=True)
 
 # Create an array of arguments for the function above
 args_list = [(snapshot, sim_data, orbits, halt) for snapshot in snaps]
