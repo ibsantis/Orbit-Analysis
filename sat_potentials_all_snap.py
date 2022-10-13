@@ -59,11 +59,16 @@ print('Read in halo tree and set up subhalo indices')
 #snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
 snaps = np.array([600, 599, 598, 597, 596, 595, 594, 593, 592, 591, 590, 589, 588])
 
+print(sim_data.num_gal)
+print(time.time())
+
 def calc_sub_potential(snap, simdata, orbit_class, halo_tree):
     #
     if simdata.num_gal == 1:
+        print(simdata.num_gal)
         #
         # Read in the snapshot dictionary, halo tree, and z = 0 snapshot
+        print(time.time())
         start = time.time()
         #
         # For luminous & ALL subhalos
@@ -149,5 +154,6 @@ args_list = [(snapshot, sim_data, orbits, halt) for snapshot in snaps]
 
 print('Starting to run on data')
 # Run the function using the arguments above in parallel
-ut.io.run_in_parallel(calc_sub_potential, args_list, proc_number=3) # ADD VERBOSE
+ut.io.run_in_parallel(calc_sub_potential, args_list, proc_number=3, verbose=True) # ADD VERBOSE
+
 print('All done.')
