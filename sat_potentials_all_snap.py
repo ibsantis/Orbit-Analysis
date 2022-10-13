@@ -4,7 +4,7 @@
 #SBATCH --mem=500G
 #SBATCH --nodes=1
 #SBATCH --ntasks=3    # processes total
-#SBATCH --time=02:00:00
+#SBATCH --time=00:30:00
 #SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/m12i_subhalo_potential_all_snaps_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
@@ -62,7 +62,7 @@ snaps = np.array([600, 599, 598, 597, 596, 595, 594, 593, 592, 591, 590, 589, 58
 print(sim_data.num_gal)
 print(time.time())
 
-def calc_sub_potential(snap, simdata, orbit_class, halo_tree):
+def calc_sub_potential(snap, simdata, orbit_class):
     #
     if simdata.num_gal == 1:
         print(simdata.num_gal)
@@ -78,7 +78,7 @@ def calc_sub_potential(snap, simdata, orbit_class, halo_tree):
         #
         # # Set up the halo inds and KDTree
         # start = time.time()
-        # orbit_tree = orbit_io.OrbitTree(tree=halo_tree, gal1=simdata.galaxy, location=loc, host=1, particles=part, subsampling=15)
+        # orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=simdata.galaxy, location=loc, host=1, particles=part, subsampling=15)
         # end = time.time()
         # print('KDTree created in {0} seconds'.format(end-start))
         # #
@@ -101,15 +101,15 @@ def calc_sub_potential(snap, simdata, orbit_class, halo_tree):
         # #
         # if snap == 600:
         #     # Find the potential of the host within R200
-        #     ndist, nind = orbit_tree.neighbors(centers=halo_tree['position'][halo_tree['host.index'][0]], neigh_num_max=1e8, neigh_dist_max=halo_tree['radius'][halo_tree['host.index'][0]], workerss=4)
-        #     part_mask = (ndist[np.isfinite(ndist)] < (halo_tree['radius'][halo_tree['host.index'][0]]+5))*(ndist[np.isfinite(ndist)] > (halo_tree['radius'][halo_tree['host.index'][0]]-5))
+        #     ndist, nind = orbit_tree.neighbors(centers=halt['position'][halt['host.index'][0]], neigh_num_max=1e8, neigh_dist_max=halt['radius'][halt['host.index'][0]], workerss=4)
+        #     part_mask = (ndist[np.isfinite(ndist)] < (halt['radius'][halt['host.index'][0]]+5))*(ndist[np.isfinite(ndist)] > (halt['radius'][halt['host.index'][0]]-5))
         #     data_dict['host.potential.R200m'] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
         #     data_dict['host.particle.num'] = np.sum(part_mask)
         #     G = 6.67*10**(-11)*(1.988*10**(30))/((1000**2)*(3.086*10**(19)))
-        #     data_dict['KE.at.Rvir'] = 0.5*G*halo_tree['mass'][halo_tree['host.index'][0]]/halo_tree['radius'][halo_tree['host.index'][0]]
+        #     data_dict['KE.at.Rvir'] = 0.5*G*halt['mass'][halt['host.index'][0]]/halt['radius'][halt['host.index'][0]]
         #     #
         #     # Find the potential of the host at 100 kpc
-        #     ndist, nind = orbit_tree.neighbors(centers=halo_tree['position'][halo_tree['host.index'][0]], neigh_num_max=1e8, neigh_dist_max=100, workerss=4)
+        #     ndist, nind = orbit_tree.neighbors(centers=halt['position'][halt['host.index'][0]], neigh_num_max=1e8, neigh_dist_max=100, workerss=4)
         #     part_mask = (ndist[np.isfinite(ndist)] < (100+5))*(ndist[np.isfinite(ndist)] > (100-5))
         #     data_dict['host.potential.100kpc'] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
         #     #
@@ -121,14 +121,14 @@ def calc_sub_potential(snap, simdata, orbit_class, halo_tree):
         #     start = time.time()
         #     # Get the halos in a mass bin
         #     real_halos = (orbit_class.sub_inds[:,600-snap] >= 0)
-        #     mass_mask = mass_binning(halo_tree.prop('mass.peak', orbit_class.sub_inds[:,600-snap][real_halos]), (halo_mass_bins[i], halo_mass_bins[i+1]))
+        #     mass_mask = mass_binning(halt.prop('mass.peak', orbit_class.sub_inds[:,600-snap][real_halos]), (halo_mass_bins[i], halo_mass_bins[i+1]))
         #     data_dict['halo.inds'][real_halos][mass_mask] = orbit_class.sub_inds[:,600-snap][real_halos][mass_mask]
         #     #
         #     # If there are halos, continue
         #     if np.sum(mass_mask) != 0:
         #         # Get the halo positions and max halo radius in the mass bin
-        #         halo_pos = halo_tree['position'][orbit_class.sub_inds[:,600-snap][real_halos][mass_mask]]
-        #         dmax = np.around(np.max(halo_tree['radius'][orbit_class.sub_inds[:,600-snap][real_halos][mass_mask]]))
+        #         halo_pos = halt['position'][orbit_class.sub_inds[:,600-snap][real_halos][mass_mask]]
+        #         dmax = np.around(np.max(halt['radius'][orbit_class.sub_inds[:,600-snap][real_halos][mass_mask]]))
         #         #
         #         # Query the particle tree and save the distances and indices
         #         ndist, nind = orbit_tree.neighbors(centers=halo_pos, neigh_num_max=1e6, neigh_dist_max=dmax, workerss=4)
@@ -136,7 +136,7 @@ def calc_sub_potential(snap, simdata, orbit_class, halo_tree):
         #         # Loop over the number of halos
         #         for j in range(0, len(halo_pos)):
         #             # Find the particles within +/- 5 kpc of the halo radius, then save the potential and particle number
-        #             part_mask = (ndist[j][np.isfinite(ndist[j])] < (halo_tree['radius'][orbit_class.sub_inds[:,600-snap][real_halos][mass_mask]][j]+5))*(ndist[j][np.isfinite(ndist[j])] > (halo_tree['radius'][orbit_class.sub_inds[:,600-snap][real_halos][mass_mask]][j]-5))
+        #             part_mask = (ndist[j][np.isfinite(ndist[j])] < (halt['radius'][orbit_class.sub_inds[:,600-snap][real_halos][mass_mask]][j]+5))*(ndist[j][np.isfinite(ndist[j])] > (halt['radius'][orbit_class.sub_inds[:,600-snap][real_halos][mass_mask]][j]-5))
         #             data_dict['subhalo.potential'][temp[mass_mask][j]] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[j][np.isfinite(ndist[j])][part_mask]])
         #             data_dict['particle.num'][temp[real_halos][mass_mask][j]] = np.sum(part_mask)
         #     #
@@ -150,7 +150,7 @@ def calc_sub_potential(snap, simdata, orbit_class, halo_tree):
 
 print('Setting up arguments')
 # Create an array of arguments for the function above
-args_list = [(snapshot, sim_data, orbits, halt) for snapshot in snaps]
+args_list = [(snapshot, sim_data, orbits) for snapshot in snaps]
 
 print('Starting to run on data')
 # Run the function using the arguments above in parallel
