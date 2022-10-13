@@ -5,7 +5,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=3    # processes total
 #SBATCH --time=02:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/m12i_subhalo_potential_all_snaps_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/m12i_subhalo_potential_all_snaps_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -147,5 +147,5 @@ def calc_sub_potential(snap, simdata, orbit_class, halo_tree):
 args_list = [(snapshot, sim_data, orbits, halt) for snapshot in snaps]
 
 # Run the function using the arguments above in parallel
-ut.io.run_in_parallel(calc_potential, args_list, proc_number=3) # ADD VERBOSE
+ut.io.run_in_parallel(calc_sub_potential, args_list, proc_number=3) # ADD VERBOSE
 print('All done.')
