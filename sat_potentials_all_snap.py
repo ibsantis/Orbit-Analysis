@@ -45,7 +45,7 @@ import time
 print('Read in the tools')
 
 ### Set path and initial parameters
-loc = 'stampede'
+loc = 'peloton'
 sim_data = orbit_io.OrbitRead(gal1='m12i', location=loc)
 print('Set paths')
 
