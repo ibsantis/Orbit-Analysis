@@ -140,6 +140,8 @@ def calc_sub_potential(snap, simdata, orbit_class):
                 for j in range(0, len(halo_pos)):
                     # Find the particles within +/- 5 kpc of the halo radius, then save the potential and particle number
                     part_mask = (ndist[j][np.isfinite(ndist[j])] < (halt['radius'][orbit_class.sub_inds[:,600-snap][real_halos*mass_mask]][j]+5))*(ndist[j][np.isfinite(ndist[j])] > (halt['radius'][orbit_class.sub_inds[:,600-snap][real_halos*mass_mask]][j]-5))
+                    #data_dict['subhalo.potential'][real_halos*mass_mask][j] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[j][np.isfinite(ndist[j])][part_mask]])
+                    #data_dict['particle.num'][real_halos*mass_mask][j] = np.sum(part_mask)
                     data_dict['subhalo.potential'][temp[real_halos*mass_mask][j]] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[j][np.isfinite(ndist[j])][part_mask]])
                     data_dict['particle.num'][temp[real_halos*mass_mask][j]] = np.sum(part_mask)
             #
