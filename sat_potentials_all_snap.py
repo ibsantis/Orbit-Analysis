@@ -59,20 +59,20 @@ print('Read in halo tree and set up subhalo indices')
 #snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
 snaps = np.array([600, 599, 598, 597, 596, 595, 594, 593, 592, 591, 590, 589, 588])
 
-print(sim_data.num_gal)
-print(time.time())
+#print(sim_data.num_gal)
+#print(time.time())
 
 def calc_sub_potential(snap, simdata, orbit_class):
     #
     if simdata.num_gal == 1:
-        print(simdata.num_gal)
+        #print(simdata.num_gal)
         #
         # Read in the snapshot dictionary, halo tree, and z = 0 snapshot
-        print(time.time())
+        #print(time.time())
         start = time.time()
         #
         # For luminous & ALL subhalos
-        part = gizmo.io.Read.read_snapshots('dark', 'redshift', snap, properties=['position', 'potential'], simulation_directory=simdata.simulation_dir, assign_hosts_rotation=True)
+        part = gizmo.io.Read.read_snapshots('dark', 'snapshot', snap, properties=['position', 'potential'], simulation_directory=simdata.simulation_dir, assign_hosts_rotation=True)
         end = time.time()
         print('Particles at snapshot {0} read in in {1} seconds'.format(snap, end-start))
         #
