@@ -97,8 +97,8 @@ def calc_sub_potential(snap, simdata, orbit_class):
         data_dict['halo.bin'] = (-1)*np.ones(len(orbit_class.sub_inds[:,600-snap]), dtype=int)
         data_dict['subhalo.potential'] = (-1)*np.ones(len(orbit_class.sub_inds[:,600-snap]))
         data_dict['particle.num'] = (-1)*np.ones(len(orbit_class.sub_inds[:,600-snap]), dtype=int)
-        #temp = np.arange(len(orbit_class.sub_inds[:,600-snap]))
-        temp = (-1)*np.ones(len(orbit_class.sub_inds[:,600-snap]), dtype=int)
+        temp = np.arange(len(orbit_class.sub_inds[:,600-snap]))
+        #temp = (-1)*np.ones(len(orbit_class.sub_inds[:,600-snap]), dtype=int)
         print('Set up a null dictionary for the data at snapshot {0}'.format(snap))
         #
         if snap == 600:
