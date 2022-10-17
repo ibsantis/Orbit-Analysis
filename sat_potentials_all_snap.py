@@ -146,7 +146,7 @@ def calc_sub_potential(snap, simdata, orbit_class):
             end = time.time()
             print('Done with mass bin {0} in {1} seconds'.format(i, end-start))
         #
-        ut.io.file_hdf5(file_name_base=simdata.home_dir+'/orbit_data/hdf5_files/potentials/all_snapshots/'+simdata.galaxy+'/'+simdata.galaxy+'_potentials_'+snap, dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=simdata.home_dir+'/orbit_data/hdf5_files/potentials/all_snapshots/'+simdata.galaxy+'/'+simdata.galaxy+'_potentials_'+str(snap), dict_or_array_to_write=data_dict, verbose=True)
 
 print('Setting up arguments')
 # Create an array of arguments for the function above
