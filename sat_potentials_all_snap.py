@@ -94,9 +94,11 @@ def calc_sub_potential(snap, simdata, orbit_class):
         data_dict = dict()
         data_dict['mass.bin'] = halo_mass_bins
         data_dict['halo.inds'] = (-1)*np.ones(len(orbit_class.sub_inds[:,600-snap]), dtype=int)
+        data_dict['halo.bin'] = (-1)*np.ones(len(orbit_class.sub_inds[:,600-snap]), dtype=int)
         data_dict['subhalo.potential'] = (-1)*np.ones(len(orbit_class.sub_inds[:,600-snap]))
         data_dict['particle.num'] = (-1)*np.ones(len(orbit_class.sub_inds[:,600-snap]), dtype=int)
-        temp = np.arange(len(orbit_class.sub_inds[:,600-snap]))
+        #temp = np.arange(len(orbit_class.sub_inds[:,600-snap]))
+        temp = (-1)*np.ones(len(orbit_class.sub_inds[:,600-snap]), dtype=int)
         print('Set up a null dictionary for the data at snapshot {0}'.format(snap))
         #
         if snap == 600:
@@ -122,13 +124,14 @@ def calc_sub_potential(snap, simdata, orbit_class):
             # Get the halos in a mass bin
             real_halos = (orbit_class.sub_inds[:,600-snap] >= 0)
             mass_mask = mass_binning(halt.prop('mass.peak', orbit_class.sub_inds[:,600-snap][real_halos]), (halo_mass_bins[i], halo_mass_bins[i+1]))
-            data_dict['halo.inds'][real_halos][mass_mask] = orbit_class.sub_inds[:,600-snap][real_halos][mass_mask]
+            data_dict['halo.inds'][real_halos*mass_mask] = orbit_class.sub_inds[:,600-snap][real_halos*mass_mask]
+            data_dict['halo.bin'][real_halos*mass_mask] = i
             #
             # If there are halos, continue
             if np.sum(mass_mask) != 0:
                 # Get the halo positions and max halo radius in the mass bin
-                halo_pos = halt['position'][orbit_class.sub_inds[:,600-snap][real_halos][mass_mask]]
-                dmax = np.around(np.max(halt['radius'][orbit_class.sub_inds[:,600-snap][real_halos][mass_mask]]))
+                halo_pos = halt['position'][orbit_class.sub_inds[:,600-snap][real_halos*mass_mask]]
+                dmax = np.around(np.max(halt['radius'][orbit_class.sub_inds[:,600-snap][real_halos*mass_mask]]))
                 #
                 # Query the particle tree and save the distances and indices
                 ndist, nind = orbit_tree.neighbors(centers=halo_pos, neigh_num_max=1e6, neigh_dist_max=dmax, workerss=4)
@@ -136,9 +139,9 @@ def calc_sub_potential(snap, simdata, orbit_class):
                 # Loop over the number of halos
                 for j in range(0, len(halo_pos)):
                     # Find the particles within +/- 5 kpc of the halo radius, then save the potential and particle number
-                    part_mask = (ndist[j][np.isfinite(ndist[j])] < (halt['radius'][orbit_class.sub_inds[:,600-snap][real_halos][mass_mask]][j]+5))*(ndist[j][np.isfinite(ndist[j])] > (halt['radius'][orbit_class.sub_inds[:,600-snap][real_halos][mass_mask]][j]-5))
-                    data_dict['subhalo.potential'][temp[mass_mask][j]] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[j][np.isfinite(ndist[j])][part_mask]])
-                    data_dict['particle.num'][temp[real_halos][mass_mask][j]] = np.sum(part_mask)
+                    part_mask = (ndist[j][np.isfinite(ndist[j])] < (halt['radius'][orbit_class.sub_inds[:,600-snap][real_halos*mass_mask]][j]+5))*(ndist[j][np.isfinite(ndist[j])] > (halt['radius'][orbit_class.sub_inds[:,600-snap][real_halos*mass_mask]][j]-5))
+                    data_dict['subhalo.potential'][temp[real_halos*mass_mask][j]] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[j][np.isfinite(ndist[j])][part_mask]])
+                    data_dict['particle.num'][temp[real_halos*mass_mask][j]] = np.sum(part_mask)
             #
             # If no halos, say so
             else:
