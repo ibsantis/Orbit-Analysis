@@ -4,7 +4,7 @@
 #SBATCH --mem=500G
 #SBATCH --nodes=1
 #SBATCH --ntasks=3    # processes total
-#SBATCH --time=00:30:00
+#SBATCH --time=12:00:00
 #SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/m12i_subhalo_potential_all_snaps_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
@@ -56,8 +56,8 @@ orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location=loc, h
 print('Read in halo tree and set up subhalo indices')
 
 # Set up the snapshot array to loop through
-#snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
-snaps = np.array([600, 599, 598, 597, 596, 595, 594, 593, 592, 591, 590, 589, 588])
+snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
+#snaps = np.array([600, 599, 598, 597, 596, 595, 594, 593, 592, 591, 590, 589, 588])
 
 #print(sim_data.num_gal)
 #print(time.time())
