@@ -123,7 +123,8 @@ def calc_sub_potential(snap, simdata, orbit_class):
             start = time.time()
             # Get the halos in a mass bin
             real_halos = (orbit_class.sub_inds[:,600-snap] >= 0)
-            mass_mask = mass_binning(halt.prop('mass.peak', orbit_class.sub_inds[:,600-snap][real_halos]), (halo_mass_bins[i], halo_mass_bins[i+1]))
+            #mass_mask = mass_binning(halt.prop('mass.peak', orbit_class.sub_inds[:,600-snap][real_halos]), (halo_mass_bins[i], halo_mass_bins[i+1]))
+            mass_mask = mass_binning(halt.prop('mass.peak', orbit_class.sub_inds[:,600-snap]), (halo_mass_bins[i], halo_mass_bins[i+1]))
             data_dict['halo.inds'][real_halos*mass_mask] = orbit_class.sub_inds[:,600-snap][real_halos*mass_mask]
             data_dict['halo.bin'][real_halos*mass_mask] = i
             #
@@ -152,6 +153,7 @@ def calc_sub_potential(snap, simdata, orbit_class):
             print('Done with mass bin {0} in {1} seconds'.format(i, end-start))
         #
         ut.io.file_hdf5(file_name_base=simdata.home_dir+'/orbit_data/hdf5_files/potentials/all_snapshots/'+simdata.galaxy+'/'+simdata.galaxy+'_potentials_'+str(snap), dict_or_array_to_write=data_dict, verbose=True)
+        print('Completely finished writing snapshot {0}'.format(snap))
 
 print('Setting up arguments')
 # Create an array of arguments for the function above
