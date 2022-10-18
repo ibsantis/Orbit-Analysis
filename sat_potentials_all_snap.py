@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=m12i_subhalo_potential_all_snaps
+#SBATCH --job-name=m12f_subhalo_potential_all_snaps
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=500G
 #SBATCH --nodes=1
 #SBATCH --ntasks=3    # processes total
 #SBATCH --time=12:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/m12i_subhalo_potential_all_snaps_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/m12f_subhalo_potential_all_snaps_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -46,7 +46,7 @@ print('Read in the tools')
 
 ### Set path and initial parameters
 loc = 'peloton'
-sim_data = orbit_io.OrbitRead(gal1='m12i', location=loc)
+sim_data = orbit_io.OrbitRead(gal1='m12f', location=loc)
 print('Set paths')
 
 # Read in snapshot dictionary and the halo tree
