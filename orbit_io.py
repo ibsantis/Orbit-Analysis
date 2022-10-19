@@ -990,10 +990,9 @@ class OrbitAnalysis:
             mask = (self.sub_inds[i] >= 0)
             #
             # Calculate the different components of angular momentum
-            if host == 1:
-                lr = (-1)*tree.prop(hindex+'.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop(hindex+'.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
-                lphi = (-1)*((tree.prop(hindex+'.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop(hindex+'.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,2]) - (tree.prop(hindex+'.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop(hindex+'.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,0]))
-                lz = tree.prop(hindex+'.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop(hindex+'.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
+            lr = (-1)*tree.prop(hindex+'.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop(hindex+'.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
+            lphi = (-1)*((tree.prop(hindex+'.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop(hindex+'.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,2]) - (tree.prop(hindex+'.distance.principal.cylindrical', self.sub_inds[i][mask])[:,2]*tree.prop(hindex+'.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,0]))
+            lz = tree.prop(hindex+'.distance.principal.cylindrical', self.sub_inds[i][mask])[:,0]*tree.prop(hindex+'.velocity.principal.cylindrical', self.sub_inds[i][mask])[:,1]
             #
             # Save the values to arrays
             ang_mom_vec_subhalo = np.asarray([(lr[j], lphi[j], lz[j]) for j in range(0, len(lr))])
