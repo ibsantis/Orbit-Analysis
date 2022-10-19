@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=RR_summary_data
+#SBATCH --job-name=RJ_summary_data
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 ##SBATCH --partition=high2    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 ##SBATCH --mem=250G
@@ -7,7 +7,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
 #SBATCH --time=02:30:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/summary/RR_summary_data_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/summary/RJ_summary_data_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -43,7 +43,7 @@ print('Read in the tools')
 
 ### Set path and initial parameters
 loc = 'stampede'
-sim_data = orbit_io.OrbitRead(gal1='m12b', location=loc)
+sim_data = orbit_io.OrbitRead(gal1='Romeo', location=loc)
 plotting = False
 print('Set paths')
 
@@ -451,6 +451,7 @@ if sim_data.num_gal == 2:
     data_dict['eccentricity.model.apsis'] = eccs_galpy_apsis
     #
     data_dict['d.tot.model'] = galpy_orbits.r(ts)
+    data_dict['d.model'] = galpy_dist_3d
     data_dict['v.tot.model'] = galpy_vels
     data_dict['L.model'] = galpy_orbits.L(ts)
     data_dict['L.z.model'] = galpy_orbits.Lz(ts)
@@ -662,6 +663,7 @@ if sim_data.num_gal == 2:
     data_dict['eccentricity.model.apsis'] = eccs_galpy_apsis
     #
     data_dict['d.tot.model'] = galpy_orbits.r(ts)
+    data_dict['d.model'] = galpy_dist_3d
     data_dict['v.tot.model'] = galpy_vels
     data_dict['L.model'] = galpy_orbits.L(ts)
     data_dict['L.z.model'] = galpy_orbits.Lz(ts)
