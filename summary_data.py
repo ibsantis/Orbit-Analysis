@@ -42,7 +42,7 @@ import pandas as pd
 print('Read in the tools')
 
 ### Set path and initial parameters
-loc = 'stampede'
+loc = 'peloton'
 sim_data = orbit_io.OrbitRead(gal1='Romeo', location=loc)
 plotting = False
 print('Set paths')
