@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=m12f_subhalo_potential_all_snaps
+#SBATCH --job-name=m12b_subhalo_potential_all_snaps
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=500G
 #SBATCH --nodes=1
-#SBATCH --ntasks=3    # processes total
+#SBATCH --ntasks=4    # processes total
 #SBATCH --time=12:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/m12f_subhalo_potential_all_snaps_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/m12b_subhalo_potential_all_snaps_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -46,7 +46,7 @@ print('Read in the tools')
 
 ### Set path and initial parameters
 loc = 'peloton'
-sim_data = orbit_io.OrbitRead(gal1='m12f', location=loc)
+sim_data = orbit_io.OrbitRead(gal1='m12b', location=loc)
 print('Set paths')
 
 # Read in snapshot dictionary and the halo tree
@@ -161,6 +161,6 @@ args_list = [(snapshot, sim_data, orbits) for snapshot in snaps]
 
 print('Starting to run on data')
 # Run the function using the arguments above in parallel
-ut.io.run_in_parallel(calc_sub_potential, args_list, proc_number=3, verbose=True) # ADD VERBOSE
+ut.io.run_in_parallel(calc_sub_potential, args_list, proc_number=4, verbose=True) # ADD VERBOSE
 
 print('All done.')
