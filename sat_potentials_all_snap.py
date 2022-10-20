@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
 #SBATCH --job-name=RJ_subhalo_potential_all_snaps
-#SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
-#SBATCH --mem=500G
+##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
+#SBATCH --partition=skx-normal
+##SBATCH --mem=500G
 #SBATCH --nodes=1
-#SBATCH --ntasks=3    # processes total
+##SBATCH --ntasks=3    # processes total
+#SBATCH --tasks-per-node=3    # MPI tasks per node
+#SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
 #SBATCH --time=12:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/RJ_subhalo_potential_all_snaps_%j.txt
+##SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/RJ_subhalo_potential_all_snaps_%j.txt
+#SBATCH --output=/home1/05400/ibsantis/scripts/jobs/potentials/all_snapshots/RJ_subhalo_potential_all_snaps_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
 #SBATCH --mail-type=begin
+#SBATCH --account=TG-AST140064
 
 """
 
@@ -38,14 +43,11 @@ import halo_analysis as halo
 import gizmo_analysis as gizmo
 import utilities as ut
 import numpy as np
-import matplotlib
-from matplotlib import pyplot as plt
-from scipy import spatial
 import time
 print('Read in the tools')
 
 ### Set path and initial parameters
-loc = 'peloton'
+loc = 'stampede'
 sim_data = orbit_io.OrbitRead(gal1='Romeo', location=loc)
 print('Set paths')
 
