@@ -3,9 +3,9 @@
 ##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --partition=skx-normal
 ##SBATCH --mem=500G
-#SBATCH --nodes=1
+#SBATCH --nodes=3
 ##SBATCH --ntasks=2    # processes total
-#SBATCH --tasks-per-node=2    # MPI tasks per node
+#SBATCH --tasks-per-node=1    # MPI tasks per node
 #SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
 #SBATCH --time=12:00:00
 ##SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/RJ_subhalo_potential_all_snaps_%j.txt
@@ -287,6 +287,6 @@ args_list = [(snapshot, sim_data, orbits) for snapshot in snaps]
 
 print('Starting to run on data')
 # Run the function using the arguments above in parallel
-ut.io.run_in_parallel(calc_sub_potential, args_list, proc_number=2, verbose=True) # ADD VERBOSE
+ut.io.run_in_parallel(calc_sub_potential, args_list, proc_number=3, verbose=True) # ADD VERBOSE
 
 print('All done.')
