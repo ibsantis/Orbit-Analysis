@@ -445,3 +445,152 @@ plt.tight_layout()
 #writergif = animation.PillowWriter(fps=30)
 #anim.save('/Users/isaiahsantistevan/Desktop/duo_Romulus.gif',writer=writergif)
 plt.show()
+
+
+
+
+
+
+
+# EXAMPLE
+# Single halo
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+sub_ind = 19
+mask = (data['d.sim'][sub_ind][:,0] != -1)
+ax.set_xlim(np.min(data['d.sim'][sub_ind][:,0][mask][:362]), np.max(data['d.sim'][sub_ind][:,0][mask][:362]))
+ax.set_ylim(np.min(data['d.sim'][sub_ind][:,1][mask][:362]), np.max(data['d.sim'][sub_ind][:,1][mask][:362]))
+ax.set_zlim(np.min(data['d.sim'][sub_ind][:,2][mask][:362]), np.max(data['d.sim'][sub_ind][:,2][mask][:362]))
+#
+ax.set_xlabel('X [kpc]', labelpad=15.)
+ax.set_ylabel('Y [kpc]', labelpad=15.)
+ax.set_zlabel('Z [kpc]', labelpad=15.)
+#
+line, = ax.plot3D(np.array([]),np.array([]),np.array([]), 'k')
+line_mod, = ax.plot3D(np.array([]),np.array([]),np.array([]), 'r')
+#
+ax.scatter(0,0,0,color='black')
+
+def init():
+    line.set_data(np.array([]),np.array([]))
+    line.set_3d_properties(np.array([]))
+    #
+    line_mod.set_data(np.array([]),np.array([]))
+    line_mod.set_3d_properties(np.array([]))
+    return line, line_mod,
+
+def animate(i):
+    x = data['d.sim'][sub_ind][:,0][mask][:362][:i]
+    y = data['d.sim'][sub_ind][:,1][mask][:362][:i]
+    z = data['d.sim'][sub_ind][:,2][mask][:362][:i]
+    #
+    x_mod = (-1)*data['d.model'][sub_ind][:,0][:362][:i]
+    y_mod = (-1)*data['d.model'][sub_ind][:,1][:362][:i]
+    z_mod = data['d.model'][sub_ind][:,2][:362][:i]
+    #
+    #line.set_data(x,y,z)
+    line.set_data(x,y)
+    line.set_3d_properties(z)
+    #
+    line_mod.set_data(x_mod,y_mod)
+    line_mod.set_3d_properties(z_mod)
+    #
+    return line, line_mod,
+
+anim = animation.FuncAnimation(fig, animate, init_func=init, frames=len(data['d.sim'][sub_ind][:,0][mask])+1, interval=1, blit=False)
+plt.show()
+
+
+
+
+
+
+
+
+traj_X = data['d.sim'][:,:,0][:,:448]
+traj_Y = data['d.sim'][:,:,1][:,:448]
+traj_Z = data['d.sim'][:,:,2][:,:448]
+#
+traj_mod_X = (-1)*data['d.model'][:,:,0][:,:448]
+traj_mod_Y = (-1)*data['d.model'][:,:,1][:,:448]
+traj_mod_Z = data['d.model'][:,:,2][:,:448]
+#
+print('Finished setting up plotting arrays')
+#
+start = time.time()
+R200m = data['host.radius'][0]+10
+fig, ax = plt.subplots(1, 2, figsize=(12,6))
+#ax[0].set(xlim=((-1)*R200m, R200m), ylim=((-1)*R200m, R200m))
+ax[0].set(xlim=(-200, 200), ylim=(-200, 200))
+ax[0].set_xlabel('X [kpc]', fontsize=28)
+ax[0].set_ylabel('Y [kpc]', fontsize=28)
+#ax[1].set(xlim=((-1)*R200m, R200m), ylim=((-1)*R200m, R200m))
+ax[1].set(xlim=(-200, 200), ylim=(-200, 200))
+ax[1].set_xlabel('X [kpc]', fontsize=28)
+ax[1].set_ylabel('Z [kpc]', fontsize=28)
+plt.suptitle('Good case, $\\Delta d_{\\rm peri} = 0.02$', fontsize=28)
+#plt.suptitle('Middle case, $\\Delta d_{\\rm peri} = 0.4$', fontsize=28)
+#plt.suptitle('Bad case, $\\Delta d_{\\rm peri} = 1.02$', fontsize=28)
+#
+# Initiate camera
+camera = Camera(fig)
+
+pick_traj = 118
+# Create individual frames
+for j in range(1,traj_X.shape[1]+1):
+    ax[0].text(-175, 150,'Lookback time = {0} Gyr'.format(np.around(data['time.sim'][-1]-np.flip(data['time.sim'])[j], 2)))
+    # Projectile's trajectory
+    x = traj_X[pick_traj][0:j]
+    y = traj_Y[pick_traj][0:j]
+    z = traj_Z[pick_traj][0:j]
+    #
+    x_mod = traj_mod_X[pick_traj][0:j]
+    y_mod = traj_mod_Y[pick_traj][0:j]
+    z_mod = traj_mod_Z[pick_traj][0:j]
+    #
+    #Plot the host position
+    ax[0].plot(0, 0, marker='x', color='k', markersize=9, alpha=0.5)
+    ax[1].plot(0, 0, marker='x', color='k', markersize=9, alpha=0.5)
+    #
+    # Show Projectile's location
+    ax[0].plot(x[-1], y[-1], marker='o', markersize=10, markeredgecolor='b', markerfacecolor='b', alpha=0.5)
+    ax[1].plot(x[-1], z[-1], marker='o', markersize=10, markeredgecolor='b', markerfacecolor='b', alpha=0.5)
+    ax[0].plot(x_mod[-1], y_mod[-1], marker='o', markersize=10, markeredgecolor='r', markerfacecolor='r', alpha=0.5)
+    ax[1].plot(x_mod[-1], z_mod[-1], marker='o', markersize=10, markeredgecolor='r', markerfacecolor='r', alpha=0.5)
+
+    # Show Projectile's trajectory
+    ax[0].plot(x, y, color='b', lw=2.5, linestyle='--', alpha=0.15)
+    ax[1].plot(x, z, color='b', lw=2.5, linestyle='--', alpha=0.15)
+    ax[0].plot(x_mod, y_mod, color='r', lw=2.5, linestyle=':', alpha=0.15)
+    ax[1].plot(x_mod, z_mod, color='r', lw=2.5, linestyle=':', alpha=0.15)
+
+    # Capture frame
+    camera.snap()
+
+end = time.time()
+print('Finished the loop in {0} seconds'.format(end-start))
+
+# Create animation
+start = end
+ax[0].tick_params(axis='both', which='both', bottom=True, labelsize=20)
+ax[1].tick_params(axis='both', which='both', bottom=True, labelsize=20)
+#
+# Plotting for the legend
+ax[1].plot(-500, -500, marker='o', markersize=10, markeredgecolor='b', markerfacecolor='b', alpha=0.5, label='Simulation')
+ax[1].plot(-500, -500, marker='o', markersize=10, markeredgecolor='r', markerfacecolor='r', alpha=0.5, label='Model')
+ax[1].legend(prop={'size': 20}, loc='upper right')
+#
+plt.tight_layout()
+plt.subplots_adjust(wspace=0.3, hspace=0)
+anim = camera.animate(interval = 40, repeat = True, repeat_delay = 500)
+end = time.time()
+print('Finished animating in {0} seconds'.format(end-start))
+
+
+# Inline display
+start = end
+writergif = animation.PillowWriter(fps=60)
+anim.save(sim_data.home_dir+'/orbit_data/animations/Romeo_single_sat_119.gif', writer=writergif)
+end = time.time()
+print('Finished saving the file in {0} seconds'.format(end-start))
+print('Done with script at {0}'.format(time.strftime("%H:%M:%S", time.localtime())))
