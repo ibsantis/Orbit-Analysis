@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=m12f_subhalo_potential_all_snaps
+#SBATCH --job-name=m12i_subhalo_potential_all_snaps
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 ##SBATCH --partition=skx-normal
 #SBATCH --mem=500G
@@ -8,7 +8,7 @@
 ##SBATCH --tasks-per-node=1    # MPI tasks per node
 #SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
 #SBATCH --time=04:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/m12f_subhalo_potential_all_snaps_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/m12i_subhalo_potential_all_snaps_%j.txt
 ##SBATCH --output=/home1/05400/ibsantis/scripts/jobs/potentials/all_snapshots/RJ_subhalo_potential_all_snaps_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
@@ -48,7 +48,7 @@ print('Read in the tools')
 
 ### Set path and initial parameters
 loc = 'peloton'
-sim_data = orbit_io.OrbitRead(gal1='m12f', location=loc)
+sim_data = orbit_io.OrbitRead(gal1='m12i', location=loc)
 print('Set paths')
 
 # Read in snapshot dictionary and the halo tree
@@ -60,6 +60,10 @@ print('Read in halo tree and set up subhalo indices')
 
 # Set up the snapshot array to loop through
 snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
+
+# Set up the host indices
+host_inds = halt.prop('progenitor.main.indices', halt['host.index'][0])
+host_snaps = halt['snapshot'][host_inds]
 
 def calc_sub_potential(snap, simdata, orbit_class):
     #
@@ -96,11 +100,15 @@ def calc_sub_potential(snap, simdata, orbit_class):
         temp = np.arange(len(orbit_class.sub_inds[:,600-snap]))
         print('Set up a null dictionary for the data at snapshot {0}'.format(snap))
         #
-        # Find the potential of the host at 100 kpc
-        ndist, nind = orbit_tree.neighbors(centers=halt['position'][halt['host.index'][0]], neigh_num_max=1e8, neigh_dist_max=100, workerss=4)
-        part_mask = (ndist[np.isfinite(ndist)] < (100+5))*(ndist[np.isfinite(ndist)] > (100-5))
-        data_dict['host.potential.100kpc'] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
-        print('Calculated potential at 100 kpc at snapshot {0}'.format(snap))
+        if snap in host_snaps:
+            # Find the potential of the host at 100 kpc
+            ndist, nind = orbit_tree.neighbors(centers=halt['position'][host_inds[600-snap]], neigh_num_max=1e8, neigh_dist_max=100, workerss=4)
+            part_mask = (ndist[np.isfinite(ndist)] < (100+5))*(ndist[np.isfinite(ndist)] > (100-5))
+            data_dict['host.potential.100kpc'] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
+            print('Calculated potential at 100 kpc at snapshot {0}'.format(snap))
+        else:
+            data_dict['host.potential.100kpc'] = np.nan
+            print('No well defined host at snapshot {0}'.format(snap))
         #
         if snap == 600:
             # Find the potential of the host within R200
