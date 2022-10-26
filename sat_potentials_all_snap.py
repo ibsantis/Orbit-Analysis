@@ -14,7 +14,7 @@
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
 #SBATCH --mail-type=begin
-#SBATCH --account=TG-AST140064
+##SBATCH --account=TG-AST140064
 
 """
 
