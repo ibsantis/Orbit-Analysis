@@ -45,8 +45,8 @@ import time
 print('Read in the tools')
 
 ### Set path and initial parameters
-#sim_data = orbit_io.OrbitRead(gal1='Thelma', location='peloton')
-sim_data = orbit_io.OrbitRead(gal1='m12w', location='peloton', dmo=True)
+sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
+#sim_data = orbit_io.OrbitRead(gal1='m12w', location='peloton', dmo=True)
 print('Set paths')
 
 if sim_data.num_gal == 1:
@@ -56,27 +56,27 @@ if sim_data.num_gal == 1:
     snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
     #
     # For the luminous and ALL subhalos
-    #halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', species_snapshot_indices=600, host_number=sim_data.num_gal)
+    halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', species_snapshot_indices=600, host_number=sim_data.num_gal)
     # For DMO subhalos
-    halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, host_number=sim_data.num_gal, species_snapshot_indices=600)
+    #halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, host_number=sim_data.num_gal, species_snapshot_indices=600)
     #
     # For luminous & ALL subhalos
-    #part = gizmo.io.Read.read_snapshots('dark', 'redshift', 0, properties=['position', 'potential'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
+    part = gizmo.io.Read.read_snapshots('dark', 'redshift', 0, properties=['position', 'potential'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
     # For DMO subhalos
-    part = gizmo.io.Read.read_snapshots('dark', 'redshift', 0, properties=['position', 'potential'], simulation_directory=sim_data.simulation_dir)
+    #part = gizmo.io.Read.read_snapshots('dark', 'redshift', 0, properties=['position', 'potential'], simulation_directory=sim_data.simulation_dir)
     end = time.time()
     print('Tree and particles at z = 0 read in in {0} seconds'.format(end-start))
     #
     # Set up the halo inds and KDTree
     # For the luminous only
-    #orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
+    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1)
     # For the halo-selection, and DMO selection
-    orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True)
+    #orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True)
     start = time.time()
     # For the luminous only
-    #orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, particles=part, subsampling=15)
+    orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, particles=part, subsampling=15)
     # For the halo-selection and DMO selection
-    orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True, particles=part, subsampling=15)
+    #orbit_tree = orbit_io.OrbitTree(tree=halt, gal1=sim_data.galaxy, location='peloton', host=1, dmo=True, particles=part, subsampling=15)
     end = time.time()
     print('KDTree created in {0} seconds'.format(end-start))
     #
@@ -103,6 +103,11 @@ if sim_data.num_gal == 1:
     data_dict['host.particle.num'] = np.sum(part_mask)
     G = 6.67*10**(-11)*(1.988*10**(30))/((1000**2)*(3.086*10**(19)))
     data_dict['KE.at.Rvir'] = 0.5*G*halt['mass'][halt['host.index'][0]]/halt['radius'][halt['host.index'][0]]
+    #
+    # Find the potential of the host at 100 kpc
+    ndist, nind = orbit_tree.neighbors(centers=halt['position'][halt['host.index'][0]], neigh_num_max=1e8, neigh_dist_max=100, workerss=4)
+    part_mask = (ndist[np.isfinite(ndist)] < (100+5))*(ndist[np.isfinite(ndist)] > (100-5))
+    data_dict['host.potential.100kpc'] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
     #
     # Loop over each mass bin
     for i in range(0, len(halo_mass_bins)-1):
@@ -133,9 +138,9 @@ if sim_data.num_gal == 1:
         end = time.time()
         print('Done with mass bin {0} in {1} seconds'.format(i, end-start))
     #
-    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials', dict_or_array_to_write=data_dict, verbose=True)
     #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials_all_subs', dict_or_array_to_write=data_dict, verbose=True)
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials_dmo', dict_or_array_to_write=data_dict, verbose=True)
+    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/potentials/'+sim_data.galaxy+'_potentials_dmo', dict_or_array_to_write=data_dict, verbose=True)
 
 if sim_data.num_gal == 2:
     #
