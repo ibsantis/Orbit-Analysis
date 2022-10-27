@@ -106,7 +106,7 @@ def calc_sub_potential(snap, simdata, orbit_class):
             part_mask = (ndist[np.isfinite(ndist)] < (100+5))*(ndist[np.isfinite(ndist)] > (100-5))
             data_dict['host.potential.100kpc'] = np.mean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
             print('Calculated potential at 100 kpc at snapshot {0}'.format(snap))
-        else:
+        if snap not in host_snaps:
             data_dict['host.potential.100kpc'] = np.nan
             print('No well defined host at snapshot {0}'.format(snap))
         #
