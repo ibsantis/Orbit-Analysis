@@ -277,13 +277,13 @@ summary_plot.median_plot(x=t_in_sim, y=(d_min_mod-d_min_sim), xtype='t.infall.te
 #
 # d_frac
 summary_plot.median_plot(x=t_in_sim, y=(d_rec_mod-d_rec_sim)/d_rec_sim, xtype='t.infall.text', ytype='delta.d.frac', limits=((0,13.8),None), binsize=0.5, title='Recent pericenter, Simulation infall time', hl=True, file_path_and_name=directory+'/dfrac_recent_vs_t_in_sim.pdf')
-summary_plot.median_plot(x=t_in_sim, y=(d_rec_mod-d_rec_sim)/d_rec_sim, xtype='t.infall.text', ytype='delta.d.frac', limits=((0,13.8),(-0.5,1.2)), binsize=0.5, title='Recent pericenter, Simulation infall time', hl=True, file_path_and_name=directory+'/dfrac_recent_vs_t_in_sim_zoom.pdf')
+summary_plot.median_plot(x=t_in_sim, y=(d_rec_mod-d_rec_sim)/d_rec_sim, xtype='t.infall.text', ytype='delta.d.frac', limits=((0,13),(-1,2)), binsize=1, hl=True, file_path_and_name=directory+'/dfrac_recent_vs_t_in_sim_zoom.pdf')
 summary_plot.median_plot(x=t_in_sim, y=(d_min_mod-d_min_sim)/d_min_sim, xtype='t.infall.text', ytype='delta.d.frac', limits=((0,13.8),None), binsize=0.5, title='Minimum pericenter, Simulation infall time', hl=True, file_path_and_name=directory+'/dfrac_min_vs_t_in_sim.pdf')
 summary_plot.median_plot(x=t_in_sim, y=(d_min_mod-d_min_sim)/d_min_sim, xtype='t.infall.text', ytype='delta.d.frac', limits=((0,13.8),(-1,10)), binsize=0.5, title='Minimum pericenter, Simulation infall time', hl=True, file_path_and_name=directory+'/dfrac_min_vs_t_in_sim_zoom.pdf')
 #
 # both d_frac on same plot
 summary_plot.median_plot_mult(x=[t_in_sim,t_in_sim], y=[(d_min_mod-d_min_sim)/d_min_sim, (d_rec_mod-d_rec_sim)/d_rec_sim], xtype=['t.infall.text','t.infall.text'], ytype=['delta.d.frac','delta.d.frac'], limits=((0,13.8),None), binsize=0.5, labels=['Minimum','Recent'], title='Simulation infall time', hl=True, file_path_and_name=directory+'/dfrac_both_vs_t_in_sim.pdf')
-summary_plot.median_plot_mult(x=[t_in_sim,t_in_sim], y=[(d_min_mod-d_min_sim)/d_min_sim, (d_rec_mod-d_rec_sim)/d_rec_sim], xtype=['t.infall.text','t.infall.text'], ytype=['delta.d.frac','delta.d.frac'], limits=((0,13.8),(-1,10)), binsize=0.5, labels=['Minimum','Recent'], title='Simulation infall time', hl=True, file_path_and_name=directory+'/dfrac_both_vs_t_in_sim_zoom.pdf')
+summary_plot.median_plot_mult(x=[t_in_sim,t_in_sim], y=[(d_rec_mod-d_rec_sim)/d_rec_sim, (d_min_mod-d_min_sim)/d_min_sim], xtype=['t.infall.text','t.infall.text'], ytype=['delta.d.frac','delta.d.frac'], limits=((0,13),(-1,2)), binsize=1, labels=['Recent','Minimum'], hl=True, file_path_and_name=directory+'/dfrac_both_vs_t_in_sim_zoom.pdf')
 
 """
     Periceneter distances vs Infall time (model)
