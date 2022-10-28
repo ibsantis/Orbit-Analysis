@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=m12c_subhalo_potential_all_snaps
+#SBATCH --job-name=m12m_subhalo_potential_all_snaps
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 ##SBATCH --partition=skx-normal
 #SBATCH --mem=500G
@@ -7,8 +7,8 @@
 #SBATCH --ntasks=3    # processes total
 ##SBATCH --tasks-per-node=1    # MPI tasks per node
 #SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
-#SBATCH --time=04:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/m12c_subhalo_potential_all_snaps_%j.txt
+#SBATCH --time=06:00:00
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/m12m_subhalo_potential_all_snaps_%j.txt
 ##SBATCH --output=/home1/05400/ibsantis/scripts/jobs/potentials/all_snapshots/RJ_subhalo_potential_all_snaps_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
@@ -48,7 +48,7 @@ print('Read in the tools')
 
 ### Set path and initial parameters
 loc = 'peloton'
-sim_data = orbit_io.OrbitRead(gal1='m12c', location=loc)
+sim_data = orbit_io.OrbitRead(gal1='m12m', location=loc)
 print('Set paths')
 
 # Read in snapshot dictionary and the halo tree
@@ -288,7 +288,6 @@ def calc_sub_potential(snap, simdata, orbit_class):
         ut.io.file_hdf5(file_name_base=simdata.home_dir+'/orbit_data/hdf5_files/potentials/all_snapshots/'+simdata.gal_1+'/'+simdata.gal_1+'_potentials_'+str(snap), dict_or_array_to_write=data_dict_1, verbose=True)
         ut.io.file_hdf5(file_name_base=simdata.home_dir+'/orbit_data/hdf5_files/potentials/all_snapshots/'+simdata.gal_2+'/'+simdata.gal_2+'_potentials_'+str(snap), dict_or_array_to_write=data_dict_2, verbose=True)
         print('Completely finished writing snapshot {0}'.format(snap))
-
 
 
 print('Setting up arguments')
