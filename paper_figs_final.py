@@ -1580,12 +1580,11 @@ plt.savefig(directory+'/times_vs_mstar.pdf')
 
 """
     Figure 5:
-        Infall time versus d(z = 0), binned by Mstar
+        Infall time versus d(z = 0)
 """
 dz0_tot = summary.d_z0(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
 t_in_tot = summary.first_infall(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
 t_in_any_tot = summary.first_infall_any(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
-Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
 #
 f, ax1 = plt.subplots(1, 1, figsize=(10,8))
 colorss = ['#000000', '#ff4900']
