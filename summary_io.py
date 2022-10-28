@@ -3093,6 +3093,27 @@ class SummaryDataPlot(SummaryDataSort):
             ax2.set_ylim(limits[1])
             ax2.set_ylabel(axis_2_label, labelpad=9)
             ax2.tick_params(pad=3)
+        if 't.' in xtype[0]:
+            # Instantiate the cosmology class and run this method first to set up scalefactors
+            cc = ut.cosmology.CosmologyClass()
+            red = np.array([0, 1])
+            cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+            #
+            axis_2_label = 'redshift'
+            axis_2_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+            axis_2_tick_values = [float(v) for v in axis_2_tick_labels]
+            axis_2_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_2_tick_values)
+            ax2 = ax.twiny()
+            if 'M.' in ytype[0]:
+                ax2.set_yscale('log')
+            else:
+                ax2.set_yscale('linear')
+            ax2.set_xscale('linear')
+            ax2.set_xticks(axis_2_tick_locations)
+            ax2.set_xticklabels(axis_2_tick_labels, fontsize=28)
+            ax2.set_xlim(limits[0])
+            ax2.set_xlabel(axis_2_label, labelpad=9)
+            ax2.tick_params(pad=3)
         ax.set_xlabel(self.labels[xtype[0]], fontsize=28)
         ax.set_ylabel(self.labels[ytype[0]], fontsize=28)
         if legend_on:
