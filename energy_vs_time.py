@@ -36,7 +36,7 @@ tlb = snaps['time'][-1] - np.flip(snaps['time'])
 # Read in the potential data
 data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/potentials/all_snapshots/'+sim_data.galaxy+'_potentials_all', verbose=True)
 # Read in the mass profile data
-mp = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/m12i_mass_profile_all', verbose=True)
+mp = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/mass_profiles/'+sim_data.galaxy+'_mass_profile_all', verbose=True)
 # Read in all of the other data
 data_total = summary.data_read(directory=sim_data.home_dir, hosts='all_no_r', sim_type='baryon')
 # Set up distance array (probably don't need it though...)
@@ -118,9 +118,9 @@ axs[0].text(1.2,4.25,'$M_{\\rm star} < 10^{6.5} M_{\\odot}$',fontsize=20)
 axs[1].text(1.2,4.25,'$M_{\\rm star} > 10^{6.5} M_{\\odot}$',fontsize=20)
 #
 axs[0].set_xlim(0,13)
-#axs[0].set_ylim(ymax=5.5)
+axs[0].set_ylim(ymax=5.5)
 axs[1].set_xlim(0,13)
-#axs[1].set_ylim(ymax=5.5)
+axs[1].set_ylim(ymax=5.5)
 #
 axs[0].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=28, labelbottom=False)
 axs[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=True)
@@ -201,7 +201,7 @@ axz.set_xlabel(axis_z_label, fontsize=30, labelpad=9)
 axz.tick_params(pad=3)
 #
 axs.set_xlim(0,max_bin)
-axs.set_ylim(-2,4)
+axs.set_ylim(-3,4)
 #
 axs.tick_params(axis='both', which='both', bottom=True, top=False, labelsize=28, labelbottom=True)
 #
