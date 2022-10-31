@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=m12w_subhalo_potential_all_snaps
-#SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
-##SBATCH --partition=skx-normal
-#SBATCH --mem=500G
+#SBATCH --job-name=RJ_subhalo_potential_all_snaps
+##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
+#SBATCH --partition=skx-normal
+##SBATCH --mem=500G
 #SBATCH --nodes=1
-#SBATCH --ntasks=3    # processes total
-##SBATCH --tasks-per-node=1    # MPI tasks per node
-#SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
-#SBATCH --time=04:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/m12w_subhalo_potential_all_snaps_%j.txt
-##SBATCH --output=/home1/05400/ibsantis/scripts/jobs/potentials/all_snapshots/RJ_subhalo_potential_all_snaps_%j.txt
+##SBATCH --ntasks=3    # processes total
+#SBATCH --tasks-per-node=1    # MPI tasks per node
+##SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
+#SBATCH --time=06:00:00
+##SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/m12w_subhalo_potential_all_snaps_%j.txt
+#SBATCH --output=/home1/05400/ibsantis/scripts/jobs/potentials/all_snapshots/RJ_subhalo_potential_all_snaps_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
 #SBATCH --mail-type=begin
-##SBATCH --account=TG-AST140064
+#SBATCH --account=TG-AST140064
 
 """
 
@@ -47,19 +47,20 @@ import time
 print('Read in the tools')
 
 ### Set path and initial parameters
-loc = 'peloton'
-sim_data = orbit_io.OrbitRead(gal1='m12w', location=loc)
+loc = 'stampede'
+sim_data = orbit_io.OrbitRead(gal1='Romeo', location=loc)
 print('Set paths')
 
 # Read in snapshot dictionary and the halo tree
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
 halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal)
-orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location=loc, host=1)
-#orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location=loc, host=1)
+#orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location=loc, host=1)
+orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location=loc, host=1)
 print('Read in halo tree and set up subhalo indices')
 
 # Set up the snapshot array to loop through
-snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
+#snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
+snaps = np.flip(snaps['index'])[:50]
 
 # Set up the host indices
 host_inds = halt.prop('progenitor.main.indices', halt['host.index'][0])
