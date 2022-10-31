@@ -19,12 +19,14 @@ print('Read in the tools')
 
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='m12w', location='mac')
+sim_data.galaxy = 'm12w'
 print('Set paths')
 
 # Set up snapshot array to loop through
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir)
 snaps = snaps['index'][4:]
+#snaps = snaps['index'][5:]
 
 if sim_data.num_gal == 1:
     #
