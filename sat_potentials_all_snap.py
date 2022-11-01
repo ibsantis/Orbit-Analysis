@@ -297,6 +297,6 @@ args_list = [(snapshot, sim_data, orbits) for snapshot in snaps]
 
 print('Starting to run on data')
 # Run the function using the arguments above in parallel
-ut.io.run_in_parallel(calc_sub_potential, args_list, proc_number=3, verbose=True) # ADD VERBOSE
+ut.io.run_in_parallel(calc_sub_potential, args_list, proc_number=1, verbose=True) # ADD VERBOSE
 
 print('All done.')
