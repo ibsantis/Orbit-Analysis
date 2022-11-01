@@ -509,7 +509,7 @@ ax30.set_ylim(limits_3[1])
 
 
 """
-    Plotting versus d(z = 0)
+    Plotting versus d(z = 0) 
 """
 dz0_tot = summary.d_z0(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
 Mstar_z0_tot = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_z', sim_type='baryon')
