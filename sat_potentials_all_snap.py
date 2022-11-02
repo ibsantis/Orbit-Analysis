@@ -44,6 +44,7 @@ import gizmo_analysis as gizmo
 import utilities as ut
 import numpy as np
 import time
+import sys
 print('Read in the tools')
 
 ### Set path and initial parameters
