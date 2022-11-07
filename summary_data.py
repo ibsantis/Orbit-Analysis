@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=RR_summary_data
+#SBATCH --job-name=m12i_summary_data_aligned_check
 #SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 ##SBATCH --partition=high2    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 ##SBATCH --mem=250G
 #SBATCH --mem=480G
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
-#SBATCH --time=02:30:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/summary/RR_summary_data_%j.txt
+#SBATCH --time=00:30:00
+#SBATCH --output=/home/ibsantis/scripts/jobs/summary/m12i_summary_data_aligned_check_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -22,6 +22,12 @@
     Integrate subhalos in custom potential
         - Disk (radial and vertical) model
         - DM halo model
+
+    11/07/22:
+        Had a seperate script that calculated orbits that were aligned with
+        the disk, but now that there's a new parameter in halo_analysis that
+        does this already, I altered this script to account for that. So, I
+        deleted summary_data_aligned.py
 
 """
 
@@ -39,17 +45,19 @@ from matplotlib import patches
 from scipy.interpolate import interp1d
 from astropy import units as u
 import pandas as pd
+import sys
 print('Read in the tools')
 
 ### Set path and initial parameters
 loc = 'peloton'
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location=loc)
+sim_data = orbit_io.OrbitRead(gal1=str(sys.argv[0]), location=loc)
 plotting = False
+aligned = True
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
-halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal)
+halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal, assign_hosts_rotation=aligned)
 part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'snapshot', 600, simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
 
 if sim_data.num_gal == 1:
@@ -256,8 +264,11 @@ if sim_data.num_gal == 1:
     print('The host radius at z=0 with the mass ratio is:', halt['radius'][halt['host.index'][0]]*mass_ratio)
     print('The mass ratio is:', mass_ratio)
 
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
-    #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
+    if aligned:
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_aligned', dict_or_array_to_write=data_dict, verbose=True)
+        #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
+    if not aligned:
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
 
     if plotting:
         orbit_plot.multi_plot(host_rads=host_radii*mass_ratio, infall_dict=infall_info, peri_dict=peris, time_dict=snaps, sim_dist=halt_dists, sim_vel=halt_vels, sim_ell=angs, model_orbits=galpy_orbits, model_times=ts)
