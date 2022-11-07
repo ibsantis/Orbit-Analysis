@@ -176,7 +176,20 @@ class SummaryDataSort:
         #
         return data_dict
 
-    def data_mass_profile_read(self, directory, hosts='all'):
+    def data_read_potential_full(self, directory, hosts='all'):
+        """
+            TBD
+        """
+        data_dict = dict()
+        #
+        # Given the type of data, read in from the appropriate directory
+        for name in self.host_names[hosts]:
+            data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/all_snapshots/'+name+'_potentials_all', verbose=True)
+            data_dict[name] = data
+        #
+        return data_dict
+
+    def data_read_mass_profile(self, directory, hosts='all'):
         """
         Testing how to read in the data
         """
@@ -2587,6 +2600,66 @@ class SummaryDataSort:
         #s
         return d
 
+    def energies(self, data_dict, mask_dict, potential_dict, mass_profile_dict, time_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
+        """
+        TBD
+        """
+        data_z0 = []
+        data_infall = []
+        tlb = time_dict['time'][-1] - np.flip(time_dict['time'])
+        #
+        for name in self.host_names[hosts]:
+            # Set the host potential at 100 kpc at z = 0
+            phi_host_z0 = potential_dict[name]['host.pot.100kpc'][-1] - potential_dict[name]['host.pot.R200m'] - potential_dict[name]['KE.at.Rvir']
+            #
+            # Set up the enclosed mass ratio within 100-ish kpc
+            M_enc_100kpc_z0 = mass_profile_dict[name][-1][16]
+            M_enc_100kpc_z = mass_profile_dict[name][:,16]
+            M_enc_ratio = M_enc_100kpc_z/M_enc_100kpc_z0
+            #
+            # Define the host potential at 100 kpc across all snapshots
+            phi_host_z = np.flip(phi_host_z0*M_enc_ratio) # Goes from z = 0 to some other z
+            #
+            # Set up null array to save the normalized subhalo potentials to
+            sub_pot = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape)
+            sub_energy = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape)
+            sub_pot_snaps = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape, int)
+            sub_pot_tlb = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape)
+            #
+            # Loop through all of the satellites
+            for i in range(0, sub_pot.shape[0]):
+                # Create the right masks
+                mask_pot_exist = (np.flip(potential_dict[name]['subhalo.pot'][i]) != -1)
+                mask_pot_finite = np.isfinite(np.flip(potential_dict[name]['subhalo.pot'][i]))
+                mask_vel_exist = (data_dict[name]['v.tot.sim'][i][:len(potential_dict[name]['subhalo.pot'][i])] != -1)
+                mask_vel_finite = np.isfinite(data_dict[name]['v.tot.sim'][i][:len(potential_dict[name]['subhalo.pot'][i])])
+                mask_host_finite = np.isfinite(np.flip(potential_dict[name]['host.pot.100kpc']))
+                mask_host_exist = (phi_host_z[:len(potential_dict[name]['subhalo.pot'][i])] != 0)
+                mask_tot = mask_pot_exist*mask_pot_finite*mask_vel_exist*mask_vel_finite*mask_host_exist*mask_host_finite
+                #
+                # Calculate the normalized subhalo potential energy
+                sub_pot[i][mask_tot] = np.flip(potential_dict[name]['subhalo.pot'][i])[mask_tot] - np.flip(potential_dict[name]['host.pot.100kpc'])[mask_tot] + phi_host_z[:len(potential_dict[name]['subhalo.pot'][i])][mask_tot]
+                #
+                # Keep which snapshots it has data for
+                sub_pot_snaps[i][mask_tot] = np.flip(time_dict['index'])[:len(potential_dict[name]['subhalo.pot'][i])][mask_tot]
+                sub_pot_tlb[i][mask_tot] = tlb[:len(potential_dict[name]['subhalo.pot'][i])][mask_tot]
+                #
+                # Calculate the total orbital energy
+                sub_energy[i][mask_tot] = sub_pot[i][mask_tot] + 0.5*(data_dict[name]['v.tot.sim'][i][:len(potential_dict[name]['subhalo.pot'][i])][mask_tot])**2
+            #
+            # Save data for the z = 0 stuff
+            data_z0.append(sub_energy[:,0][mask_dict[name]])
+            #
+            for i in range(0, np.sum(mask_dict[name])):
+                infall_mask = (tlb[:len(sub_energy[mask_dict[name]][i])] <= data_dict[name]['first.infall.time.lb'][mask_dict[name]][i])
+                data_infall.append(sub_energy[mask_dict[name]][i][infall_mask][-1])
+        #
+        d = dict()
+        d['energy.z0'] = np.hstack(data_z0)
+        d['energy.infall'] = np.hstack(data_infall)
+        #
+        return d
+
 class SummaryDataPlot(SummaryDataSort):
 
     def __init__(self):
@@ -2852,7 +2925,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.close()
         pass
 
-    def median_plot(self, x, y, xtype, ytype, binsize, file_path_and_name, binedges=None, limits=None, title=None, hl=False, w_scatter=False):
+    def median_plot(self, x, y, xtype, ytype, binsize, file_path_and_name, binedges=None, limits=None, title=None, hl=False, w_scatter=False, axis_labels=None):
         """
         DESCRIPTION:
             Bins the x-axis quantity and plots either the mean or median, along
@@ -2891,9 +2964,13 @@ class SummaryDataPlot(SummaryDataSort):
         else:
             ls = '-'
         f, ax = plt.subplots(figsize=(11, 8))
-        #ax.minorticks_on()
-        ax.set_xlabel(self.labels[xtype], fontsize=28)
-        ax.set_ylabel(self.labels[ytype], fontsize=28)
+        #
+        if axis_labels:
+            ax.set_xlabel(axis_labels[0], fontsize=28)
+            ax.set_ylabel(axis_labels[1], fontsize=28) 
+        else:
+            ax.set_xlabel(self.labels[xtype], fontsize=28)
+            ax.set_ylabel(self.labels[ytype], fontsize=28)
         if title:
             ax.set_title(title, fontsize=24)
         if 'M.' in xtype and 'M.' not in ytype:
