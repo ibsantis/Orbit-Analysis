@@ -6,7 +6,7 @@
 ##SBATCH --mem=480G
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
-#SBATCH --time=04:00:00
+#SBATCH --time=02:00:00
 #SBATCH --output=/home/ibsantis/scripts/jobs/summary/summary_data_aligned_check_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
@@ -265,7 +265,7 @@ if sim_data.num_gal == 1:
     print('The mass ratio is:', mass_ratio)
 
     if aligned:
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_aligned', dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/aligned/data_'+sim_data.galaxy+'_aligned', dict_or_array_to_write=data_dict, verbose=True)
         #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
     if not aligned:
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
