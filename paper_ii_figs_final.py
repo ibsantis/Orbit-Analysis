@@ -48,6 +48,7 @@ masks_infall_apo['m12f'][59] = False
 # Select which mask you want to use and the corresponding directory
 #directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2'
 directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2_fix'
+#directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2_fix/aligned'
 
 
 """
