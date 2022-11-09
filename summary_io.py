@@ -77,7 +77,7 @@ class SummaryDataSort:
                                    'm12r': 16, 'm12w': 16, 'm12z': 0, 'Romeo': 0, 'Juliet': 0,\
                                    'Thelma': 0, 'Louise': 0, 'Romulus': 0, 'Remus': 0}}
 
-    def data_read(self, directory, sim_type='baryon', hosts='all'):
+    def data_read(self, directory, sim_type='baryon', hosts='all', aligned=False):
         """
         DESCRIPTION:
             Reads in the summary data and stores it in a dictionary with each
@@ -110,10 +110,16 @@ class SummaryDataSort:
         #
         # Given the type of data you want, read in from the appropriate directory
         if sim_type == 'baryon':
-            for name in self.host_names[hosts]:
-                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
-                #data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/with_ecc_per/data_'+name, verbose=True)
-                data_dict[name] = data
+            #
+            if aligned:
+                for name in self.host_names[hosts]:
+                    data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/aligned_new/data_'+name+'_aligned', verbose=True)
+                    data_dict[name] = data
+            else:
+                for name in self.host_names[hosts]:
+                    data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
+                    #data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/with_ecc_per/data_'+name, verbose=True)
+                    data_dict[name] = data
         #
         elif sim_type == 'all_baryon':
             for name in self.host_names[hosts]:
@@ -176,16 +182,23 @@ class SummaryDataSort:
         #
         return data_dict
 
-    def data_read_potential_full(self, directory, hosts='all'):
+    def data_read_potential_full(self, directory, selection='sim', hosts='all'):
         """
             TBD
         """
         data_dict = dict()
         #
-        # Given the type of data, read in from the appropriate directory
-        for name in self.host_names[hosts]:
-            data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/all_snapshots/'+name+'_potentials_all', verbose=True)
-            data_dict[name] = data
+        if selection == 'sim':
+            # Given the type of data, read in from the appropriate directory
+            for name in self.host_names[hosts]:
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/all_snapshots/'+name+'_potentials_all', verbose=True)
+                data_dict[name] = data
+        #
+        elif selection == 'model':
+            # Given the type of data, read in from the appropriate directory
+            for name in self.host_names[hosts]:
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/all_snapshots/'+name+'_potentials_model', verbose=True)
+                data_dict[name] = data
         #
         return data_dict
 
@@ -2967,7 +2980,7 @@ class SummaryDataPlot(SummaryDataSort):
         #
         if axis_labels:
             ax.set_xlabel(axis_labels[0], fontsize=28)
-            ax.set_ylabel(axis_labels[1], fontsize=28) 
+            ax.set_ylabel(axis_labels[1], fontsize=28)
         else:
             ax.set_xlabel(self.labels[xtype], fontsize=28)
             ax.set_ylabel(self.labels[ytype], fontsize=28)
