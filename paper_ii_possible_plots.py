@@ -38,7 +38,7 @@ summary = summary_io.SummaryDataSort()
 summary_plot = summary_io.SummaryDataPlot()
 #
 data_total = summary.data_read(directory=sim_data.home_dir, hosts='all_no_r', sim_type='baryon')
-data_mp = summary.data_mass_profile_read(directory=sim_data.home_dir, hosts='all_no_r')
+data_mp = summary.data_read_mass_profile(directory=sim_data.home_dir, hosts='all_no_r')
 #
 masks_infall = summary.data_mask(data_total, peri_sim=False, peri_model=False, hosts='all_no_r')
 masks_infall_peri = summary.data_mask(data_total, peri_sim=True, peri_model=False, hosts='all_no_r')
@@ -2050,3 +2050,43 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(directory+'/dadr_frac_vs_Mstar.pdf')
 plt.close()
+
+
+
+data = summary.data_read_potential_full(directory=sim_data.home_dir, hosts='all_energy_new')
+snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/m12i_res7100')
+t_in_sim = summary.first_infall(data_total, masks_infall, selection='sim', oversample=True, hosts='all_energy_new', sim_type='baryon')
+energies = summary.energies(data_total, masks_infall, data, data_mp, snaps, oversample=True, hosts='all_energy_new')
+#
+# Plot the energy differences vs infall time
+summary_plot.median_plot(x=t_in_sim, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.infall'], xtype='t.infall.text', ytype='E.tot', limits=((0,13.5),None), binsize=1, hl=True, axis_labels=['Lookback Infall time [Gyr]', '($E(z=0)$ -  $E_{\\rm infall}$)/$E_{\\rm infall}$'], file_path_and_name=directory+'/energy/E_norm_infall_vs_t_infall.pdf')
+summary_plot.median_plot(x=t_in_sim, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.infall'], xtype='t.infall.text', ytype='E.tot', limits=((0,13.5),(-6,4)), binsize=1, hl=True, axis_labels=['Lookback Infall time [Gyr]', '($E(z=0)$ -  $E_{\\rm infall}$)/$E_{\\rm infall}$'], file_path_and_name=directory+'/energy/E_norm_infall_vs_t_infall_zoom.pdf')
+summary_plot.median_plot(x=t_in_sim, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.z0'], xtype='t.infall.text', ytype='E.tot', limits=((0,13.5),None), binsize=1, hl=True, axis_labels=['Lookback Infall time [Gyr]', '($E(z=0)$ -  $E_{\\rm infall}$)/$E(z=0)$'], file_path_and_name=directory+'/energy/E_norm_z0_vs_t_infall.pdf')
+summary_plot.median_plot(x=t_in_sim, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.z0'], xtype='t.infall.text', ytype='E.tot', limits=((0,13.5),(-5,6)), binsize=1, hl=True, axis_labels=['Lookback Infall time [Gyr]', '($E(z=0)$ -  $E_{\\rm infall}$)/$E(z=0)$'], file_path_and_name=directory+'/energy/E_norm_z0_vs_t_infall_zoom.pdf')
+#
+# Plot the energy differences vs Mstar
+energies = summary.energies(data_total, masks_infall_peri, data, data_mp, snaps, oversample=True, hosts='all_energy_new')
+Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all_energy_new', sim_type='baryon')
+dz0_tot = summary.d_z0(data_total, masks_infall_peri, oversample=True, hosts='all_energy_new', sim_type='baryon')
+#
+summary_plot.median_plot(x=Mstar_z0, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.infall'], xtype='M.star.z0', ytype='E.tot', limits=((4,9.5),None), binsize=0.5, hl=True, axis_labels=['$M_{\\rm star} \ [M_{\\odot}]$', '($E(z=0)$ -  $E_{\\rm infall}$)/$E_{\\rm infall}$'], file_path_and_name=directory+'/energy/E_norm_infall_vs_Mstar.pdf')
+summary_plot.median_plot(x=Mstar_z0, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.infall'], xtype='M.star.z0', ytype='E.tot', limits=((4,9.5),(-10,10)), binsize=0.5, hl=True, axis_labels=['$M_{\\rm star} \ [M_{\\odot}]$', '($E(z=0)$ -  $E_{\\rm infall}$)/$E_{\\rm infall}$'], file_path_and_name=directory+'/energy/E_norm_infall_vs_Mstar_zoom.pdf')
+summary_plot.median_plot(x=Mstar_z0, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.z0'], xtype='M.star.z0', ytype='E.tot', limits=((4,9.5),None), binsize=0.5, hl=True, axis_labels=['$M_{\\rm star} \ [M_{\\odot}]$', '($E(z=0)$ -  $E_{\\rm infall}$)/$E(z=0)$'], file_path_and_name=directory+'/energy/E_norm_z0_vs_Mstar.pdf')
+summary_plot.median_plot(x=Mstar_z0, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.z0'], xtype='M.star.z0', ytype='E.tot', limits=((4,9.5),(-1,8)), binsize=0.5, hl=True, axis_labels=['$M_{\\rm star} \ [M_{\\odot}]$', '($E(z=0)$ -  $E_{\\rm infall}$)/$E(z=0)$'], file_path_and_name=directory+'/energy/E_norm_z0_vs_Mstar_zoom.pdf')
+#
+# Plot the energy differences vs d(z = 0)
+summary_plot.median_plot(x=dz0_tot, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.infall'], xtype='d.z0', ytype='E.tot', limits=((0,400),None), binsize=50, hl=True, axis_labels=['Host distance, d [kpc]', '($E(z=0)$ -  $E_{\\rm infall}$)/$E_{\\rm infall}$'], file_path_and_name=directory+'/energy/E_norm_infall_vs_dz0.pdf')
+summary_plot.median_plot(x=dz0_tot, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.infall'], xtype='d.z0', ytype='E.tot', limits=((0,400),(-10,1)), binsize=50, hl=True, axis_labels=['Host distance, d [kpc]', '($E(z=0)$ -  $E_{\\rm infall}$)/$E_{\\rm infall}$'], file_path_and_name=directory+'/energy/E_norm_infall_vs_dz0_zoom.pdf')
+summary_plot.median_plot(x=dz0_tot, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.z0'], xtype='d.z0', ytype='E.tot', limits=((0,400),None), binsize=50, hl=True, axis_labels=['Host distance, d [kpc]', '($E(z=0)$ -  $E_{\\rm infall}$)/$E(z=0)$'], file_path_and_name=directory+'/energy/E_norm_z0_vs_dz0.pdf')
+summary_plot.median_plot(x=dz0_tot, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.z0'], xtype='d.z0', ytype='E.tot', limits=((0,400),(-10,10)), binsize=50, hl=True, axis_labels=['Host distance, d [kpc]', '($E(z=0)$ -  $E_{\\rm infall}$)/$E(z=0)$'], file_path_and_name=directory+'/energy/E_norm_z0_vs_dz0_zoom.pdf')
+
+
+
+
+
+
+
+
+
+summary_plot.plot_hist(x=(d_rec_mod - d_rec_mod_aligned), xtype='d.model', x_labels='$d_{\\rm peri,unaligned} - d_{\\rm peri,aligned}$ [kpc]', title='Recent Model Pericenters', pdf=True, binsize=0.05, xlimits=(-0.6,0.6), file_path_and_name=directory+'/d_mod_recent_hist.pdf')
+summary_plot.plot_hist(x=(d_rec_mod - d_rec_mod_aligned), xtype='d.model', x_labels='$d_{\\rm peri,unaligned} - d_{\\rm peri,aligned}$ [kpc]', title='Recent Model Pericenters', pdf=False, binsize=0.05, xlimits=(-0.6,0.6), file_path_and_name=directory+'/d_mod_recent_raw.pdf')
