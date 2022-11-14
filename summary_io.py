@@ -50,7 +50,10 @@ class SummaryDataSort:
                            #
                            'all_energy': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', \
                                           'Romeo', 'Juliet', 'Thelma', 'Louise'],
-                            #
+                           #
+                           'all_energy_new': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', \
+                                              'Romeo', 'Juliet', 'Thelma', 'Louise'],
+                           #
                            'iso': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w', 'm12z'], \
                            #
                            'iso_no_z': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w'], \
@@ -77,7 +80,7 @@ class SummaryDataSort:
                                    'm12r': 16, 'm12w': 16, 'm12z': 0, 'Romeo': 0, 'Juliet': 0,\
                                    'Thelma': 0, 'Louise': 0, 'Romulus': 0, 'Remus': 0}}
 
-    def data_read(self, directory, sim_type='baryon', hosts='all', aligned=False):
+    def data_read(self, directory, sim_type='baryon', hosts='all', aligned=False, point_mass=False):
         """
         DESCRIPTION:
             Reads in the summary data and stores it in a dictionary with each
@@ -111,9 +114,13 @@ class SummaryDataSort:
         # Given the type of data you want, read in from the appropriate directory
         if sim_type == 'baryon':
             #
-            if aligned:
+            if aligned and not point_mass:
                 for name in self.host_names[hosts]:
                     data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/aligned_new/data_'+name+'_aligned', verbose=True)
+                    data_dict[name] = data
+            elif aligned and point_mass:
+                for name in self.host_names[hosts]:
+                    data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/aligned_new/data_'+name+'_aligned_point_mass', verbose=True)
                     data_dict[name] = data
             else:
                 for name in self.host_names[hosts]:
@@ -3425,7 +3432,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def plot_hist(self, x, xtype, binsize, file_path_and_name, pdf=False, xlimits=None, title=None, binedges=None):
+    def plot_hist(self, x, xtype, binsize, file_path_and_name, pdf=False, xlimits=None, title=None, binedges=None, x_labels=None):
         """
         DESCRIPTION:
             Plots a histogram of a given property.
@@ -3484,7 +3491,10 @@ class SummaryDataPlot(SummaryDataSort):
             plt.scatter(np.mean(x), y_mean, s=250, marker='s', c='k')
         #
         plt.xlim(xlimits)
-        plt.xlabel(self.labels[xtype], fontsize=28)
+        if x_labels:
+            plt.xlabel(x_labels, fontsize=28)
+        else:
+            plt.xlabel(self.labels[xtype], fontsize=28)
         plt.ylabel(y_label, fontsize=34)
         if title:
             plt.title(title, fontsize=24)
