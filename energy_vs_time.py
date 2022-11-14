@@ -24,7 +24,7 @@ print('Read in the tools')
 
 ### Set path and initial parameters
 sim_data = orbit_io.OrbitRead(gal1='Romeo', location='mac')
-sim_data.galaxy = sim_data.gal_1
+sim_data.galaxy = sim_data.gal_2
 summary = summary_io.SummaryDataSort()
 summary_plot = summary_io.SummaryDataPlot()
 directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2_fix/energy'
@@ -111,12 +111,12 @@ axz.set_xlim(0,13)
 axz.set_xlabel(axis_z_label, fontsize=30, labelpad=9)
 axz.tick_params(pad=3)
 #
-r1 = mpatches.Rectangle(xy=(1,4),width=3.5,height=1, color='k', alpha=0.1)
-r2 = mpatches.Rectangle(xy=(1,4),width=3.5,height=1, color='k', alpha=0.1)
+r1 = mpatches.Rectangle(xy=(1,2),width=3.5,height=1, color='k', alpha=0.1)
+r2 = mpatches.Rectangle(xy=(1,2),width=3.5,height=1, color='k', alpha=0.1)
 axs[0].add_patch(r1)
 axs[1].add_patch(r2)
-axs[0].text(1.2,4.25,'$M_{\\rm star} < 10^{6.5} M_{\\odot}$',fontsize=20)
-axs[1].text(1.2,4.25,'$M_{\\rm star} > 10^{6.5} M_{\\odot}$',fontsize=20)
+axs[0].text(1.2,2.25,'$M_{\\rm star} < 10^{6.5} M_{\\odot}$',fontsize=20)
+axs[1].text(1.2,2.25,'$M_{\\rm star} > 10^{6.5} M_{\\odot}$',fontsize=20)
 #
 axs[0].set_xlim(0,13)
 #axs[0].set_ylim(ymax=5.5)
