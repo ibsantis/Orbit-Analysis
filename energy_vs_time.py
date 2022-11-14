@@ -79,10 +79,7 @@ for i in range(0, sub_pot.shape[0]):
     # Calculate the total orbital energy
     sub_energy[i][mask_sub*mask_host] = sub_pot[i][mask_sub*mask_host] + 0.5*(data_total[sim_data.galaxy]['v.tot.sim'][i][:len(data[sim_data.galaxy]['subhalo.pot'][i])][mask_sub*mask_host])**2
 
-
-mask_low = (data_total[sim_data.galaxy]['infall.check'])*(data_total[sim_data.galaxy]['M.star.z0'] < 3e6)
-mask_high = (data_total[sim_data.galaxy]['infall.check'])*(data_total[sim_data.galaxy]['M.star.z0'] > 3e6)
-
+# Calculate the normalized energy relative to z = 0
 mask_infall = data_total[sim_data.galaxy]['infall.check']
 sub_energy_norm = (-1)*np.ones(sub_energy.shape)
 #
@@ -91,7 +88,14 @@ for i in range(0, sub_energy.shape[0]):
         m = (sub_energy[i] != -1)*np.isfinite(sub_energy[i])
         sub_energy_norm[i][m] = (sub_energy[i][m] - sub_energy[i][m][0])/sub_energy[i][m][0]
 
-
+"""
+    Plot the energies of the satellites that fell in and split by:
+        - Low mass  : Mstar < 3e6 Msun
+        - High mass : Mstar > 3e6 Msun
+"""
+mask_low = (data_total[sim_data.galaxy]['infall.check'])*(data_total[sim_data.galaxy]['M.star.z0'] < 3e6)
+mask_high = (data_total[sim_data.galaxy]['infall.check'])*(data_total[sim_data.galaxy]['M.star.z0'] > 3e6)
+#
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(2, 1, figsize=(10,12))
 #
@@ -148,6 +152,9 @@ plt.savefig(directory+'/infall_satellites/'+sim_data.galaxy+'_E_vs_tlb_all_check
 plt.close()
 
 
+"""
+    Plot the normalized energies for satellites that fell in
+"""
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(2, 1, figsize=(10,12))
 #
@@ -199,7 +206,8 @@ plt.close()
 
 
 """
-    Plot a version that shows just the median for each host
+    Plot the median energy of all satellites in a host vs time
+        - Only including satellites that fell in
 """
 
 binss, half_binss = summary_plot.binning_scheme(x=tlb, xtype='t.lb', binsize=1)
@@ -278,7 +286,9 @@ plt.savefig(directory+'/infall_satellites/'+sim_data.galaxy+'_E_vs_tlb_median.pd
 plt.close()
 
 
-
+"""
+    Plot the normalized median energy of all satellites in a host vs time
+"""
 binss, half_binss = summary_plot.binning_scheme(x=tlb, xtype='t.lb', binsize=1)
 max_bin = int(binss[-1])
 #
