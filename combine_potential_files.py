@@ -26,7 +26,6 @@ print('Set paths')
 # Set up snapshot array to loop through
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir)
 snaps = snaps['index'][2:]
-#snaps = snaps['index'][5:]
 
 # Read in the z = 0 data so that I can get the length of the arrays
 data_z0 = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/potentials/all_snapshots/'+sim_data.galaxy+'/'+sim_data.galaxy+'_potentials_600', verbose=True)
