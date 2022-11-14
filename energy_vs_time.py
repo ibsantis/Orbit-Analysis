@@ -23,7 +23,7 @@ print('Read in the tools')
 
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romeo', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='Thelma', location='mac')
 sim_data.galaxy = sim_data.gal_2
 summary = summary_io.SummaryDataSort()
 summary_plot = summary_io.SummaryDataPlot()
@@ -35,11 +35,11 @@ snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies
 tlb = snaps['time'][-1] - np.flip(snaps['time'])
 
 # Read in the potential data
-data = summary.data_read_potential_full(directory=sim_data.home_dir, hosts='lg_no_RR')
+data = summary.data_read_potential_full(directory=sim_data.home_dir, hosts='all_energy_new')
 # Read in the mass profile data
-data_mp = summary.data_read_mass_profile(directory=sim_data.home_dir, hosts='lg_no_RR')
+data_mp = summary.data_read_mass_profile(directory=sim_data.home_dir, hosts='all_energy_new')
 # Read in all of the other data
-data_total = summary.data_read(directory=sim_data.home_dir, hosts='lg_no_RR', sim_type='baryon')
+data_total = summary.data_read(directory=sim_data.home_dir, hosts='all_energy_new', sim_type='baryon')
 # Set up distance array (probably don't need it though...)
 rs = data_mp['rs']
 
@@ -82,6 +82,14 @@ for i in range(0, sub_pot.shape[0]):
 
 mask_low = (data_total[sim_data.galaxy]['infall.check'])*(data_total[sim_data.galaxy]['M.star.z0'] < 3e6)
 mask_high = (data_total[sim_data.galaxy]['infall.check'])*(data_total[sim_data.galaxy]['M.star.z0'] > 3e6)
+
+mask_infall = data_total[sim_data.galaxy]['infall.check']
+sub_energy_norm = (-1)*np.ones(sub_energy.shape)
+#
+for i in range(0, sub_energy.shape[0]):
+    if mask_infall[i]:
+        m = (sub_energy[i] != -1)*np.isfinite(sub_energy[i])
+        sub_energy_norm[i][m] = (sub_energy[i][m] - sub_energy[i][m][0])/sub_energy[i][m][0]
 
 
 plt.rcParams["font.family"] = "serif"
@@ -138,6 +146,56 @@ plt.subplots_adjust(wspace=0.12, hspace=0)
 #plt.show()
 plt.savefig(directory+'/infall_satellites/'+sim_data.galaxy+'_E_vs_tlb_all_check.pdf')
 plt.close()
+
+
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(2, 1, figsize=(10,12))
+#
+for i in range(0, np.sum(mask_low)):
+    m = (sub_energy_norm[mask_low][i] != -1)*(sub_pot_tlb[mask_low][i] < data_total[sim_data.galaxy]['first.infall.time.lb'][mask_low][i])
+    axs[0].plot(sub_pot_tlb[mask_low][i][m], sub_energy_norm[mask_low][i][m], 'k', alpha=0.2)
+for i in range(0, np.sum(mask_high)):
+    m = (sub_energy_norm[mask_high][i] != -1)*(sub_pot_tlb[mask_high][i] < data_total[sim_data.galaxy]['first.infall.time.lb'][mask_high][i])
+    axs[1].plot(sub_pot_tlb[mask_high][i][m], sub_energy_norm[mask_high][i][m], 'k', alpha=0.2)
+#
+cc = ut.cosmology.CosmologyClass()
+red = np.array([0, 1])
+cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+#
+axis_z_label = 'redshift'
+axis_z_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+axis_z_tick_values = [float(v) for v in axis_z_tick_labels]
+axis_z_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_z_tick_values)
+axz = axs[0].twiny()
+axz.set_xscale('linear')
+axz.set_yscale('linear')
+axz.set_xticks(axis_z_tick_locations)
+axz.set_xticklabels(axis_z_tick_labels, fontsize=26)
+axz.set_xlim(0,13)
+axz.set_xlabel(axis_z_label, fontsize=30, labelpad=9)
+axz.tick_params(pad=3)
+#
+axs[0].set_xlim(0,13)
+#axs[0].set_ylim(-10,6)
+axs[1].set_xlim(0,13)
+#axs[1].set_ylim(ymax=5.5)
+#
+axs[0].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=28, labelbottom=False)
+axs[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=True)
+#
+axs[0].set_ylabel('($E(t) - E(t=0))/E(t=0)$', fontsize=20)
+axs[0].get_yaxis().set_label_coords(-0.12,0.5)
+axs[1].set_ylabel('($E(t) - E(t=0))/E(t=0)$', fontsize=20)
+axs[1].get_yaxis().set_label_coords(-0.12,0.5)
+#
+axs[1].set_xlabel('Lookback time [Gyr]', fontsize=32)
+#
+plt.tight_layout()
+plt.subplots_adjust(wspace=0.12, hspace=0)
+#plt.show()
+plt.savefig(directory+'/infall_satellites_norm/'+sim_data.galaxy+'_E_norm_vs_tlb_all.pdf')
+plt.close()
+
 
 
 """
@@ -217,4 +275,78 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(directory+'/infall_satellites/'+sim_data.galaxy+'_E_vs_tlb_median.pdf')
 #plt.savefig(directory+'/'+sim_data.galaxy+'_E_vs_tlb_median_zoom.pdf')
+plt.close()
+
+
+
+binss, half_binss = summary_plot.binning_scheme(x=tlb, xtype='t.lb', binsize=1)
+max_bin = int(binss[-1])
+#
+meds = np.zeros(max_bin)
+upper68 = np.zeros(max_bin)
+lower68 = np.zeros(max_bin)
+upper95 = np.zeros(max_bin)
+lower95 = np.zeros(max_bin)
+upper100 = np.zeros(max_bin)
+lower100 = np.zeros(max_bin)
+#
+onesigp = 84.13
+onesigm = 15.87
+twosigp = 97.72
+twosigm = 2.28
+thrsigp = 100
+thrsigm = 0
+#
+for i in range(0, max_bin):
+    mask_time = (tlb[:len(sub_energy[0])] > binss[i])*(tlb[:len(sub_energy[0])] < binss[i+1])
+    temp = []
+    for j in range(0, np.sum(mask_infall)):
+        mask_sub = (sub_energy_norm[mask_infall][j] != -1)*np.isfinite(sub_energy_norm[mask_infall][j])*mask_time*(sub_pot_tlb[mask_infall][j] < data_total[sim_data.galaxy]['first.infall.time.lb'][mask_infall][j])
+        temp.append(sub_energy_norm[mask_infall][j][mask_sub])
+    meds[i] = np.nanmedian(np.hstack(temp))
+    upper68[i] = np.nanpercentile(np.hstack(temp), onesigp)
+    lower68[i] = np.nanpercentile(np.hstack(temp), onesigm)
+    upper95[i] = np.nanpercentile(np.hstack(temp), twosigp)
+    lower95[i] = np.nanpercentile(np.hstack(temp), twosigm)
+    upper100[i] = np.nanpercentile(np.hstack(temp), thrsigp)
+    lower100[i] = np.nanpercentile(np.hstack(temp), thrsigm)
+#
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+axs.plot(binss[:max_bin]+half_binss, meds, 'g', alpha=0.7)
+axs.fill_between(binss[:max_bin]+half_binss, upper68, lower68, color='g', alpha=0.3)
+axs.fill_between(binss[:max_bin]+half_binss, upper95, lower95, color='g', alpha=0.15)
+axs.fill_between(binss[:max_bin]+half_binss, upper100, lower100, color='g', alpha=0.05)
+#
+cc = ut.cosmology.CosmologyClass()
+red = np.array([0, 1])
+cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+#
+axis_z_label = 'redshift'
+axis_z_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
+axis_z_tick_values = [float(v) for v in axis_z_tick_labels]
+axis_z_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_z_tick_values)
+axz = axs.twiny()
+axz.set_xscale('linear')
+axz.set_yscale('linear')
+axz.set_xticks(axis_z_tick_locations)
+axz.set_xticklabels(axis_z_tick_labels, fontsize=26)
+axz.set_xlim(0,max_bin)
+axz.set_xlabel(axis_z_label, fontsize=30, labelpad=9)
+axz.tick_params(pad=3)
+#
+axs.set_xlim(0,max_bin)
+axs.set_ylim(-3,1)
+#
+axs.tick_params(axis='both', which='both', bottom=True, top=False, labelsize=28, labelbottom=True)
+#
+axs.set_ylabel('($E(t) - E(t=0))/E(t=0)$', fontsize=30)
+axs.get_yaxis().set_label_coords(-0.12,0.5)
+#
+axs.set_xlabel('Lookback time [Gyr]', fontsize=32)
+#
+plt.tight_layout()
+#plt.show()
+plt.savefig(directory+'/infall_satellites_norm/'+sim_data.galaxy+'_E_norm_vs_tlb_median.pdf')
 plt.close()
