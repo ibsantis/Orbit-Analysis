@@ -48,7 +48,6 @@ masks_infall_apo['m12f'][59] = False
 # Select which mask you want to use and the corresponding directory
 #directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2'
 directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2_fix'
-#directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2_fix/aligned'
 
 
 """
@@ -551,10 +550,16 @@ plt.close()
     Figure 5:
         Satellite orbits
 """
+snap_e = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/m12i_res7100')
+tlb = snap_e['time'][-1] - np.flip(snap_e['time'])
+data = summary.data_read_potential_full(directory=sim_data.home_dir, hosts='all_energy_new', selection='sim')
+data_mp = summary.data_read_mass_profile(directory=sim_data.home_dir, hosts='all_energy_new')
+#
 d_rec_sim = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=False, hosts='all_no_r', sim_type='baryon')
 d_min_sim = summary.dperi_min(data_total, masks_infall_peri, selection='sim', oversample=False, hosts='all_no_r', sim_type='baryon')
 d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model', oversample=False, hosts='all_no_r', sim_type='baryon')
 d_min_mod = summary.dperi_min(data_total, masks_infall_peri, selection='model', oversample=False, hosts='all_no_r', sim_type='baryon')
+#
 frac_d = np.abs((d_rec_mod-d_rec_sim)/d_rec_sim)
 names = summary.halo_id(data_total, masks_infall_peri, hosts='all_no_r')
 
@@ -564,13 +569,13 @@ names = summary.halo_id(data_total, masks_infall_peri, hosts='all_no_r')
 
 peri_color, apo_color = '#337422', '#D994F8'
 
-halo_ids = [59-1, 49-1, 125-1, 48-1] # 16%, 40%, 62%, 102%
+halo_ids = [28-1, 49-1, 49-1, 68-1] # 11%, 40%, 51%, 95%
 #
-hosts = ['Louise', 'm12f', 'Remus', 'm12z']
+hosts = ['m12w', 'm12f', 'Romeo', 'Louise']
 
 # First column
 plt.rcParams["font.family"] = "serif"
-f, axs = plt.subplots(3, 4, figsize=(32,16))
+f, axs = plt.subplots(4, 4, figsize=(32,22))
 #
 for i in range(0, len(halo_ids)):
     snaps = data_total[hosts[i]]['time.sim']
@@ -583,10 +588,51 @@ for i in range(0, len(halo_ids)):
     d_sim = data_total[hosts[i]]['d.tot.sim'][halo_ids[i]]
     v_sim = data_total[hosts[i]]['v.tot.sim'][halo_ids[i]]
     L_sim = data_total[hosts[i]]['L.tot.sim'][halo_ids[i]]/10000
+    #
+    # Set the host potential at 100 kpc at z = 0
+    phi_host_z0 = data[hosts[i]]['host.pot.100kpc'][-1] - data[hosts[i]]['host.pot.R200m'] - data[hosts[i]]['KE.at.Rvir']
+    #
+    # Set up the enclosed mass ratio within 100-ish kpc
+    M_enc_100kpc_z0 = data_mp[hosts[i]][-1][16]
+    M_enc_100kpc_z = data_mp[hosts[i]][:,16]
+    #
+    M_enc_ratio = M_enc_100kpc_z/M_enc_100kpc_z0
+    #
+    # Define the host potential at 100 kpc across all snapshots
+    phi_host_z = np.flip(phi_host_z0*M_enc_ratio) # Goes from z = 0 to some other z
+    #
+    # Set up null array to save the normalized subhalo potentials to
+    sub_pot = (-1)*np.ones(data[hosts[i]]['subhalo.pot'].shape)
+    sub_energy = (-1)*np.ones(data[hosts[i]]['subhalo.pot'].shape)
+    sub_pot_snaps = (-1)*np.ones(data[hosts[i]]['subhalo.pot'].shape, int)
+    sub_pot_tlb = (-1)*np.ones(data[hosts[i]]['subhalo.pot'].shape)
+    #
+    # Loop through all of the satellites
+    for j in range(0, sub_pot.shape[0]):
+        # Create a mask for the subhalo data
+        mask_sub = (np.flip(data[hosts[i]]['subhalo.pot'][j]) != -1)*np.isfinite(np.flip(data[hosts[i]]['subhalo.pot'][j]))*(data_total[hosts[i]]['v.tot.sim'][j][:len(data[hosts[i]]['subhalo.pot'][j])] != -1)*np.isfinite(data_total[hosts[i]]['v.tot.sim'][j][:len(data[hosts[i]]['subhalo.pot'][j])])*np.isfinite(np.flip(data[hosts[i]]['host.pot.100kpc']))
+        #
+        # Create a mask for the host data
+        mask_host = (phi_host_z[:len(data[hosts[i]]['subhalo.pot'][j])] != 0)
+        #
+        # Calculate the normalized subhalo energy
+        sub_pot[j][mask_sub*mask_host] = np.flip(data[hosts[i]]['subhalo.pot'][j])[mask_sub*mask_host] - np.flip(data[hosts[i]]['host.pot.100kpc'])[mask_sub*mask_host] + phi_host_z[:len(data[hosts[i]]['subhalo.pot'][j])][mask_sub*mask_host]
+        # Keep which snapshots it has data for
+        sub_pot_snaps[j][mask_sub*mask_host] = np.flip(snap_e['index'])[:len(data[hosts[i]]['subhalo.pot'][j])][mask_sub*mask_host]
+        sub_pot_tlb[j][mask_sub*mask_host] = tlb[:len(data[hosts[i]]['subhalo.pot'][j])][mask_sub*mask_host]
+        #
+        # Calculate the total orbital energy
+        sub_energy[j][mask_sub*mask_host] = sub_pot[j][mask_sub*mask_host] + 0.5*(data_total[hosts[i]]['v.tot.sim'][j][:len(data[hosts[i]]['subhalo.pot'][j])][mask_sub*mask_host])**2
+    #
+    E_sim = sub_energy[halo_ids[i]]
+    t_E = sub_pot_tlb[halo_ids[i]]
     d_mask = (d_sim >= 0)
     d_sim = d_sim[d_mask]
     v_sim = v_sim[d_mask]
     L_sim = L_sim[d_mask]
+    E_sim = E_sim[E_sim != -1]
+    t_E = t_E[:len(E_sim)][E_sim != -1]
+    #E_sim =
     lookback_time = np.flip(snaps[-1] - snaps)
     times = lookback_time[:len(d_sim)]
     times_model = data_total[hosts[i]]['time.model']
@@ -657,41 +703,65 @@ for i in range(0, len(halo_ids)):
     axs[2,i].set_ylim(top=np.nanmax(L_sim)+0.3)
     axs[2,i].label_outer()
     #
+    # Plot the energy
+    axs[3,i].plot(t_E, E_sim/1e4, 'k')
+    #axs[3,i].plot(-1*times_model, L_model, alpha=0.5)
+    #
+    if infall:
+        infall_time = data_total[hosts[i]]['first.infall.time.lb'][halo_ids[i]]
+        axs[3,i].axvline(x=infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+    #
+    if peri:
+        for j in data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]][data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]] != -1]:
+            axs[3,i].axvline(x=j, ymin=0, ymax=1, color=peri_color, linestyle=':', alpha=0.3)
+    #
+    # Set the labels and save the figure
+    axs[3,i].set_ylim(top=np.nanmax(L_sim)+0.3)
+    axs[3,i].label_outer()
+    #
 axs[0,0].set_xlim(13.8,0)
 axs[1,0].set_xlim(13.8,0)
 axs[2,0].set_xlim(13.8,0)
+axs[3,0].set_xlim(13.8,0)
 axs[0,1].set_xlim(13.8,0)
 axs[1,1].set_xlim(13.8,0)
 axs[2,1].set_xlim(13.8,0)
+axs[3,1].set_xlim(13.8,0)
 axs[0,2].set_xlim(13.8,0)
 axs[1,2].set_xlim(13.8,0)
 axs[2,2].set_xlim(13.8,0)
+axs[3,2].set_xlim(13.8,0)
 axs[0,3].set_xlim(13.8,0)
 axs[1,3].set_xlim(13.8,0)
 axs[2,3].set_xlim(13.8,0)
+axs[3,3].set_xlim(13.8,0)
 #
-axs[0,0].set_ylim(0,490)
+axs[0,0].set_ylim(0,450)
 axs[0,1].set_ylim(0,330)
-axs[0,2].set_ylim(0,330)
-axs[0,3].set_ylim(0,300)
+axs[0,2].set_ylim(0,400)
+axs[0,3].set_ylim(0,400)
 axs[1,0].set_ylim(0,330)
 axs[1,1].set_ylim(0,430)
 axs[1,2].set_ylim(0,430)
 axs[1,3].set_ylim(0,340)
-axs[2,0].set_ylim(0,3.6)
+axs[2,0].set_ylim(0,3.3)
 axs[2,1].set_ylim(0,2.75)
-axs[2,2].set_ylim(0,3.4)
-axs[2,3].set_ylim(0,1.9)
+axs[2,2].set_ylim(0,3.3)
+axs[2,3].set_ylim(0,2.9)
+axs[3,0].set_ylim(-10,10)
+axs[3,1].set_ylim(-10,10)
+axs[3,2].set_ylim(-10,10)
+axs[3,3].set_ylim(-10,10)
 #
 axs[0,0].legend(prop={'size': 24}, loc='upper right', framealpha=1)
 axs[0,1].legend(prop={'size': 24}, loc='upper right', framealpha=1)
 axs[0,2].legend(prop={'size': 24}, loc='upper right', framealpha=1)
 axs[0,3].legend(prop={'size': 24}, loc='upper right', framealpha=1)
 #
-axs[2,0].set_xlabel('Lookback time [Gyr]', fontsize=32)
-axs[2,1].set_xlabel('Lookback time [Gyr]', fontsize=32)
-axs[2,2].set_xlabel('Lookback time [Gyr]', fontsize=32)
-axs[2,3].set_xlabel('Lookback time [Gyr]', fontsize=32)
+axs[3,0].set_xlabel('Lookback time [Gyr]', fontsize=32)
+axs[3,1].set_xlabel('Lookback time [Gyr]', fontsize=32)
+axs[3,2].set_xlabel('Lookback time [Gyr]', fontsize=32)
+axs[3,3].set_xlabel('Lookback time [Gyr]', fontsize=32)
 #
 axs[0,0].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=28, labelbottom=False, labelleft=True)
 axs[0,1].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=28, labelbottom=False, labelleft=True)
@@ -703,10 +773,15 @@ axs[1,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize
 axs[1,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=False, labelleft=True)
 axs[1,3].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=False, labelleft=True)
 #
-axs[2,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=True)
-axs[2,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=True)
-axs[2,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=True)
-axs[2,3].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=True)
+axs[2,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=False, labelleft=True)
+axs[2,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=False, labelleft=True)
+axs[2,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=False, labelleft=True)
+axs[2,3].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=False, labelleft=True)
+#
+axs[3,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=True)
+axs[3,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=True)
+axs[3,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=True)
+axs[3,3].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelleft=True)
 #
 #plt.tight_layout()
 axs[0,0].set_ylabel('Host distance, r [kpc]', fontsize=26)
@@ -715,15 +790,17 @@ axs[1,0].set_ylabel('Total Velocity [km s$^{-1}$]', fontsize=26)
 axs[1,0].get_yaxis().set_label_coords(-0.13,0.5)
 axs[2,0].set_ylabel('$\\ell$ [10$^4$ kpc km s$^{-1}$]', fontsize=26)
 axs[2,0].get_yaxis().set_label_coords(-0.13,0.5)
+axs[3,0].set_ylabel('Energy [10$^4$ kpc km s$^{-1}$]', fontsize=26)
+axs[3,0].get_yaxis().set_label_coords(-0.13,0.5)
 #
-r1 = mpatches.Rectangle(xy=(12.9,400),width=-1.35,height=65, color='k', alpha=0.2)
+r1 = mpatches.Rectangle(xy=(12.9,375),width=-1.35,height=55, color='k', alpha=0.2)
 r2 = mpatches.Rectangle(xy=(12.9,275),width=-1.35,height=40, color='k', alpha=0.2)
-r3 = mpatches.Rectangle(xy=(12.9,275),width=-1.35,height=40, color='k', alpha=0.2)
-r4 = mpatches.Rectangle(xy=(12.9,245),width=-1.35,height=40, color='k', alpha=0.2)
-axs[0,0].text(12.5,418,'A',fontsize=28)
+r3 = mpatches.Rectangle(xy=(12.9,330),width=-1.35,height=50, color='k', alpha=0.2)
+r4 = mpatches.Rectangle(xy=(12.9,330),width=-1.35,height=50, color='k', alpha=0.2)
+axs[0,0].text(12.5,388,'A',fontsize=28)
 axs[0,1].text(12.5,285,'B',fontsize=28)
-axs[0,2].text(12.5,285,'C',fontsize=28)
-axs[0,3].text(12.5,257,'D',fontsize=28)
+axs[0,2].text(12.5,345,'C',fontsize=28)
+axs[0,3].text(12.5,345,'D',fontsize=28)
 axs[0,0].add_patch(r1)
 axs[0,1].add_patch(r2)
 axs[0,2].add_patch(r3)
