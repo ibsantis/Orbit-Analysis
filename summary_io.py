@@ -2668,11 +2668,17 @@ class SummaryDataSort:
                 sub_energy[i][mask_tot] = sub_pot[i][mask_tot] + 0.5*(data_dict[name]['v.tot.sim'][i][:len(potential_dict[name]['subhalo.pot'][i])][mask_tot])**2
             #
             # Save data for the z = 0 stuff
-            data_z0.append(sub_energy[:,0][mask_dict[name]])
+            if oversample:
+                data_z0.append(np.repeat(sub_energy[:,0][mask_dict[name]], self.oversample[sim_type][name]))
+            else:
+                data_z0.append(sub_energy[:,0][mask_dict[name]])
             #
             for i in range(0, np.sum(mask_dict[name])):
                 infall_mask = (tlb[:len(sub_energy[mask_dict[name]][i])] <= data_dict[name]['first.infall.time.lb'][mask_dict[name]][i])
-                data_infall.append(sub_energy[mask_dict[name]][i][infall_mask][-1])
+                if oversample:
+                    data_infall.append(np.repeat(sub_energy[mask_dict[name]][i][infall_mask][-1], self.oversample[sim_type][name]))
+                else:
+                    data_infall.append(sub_energy[mask_dict[name]][i][infall_mask][-1])
         #
         d = dict()
         d['energy.z0'] = np.hstack(data_z0)
