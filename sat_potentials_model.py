@@ -6,7 +6,7 @@
 ##SBATCH --mem=480G
 #SBATCH --nodes=1
 #SBATCH --ntasks=4    # processes total
-#SBATCH --time=02:00:00
+#SBATCH --time=01:00:00
 #SBATCH --output=/home/ibsantis/scripts/jobs/summary/model_potential%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
@@ -77,7 +77,7 @@ if sim_data.num_gal == 1:
     model_pot = (-1)*np.ones(galpy_orbits.R(ts).shape)
     for i in range(0, galpy_orbits.R(ts).shape[0]):
         for j in range(0, galpy_orbits.R(ts).shape[1]):
-            model_pot[i,j] = evaluatePotentials(potential_two_power, galpy_orbits.R(ts)[i,j], galpy_orbits.z(ts)[i,j], phi=galpy_orbits.phi(ts)[i,j])
+            model_pot[i,j] = evaluatePotentials(potential_two_power, galpy_orbits.R(ts)[i,j]*u.kpc, galpy_orbits.z(ts)[i,j]*u.kpc, phi=galpy_orbits.phi(ts)[i,j]*u.deg, t=ts[j])
     #
     d = dict()
     d['model.potential'] = model_pot
@@ -106,7 +106,7 @@ if sim_data.num_gal == 2:
     model_pot = (-1)*np.ones(galpy_orbits.R(ts).shape)
     for i in range(0, galpy_orbits.R(ts).shape[0]):
         for j in range(0, galpy_orbits.R(ts).shape[1]):
-            model_pot[i,j] = evaluatePotentials(potential_two_power, galpy_orbits.R(ts)[i,j], galpy_orbits.z(ts)[i,j], phi=galpy_orbits.phi(ts)[i,j])
+            model_pot[i,j] = evaluatePotentials(potential_two_power, galpy_orbits.R(ts)[i,j]*u.kpc, galpy_orbits.z(ts)[i,j]*u.kpc, phi=galpy_orbits.phi(ts)[i,j]*u.deg)
     #
     d = dict()
     d['model.potential'] = model_pot
@@ -134,7 +134,7 @@ if sim_data.num_gal == 2:
     model_pot = (-1)*np.ones(galpy_orbits.R(ts).shape)
     for i in range(0, galpy_orbits.R(ts).shape[0]):
         for j in range(0, galpy_orbits.R(ts).shape[1]):
-            model_pot[i,j] = evaluatePotentials(potential_two_power, galpy_orbits.R(ts)[i,j], galpy_orbits.z(ts)[i,j], phi=galpy_orbits.phi(ts)[i,j])
+            model_pot[i,j] = evaluatePotentials(potential_two_power, galpy_orbits.R(ts)[i,j]*u.kpc, galpy_orbits.z(ts)[i,j]*u.kpc, phi=galpy_orbits.phi(ts)[i,j]*u.deg)
     #
     d = dict()
     d['model.potential'] = model_pot
