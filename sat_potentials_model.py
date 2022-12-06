@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 #SBATCH --job-name=model_potential
 ##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
-#SBATCH --partition=high2    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
-#SBATCH --mem=250G
+##SBATCH --partition=high2    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
+#SBATCH --partition=skx-normal
+##SBATCH --mem=250G
 ##SBATCH --mem=480G
 #SBATCH --nodes=1
-#SBATCH --ntasks=4    # processes total
+##SBATCH --ntasks=4    # processes total
+#SBATCH --tasks-per-node=4
 #SBATCH --time=01:00:00
 #SBATCH --output=/home/ibsantis/scripts/jobs/summary/model_potential%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
@@ -40,7 +42,8 @@ print('Read in the tools')
 
 
 ### Set path and initial parameters
-loc = 'peloton'
+#loc = 'peloton'
+loc='stampede'
 sim_data = orbit_io.OrbitRead(gal1=str(sys.argv[1]), location=loc)
 aligned = True
 print('Set paths')
@@ -106,7 +109,7 @@ if sim_data.num_gal == 2:
     model_pot = (-1)*np.ones(galpy_orbits.R(ts).shape)
     for i in range(0, galpy_orbits.R(ts).shape[0]):
         for j in range(0, galpy_orbits.R(ts).shape[1]):
-            model_pot[i,j] = evaluatePotentials(potential_two_power, galpy_orbits.R(ts)[i,j]*u.kpc, galpy_orbits.z(ts)[i,j]*u.kpc, phi=galpy_orbits.phi(ts)[i,j]*u.deg)
+            model_pot[i,j] = evaluatePotentials(potential_two_power, galpy_orbits.R(ts)[i,j]*u.kpc, galpy_orbits.z(ts)[i,j]*u.kpc, phi=galpy_orbits.phi(ts)[i,j]*u.deg, t=ts[j])
     #
     d = dict()
     d['model.potential'] = model_pot
@@ -134,7 +137,7 @@ if sim_data.num_gal == 2:
     model_pot = (-1)*np.ones(galpy_orbits.R(ts).shape)
     for i in range(0, galpy_orbits.R(ts).shape[0]):
         for j in range(0, galpy_orbits.R(ts).shape[1]):
-            model_pot[i,j] = evaluatePotentials(potential_two_power, galpy_orbits.R(ts)[i,j]*u.kpc, galpy_orbits.z(ts)[i,j]*u.kpc, phi=galpy_orbits.phi(ts)[i,j]*u.deg)
+            model_pot[i,j] = evaluatePotentials(potential_two_power, galpy_orbits.R(ts)[i,j]*u.kpc, galpy_orbits.z(ts)[i,j]*u.kpc, phi=galpy_orbits.phi(ts)[i,j]*u.deg, t=ts[j])
     #
     d = dict()
     d['model.potential'] = model_pot
