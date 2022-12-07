@@ -5,9 +5,9 @@
 #SBATCH --partition=icx-normal
 ##SBATCH --mem=250G
 ##SBATCH --mem=480G
-#SBATCH --nodes=1
+#SBATCH --nodes=2
 ##SBATCH --ntasks=4    # processes total
-#SBATCH --tasks-per-node=2
+#SBATCH --tasks-per-node=1
 #SBATCH --time=01:00:00
 ##SBATCH --output=/home/ibsantis/scripts/jobs/summary/model_potential%j.txt
 #SBATCH --output=/home1/05400/ibsantis/scripts/jobs/summary/model_potential%j.txt
