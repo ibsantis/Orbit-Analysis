@@ -31,11 +31,6 @@ import halo_analysis as halo
 import gizmo_analysis as gizmo
 import utilities as ut
 import numpy as np
-import h5py
-import matplotlib
-from matplotlib import pyplot as plt
-from matplotlib import patches
-from scipy.interpolate import interp1d
 from astropy import units as u
 import pandas as pd
 import sys
@@ -97,7 +92,6 @@ if sim_data.num_gal == 2:
     #
     orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location=loc, host=1, dmo=False)
     orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location=loc, host=1, dmo=False)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location=loc, host=1, dmo=False)
     #
     # Initialize the orbits in Galpy
     galpy_orbits = orbit_gal.galpy_orbit_init(tree=halt)
@@ -111,6 +105,7 @@ if sim_data.num_gal == 2:
     for i in range(0, galpy_orbits.R(ts).shape[0]):
         for j in range(0, galpy_orbits.R(ts).shape[1]):
             model_pot[i,j] = evaluatePotentials(potential_two_power, galpy_orbits.R(ts)[i,j]*u.kpc, galpy_orbits.z(ts)[i,j]*u.kpc, phi=galpy_orbits.phi(ts)[i,j]*u.deg, t=ts[j])
+        print('Done with satellite {0} out of {1}'.format(i+1, galpy_orbits.R(ts).shape[0]+1))
     #
     d = dict()
     d['model.potential'] = model_pot
@@ -139,6 +134,7 @@ if sim_data.num_gal == 2:
     for i in range(0, galpy_orbits.R(ts).shape[0]):
         for j in range(0, galpy_orbits.R(ts).shape[1]):
             model_pot[i,j] = evaluatePotentials(potential_two_power, galpy_orbits.R(ts)[i,j]*u.kpc, galpy_orbits.z(ts)[i,j]*u.kpc, phi=galpy_orbits.phi(ts)[i,j]*u.deg, t=ts[j])
+        print('Done with satellite {0} out of {1}'.format(i+1, galpy_orbits.R(ts).shape[0]+1))
     #
     d = dict()
     d['model.potential'] = model_pot
