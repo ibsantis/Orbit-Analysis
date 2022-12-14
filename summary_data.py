@@ -54,7 +54,7 @@ loc = 'peloton'
 sim_data = orbit_io.OrbitRead(gal1=str(sys.argv[1]), location=loc)
 plotting = False
 aligned = True
-point_mass = True
+point_mass = False
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -98,15 +98,16 @@ if sim_data.num_gal == 1:
 
     if point_mass:
         # Import the potentials and combine them for our model
-        #from galpy.potential import DoubleExponentialDiskPotential # For disks
-        #from galpy.potential import TwoPowerSphericalPotential # For DM halos
+        from galpy.potential import DoubleExponentialDiskPotential # For disks
+        from galpy.potential import TwoPowerSphericalPotential # For DM halos
         #
-        #disk_outer = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_out'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=(fitting_data['r_out'][sim_data.galaxy]/1000)*u.kpc, hz=(fitting_data['h_z'][sim_data.galaxy]/1000)*u.kpc)
-        #disk_inner = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_in'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=(fitting_data['r_in'][sim_data.galaxy]/1000)*u.kpc, hz=(fitting_data['h_z'][sim_data.galaxy]/1000)*u.kpc)
-        #halo_2p = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data['alpha'][sim_data.galaxy], beta=fitting_data['beta'][sim_data.galaxy])
-        #potential_two_power = disk_inner+disk_outer+halo_2p
-        from galpy.potential import KeplerPotential
-        potential_two_power = KeplerPotential(amp=1.31335415e+12*u.solMass)
+        disk_outer = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_out'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=(fitting_data['r_out'][sim_data.galaxy]/1000)*u.kpc, hz=(fitting_data['h_z'][sim_data.galaxy]/1000)*u.kpc)
+        disk_inner = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_in'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=(fitting_data['r_in'][sim_data.galaxy]/1000)*u.kpc, hz=(fitting_data['h_z'][sim_data.galaxy]/1000)*u.kpc)
+        halo_2p = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data['alpha'][sim_data.galaxy], beta=fitting_data['beta'][sim_data.galaxy])
+        potential_two_power = disk_inner+disk_outer+halo_2p
+        #
+        #from galpy.potential import KeplerPotential
+        #potential_two_power = KeplerPotential(amp=1.31335415e+12*u.solMass)
     #
     else:
         # Import the potentials and combine them for our model
@@ -281,8 +282,8 @@ if sim_data.num_gal == 1:
 
     if aligned:
         if point_mass:
-            #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/aligned/data_'+sim_data.galaxy+'_aligned_point_mass', dict_or_array_to_write=data_dict, verbose=True)
-            ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/aligned/data_'+sim_data.galaxy+'_aligned_point_mass_kepler', dict_or_array_to_write=data_dict, verbose=True)
+            ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/aligned/data_'+sim_data.galaxy+'_aligned_point_mass', dict_or_array_to_write=data_dict, verbose=True)
+            #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/aligned/data_'+sim_data.galaxy+'_aligned_point_mass_kepler', dict_or_array_to_write=data_dict, verbose=True)
         else:
             ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/aligned/data_'+sim_data.galaxy+'_aligned', dict_or_array_to_write=data_dict, verbose=True)
             #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
