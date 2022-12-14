@@ -27,8 +27,8 @@ import matplotlib.cm as cm
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12b', location='mac')
-#sim_data.galaxy = 'Remus'
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='mac')
+sim_data.galaxy = 'Remus'
 print('Set paths')
 
 
