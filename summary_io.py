@@ -80,7 +80,7 @@ class SummaryDataSort:
                                    'm12r': 16, 'm12w': 16, 'm12z': 0, 'Romeo': 0, 'Juliet': 0,\
                                    'Thelma': 0, 'Louise': 0, 'Romulus': 0, 'Remus': 0}}
 
-    def data_read(self, directory, sim_type='baryon', hosts='all', aligned=False, point_mass=False):
+    def data_read(self, directory, sim_type='baryon', hosts='all', point_mass=False):
         """
         DESCRIPTION:
             Reads in the summary data and stores it in a dictionary with each
@@ -114,18 +114,13 @@ class SummaryDataSort:
         # Given the type of data you want, read in from the appropriate directory
         if sim_type == 'baryon':
             #
-            if aligned and not point_mass:
+            if point_mass:
                 for name in self.host_names[hosts]:
-                    data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/aligned_new/data_'+name+'_aligned', verbose=True)
-                    data_dict[name] = data
-            elif aligned and point_mass:
-                for name in self.host_names[hosts]:
-                    data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/aligned_new/data_'+name+'_aligned_point_mass', verbose=True)
+                    data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/point_mass/data_'+name+'_point_mass', verbose=True)
                     data_dict[name] = data
             else:
                 for name in self.host_names[hosts]:
                     data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
-                    #data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/with_ecc_per/data_'+name, verbose=True)
                     data_dict[name] = data
         #
         elif sim_type == 'all_baryon':
