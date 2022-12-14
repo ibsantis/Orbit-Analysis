@@ -27,6 +27,7 @@ from matplotlib import patches
 from matplotlib import gridspec
 import matplotlib.patches as mpatches
 import matplotlib.ticker as ticker
+from astropy import units as u
 print('Read in the tools')
 
 ### Set path and initial parameters
@@ -46,8 +47,7 @@ masks_infall_peri['m12f'][59] = False
 masks_infall_apo['m12f'][59] = False
 
 # Select which mask you want to use and the corresponding directory
-#directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2'
-directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2_fix'
+directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2'
 
 
 """
@@ -141,7 +141,7 @@ axs[0].fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color='g',
 axs[0].fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color='g', alpha=0.15)
 axs[0].plot(binss[1][:-1]+half_bins[1], medians[1], 'k', alpha=0.5, lw=4)
 #
-axis_y2_label = '$M_{\\rm 200m}(t_{\\rm lb}) \ [10^{12} M_{\\odot}]$'
+axis_y2_label = 'Median $M_{\\rm 200m}(t_{\\rm lb}) \ [10^{12} M_{\\odot}]$'
 axis_y2_tick_labels = ['1.4', '1.2', '1.0', '0.8', '0.6', '0.4', '0.2', '0.0']
 axis_y2_tick_values = [float(v) for v in axis_y2_tick_labels]
 axis_y2_tick_locations = [1.061, 0.9094, 0.7578, 0.6063, 0.4547, 0.3031, 0.1516, 0.0]
@@ -177,7 +177,7 @@ axs[1].fill_between(binss[3][:-1]+half_bins[3], uppers[3], lowers[3], color='g',
 axs[1].fill_between(binss[3][:-1]+half_bins[3], highests[3], lowests[3], color='g', alpha=0.15)
 axs[1].plot(binss[3][:-1]+half_bins[3], medians[3], 'k', alpha=0.5, lw=4)
 #
-axis2_y2_label = '$R_{\\rm 200m}(t_{\\rm lb}) \ [\\rm kpc]$'
+axis2_y2_label = 'Median $R_{\\rm 200m}(t_{\\rm lb}) \ [\\rm kpc]$'
 axis2_y2_tick_labels = ['400', '300', '200', '100', '0']
 axis2_y2_tick_locations = [1.022, 0.767, 0.511, 0.256, 0.0]
 axis2_y2_minor_tick_locations = [1.02214915, 0.95826483, 0.89438051, 0.83049619, 0.76661186, 0.70272754, 0.63884322, 0.5749589 , 0.51107458, 0.44719025, 0.38330593, 0.31942161, 0.25553729, 0.19165297, 0.12776864, 0.06388432, 0.        ]
@@ -456,6 +456,7 @@ lower_thr = np.percentile(mass_prof_avg_all, thrsigm, axis=(0,1))
 ax2.fill_between(rs[1:], upper_thr, lower_thr, color='#6fc4de', alpha=0.3)
 #ax2.fill_between(rs[1:], upper_two, lower_two, color='#6fc4de', alpha=0.5)
 ax2.fill_between(rs[1:], upper_one, lower_one, color='#6fc4de', alpha=1)
+ax2.plot(rs[1:], np.median(mass_prof_avg_all_med, axis=0), color='k') # Comment this line out to get back to the old version
 ax2.hlines(1, 0.1, 500, color='k', alpha=0.8, linestyles='dotted', zorder=100)
 ax2.set_xlim(limits_2[0])
 ax2.set_ylim(limits_2[1])
@@ -513,16 +514,11 @@ for i in range(0, len(mass_profs)):
 onesigp = 84.13
 onesigm = 15.87
 #
-twosigp = 97.72
-twosigm = 2.28
-#
 thrsigp = 100
 thrsigm = 0
 #
 upper_one = np.percentile(mass_ratio, onesigp, axis=0)
 lower_one = np.percentile(mass_ratio, onesigm, axis=0)
-upper_two = np.percentile(mass_ratio, twosigp, axis=0)
-lower_two = np.percentile(mass_ratio, twosigm, axis=0)
 upper_thr = np.percentile(mass_ratio, thrsigp, axis=0)
 lower_thr = np.percentile(mass_ratio, thrsigm, axis=0)
 #
@@ -530,13 +526,12 @@ mass_ratio_med = np.median(mass_ratio, axis=0)
 #
 plt.figure(figsize=(10,8))
 plt.fill_between(rs[1:], upper_thr, lower_thr, color='#9966cc', alpha=0.15)
-plt.fill_between(rs[1:], upper_two, lower_two, color='#9966cc', alpha=0.3)
 plt.fill_between(rs[1:], upper_one, lower_one, color='#9966cc', alpha=0.5)
 plt.plot(rs[1:], mass_ratio_med, color='k', alpha=1)
 plt.hlines(y=1, xmin=0, xmax=500, linestyles='dotted', colors='k', alpha=0.5)
 plt.xscale('log')
 plt.xlim(xmin=5, xmax=500)
-plt.ylim(ymin=0.8, ymax=1.2)
+plt.ylim(ymin=0.9, ymax=1.1)
 plt.xlabel('Host distance, $r$ [kpc]', fontsize=34)
 plt.ylabel('$M_{\\rm model}(<r)\ /\ M_{\\rm sim}(<r)$', fontsize=34)
 plt.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
@@ -553,19 +548,24 @@ plt.close()
 snap_e = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/m12i_res7100')
 tlb = snap_e['time'][-1] - np.flip(snap_e['time'])
 data = summary.data_read_potential_full(directory=sim_data.home_dir, hosts='all_energy_new', selection='sim')
+data_model = summary.data_read_potential_full(directory=sim_data.home_dir, hosts='all_energy_new', selection='model')
 data_mp = summary.data_read_mass_profile(directory=sim_data.home_dir, hosts='all_energy_new')
 #
-d_rec_sim = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=False, hosts='all_no_r', sim_type='baryon')
-d_min_sim = summary.dperi_min(data_total, masks_infall_peri, selection='sim', oversample=False, hosts='all_no_r', sim_type='baryon')
-d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model', oversample=False, hosts='all_no_r', sim_type='baryon')
-d_min_mod = summary.dperi_min(data_total, masks_infall_peri, selection='model', oversample=False, hosts='all_no_r', sim_type='baryon')
+d_rec_sim = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=False, hosts='all_energy_new', sim_type='baryon')
+d_min_sim = summary.dperi_min(data_total, masks_infall_peri, selection='sim', oversample=False, hosts='all_energy_new', sim_type='baryon')
+d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model', oversample=False, hosts='all_energy_new', sim_type='baryon')
+d_min_mod = summary.dperi_min(data_total, masks_infall_peri, selection='model', oversample=False, hosts='all_energy_new', sim_type='baryon')
 #
 frac_d = np.abs((d_rec_mod-d_rec_sim)/d_rec_sim)
-names = summary.halo_id(data_total, masks_infall_peri, hosts='all_no_r')
+names = summary.halo_id(data_total, masks_infall_peri, hosts='all_energy_new')
 
 #m1 = (frac_d > 0.75)#*(frac_d < 0.75)
 #halo_index = np.random.randint(low=0, high=np.sum(m1))
 #print(names['host'][m1][halo_index], names['ids'][m1][halo_index], frac_d[m1][halo_index])
+
+from galpy.potential import DoubleExponentialDiskPotential # For disks
+from galpy.potential import TwoPowerSphericalPotential # For DM halos
+from galpy.potential import evaluatePotentials
 
 peri_color, apo_color = '#337422', '#D994F8'
 
@@ -589,6 +589,9 @@ for i in range(0, len(halo_ids)):
     v_sim = data_total[hosts[i]]['v.tot.sim'][halo_ids[i]]
     L_sim = data_total[hosts[i]]['L.tot.sim'][halo_ids[i]]/10000
     #
+    """
+        Calculate the total energy for the satellites in the simulations
+    """
     # Set the host potential at 100 kpc at z = 0
     phi_host_z0 = data[hosts[i]]['host.pot.100kpc'][-1] - data[hosts[i]]['host.pot.R200m'] - data[hosts[i]]['KE.at.Rvir']
     #
@@ -624,15 +627,66 @@ for i in range(0, len(halo_ids)):
         # Calculate the total orbital energy
         sub_energy[j][mask_sub*mask_host] = sub_pot[j][mask_sub*mask_host] + 0.5*(data_total[hosts[i]]['v.tot.sim'][j][:len(data[hosts[i]]['subhalo.pot'][j])][mask_sub*mask_host])**2
     #
+    """
+        Calculate the total energy for the satellites in the model
+    """
+    # Set up the potential model
+    fitting_data = pd.read_csv(sim_data.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
+    #
+    disk_outer = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_out'][hosts[i]]*u.solMass/u.kpc**3, hr=fitting_data['r_out'][hosts[i]]*u.kpc, hz=fitting_data['h_z'][hosts[i]]*u.kpc)
+    disk_inner = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_in'][hosts[i]]*u.solMass/u.kpc**3, hr=fitting_data['r_in'][hosts[i]]*u.kpc, hz=fitting_data['h_z'][hosts[i]]*u.kpc)
+    halo_2p = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][hosts[i]]*u.solMass, a=fitting_data['a_halo'][hosts[i]]*u.kpc, alpha=fitting_data['alpha'][hosts[i]], beta=fitting_data['beta'][hosts[i]])
+    potential_two_power = disk_inner+disk_outer+halo_2p
+    #
+    # Set the global potential at 100 kpc
+    d100 = 100/np.sqrt(2)
+    d200m = data_total[hosts[i]]['host.radius'][0]/np.sqrt(2)
+    phi_model_100kpc = evaluatePotentials(potential_two_power, d100*u.kpc, d100*u.kpc)
+    #
+    # Set the potential at z = 0
+    phi_model_z0 = evaluatePotentials(potential_two_power, d100*u.kpc, d100*u.kpc) - evaluatePotentials(potential_two_power, d200m*u.kpc, d200m*u.kpc) - data[hosts[i]]['KE.at.Rvir']
+    # Set the potential across all time as just the potential at z = 0
+    phi_model_z = phi_model_z0*np.ones(data_model[hosts[i]]['model.potential'].shape[1])
+    #
+    # Set up null array to save the normalized subhalo potentials to
+    sub_pot_model = (-1)*np.ones(data_model[hosts[i]]['model.potential'].shape)
+    sub_energy_model = (-1)*np.ones(data_model[hosts[i]]['model.potential'].shape)
+    sub_pot_snaps_model = (-1)*np.ones(data_model[hosts[i]]['model.potential'].shape, int)
+    sub_pot_tlb_model = (-1)*np.ones(data_model[hosts[i]]['model.potential'].shape)
+    sub_kin_model = (-1)*np.ones(data_model[hosts[i]]['model.potential'].shape)
+    #
+    # Loop through all of the satellites and calculate the potential the same way that I do in the simulations
+    for j in range(0, sub_pot_model.shape[0]):
+        # Create a mask for the subhalo data
+        # Calculate the normalized subhalo energy
+        sub_pot_model[j] = data_model[hosts[i]]['model.potential'][j] - phi_model_100kpc + phi_model_z
+        #
+        # Keep which snapshots it has data for
+        sub_pot_snaps_model[j] = np.flip(snap_e['index'])
+        sub_pot_tlb_model[j] = tlb
+        #
+        # Calculate the total orbital energy
+        sub_energy_model[j] = sub_pot_model[j] + 0.5*(data_total[hosts[i]]['v.tot.model'][j])**2
+        sub_kin_model[j] =  0.5*(data_total[hosts[i]]['v.tot.model'][j])**2
+    #
+    """
+        Mask the right data and plot
+    """
     E_sim = sub_energy[halo_ids[i]]
     t_E = sub_pot_tlb[halo_ids[i]]
+    E_model = sub_energy_model[halo_ids[i]]
+    t_E_model = sub_pot_tlb_model[halo_ids[i]]
+    #
     d_mask = (d_sim >= 0)
     d_sim = d_sim[d_mask]
     v_sim = v_sim[d_mask]
     L_sim = L_sim[d_mask]
+    #
     E_sim = E_sim[E_sim != -1]
     t_E = t_E[:len(E_sim)][E_sim != -1]
-    #E_sim =
+    E_model = E_model[:len(E_sim)]
+    t_E_model = t_E_model[:len(t_E)]
+    #
     lookback_time = np.flip(snaps[-1] - snaps)
     times = lookback_time[:len(d_sim)]
     times_model = data_total[hosts[i]]['time.model']
@@ -705,7 +759,7 @@ for i in range(0, len(halo_ids)):
     #
     # Plot the energy
     axs[3,i].plot(t_E, E_sim/1e4, 'k')
-    #axs[3,i].plot(-1*times_model, L_model, alpha=0.5)
+    axs[3,i].plot(t_E_model, E_model/1e4, alpha=0.5)
     #
     if infall:
         infall_time = data_total[hosts[i]]['first.infall.time.lb'][halo_ids[i]]
