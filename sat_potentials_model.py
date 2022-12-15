@@ -38,8 +38,8 @@ print('Read in the tools')
 
 
 ### Set path and initial parameters
-#loc = 'peloton'
-loc='stampede'
+loc = 'peloton'
+#loc='stampede'
 sim_data = orbit_io.OrbitRead(gal1=str(sys.argv[1]), location=loc)
 aligned = True
 print('Set paths')
