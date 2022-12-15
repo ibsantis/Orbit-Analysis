@@ -281,10 +281,10 @@ if sim_data.num_gal == 1:
     print('The mass ratio is:', mass_ratio)
 
     if point_mass:
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/aligned/data_'+sim_data.galaxy+'_point_mass', dict_or_array_to_write=data_dict, verbose=True)
-        #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/aligned/data_'+sim_data.galaxy+'_point_mass_kepler', dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_point_mass', dict_or_array_to_write=data_dict, verbose=True)
+        #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_point_mass_kepler', dict_or_array_to_write=data_dict, verbose=True)
     else:
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/aligned/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
         #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
 
     if plotting:
@@ -511,10 +511,10 @@ if sim_data.num_gal == 2:
     print('The mass ratio is:', mass_ratio)
 
     if point_mass:
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/aligned/data_'+sim_data.gal_1+'_point_mass', dict_or_array_to_write=data_dict, verbose=True)
-        #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/aligned/data_'+sim_data.gal_1+'_point_mass_kepler', dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_point_mass', dict_or_array_to_write=data_dict, verbose=True)
+        #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_point_mass_kepler', dict_or_array_to_write=data_dict, verbose=True)
     else:
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/aligned/data_'+sim_data.gal_1, dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1, dict_or_array_to_write=data_dict, verbose=True)
         #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
     #
     if plotting:
@@ -740,10 +740,10 @@ if sim_data.num_gal == 2:
 
 
     if point_mass:
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/aligned/data_'+sim_data.gal_2+'_point_mass', dict_or_array_to_write=data_dict, verbose=True)
-        #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/aligned/data_'+sim_data.gal_2+'_point_mass_kepler', dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_point_mass', dict_or_array_to_write=data_dict, verbose=True)
+        #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_point_mass_kepler', dict_or_array_to_write=data_dict, verbose=True)
     else:
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/aligned/data_'+sim_data.gal_2, dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2, dict_or_array_to_write=data_dict, verbose=True)
         #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
 
     if plotting:
