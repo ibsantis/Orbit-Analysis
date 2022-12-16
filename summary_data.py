@@ -59,7 +59,8 @@ print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
-halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal, assign_hosts_rotation=aligned)
+#halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal, assign_hosts_rotation=aligned)
+halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal, assign_hosts_rotation=aligned, catalog_hdf5_directory='catalog_hdf5_default') # This is only for m12z
 part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'snapshot', 600, simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=aligned)
 
 if sim_data.num_gal == 1:
