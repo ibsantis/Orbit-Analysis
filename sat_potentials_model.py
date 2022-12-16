@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 #SBATCH --job-name=model_potential
-##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
-#SBATCH --partition=high2    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
+#SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
+##SBATCH --partition=high2    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 ##SBATCH --partition=icx-normal
-#SBATCH --mem=250G
-##SBATCH --mem=480G
+##SBATCH --mem=250G
+#SBATCH --mem=480G
 #SBATCH --nodes=1
 #SBATCH --ntasks=1    # processes total, used to be 4...
 ##SBATCH --tasks-per-node=1
-#SBATCH --time=01:00:00
+#SBATCH --time=02:00:00
 #SBATCH --output=/home/ibsantis/scripts/jobs/summary/model_potential%j.txt
 ##SBATCH --output=/home1/05400/ibsantis/scripts/jobs/summary/model_potential%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
