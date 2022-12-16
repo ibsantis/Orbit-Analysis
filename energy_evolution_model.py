@@ -26,24 +26,26 @@ print('Read in the tools')
 
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12w', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='Thelma', location='mac')
 summary = summary_io.SummaryDataSort()
 summary_plot = summary_io.SummaryDataPlot()
-directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2_fix/energy'
+directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2'
 print('Set paths')
 
+sim_data.galaxy = sim_data.gal_2
+
 # Set up snapshot array to loop through
-#snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/m12i_res7100')
-snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/m12w_res7100')
+#snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/m12w_res7100')
+snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/R_J')
 tlb = snaps['time'][-1] - np.flip(snaps['time'])
 
 # Read in the potential data
-data = summary.data_read_potential_full(directory=sim_data.home_dir, hosts='iso_dmo', selection='model') # These potentials already start at z = 0 and go backward
-data_host = summary.data_read_potential_full(directory=sim_data.home_dir, hosts='iso_dmo', selection='sim')
+data = summary.data_read_potential_full(directory=sim_data.home_dir, hosts='all_energy_new', selection='model') # These potentials already start at z = 0 and go backward
+data_host = summary.data_read_potential_full(directory=sim_data.home_dir, hosts='all_energy_new', selection='sim')
 # Read in the mass profile data
-data_mp = summary.data_read_mass_profile(directory=sim_data.home_dir, hosts='iso_dmo')
+data_mp = summary.data_read_mass_profile(directory=sim_data.home_dir, hosts='all_energy_new')
 # Read in all of the other data
-data_total = summary.data_read(directory=sim_data.home_dir, hosts='iso_dmo', sim_type='baryon')
+data_total = summary.data_read(directory=sim_data.home_dir, hosts='all_energy_new', sim_type='baryon')
 # Set up distance array (probably don't need it though...)
 rs = data_mp['rs']
 
@@ -159,7 +161,7 @@ for i in range(0, len(data_total[sim_data.galaxy]['infall.check'])):
         axs[0].plot(sub_pot_tlb[sat_ind][m], sub_kin[sat_ind][m]/1e4, ':k', alpha=0.2)
         #
         # Mask to make sure the potential and orbit is real and to get the times after infall
-        ms = (sub_pot_sim[sat_ind] != -1)*(sub_pot_tlb_sim[sat_ind] < data_total[sim_data.galaxy]['first.infall.time.lb'][sat_ind])*(data_total[sim_data.galaxy]['d.tot.sim'][sat_ind] != -1)
+        ms = (sub_pot_sim[sat_ind] != -1)*(sub_pot_tlb_sim[sat_ind] < data_total[sim_data.galaxy]['first.infall.time.lb'][sat_ind])*(data_total[sim_data.galaxy]['d.tot.sim'][sat_ind][:len(sub_pot_sim[sat_ind])] != -1)
         #
         # Plot a null array in the top subpanel for the legend
         axs[0].plot(sub_pot_tlb_sim[sat_ind][ms], 100+sub_pot_sim[sat_ind][ms]/1e4, 'b', alpha=0.2, label='Simulation')
@@ -206,7 +208,7 @@ for i in range(0, len(data_total[sim_data.galaxy]['infall.check'])):
         plt.tight_layout()
         plt.subplots_adjust(wspace=0.12, hspace=0)
         #plt.show()
-        plt.savefig(directory+'/energy_conservation/'+sim_data.galaxy+'/'+sim_data.galaxy+'_single_sat_e_components_'+str(i+1)+'.pdf')
+        plt.savefig(directory+'/energy_conservation/model/'+sim_data.galaxy+'/components/'+sim_data.galaxy+'_single_sat_e_components_'+str(i+1)+'.pdf')
         plt.close()
 
 
@@ -218,12 +220,12 @@ for i in range(0, len(data_total[sim_data.galaxy]['infall.check'])):
         sat_ind = i
         #
         m = (sub_energy[sat_ind] != -1)*(sub_pot_tlb[sat_ind] < data_total[sim_data.galaxy]['first.infall.time.lb'][sat_ind])
-        ms = (sub_energy_sim[sat_ind] != -1)*(sub_pot_tlb_sim[sat_ind] < data_total[sim_data.galaxy]['first.infall.time.lb'][sat_ind])*(data_total[sim_data.galaxy]['d.tot.sim'][sat_ind] != -1)
+        ms = (sub_energy_sim[sat_ind] != -1)*(sub_pot_tlb_sim[sat_ind] < data_total[sim_data.galaxy]['first.infall.time.lb'][sat_ind])*(data_total[sim_data.galaxy]['d.tot.sim'][sat_ind][:len(sub_pot_sim[sat_ind])] != -1)
         axs[0].plot(sub_pot_tlb[sat_ind][m], sub_energy[sat_ind][m]/1e4, 'k', alpha=0.2)
         axs[0].plot(sub_pot_tlb_sim[sat_ind][ms], sub_energy_sim[sat_ind][ms]/1e4, 'b', alpha=0.2)
         #
-        axs[1].plot(sub_pot_tlb[sat_ind][m], data_total[sim_data.galaxy]['d.tot.model'][sat_ind][m], 'k', alpha=0.2, label='Model')
-        axs[1].plot(sub_pot_tlb_sim[sat_ind][ms], data_total[sim_data.galaxy]['d.tot.sim'][sat_ind][ms], 'b', alpha=0.2, label='Simulation')
+        axs[1].plot(sub_pot_tlb[sat_ind][m], data_total[sim_data.galaxy]['d.tot.model'][sat_ind][:len(m)][m], 'k', alpha=0.2, label='Model')
+        axs[1].plot(sub_pot_tlb_sim[sat_ind][ms], data_total[sim_data.galaxy]['d.tot.sim'][sat_ind][:len(ms)][ms], 'b', alpha=0.2, label='Simulation')
         #
         cc = ut.cosmology.CosmologyClass()
         red = np.array([0, 1])
@@ -261,12 +263,8 @@ for i in range(0, len(data_total[sim_data.galaxy]['infall.check'])):
         plt.tight_layout()
         plt.subplots_adjust(wspace=0.12, hspace=0)
         #plt.show()
-        plt.savefig(directory+'/energy_conservation/'+sim_data.galaxy+'/'+sim_data.galaxy+'_single_sat_check_'+str(i+1)+'.pdf')
+        plt.savefig(directory+'/energy_conservation/model/'+sim_data.galaxy+'/e_and_orbit/'+sim_data.galaxy+'_single_sat_check_'+str(i+1)+'.pdf')
         plt.close()
-
-
-
-
 
 
 
@@ -327,5 +325,5 @@ axs[1].set_xlabel('Lookback time [Gyr]', fontsize=32)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.12, hspace=0)
 #plt.show()
-plt.savefig(directory+'/infall_satellites/'+sim_data.galaxy+'_E_vs_tlb_all_model.pdf')
+plt.savefig(directory+'/energy_conservation/model/'+sim_data.galaxy+'/'+sim_data.galaxy+'_E_vs_tlb_all_model.pdf')
 plt.close()
