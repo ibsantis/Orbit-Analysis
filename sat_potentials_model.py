@@ -63,7 +63,6 @@ if sim_data.num_gal == 1:
     #
     orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location=loc, host=1, dmo=False)
     orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location=loc, host=1, dmo=False)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location=loc, host=1, dmo=False)
     #
     # Initialize the orbits in Galpy
     galpy_orbits = orbit_gal.galpy_orbit_init(tree=halt)
@@ -120,10 +119,9 @@ if sim_data.num_gal == 2:
     #
     orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location=loc, host=2, dmo=False)
     orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location=loc, host=2, dmo=False)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location=loc, host=2, dmo=False)
     #
     # Initialize the orbits in Galpy
-    galpy_orbits = orbit_gal.galpy_orbit_init(tree=halt)
+    galpy_orbits = orbit_gal.galpy_orbit_init(tree=halt, host=2)
     #
     # Integrate all of the orbits in both potentials
     ts = np.flip(snaps['time'] - snaps['time'][-1])*u.Gyr
