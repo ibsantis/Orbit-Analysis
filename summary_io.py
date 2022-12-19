@@ -18,6 +18,8 @@ import matplotlib
 from matplotlib import pyplot as plt
 import matplotlib.ticker
 from scipy.interpolate import splrep, splev
+import pandas as pd
+import galpy
 
 
 class SummaryDataSort:
@@ -2615,12 +2617,15 @@ class SummaryDataSort:
         #s
         return d
 
-    def energies(self, data_dict, mask_dict, potential_dict, mass_profile_dict, time_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
+    # Needs a lot of documenting
+    def energies(self, data_dict, mask_dict, potential_dict, mass_profile_dict, time_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
         TBD
         """
         data_z0 = []
         data_infall = []
+        data_all = dict()
+        data_all_time = dict()
         tlb = time_dict['time'][-1] - np.flip(time_dict['time'])
         #
         for name in self.host_names[hosts]:
@@ -2662,6 +2667,10 @@ class SummaryDataSort:
                 # Calculate the total orbital energy
                 sub_energy[i][mask_tot] = sub_pot[i][mask_tot] + 0.5*(data_dict[name]['v.tot.sim'][i][:len(potential_dict[name]['subhalo.pot'][i])][mask_tot])**2
             #
+            # Save all energy data for the satellites.
+            data_all[name] = sub_energy
+            data_all_time[name] = sub_pot_tlb
+            #
             # Save data for the z = 0 stuff
             if oversample:
                 data_z0.append(np.repeat(sub_energy[:,0][mask_dict[name]], self.oversample[sim_type][name]))
@@ -2678,6 +2687,94 @@ class SummaryDataSort:
         d = dict()
         d['energy.z0'] = np.hstack(data_z0)
         d['energy.infall'] = np.hstack(data_infall)
+        d['energy.all'] = data_all
+        d['energy.all.tlb'] = data_all_time
+        #
+        return d
+
+    def energies_model(self, data_dict, mask_dict, potential_dict_sim, potential_dict_model, time_dict, oversample=False, hosts='all', sim_type='baryon'):
+        """
+        TBD
+        """
+        # Import the relevant potentials
+        from galpy.potential import DoubleExponentialDiskPotential # For disks
+        from galpy.potential import TwoPowerSphericalPotential # For DM halos
+        from galpy.potential import evaluatePotentials
+        from astropy import units as u
+        #
+        # Set up the potential model
+        fitting_data = pd.read_csv('/Users/isaiahsantistevan/simulation/orbit_data/fitting_param.csv', index_col=0)
+        #
+        # Set up empty dictionary/lists to save data to
+        d = dict()
+        data_z0 = []
+        data_infall = []
+        data_all = dict()
+        data_all_time = dict()
+        #
+        tlb = time_dict['time'][-1] - np.flip(time_dict['time'])
+        #
+        # Loop through each host
+        for name in self.host_names[hosts]:
+            # Set up the model host potential
+            disk_outer = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_out'][name]*u.solMass/u.kpc**3, hr=fitting_data['r_out'][name]*u.kpc, hz=fitting_data['h_z'][name]*u.kpc)
+            disk_inner = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_in'][name]*u.solMass/u.kpc**3, hr=fitting_data['r_in'][name]*u.kpc, hz=fitting_data['h_z'][name]*u.kpc)
+            halo_2p = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][name]*u.solMass, a=fitting_data['a_halo'][name]*u.kpc, alpha=fitting_data['alpha'][name], beta=fitting_data['beta'][name])
+            potential_two_power = disk_inner+disk_outer+halo_2p
+            #
+            # Set the global potential at 100 kpc
+            d100 = 100/np.sqrt(2)
+            d200m = data_dict[name]['host.radius'][0]/np.sqrt(2)
+            phi_model_100kpc = evaluatePotentials(potential_two_power, d100*u.kpc, d100*u.kpc)
+            #
+            # Set the potential at z = 0
+            phi_model_z0 = evaluatePotentials(potential_two_power, d100*u.kpc, d100*u.kpc) - evaluatePotentials(potential_two_power, d200m*u.kpc, d200m*u.kpc) - potential_dict_sim[name]['KE.at.Rvir']
+            # Set the potential across all time as just the potential at z = 0
+            phi_model_z = phi_model_z0*np.ones(potential_dict_model[name]['model.potential'].shape[1])
+            #
+            # Set up null array to save the normalized subhalo potentials to
+            sub_pot_model = (-1)*np.ones(potential_dict_model[name]['model.potential'].shape)
+            sub_energy_model = (-1)*np.ones(potential_dict_model[name]['model.potential'].shape)
+            sub_pot_snaps_model = (-1)*np.ones(potential_dict_model[name]['model.potential'].shape, int)
+            sub_pot_tlb_model = (-1)*np.ones(potential_dict_model[name]['model.potential'].shape)
+            sub_kin_model = (-1)*np.ones(potential_dict_model[name]['model.potential'].shape)
+            #
+            # Loop through all of the satellites and calculate the potential the same way that I do in the simulations
+            for j in range(0, sub_pot_model.shape[0]):
+                # Create a mask for the subhalo data
+                # Calculate the normalized subhalo energy
+                sub_pot_model[j] = potential_dict_model[name]['model.potential'][j] - phi_model_100kpc + phi_model_z
+                #
+                # Keep which snapshots it has data for
+                sub_pot_snaps_model[j] = np.flip(time_dict['index'])
+                sub_pot_tlb_model[j] = tlb
+                #
+                # Calculate the total orbital energy
+                sub_energy_model[j] = sub_pot_model[j] + 0.5*(data_dict[name]['v.tot.model'][j])**2
+                sub_kin_model[j] =  0.5*(data_dict[name]['v.tot.model'][j])**2
+            #
+            # Save all energy data for the satellites.
+            data_all[name] = sub_energy_model
+            data_all_time[name] = sub_pot_tlb_model
+            #
+            # Save data for the z = 0 stuff
+            if oversample:
+                data_z0.append(np.repeat(sub_energy_model[:,0][mask_dict[name]], self.oversample[sim_type][name]))
+            else:
+                data_z0.append(sub_energy_model[:,0][mask_dict[name]])
+            #
+            for i in range(0, np.sum(mask_dict[name])):
+                infall_mask = (tlb[:len(sub_energy_model[mask_dict[name]][i])] <= data_dict[name]['first.infall.time.lb'][mask_dict[name]][i])
+                if oversample:
+                    data_infall.append(np.repeat(sub_energy_model[mask_dict[name]][i][infall_mask][-1], self.oversample[sim_type][name]))
+                else:
+                    data_infall.append(sub_energy_model[mask_dict[name]][i][infall_mask][-1])
+            #
+            # Save the data to the dictionary
+            d['energy.z0'] = np.hstack(data_z0)
+            d['energy.infall'] = np.hstack(data_infall)
+            d['energy.all'] = data_all
+            d['energy.all.tlb'] = data_all_time
         #
         return d
 
