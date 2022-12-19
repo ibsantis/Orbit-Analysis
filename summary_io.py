@@ -60,7 +60,6 @@ class SummaryDataSort:
                            #
                            'iso_no_z': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12r', 'm12w'], \
                            #
-                           # Don't really need this selection anymore
                            'iso_dmo': ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w'], \
                            #
                            'lg': ['Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus'], \
@@ -161,10 +160,12 @@ class SummaryDataSort:
         NOTES:
             - The returned dictionary contains other dictionaries.
             - Each key in the dictionary is a host name
-                - Each key in the sub-dictionaries is given in summary_data.py
+                - Each key in the sub-dictionaries is given in potential_tree.py
             - Data is arranged in order of self.host_names[hosts]. Subhalos in
               each host are arranged in the same way they were generated from
-              summary_data.py or summary_data_dmo.py.
+              potential_tree.py
+
+            **THIS METHOD WAS USED PRIMARILY FOR THE PAPER I DATA**
         """
         data_dict = dict()
         #
@@ -188,18 +189,43 @@ class SummaryDataSort:
 
     def data_read_potential_full(self, directory, selection='sim', hosts='all'):
         """
-            TBD
+        DESCRIPTION:
+            Reads in the potential data and stores it in a dictionary with each
+            key being the host name.
+
+        VARIABLES:
+            directory : string
+                        Home directory.
+
+            selection : string
+                        Can either be 'sim' or 'model' depending on what you want
+
+            hosts     : string
+                        Choose any of the options listed in self.host_names within
+                        the __init__ function above.
+
+        NOTES:
+            - The returned dictionary contains other dictionaries.
+            - Each key in the dictionary is a host name
+                - Each key in the sub-dictionaries is given in combine_potential_files.py
+                  or in sat_potentials_model.py
+            - Data is arranged in order of self.host_names[hosts]. Subhalos in
+              each host are arranged in the same way they were generated from
+              sat_potentials_all_snap.py and combined with combine_potential_files.py,
+              or generated from sat_potentials_model.py
+
+            **THIS METHOD WAS USED PRIMARILY FOR THE PAPER II DATA**
         """
+        # Set up empty dictionary to save data to
         data_dict = dict()
         #
+        # Given the type of data, read in from the appropriate directory
         if selection == 'sim':
-            # Given the type of data, read in from the appropriate directory
             for name in self.host_names[hosts]:
                 data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/all_snapshots/'+name+'_potentials_all', verbose=True)
                 data_dict[name] = data
         #
         elif selection == 'model':
-            # Given the type of data, read in from the appropriate directory
             for name in self.host_names[hosts]:
                 data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/all_snapshots/'+name+'_potentials_model', verbose=True)
                 data_dict[name] = data
@@ -208,14 +234,34 @@ class SummaryDataSort:
 
     def data_read_mass_profile(self, directory, hosts='all'):
         """
-        Testing how to read in the data
+        DESCRIPTION:
+            Reads in the mass profile data for each host and stores it in a
+            dictionary, along with time and distance arrays used in generating
+            the mass profile data.
+
+        VARIABLES:
+            directory : string
+                        Home directory.
+
+            hosts     : string
+                        Choose any of the options listed in self.host_names within
+                        the __init__ function above.
+
+        NOTES:
+            - Returns a dictionary.
+            - Data was generated from mass_profile_parallel.py, and combined with
+              mass_profile_comobine_files.py
+            - This is used for Figure 3 of Paper II
         """
+        # Set up an empty dictionary to save to
         data_dict = dict()
         #
+        # Loop through each host
         for name in self.host_names[hosts]:
             data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/mass_profiles/'+name+'_mass_profile_all', verbose=True)
             data_dict[name] = data['mass.profile']
         #
+        # Save extra useful information
         data_dict['snapshot'] = data['snapshot']
         data_dict['time'] = data['time']
         data_dict['rs'] = np.logspace(np.log10(5), np.log10(500), 25)
@@ -223,48 +269,38 @@ class SummaryDataSort:
         #
         return data_dict
 
-    def host_properties(self, data_dict, hosts='all'):
+    def data_read_dadr(self, mass_profile, hosts='all'):
         """
-        TBD
-        """
-        d = dict()
-        R200m = []
-        M200m = []
-        Vcirc = []
-        Evir = []
-        Lvir = []
-        G = 6.67*10**(-11)
-        #
-        for name in self.host_names[hosts]:
-            radius = data_dict[name]['host.radius'][0]
-            mass = data_dict[name]['host.mass'][0]
-            energy = (G*2*10**(30))/(1000**3*3.086*10**(16))*mass/radius # in kmsis
-            vel = np.sqrt(energy)
-            ell = radius*vel
-            #
-            R200m.append(radius)
-            M200m.append(mass)
-            Vcirc.append(vel)
-            Evir.append(energy)
-            Lvir.append(ell)
-        #
-        d['mass'] = np.hstack(M200m)
-        d['radius'] = np.hstack(R200m)
-        d['vcirc'] = np.hstack(Vcirc)
-        d['Evir'] = np.hstack(Evir)
-        d['Lvir'] = np.hstack(Lvir)
-        #
-        return d
+        DESCRIPTION:
+            Using the host halos enclosed mass profile, calculates the change in
+            the tidal acceleration for each host at each snapshot from 5 to 500
+            kpc.
 
-    # testing
-    def da_dr(self, mass_profile, hosts='all'):
+        VARIABLES:
+            mass_profile : dictionary
+                           Data containing each host's mass profile over time
+
+            hosts        : string
+                           Choose any of the options listed in self.host_names within
+                           the __init__ function above.
+
+        NOTES:
+            - Returns a dictionary.
+            - Each element in the dictionary is data for a given host
+            - Each element in a host's dictionary is the change in the tidal
+              acceleration, given in cm / s^2
+            - This method first reads in the mass profile and saves the tidal
+              field at each distance and snapshot for a host.
+              - Then it loops through the tidal field array, and numerically
+                calculates the derivative at each distance in an interpolated
+                distance array to calculate the change in the tidal acceleration.
         """
-        Testing how to calculate da_dr at d_peri,min
-        """
+        # Set up an empty dictionary to save to, along with useful arrays
         da_dr_all = dict()
         rs = mass_profile['rs']
         rs_new = mass_profile['rs.interp']
         #
+        # Loop through each host
         for name in self.host_names[hosts]:
             tidal_field_ind = np.zeros(mass_profile[name].shape)
             da_dr_ind = np.zeros((mass_profile[name].shape[0], len(rs_new)))
@@ -276,6 +312,7 @@ class SummaryDataSort:
                     # Calculate the tidal acceleration
                     tidal_field_ind[i,j] = (mass_profile[name][i][j]/rs[j+1]**2)*(6.67*10**(-11))*(2*10**(30)*100)/((1000**2)*(3.086*10**(16))**2) # in cm/s^2
             #
+            # Loop through the data again and interpolate between the distance array
             for i in range(0, mass_profile[name].shape[0]):
                 spline_fit = splrep(x=rs[1:], y=tidal_field_ind[i])
                 da_dr_ind[i] = splev(rs_new, spline_fit, der=1)*(1/1000)*(1/(3.086*10**(18))) # Needed to convert the denominator to cm
@@ -428,67 +465,7 @@ class SummaryDataSort:
         #
         return mask_dict
 
-    def data_mask_nperi(self, dictionary, nperi, select='both', hosts='all'):
-        """
-        OLD METHOD:
-        ===========
-        This was primarily used to create masks for the satellites that had
-        experienced 0, 1, and > 1 pericenters. I used this in previous plots
-        that are no longer included in Paper I, so it would be okay to eventually
-        delete this method.
-        """
-        # Set up a dictionary to save the masks to
-        mask_dict = dict()
-        #
-        # Depending on the pericenter number you are interested in, create a
-        # dictionary of masks, similar to data_mask and data_mask_apo
-        #
-        for name in self.host_names[hosts]:
-            mask_dict[name] = np.zeros(len(dictionary[name]['infall.check']), bool)
-            for i in range(0, len(mask_dict[name])):
-                if select == 'both':
-                    peri_mask_sim = (dictionary[name]['pericenter.dist.sim'][i] != -1)
-                    peri_mask_mod = (dictionary[name]['pericenter.dist.model'][i] != -1)
-                    if (dictionary[name]['infall.check'][i]) and (np.sum(peri_mask_sim) >= nperi)  and (np.sum(peri_mask_mod) >= nperi):
-                        mask_dict[name][i] = True
-                elif select == 'sim':
-                    peri_mask = (dictionary[name]['pericenter.dist.sim'][i] != -1)
-                    if (dictionary[name]['infall.check'][i]) and (np.sum(peri_mask) >= nperi):
-                        mask_dict[name][i] = True
-                elif select == 'model':
-                    peri_mask = (dictionary[name]['pericenter.dist.model'][i] != -1)
-                    if (dictionary[name]['infall.check'][i]) and (np.sum(peri_mask) >= nperi):
-                        mask_dict[name][i] = True
-        #
-        return mask_dict
-
-    # NEW!
-    def data_mask_ninfall(self, dictionary, n_infall, select='both', hosts='all'):
-        """
-        TBD
-        """
-        # Set up a dictionary to save the masks to
-        mask_dict = dict()
-        #
-        for name in self.host_names[hosts]:
-            mask_dict[name] = np.zeros(len(dictionary[name]['infall.check']), bool)
-            for i in range(0, len(mask_dict[name])):
-                if (dictionary[name]['infall.check'][i]):
-                    if select == 'both':
-                        infall_mask_sim = (dictionary[name]['all.infall.time.lb'][i] != -1)
-                        infall_mask_mod = (dictionary[name]['all.infall.time.lb.model'][i] != -1)
-                        if (np.sum(infall_mask_sim) >= n_infall)  and (np.sum(infall_mask_mod) >= n_infall):
-                            mask_dict[name][i] = True
-                    elif select == 'sim':
-                        infall_mask = (dictionary[name]['pericenter.dist.sim'][i] != -1)
-                        if (np.sum(infall_mask) >= n_infall):
-                            mask_dict[name][i] = True
-                    elif select == 'model':
-                        infall_mask = (dictionary[name]['pericenter.dist.model'][i] != -1)
-                        if (np.sum(infall_mask) >= n_infall):
-                            mask_dict[name][i] = True
-        #
-        return mask_dict
+    ### Everything above this can probably go in it's own class for reading and masking the data.
 
     def halo_id(self, data_dict, mask_dict, hosts='all'):
         """
@@ -497,9 +474,6 @@ class SummaryDataSort:
             return another dictionary to list various identifiers for the
             satellites to better distinguish them. This is purely a diagnostic
             tool.
-            ** Might want to think about incorporating this into the data_read()
-               function, but this also requires the masking dictionary. The
-               masking dictionary is not entirely necessary though... **
 
         VARIABLES:
             data_dict  : dictionary
@@ -550,6 +524,39 @@ class SummaryDataSort:
         """
         for i in data_dict[host].keys():
             print(i)
+
+    def host_vir_properties(self, data_dict, hosts='all'):
+        """
+        TBD
+        """
+        d = dict()
+        R200m = []
+        M200m = []
+        Vcirc = []
+        Evir = []
+        Lvir = []
+        G = 6.67*10**(-11)
+        #
+        for name in self.host_names[hosts]:
+            radius = data_dict[name]['host.radius'][0]
+            mass = data_dict[name]['host.mass'][0]
+            energy = (G*2*10**(30))/(1000**3*3.086*10**(16))*mass/radius # in kmsis
+            vel = np.sqrt(energy)
+            ell = radius*vel
+            #
+            R200m.append(radius)
+            M200m.append(mass)
+            Vcirc.append(vel)
+            Evir.append(energy)
+            Lvir.append(ell)
+        #
+        d['mass'] = np.hstack(M200m)
+        d['radius'] = np.hstack(R200m)
+        d['vcirc'] = np.hstack(Vcirc)
+        d['Evir'] = np.hstack(Evir)
+        d['Lvir'] = np.hstack(Lvir)
+        #
+        return d
 
     def nperi(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
@@ -648,8 +655,6 @@ class SummaryDataSort:
             infall_type = 'first.infall.time.lb'
         elif selection == 'model':
             infall_type = 'first.infall.time.lb.model'
-        elif selection == 'model.300':
-            infall_type = 'infall.time.lb.model.300kpc'
         elif selection == 'model.R200m':
             infall_type = 'infall.time.lb.model.R200m'
         else:
@@ -728,63 +733,6 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # New method!
-    def dperi_select(self, data_dict, lb_number=1, mask_selection='both', selection='sim', oversample=False, hosts='all', sim_type='baryon'):
-        """
-        DESCRIPTION:
-            Groups the recent pericenter distances a subhalo experiences, either
-            in the simulation or model, together into one array.
-
-        VARIABLES:
-            data_dict  : dictionary
-                         Dictionary of data created by data_read()
-
-            lb_number  : integer
-                         Lookback pericenter number
-
-            selection  : string
-                         Choose whether you want values from simulation data or
-                         data from the model.
-
-            oversample : boolean
-                         Choose whether you want to oversample the subhalos or not.
-
-            hosts      : string
-                         Choose which host galaxies you want to analyze; choices
-                         listed in __init__().
-
-            sim_type   : string
-                         Choose which type of data you are analyzing. This is
-                         only used for oversampling factors and does not matter
-                         if you are not oversampling.
-
-        NOTES:
-            - Returns a 1D array.
-            - Data is arranged in order of self.host_names[hosts]. Subhalos in
-              each host are arranged in the same way they were generated from
-              summary_data.py or summary_data_dmo.py.
-            - If a subhalo has not experienced a pericenter, sets the most recent
-              pericenter distance equal to the present-day distance.
-        """
-        # Create the data mask from data_mask_nperi() above
-        mask_dict = self.data_mask_nperi(dictionary=data_dict, select=mask_selection, nperi=lb_number, hosts=hosts)
-        #
-        # Set up an empty list to save values to
-        data = []
-        #
-        # Loops through each host
-        for name in self.host_names[hosts]:
-            # Get all of the most recent pericenters
-            temp_array = data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][:, lb_number-1]
-            #
-            # Determine oversampling and save to list
-            if oversample:
-                data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
-            else:
-                data.append(temp_array)
-        #
-        return np.hstack(data)
-
     def dperi_min(self, data_dict, mask_dict, oversample=False, selection='sim', hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -846,42 +794,7 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # Old and ready to delete after Paper I submission
-    def dperi_first(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
-        """
-        OLD METHOD:
-        ===========
-        I am not using first pericenters as a metric anymore in Paper I, therefore,
-        it is probably worth getting rid of this method eventually.
-        """
-        # Set up an empty list to save values to
-        data = []
-        #
-        # Determines whether oversampling or not, then
-        if oversample == False:
-            for name in self.host_names[hosts]:
-                for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
-                    mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
-                    #
-                    if np.sum(mask_temp) == 0:
-                        data.append(data_dict[name]['d.tot.sim'][mask_dict[name]][i][0])
-                    #
-                    else:
-                        data.append(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp][-1])
-        #
-        elif oversample == True:
-            for name in self.host_names[hosts]:
-                for i in range(0, len(data_dict[name]['pericenter.dist.sim'][mask_dict[name]])):
-                    mask_temp = (data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i] != -1)
-                    #
-                    if np.sum(mask_temp) == 0:
-                        data.append(np.repeat(data_dict[name]['d.tot.sim'][mask_dict[name]][i][0], self.oversample[sim_type][name]))
-                    #
-                    else:
-                        data.append(np.repeat(data_dict[name]['pericenter.dist.sim'][mask_dict[name]][i][mask_temp][-1], self.oversample[sim_type][name]))
-        #
-        return np.hstack(data)
-
+    # Check up on this and whether or not I want to keep the max distance rule
     def dapo_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -945,7 +858,7 @@ class SummaryDataSort:
     def dmax(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
-            Finds the largest distance a satellite ever experienced was.
+            Finds the largest distance a satellite ever experienced.
 
         VARIABLES:
             data_dict  : dictionary
@@ -998,76 +911,6 @@ class SummaryDataSort:
                     data.append(np.repeat(data_dict[name]['apocenter.dist.model'][mask_dict[name]][:,0], self.oversample[sim_type][name]))
                 else:
                     data.append(data_dict[name]['apocenter.dist.model'][mask_dict[name]][:,0])
-        #
-        return np.hstack(data)
-
-    def delta_dperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all', sim_type='baryon'):
-        """
-        DESCRIPTION:
-            Similar to delta_nperi(), except calculates the difference in
-            pericenter distances between the model and the simulation.
-
-        VARIABLES:
-            data_dict  : dictionary
-                         Dictionary of data created by data_read()
-
-            mask_dict  : dictionary
-                         Dictionary of masks created by data_mask(). This is used
-                         on data_dict to mask out the subhalos you want.
-
-            fraction   : boolean
-                         Set to True if interested in fractional difference in
-                         pericenter distances.
-
-            oversample : boolean
-                         Choose whether you want to oversample the subhalos or not.
-
-            hosts      : string
-                         Choose which host galaxies you want to analyze; choices
-                         listed in __init__().
-
-            sim_type   : string
-                         Choose which type of data you are analyzing. This is
-                         only used for oversampling factors and does not matter
-                         if you are not oversampling.
-
-        NOTES:
-            - This only calculates the difference between the MOST RECENT
-              pericenter distances.
-            - Returns a 1D array.
-            - Data is arranged in order of self.host_names[hosts]. Subhalos in
-              each host are arranged in the same way they were generated from
-              summary_data.py or summary_data_dmo.py.
-        """
-        # Initialize an empty list to save data to
-        data = []
-        #
-        # Loop through each host
-        for name in self.host_names[hosts]:
-            # Save the most recent pericenters
-            temp_array_model = data_dict[name]['pericenter.dist.galpy'][mask_dict[name]][:,0]
-            # If no pericenters, replace with present-day distances
-            mask_temp = (temp_array_model == -1)
-            temp_array_model[mask_temp] = data_dict[name]['d.tot.sim'][mask_dict[name]][:,0][mask_temp]
-            #
-            temp_array_sim = data_dict[name]['pericenter.dist.sim'][mask_dict[name]][:,0]
-            mask_temp = (temp_array_sim == -1)
-            temp_array_sim[mask_temp] = data_dict[name]['d.tot.sim'][mask_dict[name]][:,0][mask_temp]
-            #
-            # Determine what kind of difference, oversample if needed, and append to list
-            if fraction:
-                if oversample:
-                    data.append((np.repeat(temp_array_model, self.oversample[sim_type][name]) - \
-                                 np.repeat(temp_array_sim, self.oversample[sim_type][name]))\
-                                 /np.repeat(temp_array_sim, self.oversample[sim_type][name]))
-                else:
-                    data.append((temp_array_model - temp_array_sim)/temp_array_sim)
-            else:
-                if oversample:
-                    data.append(np.repeat(temp_array_model,self.oversample[sim_type][name]) - \
-                                 np.repeat(temp_array_sim,self.oversample[sim_type][name]))
-                else:
-                    data.append(temp_array_model - temp_array_sim)
         #
         return np.hstack(data)
 
@@ -1193,85 +1036,6 @@ class SummaryDataSort:
         else:
             data = self.tperi_recent(data_dict, mask_dict, selection=selection, oversample=oversample, hosts=hosts, sim_type=sim_type)
             return data
-
-    def delta_tperi(self, data_dict, mask_dict, fraction=False, oversample=False, hosts='all', sim_type='baryon'):
-        """
-        DESCRIPTION:
-            Similar to delta_nperi(), except calculates the difference in
-            pericenter lookback times between the model and the simulation.
-
-        VARIABLES:
-            data_dict  : dictionary
-                         Dictionary of data created by data_read()
-
-            mask_dict  : dictionary
-                         Dictionary of masks created by data_mask(). This is used
-                         on data_dict to mask out the subhalos you want.
-
-            fraction   : boolean
-                         Set to True if interested in fractional difference in
-                         pericenter lookback times.
-
-            oversample : boolean
-                         Choose whether you want to oversample the subhalos or not.
-
-            hosts      : string
-                         Choose which host galaxies you want to analyze; choices
-                         listed in __init__().
-
-            sim_type   : string
-                         Choose which type of data you are analyzing. This is
-                         only used for oversampling factors and does not matter
-                         if you are not oversampling.
-
-        NOTES:
-            - This only calculates the time difference between the MOST RECENT
-              pericenter events.
-            - Returns a 1D array.
-            - Data is arranged in order of self.host_names[hosts]. Subhalos in
-              each host are arranged in the same way they were generated from
-              summary_data.py or summary_data_dmo.py.
-        """
-        # Set up an empty list to save data to
-        data = []
-        #
-        # Loop through each host
-        for name in self.host_names[hosts]:
-            # Save data from the model to a temporary array
-            temp_array_model = data_dict[name]['pericenter.time.lb.galpy'][mask_dict[name]][:,0]
-            # Mask out null values
-            mask_temp = (temp_array_model == -1)
-            # Set null values to present-day
-            temp_array_model[mask_temp] = 0.0
-            #
-            # Repeat for the simulation
-            temp_array_sim = data_dict[name]['pericenter.time.lb.sim'][mask_dict[name]][:,0]
-            mask_temp = (temp_array_sim == -1)
-            temp_array_sim[mask_temp] = 0.0
-            #
-            # If fractional difference, oversample if needed
-            if fraction:
-                if oversample:
-                    ratio = (np.repeat(temp_array_model,self.oversample[sim_type][name]) - \
-                                 np.repeat(temp_array_sim,self.oversample[sim_type][name]))\
-                                 /np.repeat(temp_array_sim,self.oversample[sim_type][name])
-                    # For cases where the lookback time is present-day, set the fraction to present-day
-                    # i.e., do not save infinite values
-                    ratio[~np.isfinite(ratio)] = 0
-                    data.append(ratio)
-                else:
-                    ratio = (temp_array_model - temp_array_sim)/temp_array_sim
-                    ratio[~np.isfinite(ratio)] = 0
-                    data.append(ratio)
-            # If not interested in fractional difference, oversample if needed and save data to array
-            else:
-                if oversample:
-                    data.append(np.repeat(temp_array_model,self.oversample[sim_type][name]) - \
-                                 np.repeat(temp_array_sim,self.oversample[sim_type][name]))
-                else:
-                    data.append(temp_array_model - temp_array_sim)
-        #
-        return np.hstack(data)
 
     def tapo_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
@@ -2725,6 +2489,7 @@ class SummaryDataSort:
         #
         return d
 
+    # Needs a lot of documenting
     def energies_model(self, data_dict, mask_dict, potential_dict_sim, potential_dict_model, time_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
         TBD
