@@ -13,8 +13,7 @@
 
   Do this every 100 Myr going back to 1 Gyr (11 snapshots total)
 
-            ** OLDER SCRIPT **
-  ** Newer script is mass_profile_parallel.py **
+  NOTE : This script generates data for Figure 3 in the paper 
 
 """
 import halo_analysis as halo
