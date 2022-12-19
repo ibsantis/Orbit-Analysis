@@ -223,6 +223,39 @@ class SummaryDataSort:
         #
         return data_dict
 
+    def host_properties(self, data_dict, hosts='all'):
+        """
+        TBD
+        """
+        d = dict()
+        R200m = []
+        M200m = []
+        Vcirc = []
+        Evir = []
+        Lvir = []
+        G = 6.67*10**(-11)
+        #
+        for name in self.host_names[hosts]:
+            radius = data_dict[name]['host.radius'][0]
+            mass = data_dict[name]['host.mass'][0]
+            energy = (G*2*10**(30))/(1000**3*3.086*10**(16))*mass/radius # in kmsis
+            vel = np.sqrt(energy)
+            ell = radius*vel
+            #
+            R200m.append(radius)
+            M200m.append(mass)
+            Vcirc.append(vel)
+            Evir.append(energy)
+            Lvir.append(ell)
+        #
+        d['mass'] = np.hstack(M200m)
+        d['radius'] = np.hstack(R200m)
+        d['vcirc'] = np.hstack(Vcirc)
+        d['Evir'] = np.hstack(Evir)
+        d['Lvir'] = np.hstack(Lvir)
+        #
+        return d
+
     # testing
     def da_dr(self, mass_profile, hosts='all'):
         """
