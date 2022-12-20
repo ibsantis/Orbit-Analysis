@@ -855,6 +855,7 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
+    # Is this even relevant anymore?
     def dmax(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -1037,6 +1038,7 @@ class SummaryDataSort:
             data = self.tperi_recent(data_dict, mask_dict, selection=selection, oversample=oversample, hosts=hosts, sim_type=sim_type)
             return data
 
+    # Do I want to keep this?
     def tapo_recent(self, data_dict, mask_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -1219,15 +1221,14 @@ class SummaryDataSort:
                 #
         return np.hstack(data)
 
-    # not going to be around for long, this is just to check how the other infall metrics compare
-    def infall_diagnostics(self, data_dict, mask_dict, selection='300kpc', oversample=False, hosts='all', sim_type='baryon'):
+    def infall_fixed(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon'):
         """
-            Not a long-term method...
+            TBD
         """
         # Set up empty array to save to
         data = []
         #
-        time_name = 'infall.time.lb.model.'+selection
+        time_name = 'infall.time.lb.model.R200m'
         #
         # Loop through each host
         for name in self.host_names[hosts]:
@@ -2185,7 +2186,7 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # Needs dox
+    # Is this necessary?
     def period_average(self, data_dict, mask_dict, selection='sim', choice='peri', oversample=False, hosts='all', sim_type='baryon'):
         """
         DESCRIPTION:
@@ -2260,92 +2261,8 @@ class SummaryDataSort:
         #
         return np.hstack(data)
 
-    # Testing something out
-    def da_dr_dperi_min(self, data_dict, mask_dict, mass_profile_dict, da_dr_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
-        """
-        Finding da_dr at d_peri,min
-        """
-        data = []
-        data_dist = []
-        data_time = []
-        #
-        # Loop through all of the hosts
-        for name in self.host_names[hosts]:
-            #
-            if selection == 'sim':
-                # Loop through each of the satellites in a given host
-                for i in range(0, len(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]])):
-                    #
-                    # Find only real pericenters
-                    mask = (data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i] != -1)
-                    #
-                    # Get the minimum pericenter index and save the distance and time of this event
-                    min_ind = np.where(np.min(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask]) == data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask])[0][0]
-                    d_min = data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask][min_ind]
-                    t_min = data_dict[name]['pericenter.time.'+selection][mask_dict[name]][i][mask][min_ind]
-                    #
-                    # Find the snapshot when this occurred
-                    t_ind = np.where(np.min(np.abs(t_min - mass_profile_dict['time'])) == np.abs(t_min - mass_profile_dict['time']))[0][0]
-                    snapshot_min = mass_profile_dict['snapshot'][t_ind]
-                    #
-                    # Find the index of the minimum pericenter in the interpolated distance array
-                    d_ind = np.where(np.min(np.abs(d_min - mass_profile_dict['rs.interp'])) ==  np.abs(d_min - mass_profile_dict['rs.interp']))[0][0]
-                    #
-                    # Find the dadr value at the right snapshot, at the interpolated distance that corresponds to the minimum pericenter
-                    da_dr_min = np.abs(da_dr_dict[name][snapshot_min-2][d_ind])
-                    #
-                    if oversample:
-                        data.append(np.repeat(da_dr_min, self.oversample[sim_type][name]))
-                        data_dist.append(np.repeat(mass_profile_dict['rs.interp'][d_ind], self.oversample[sim_type][name]))
-                        data_time.append(np.repeat(mass_profile_dict['time'][t_ind], self.oversample[sim_type][name]))
-                    else:
-                        data.append(da_dr_min)
-                        data_dist.append(mass_profile_dict['rs.interp'][d_ind])
-                        data_time.append(mass_profile_dict['time'][t_ind])
-            #
-            elif selection == 'model':
-                # Loop through each of the satellites
-                for i in range(0, len(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]])):
-                    #
-                    # Make sure there is a recent pericenter in the model
-                    if (data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][0] != -1):
-                        #
-                        # Get the minimum pericenter index and save the distance and time of this event
-                        d_min = data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][0]
-                        t_min = data_dict[name]['pericenter.time.'+selection][mask_dict[name]][i][0]
-                        #
-                    else:
-                        d_min = data_dict[name]['d.tot.'+selection][mask_dict[name]][i][0]
-                        t_min = mass_profile_dict['time'][-1]
-                    # Find the snapshot when this occurred
-                    t_ind = np.where(np.min(np.abs(t_min - mass_profile_dict['time'])) == np.abs(t_min - mass_profile_dict['time']))[0][0]
-                    snapshot_min = mass_profile_dict['snapshot'][t_ind]
-                    #
-                    # Find the index of the minimum pericenter in the interpolated distance array
-                    d_ind = np.where(np.min(np.abs(d_min - mass_profile_dict['rs.interp'])) ==  np.abs(d_min - mass_profile_dict['rs.interp']))[0][0]
-                    #
-                    # Find the dadr value at the right snapshot, at the interpolated distance that corresponds to the minimum pericenter
-                    da_dr_min = np.abs(da_dr_dict[name][-1][d_ind]) # want the da/dr field at z = 0 because it doesn't change in the model
-                    #
-                    if oversample:
-                        data.append(np.repeat(da_dr_min, self.oversample[sim_type][name]))
-                        data_dist.append(np.repeat(mass_profile_dict['rs.interp'][d_ind], self.oversample[sim_type][name]))
-                        data_time.append(np.repeat(mass_profile_dict['time'][t_ind], self.oversample[sim_type][name]))
-                    else:
-                        data.append(da_dr_min)
-                        data_dist.append(mass_profile_dict['rs.interp'][d_ind])
-                        data_time.append(mass_profile_dict['time'][t_ind])
-        #
-        d = dict()
-        d['dadr'] = np.hstack(data)
-        d['dadr.dist.interp'] = np.hstack(data_dist)
-        d['dadr.time.interp'] = np.hstack(data_time)
-        d['dadr.time.lb.interp'] = np.hstack(mass_profile_dict['time'][-1] - data_time)
-        #
-        return d
-
-    # Testing another thing out
-    def da_dr_max(self, data_dict, mask_dict, mass_profile_dict, da_dr_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
+    # Needs dox
+    def da_dr(self, data_dict, mask_dict, mass_profile_dict, da_dr_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
         Finding da_dr at d_peri,min
         """
