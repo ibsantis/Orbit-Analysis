@@ -53,6 +53,8 @@ directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2'
 """
     Figure 1: Host M200m and R200m
 """
+t90_values = np.array([1.27, 0.98, 1.19, 1.45, 1.49, 0.92, 0.55, 2.13, 1.57, 1.08, 1.52, 1.38, 1.89])
+t_in_sim = summary.first_infall(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
 
 masses = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
 radii = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
@@ -141,8 +143,17 @@ axs[0].fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color='g',
 axs[0].fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color='g', alpha=0.15)
 axs[0].plot(binss[1][:-1]+half_bins[1], medians[1], 'k', alpha=0.5, lw=4)
 #
-axis_y2_label = 'Median $M_{\\rm 200m}(t_{\\rm lb}) \ [10^{12} M_{\\odot}]$'
-axis_y2_tick_labels = ['1.4', '1.2', '1.0', '0.8', '0.6', '0.4', '0.2', '0.0']
+onesigp = 84.13
+onesigm = 15.87
+sigma_one_op = np.nanpercentile(t_in_sim, onesigp)
+sigma_one_om = np.nanpercentile(t_in_sim, onesigm)
+axs[0].scatter(np.median(t_in_sim), 1, s=150, c='k', marker='s', label='Satellite infall times')
+axs[0].errorbar(np.median(t_in_sim), 1, xerr=np.array([[np.median(t_in_sim)-sigma_one_om],[sigma_one_op-np.median(t_in_sim)]]), color='k', lw=3, capsize=0, alpha=0.7)
+#axs[0].fill_between(x=(5.1, 7.8), y1=0.945, y2=0.955, color='b', label='Santistevan+20')
+#axs[0].fill_between(x=(0.55,2.13), y1=0.995, y2=1.005, color='r', label='Gandhi+22')
+#
+axis_y2_label = 'Median $M_{\\rm 200m}(t_{\\rm lb}) \ [10^{11} M_{\\odot}]$'
+axis_y2_tick_labels = ['14', '12', '10', '8', '6', '4', '2', '0']
 axis_y2_tick_values = [float(v) for v in axis_y2_tick_labels]
 axis_y2_tick_locations = [1.061, 0.9094, 0.7578, 0.6063, 0.4547, 0.3031, 0.1516, 0.0]
 axis_y2_minor_tick_locations = [1.06097825, 1.02308617, 0.98519409, 0.94730201, 0.90940993, 0.87151785, 0.83362577, 0.79573369, 0.7578416 , 0.71994952, 0.68205744, 0.64416536, 0.60627328, 0.5683812 , 0.53048912, 0.49259704, 0.45470496, 0.41681288, 0.3789208 , 0.34102872, 0.30313664, 0.26524456, 0.22735248, 0.1894604 , 0.15156832, 0.11367624, 0.07578416, 0.03789208, 0.]
@@ -176,6 +187,8 @@ axz.tick_params(pad=3)
 axs[1].fill_between(binss[3][:-1]+half_bins[3], uppers[3], lowers[3], color='g', alpha=0.3)
 axs[1].fill_between(binss[3][:-1]+half_bins[3], highests[3], lowests[3], color='g', alpha=0.15)
 axs[1].plot(binss[3][:-1]+half_bins[3], medians[3], 'k', alpha=0.5, lw=4)
+axs[1].scatter(np.median(t_in_sim), 0.95, s=150, c='k', marker='s')
+axs[1].errorbar(np.median(t_in_sim), 0.95, xerr=np.array([[np.median(t_in_sim)-sigma_one_om],[sigma_one_op-np.median(t_in_sim)]]), color='k', lw=3, capsize=0, alpha=0.7)
 #
 axis2_y2_label = 'Median $R_{\\rm 200m}(t_{\\rm lb}) \ [\\rm kpc]$'
 axis2_y2_tick_labels = ['400', '300', '200', '100', '0']
@@ -218,6 +231,7 @@ axs[1].get_yaxis().set_label_coords(-0.1,0.5)
 #
 axs[0].set_xlabel('Lookback Time [Gyr]', fontsize=30)
 axs[1].set_xlabel('Lookback Time [Gyr]', fontsize=30)
+axs[0].legend(prop={'size': 20}, loc='lower right')
 #
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.4, hspace=0)
@@ -531,12 +545,13 @@ plt.plot(rs[1:], mass_ratio_med, color='k', alpha=1)
 plt.hlines(y=1, xmin=0, xmax=500, linestyles='dotted', colors='k', alpha=0.5)
 plt.xscale('log')
 plt.xlim(xmin=5, xmax=500)
-plt.ylim(ymin=0.9, ymax=1.1)
+#plt.ylim(ymin=0.9, ymax=1.1)
+plt.ylim(ymin=0.75, ymax=1.25)
 plt.xlabel('Host distance, $r$ [kpc]', fontsize=34)
 plt.ylabel('$M_{\\rm model}(<r)\ /\ M_{\\rm sim}(<r)$', fontsize=34)
 plt.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
-plt.savefig(directory+'/mass_ratio_fit_median.pdf')
+plt.savefig(directory+'/mass_ratio_fit_medianasdf.pdf')
 plt.close()
 
 
@@ -797,7 +812,7 @@ plt.close()
 """
 t_in_sim = summary.first_infall(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
 t_in_mod = summary.first_infall(data_total, masks_infall, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
-t_in_mod_R200m = summary.infall_diagnostics(data_total, masks_infall, selection='R200m', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_mod_R200m = summary.infall_fixed(data_total, masks_infall, oversample=True, hosts='all_no_r', sim_type='baryon')
 Mstar_z0 = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 mask_finite = np.isfinite(t_in_mod)*(t_in_mod != -1)
