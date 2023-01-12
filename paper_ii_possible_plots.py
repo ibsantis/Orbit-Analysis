@@ -48,7 +48,7 @@ masks_infall_peri['m12f'][59] = False
 masks_infall_apo['m12f'][59] = False
 
 # Select which mask you want to use and the corresponding directory
-directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2_fix'
+directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2'
 
 
 """
@@ -2056,29 +2056,35 @@ plt.close()
 data = summary.data_read_potential_full(directory=sim_data.home_dir, hosts='all_energy_new')
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/m12i_res7100')
 t_in_sim = summary.first_infall(data_total, masks_infall, selection='sim', oversample=True, hosts='all_energy_new', sim_type='baryon')
-energies = summary.energies(data_total, masks_infall, data, data_mp, snaps, oversample=True, hosts='all_energy_new')
+sub_energy = summary.energies(data_total, masks_infall, data, data_mp, snaps, oversample=True, hosts='all_energy_new')
 #
 # Plot the energy differences vs infall time
-summary_plot.median_plot(x=t_in_sim, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.infall'], xtype='t.infall.text', ytype='E.tot', limits=((0,13.5),None), binsize=1, hl=True, axis_labels=['Lookback Infall time [Gyr]', '($E(z=0)$ -  $E_{\\rm infall}$)/$E_{\\rm infall}$'], file_path_and_name=directory+'/energy/E_norm_infall_vs_t_infall.pdf')
-summary_plot.median_plot(x=t_in_sim, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.infall'], xtype='t.infall.text', ytype='E.tot', limits=((0,13.5),(-6,4)), binsize=1, hl=True, axis_labels=['Lookback Infall time [Gyr]', '($E(z=0)$ -  $E_{\\rm infall}$)/$E_{\\rm infall}$'], file_path_and_name=directory+'/energy/E_norm_infall_vs_t_infall_zoom.pdf')
-summary_plot.median_plot(x=t_in_sim, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.z0'], xtype='t.infall.text', ytype='E.tot', limits=((0,13.5),None), binsize=1, hl=True, axis_labels=['Lookback Infall time [Gyr]', '($E(z=0)$ -  $E_{\\rm infall}$)/$E(z=0)$'], file_path_and_name=directory+'/energy/E_norm_z0_vs_t_infall.pdf')
-summary_plot.median_plot(x=t_in_sim, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.z0'], xtype='t.infall.text', ytype='E.tot', limits=((0,13.5),(-5,6)), binsize=1, hl=True, axis_labels=['Lookback Infall time [Gyr]', '($E(z=0)$ -  $E_{\\rm infall}$)/$E(z=0)$'], file_path_and_name=directory+'/energy/E_norm_z0_vs_t_infall_zoom.pdf')
+summary_plot.median_plot(x=t_in_sim, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['energy.infall']), xtype='t.infall.text', ytype='E.tot', limits=((0,13.5),None), binsize=1, hl=True, axis_labels=['Lookback Infall time [Gyr]', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E_{\\rm infall}$|'], file_path_and_name=directory+'/energy/E_norm_infall_vs_t_infall.pdf')
+summary_plot.median_plot(x=t_in_sim, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['energy.infall']), xtype='t.infall.text', ytype='E.tot', limits=((0,13.5),(-10,2)), binsize=1, hl=True, axis_labels=['Lookback Infall time [Gyr]', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E_{\\rm infall}$|'], file_path_and_name=directory+'/energy/E_norm_infall_vs_t_infall_zoom.pdf')
+summary_plot.median_plot(x=t_in_sim, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['energy.z0']), xtype='t.infall.text', ytype='E.tot', limits=((0,13.5),None), binsize=1, hl=True, axis_labels=['Lookback Infall time [Gyr]', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E(z=0)$|'], file_path_and_name=directory+'/energy/E_norm_z0_vs_t_infall.pdf')
+summary_plot.median_plot(x=t_in_sim, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['energy.z0']), xtype='t.infall.text', ytype='E.tot', limits=((0,13.5),(-5,2)), binsize=1, hl=True, axis_labels=['Lookback Infall time [Gyr]', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E(z=0)$|'], file_path_and_name=directory+'/energy/E_norm_z0_vs_t_infall_zoom.pdf')
+summary_plot.median_plot(x=t_in_sim, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['E.vir']), xtype='t.infall.text', ytype='E.tot', limits=((0,13.5),None), binsize=1, hl=True, axis_labels=['Lookback Infall time [Gyr]', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E_{\\rm vir}$|'], file_path_and_name=directory+'/energy/E_norm_vir_vs_t_infall.pdf')
+summary_plot.median_plot(x=t_in_sim, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['E.vir']), xtype='t.infall.text', ytype='E.tot', limits=((0,13.5),(-4,0.5)), binsize=1, hl=True, axis_labels=['Lookback Infall time [Gyr]', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E_{\\rm vir}$|'], file_path_and_name=directory+'/energy/E_norm_vir_vs_t_infall_zoom.pdf')
 #
 # Plot the energy differences vs Mstar
-energies = summary.energies(data_total, masks_infall_peri, data, data_mp, snaps, oversample=True, hosts='all_energy_new')
+sub_energy = summary.energies(data_total, masks_infall_peri, data, data_mp, snaps, oversample=True, hosts='all_energy_new')
 Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all_energy_new', sim_type='baryon')
 dz0_tot = summary.d_z0(data_total, masks_infall_peri, oversample=True, hosts='all_energy_new', sim_type='baryon')
 #
-summary_plot.median_plot(x=Mstar_z0, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.infall'], xtype='M.star.z0', ytype='E.tot', limits=((4,9.5),None), binsize=0.5, hl=True, axis_labels=['$M_{\\rm star} \ [M_{\\odot}]$', '($E(z=0)$ -  $E_{\\rm infall}$)/$E_{\\rm infall}$'], file_path_and_name=directory+'/energy/E_norm_infall_vs_Mstar.pdf')
-summary_plot.median_plot(x=Mstar_z0, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.infall'], xtype='M.star.z0', ytype='E.tot', limits=((4,9.5),(-10,10)), binsize=0.5, hl=True, axis_labels=['$M_{\\rm star} \ [M_{\\odot}]$', '($E(z=0)$ -  $E_{\\rm infall}$)/$E_{\\rm infall}$'], file_path_and_name=directory+'/energy/E_norm_infall_vs_Mstar_zoom.pdf')
-summary_plot.median_plot(x=Mstar_z0, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.z0'], xtype='M.star.z0', ytype='E.tot', limits=((4,9.5),None), binsize=0.5, hl=True, axis_labels=['$M_{\\rm star} \ [M_{\\odot}]$', '($E(z=0)$ -  $E_{\\rm infall}$)/$E(z=0)$'], file_path_and_name=directory+'/energy/E_norm_z0_vs_Mstar.pdf')
-summary_plot.median_plot(x=Mstar_z0, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.z0'], xtype='M.star.z0', ytype='E.tot', limits=((4,9.5),(-1,8)), binsize=0.5, hl=True, axis_labels=['$M_{\\rm star} \ [M_{\\odot}]$', '($E(z=0)$ -  $E_{\\rm infall}$)/$E(z=0)$'], file_path_and_name=directory+'/energy/E_norm_z0_vs_Mstar_zoom.pdf')
+summary_plot.median_plot(x=Mstar_z0, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['energy.infall']), xtype='M.star.z0', ytype='E.tot', limits=((4,9.5),None), binsize=0.5, hl=True, axis_labels=['$M_{\\rm star} \ [M_{\\odot}]$', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E_{\\rm infall}$|'], file_path_and_name=directory+'/energy/E_norm_infall_vs_Mstar.pdf')
+summary_plot.median_plot(x=Mstar_z0, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['energy.infall']), xtype='M.star.z0', ytype='E.tot', limits=((4,9.5),(-10,0.5)), binsize=0.5, hl=True, axis_labels=['$M_{\\rm star} \ [M_{\\odot}]$', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E_{\\rm infall}$|'], file_path_and_name=directory+'/energy/E_norm_infall_vs_Mstar_zoom.pdf')
+summary_plot.median_plot(x=Mstar_z0, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['energy.z0']), xtype='M.star.z0', ytype='E.tot', limits=((4,9.5),None), binsize=0.5, hl=True, axis_labels=['$M_{\\rm star} \ [M_{\\odot}]$', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E(z=0)$|'], file_path_and_name=directory+'/energy/E_norm_z0_vs_Mstar.pdf')
+summary_plot.median_plot(x=Mstar_z0, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['energy.z0']), xtype='M.star.z0', ytype='E.tot', limits=((4,9.5),(-8,0.5)), binsize=0.5, hl=True, axis_labels=['$M_{\\rm star} \ [M_{\\odot}]$', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E(z=0)$|'], file_path_and_name=directory+'/energy/E_norm_z0_vs_Mstar_zoom.pdf')
+summary_plot.median_plot(x=Mstar_z0, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['E.vir']), xtype='M.star.z0', ytype='E.tot', limits=((4,9.5),None), binsize=0.5, hl=True, axis_labels=['$M_{\\rm star} \ [M_{\\odot}]$', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E_{\\rm vir}$|'], file_path_and_name=directory+'/energy/E_norm_vir_vs_Mstar.pdf')
+summary_plot.median_plot(x=Mstar_z0, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['E.vir']), xtype='M.star.z0', ytype='E.tot', limits=((4,9.5),(-3,0.5)), binsize=0.5, hl=True, axis_labels=['$M_{\\rm star} \ [M_{\\odot}]$', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E_{\\rm vir}$|'], file_path_and_name=directory+'/energy/E_norm_vir_vs_Mstar_zoom.pdf')
 #
 # Plot the energy differences vs d(z = 0)
-summary_plot.median_plot(x=dz0_tot, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.infall'], xtype='d.z0', ytype='E.tot', limits=((0,400),None), binsize=50, hl=True, axis_labels=['Host distance, d [kpc]', '($E(z=0)$ -  $E_{\\rm infall}$)/$E_{\\rm infall}$'], file_path_and_name=directory+'/energy/E_norm_infall_vs_dz0.pdf')
-summary_plot.median_plot(x=dz0_tot, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.infall'], xtype='d.z0', ytype='E.tot', limits=((0,400),(-10,1)), binsize=50, hl=True, axis_labels=['Host distance, d [kpc]', '($E(z=0)$ -  $E_{\\rm infall}$)/$E_{\\rm infall}$'], file_path_and_name=directory+'/energy/E_norm_infall_vs_dz0_zoom.pdf')
-summary_plot.median_plot(x=dz0_tot, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.z0'], xtype='d.z0', ytype='E.tot', limits=((0,400),None), binsize=50, hl=True, axis_labels=['Host distance, d [kpc]', '($E(z=0)$ -  $E_{\\rm infall}$)/$E(z=0)$'], file_path_and_name=directory+'/energy/E_norm_z0_vs_dz0.pdf')
-summary_plot.median_plot(x=dz0_tot, y=(energies['energy.z0']-energies['energy.infall'])/energies['energy.z0'], xtype='d.z0', ytype='E.tot', limits=((0,400),(-10,10)), binsize=50, hl=True, axis_labels=['Host distance, d [kpc]', '($E(z=0)$ -  $E_{\\rm infall}$)/$E(z=0)$'], file_path_and_name=directory+'/energy/E_norm_z0_vs_dz0_zoom.pdf')
+summary_plot.median_plot(x=dz0_tot, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['energy.infall']), xtype='d.z0', ytype='E.tot', limits=((0,400),None), binsize=50, hl=True, axis_labels=['Host distance, d [kpc]', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E_{\\rm infall}$|'], file_path_and_name=directory+'/energy/E_norm_infall_vs_dz0.pdf')
+summary_plot.median_plot(x=dz0_tot, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['energy.infall']), xtype='d.z0', ytype='E.tot', limits=((0,400),(-10,1)), binsize=50, hl=True, axis_labels=['Host distance, d [kpc]', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E_{\\rm infall}$|'], file_path_and_name=directory+'/energy/E_norm_infall_vs_dz0_zoom.pdf')
+summary_plot.median_plot(x=dz0_tot, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['energy.z0']), xtype='d.z0', ytype='E.tot', limits=((0,400),None), binsize=50, hl=True, axis_labels=['Host distance, d [kpc]', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E(z=0)$|'], file_path_and_name=directory+'/energy/E_norm_z0_vs_dz0.pdf')
+summary_plot.median_plot(x=dz0_tot, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['energy.z0']), xtype='d.z0', ytype='E.tot', limits=((0,400),(-10,0.5)), binsize=50, hl=True, axis_labels=['Host distance, d [kpc]', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E(z=0)$|'], file_path_and_name=directory+'/energy/E_norm_z0_vs_dz0_zoom.pdf')
+summary_plot.median_plot(x=dz0_tot, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['E.vir']), xtype='d.z0', ytype='E.tot', limits=((0,400),None), binsize=50, hl=True, axis_labels=['Host distance, d [kpc]', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E_{\\rm vir}$|'], file_path_and_name=directory+'/energy/E_norm_vir_vs_dz0.pdf')
+summary_plot.median_plot(x=dz0_tot, y=(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['E.vir']), xtype='d.z0', ytype='E.tot', limits=((0,400),(-4, 0.5)), binsize=50, hl=True, axis_labels=['Host distance, d [kpc]', '($E(z=0)$ -  $E_{\\rm infall}$)/|$E_{\\rm vir}$|'], file_path_and_name=directory+'/energy/E_norm_vir_vs_dz0_zoom.pdf')
 
 
 
@@ -2090,3 +2096,9 @@ summary_plot.median_plot(x=dz0_tot, y=(energies['energy.z0']-energies['energy.in
 
 summary_plot.plot_hist(x=(d_rec_mod - d_rec_mod_aligned), xtype='d.model', x_labels='$d_{\\rm peri,unaligned} - d_{\\rm peri,aligned}$ [kpc]', title='Recent Model Pericenters', pdf=True, binsize=0.05, xlimits=(-0.6,0.6), file_path_and_name=directory+'/d_mod_recent_hist.pdf')
 summary_plot.plot_hist(x=(d_rec_mod - d_rec_mod_aligned), xtype='d.model', x_labels='$d_{\\rm peri,unaligned} - d_{\\rm peri,aligned}$ [kpc]', title='Recent Model Pericenters', pdf=False, binsize=0.05, xlimits=(-0.6,0.6), file_path_and_name=directory+'/d_mod_recent_raw.pdf')
+
+
+
+
+
+summary_plot.plot_hist(x=(sub_energy['energy.z0'] - sub_energy['energy.infall'])/sub_energy['energy.infall'], xtype='E.tot', binsize=1, pdf=True, xlimits=(-15,5), x_labels='($E(z=0)-E_{\\rm infall})/E_{\\rm infall}$', file_path_and_name=directory+'/energy_hist_zoom.pdf')
