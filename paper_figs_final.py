@@ -53,7 +53,6 @@ masks_infall_peri['m12f'][59] = False
 N_sim_tot = summary.nperi(data_total, masks_infall, oversample=True, selection='sim', hosts='all_no_z', sim_type='baryon')
 d_sim_tot = summary.dperi_recent(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
 d_min_tot = summary.dperi_min(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
-d_1st_tot = summary.dperi_first(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
 dz0_tot = summary.d_z0(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
 t_sim_tot = summary.tperi_recent(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_z', sim_type='baryon')
 t_min_tot = summary.tperi_min(data_total, masks_infall, oversample=True, hosts='all_no_z', sim_type='baryon')
