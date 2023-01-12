@@ -55,7 +55,7 @@ tapo_rec_sim = summary.tapo_recent(data_total, masks_infall_apo, selection='sim'
 tapo_rec_mod = summary.tapo_recent(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 t_in_sim = summary.first_infall(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
 t_in_mod = summary.first_infall(data_total, masks_infall, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
-t_in_mod_R200m = summary.infall_diagnostics(data_total, masks_infall, selection='R200m', oversample=True, hosts='all_no_r', sim_type='baryon')
+t_in_mod_R200m = summary.infall_fixed(data_total, masks_infall, oversample=True, hosts='all_no_r', sim_type='baryon')
 mask_in_mod = np.isfinite(t_in_mod)
 mask_in_mod_R200m = np.isfinite(t_in_mod_R200m)
 #ecc = summary.eccentricity_recent(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
@@ -93,14 +93,11 @@ def rmse(sim, mod):
 print('The RMSE of d_rec is {0}'.format(rmse(d_rec_sim, d_rec_mod)))
 print('The RMSE of d_min is {0}'.format(rmse(d_min_sim, d_min_mod)))
 print('The RMSE of t_rec is {0}'.format(rmse(t_rec_sim, t_rec_mod)))
-#print('The RMSE of t_min is {0}'.format(rmse(t_min_sim, t_min_mod)))
 print('The RMSE of N_r is {0}'.format(rmse(n_sim, n_mod_mod_infall)))
 print('The RMSE of N_r200 is {0}'.format(rmse(n_sim, n_mod_r200)))
 print('The RMSE of v_rec is {0}'.format(rmse(v_rec_sim, v_rec_mod)))
 print('The RMSE of v_min is {0}'.format(rmse(v_min_sim, v_min_mod)))
 print('The RMSE of d_apo is {0}'.format(rmse(dapo_rec_sim, dapo_rec_mod)))
-#print('The RMSE of d_max is {0}'.format(rmse(dmax_sim, dmax_mod)))
-#print('The RMSE of t_apo is {0}'.format(rmse(tapo_rec_sim, tapo_rec_mod)))
 print('The RMSE of t_infall is {0}'.format(rmse(t_in_sim[mask_in_mod], t_in_mod[mask_in_mod])))
 print('The RMSE of t_infall,R200m is {0}'.format(rmse(t_in_sim[mask_in_mod_R200m], t_in_mod_R200m[mask_in_mod_R200m])))
 print('The RMSE of eccentricity is {0}'.format(rmse(ecc, ecc_model)))
@@ -117,6 +114,10 @@ def rmse_norm(sim, mod):
             results.append(((sim[i]-mod[i])/sim[i])**2)
     results = np.asarray(results)
     return np.sqrt(np.sum(results)/len(sim))
+
+def rmse_norm(sim, mod):
+    return np.sqrt(np.sum(((mod-sim)/sim)**2)/len(sim))
+
 
 print(rmse_norm(d_rec_sim, d_rec_mod))
 print(rmse_norm(d_min_sim, d_min_mod))
