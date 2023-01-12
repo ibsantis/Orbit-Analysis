@@ -626,7 +626,6 @@ class SummaryDataSort:
                          you're interested in.
                          - sim         : infall time defined from simulation data with evolving R200m
                          - model       : infall time defined from model data with evolving R200m
-                         - model.300   : infall time defined from model data of when sat first crossed 300 kpc
                          - model.R200m : infall time defined from model data of when sat first crossed R200m
 
             oversample : boolean
@@ -774,23 +773,38 @@ class SummaryDataSort:
         data = []
         #
         # Loop through each host
-        for name in self.host_names[hosts]:
-            # Loop through each subhalo in the host
-            for i in range(0, len(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]])):
-                # Mask out the null pericenter values
-                mask_temp = (data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i] != -1)
-                # If there are no pericenters, append the present-day distance as the minimum
-                if np.sum(mask_temp) == 0:
-                    if oversample:
-                        data.append(np.repeat(data_dict[name]['d.tot.sim'][mask_dict[name]][i][0], self.oversample[sim_type][name]))
+        if selection == 'sim':
+            for name in self.host_names[hosts]:
+                # Loop through each subhalo in the host
+                for i in range(0, len(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]])):
+                    # Mask out the null pericenter values
+                    mask_temp = (data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i] != -1)
+                    # If there are no pericenters, append the present-day distance as the minimum
+                    if np.sum(mask_temp) == 0:
+                        if oversample:
+                            data.append(np.repeat(data_dict[name]['d.tot.sim'][mask_dict[name]][i][0], self.oversample[sim_type][name]))
+                        else:
+                            data.append(data_dict[name]['d.tot.sim'][mask_dict[name]][i][0])
+                    # If there are pericenters, append the minimum value to the list
                     else:
-                        data.append(data_dict[name]['d.tot.sim'][mask_dict[name]][i][0])
-                # If there are pericenters, append the minimum value to the list
+                        if oversample:
+                            data.append(np.repeat(np.min(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask_temp]), self.oversample[sim_type][name]))
+                        else:
+                            data.append(np.min(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask_temp]))
+        #
+        elif selection == 'model':
+            for name in self.host_names[hosts]:
+                # Get all of the most recent pericenters
+                temp_array = data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][:,0]
+                # Mask out the cases where there are no pericenters
+                mask_temp = (temp_array == -1)
+                # For the null values, replace with present-day distances
+                temp_array[mask_temp] = data_dict[name]['d.tot.sim'][mask_dict[name]][:,0][mask_temp]
+                # Determine oversampling and save to list
+                if oversample:
+                    data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
                 else:
-                    if oversample:
-                        data.append(np.repeat(np.min(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask_temp]), self.oversample[sim_type][name]))
-                    else:
-                        data.append(np.min(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask_temp]))
+                    data.append(temp_array)
         #
         return np.hstack(data)
 
@@ -1536,27 +1550,42 @@ class SummaryDataSort:
         # Set up an empty list to save values to
         data = []
         #
-        # Loop through each host
-        for name in self.host_names[hosts]:
-            # Loop through each subhalo in the host
-            for i in range(0, len(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]])):
-                # Mask out the null pericenter values
-                mask_temp = (data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i] != -1)
-                # If there are no pericenters, append the present-day velocity as the minimum
-                if np.sum(mask_temp) == 0:
-                    if oversample:
-                        data.append(np.repeat(data_dict[name]['v.tot.sim'][mask_dict[name]][i][0], self.oversample[sim_type][name]))
+        if selection == 'sim':
+            # Loop through each host
+            for name in self.host_names[hosts]:
+                # Loop through each subhalo in the host
+                for i in range(0, len(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]])):
+                    # Mask out the null pericenter values
+                    mask_temp = (data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i] != -1)
+                    # If there are no pericenters, append the present-day velocity as the minimum
+                    if np.sum(mask_temp) == 0:
+                        if oversample:
+                            data.append(np.repeat(data_dict[name]['v.tot.sim'][mask_dict[name]][i][0], self.oversample[sim_type][name]))
+                        else:
+                            data.append(data_dict[name]['v.tot.sim'][mask_dict[name]][i][0])
+                    # If there are pericenters, append the value of the velocity at minimum to the list
                     else:
-                        data.append(data_dict[name]['v.tot.sim'][mask_dict[name]][i][0])
-                # If there are pericenters, append the value of the velocity at minimum to the list
-                else:
-                    index = np.where(np.min(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask_temp]) \
-                                     == data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask_temp])[0][0]
-                    if oversample:
-                        data.append(np.repeat(data_dict[name]['pericenter.vel.'+selection][mask_dict[name]][i][mask_temp][index], self.oversample[sim_type][name]))
-                    else:
-                        data.append(data_dict[name]['pericenter.vel.'+selection][mask_dict[name]][i][mask_temp][index])
+                        index = np.where(np.min(data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask_temp]) \
+                                         == data_dict[name]['pericenter.dist.'+selection][mask_dict[name]][i][mask_temp])[0][0]
+                        if oversample:
+                            data.append(np.repeat(data_dict[name]['pericenter.vel.'+selection][mask_dict[name]][i][mask_temp][index], self.oversample[sim_type][name]))
+                        else:
+                            data.append(data_dict[name]['pericenter.vel.'+selection][mask_dict[name]][i][mask_temp][index])
         #
+        elif selection == 'model':
+            # Loop through each host
+            for name in self.host_names[hosts]:
+                # Get all of the most recent pericenters
+                temp_array = data_dict[name]['pericenter.vel.'+selection][mask_dict[name]][:,0]
+                # Mask out the cases where there are no pericenters
+                mask_temp = (temp_array == -1)
+                # For the null values, replace with present-day velocities
+                temp_array[mask_temp] = data_dict[name]['v.tot.sim'][mask_dict[name]][:,0][mask_temp]
+                # Determine oversampling and save to list
+                if oversample:
+                    data.append(np.repeat(temp_array, self.oversample[sim_type][name]))
+                else:
+                    data.append(temp_array)
         return np.hstack(data)
 
     def potential(self, data_dict, mask_dict, oversample=False, hosts='all', sim_type='baryon', norm='potential'):
@@ -2341,6 +2370,7 @@ class SummaryDataSort:
         data_all = dict()
         data_all_time = dict()
         tlb = time_dict['time'][-1] - np.flip(time_dict['time'])
+        data_all_host = []
         #
         for name in self.host_names[hosts]:
             # Set the host potential at 100 kpc at z = 0
@@ -2359,6 +2389,9 @@ class SummaryDataSort:
             sub_energy = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape)
             sub_pot_snaps = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape, int)
             sub_pot_tlb = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape)
+            sub_host_energy = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape[0])
+            #
+            host_energies = ((6.67*10**(-11)*2*10**(30))/(10**3*3.086*10**(16)*1000**2))*(data_dict[name]['host.mass'][0]/data_dict[name]['host.radius'][0])
             #
             # Loop through all of the satellites
             for i in range(0, sub_pot.shape[0]):
@@ -2380,6 +2413,7 @@ class SummaryDataSort:
                 #
                 # Calculate the total orbital energy
                 sub_energy[i][mask_tot] = sub_pot[i][mask_tot] + 0.5*(data_dict[name]['v.tot.sim'][i][:len(potential_dict[name]['subhalo.pot'][i])][mask_tot])**2
+                sub_host_energy[i] = host_energies
             #
             # Save all energy data for the satellites.
             data_all[name] = sub_energy
@@ -2388,8 +2422,10 @@ class SummaryDataSort:
             # Save data for the z = 0 stuff
             if oversample:
                 data_z0.append(np.repeat(sub_energy[:,0][mask_dict[name]], self.oversample[sim_type][name]))
+                data_all_host.append(np.repeat(sub_host_energy[mask_dict[name]], self.oversample[sim_type][name]))
             else:
                 data_z0.append(sub_energy[:,0][mask_dict[name]])
+                data_all_host.append(sub_host_energy[mask_dict[name]])
             #
             for i in range(0, np.sum(mask_dict[name])):
                 infall_mask = (tlb[:len(sub_energy[mask_dict[name]][i])] <= data_dict[name]['first.infall.time.lb'][mask_dict[name]][i])
@@ -2403,6 +2439,7 @@ class SummaryDataSort:
         d['energy.infall'] = np.hstack(data_infall)
         d['energy.all'] = data_all
         d['energy.all.tlb'] = data_all_time
+        d['E.vir'] = np.hstack(data_all_host)
         #
         return d
 
