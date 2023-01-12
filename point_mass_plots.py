@@ -71,16 +71,16 @@ t_in_mod_pm = summary.first_infall(data_total_point, masks_infall_point, selecti
 mask_finite = np.isfinite(t_in_mod)*(t_in_mod != -1)
 mask_finite_pm = np.isfinite(t_in_mod_pm)*(t_in_mod_pm != -1)
 #
-summary_plot.plot_hist(x=(t_in_mod_pm[mask_finite*mask_finite_pm] - t_in_mod[mask_finite*mask_finite_pm])/t_in_mod[mask_finite*mask_finite_pm], xtype='t.infall.text', binsize=0.05, pdf=True, x_labels='$(t_{\\rm in,lb,point}-t_{\\rm in,lb,disk})/t_{\\rm in,disk}$', file_path_and_name=directory+'/infall_hist.pdf')
-summary_plot.median_plot(x=t_in_mod[mask_finite*mask_finite_pm], y=(t_in_mod_pm[mask_finite*mask_finite_pm] - t_in_mod[mask_finite*mask_finite_pm]), xtype='t.infall.text', ytype='delta_t', binsize=0.5, limits=((13.7,0),(-7, 2.5)), hl=True, axis_labels=['$t_{\\rm infall,lb,disk}$ [Gyr]', '$t_{\\rm infall,lb,point}-t_{\\rm infall,lb,disk}$ [Gyr]'], file_path_and_name=directory+'/delta_infall_vs_infall.pdf')
+summary_plot.plot_hist(x=t_in_mod_pm[mask_finite*mask_finite_pm] - t_in_mod[mask_finite*mask_finite_pm], xtype='t.infall.text', binsize=0.1, pdf=True, xlimits=(-4,2), x_labels='$t_{\\rm in,lb,point}-t_{\\rm in,lb,disk}$ [Gyr]', file_path_and_name=directory+'/infall_hist.pdf')
+summary_plot.median_plot(x=t_in_mod[mask_finite*mask_finite_pm], y=(t_in_mod_pm[mask_finite*mask_finite_pm] - t_in_mod[mask_finite*mask_finite_pm]), xtype='t.infall.text', ytype='delta_t', binsize=0.5, limits=((13.7,0),(-4, 1.5)), hl=True, axis_labels=['$t_{\\rm infall,lb,disk}$ [Gyr]', '$t_{\\rm infall,lb,point}-t_{\\rm infall,lb,disk}$ [Gyr]'], file_path_and_name=directory+'/delta_infall_vs_infall.pdf')
 #
 t_in_mod_fixed = summary.infall_fixed(data_total, masks_infall, oversample=True, hosts='all_no_r', sim_type='baryon')
 t_in_mod_fixed_pm = summary.infall_fixed(data_total_point, masks_infall_point, oversample=True, hosts='all_no_r', sim_type='baryon')
 mask_finite_fixed = np.isfinite(t_in_mod_fixed)*(t_in_mod_fixed != -1)
 mask_finite_fixed_pm = np.isfinite(t_in_mod_fixed_pm)*(t_in_mod_fixed_pm != -1)
 #
-summary_plot.plot_hist(x=(t_in_mod_fixed_pm[mask_finite_fixed*mask_finite_fixed_pm] - t_in_mod_fixed[mask_finite_fixed*mask_finite_fixed_pm])/t_in_mod_fixed[mask_finite_fixed*mask_finite_fixed_pm], xtype='t.infall.text', binsize=0.05, pdf=True, x_labels='$(t_{\\rm in,lb,point,fixed}-t_{\\rm in,lb,disk,fixed})/t_{\\rm in,lb,disk,fixed}$', file_path_and_name=directory+'/infall_fixed_hist.pdf')
-summary_plot.median_plot(x=t_in_mod_fixed[mask_finite_fixed*mask_finite_fixed_pm], y=(t_in_mod_fixed_pm[mask_finite_fixed*mask_finite_fixed_pm] - t_in_mod_fixed[mask_finite_fixed*mask_finite_fixed_pm]), xtype='t.infall.text', ytype='delta_t', binsize=0.5, limits=((13.7,0),(-1, 1)), hl=True, axis_labels=['$t_{\\rm infall,lb,disk}$ [Gyr]', '$t_{\\rm infall,lb,point}-t_{\\rm infall,lb,disk}$ [Gyr]'], file_path_and_name=directory+'/delta_infall_vs_infall_fixed.pdf')
+summary_plot.plot_hist(x=(t_in_mod_fixed_pm[mask_finite_fixed*mask_finite_fixed_pm] - t_in_mod_fixed[mask_finite_fixed*mask_finite_fixed_pm]), xtype='t.infall.text', binsize=0.05, xlimits=(-0.5,0.5), pdf=True, x_labels='$t_{\\rm in,lb,point,fixed}-t_{\\rm in,lb,disk,fixed}$ [Gyr]', file_path_and_name=directory+'/infall_fixed_hist.pdf')
+summary_plot.median_plot(x=t_in_mod_fixed[mask_finite_fixed*mask_finite_fixed_pm], y=(t_in_mod_fixed_pm[mask_finite_fixed*mask_finite_fixed_pm] - t_in_mod_fixed[mask_finite_fixed*mask_finite_fixed_pm]), xtype='t.infall.text', ytype='delta_t', binsize=0.5, limits=((12,0),(-1, 1)), hl=True, axis_labels=['$t_{\\rm infall,lb,disk}$ [Gyr]', '$t_{\\rm infall,lb,point}-t_{\\rm infall,lb,disk}$ [Gyr]'], file_path_and_name=directory+'/delta_infall_vs_infall_fixed.pdf')
 
 
 """
