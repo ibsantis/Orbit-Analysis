@@ -103,17 +103,6 @@ print('The RMSE of t_infall,R200m is {0}'.format(rmse(t_in_sim[mask_in_mod_R200m
 print('The RMSE of eccentricity is {0}'.format(rmse(ecc, ecc_model)))
 print('The RMSE of period is {0}'.format(rmse(per, per_model)))
 
-def rmse_norm(sim, mod):
-    results = []
-    for i in range(0, len(sim)):
-        if (sim[i] == 0) & (mod[i] == 0):
-            results.append(1)
-        elif (sim[i] == 0) & (mod[i] != 0):
-            results.append(((1e-5-mod[i])/1e-5)**2)
-        else:
-            results.append(((sim[i]-mod[i])/sim[i])**2)
-    results = np.asarray(results)
-    return np.sqrt(np.sum(results)/len(sim))
 
 def rmse_norm(sim, mod):
     return np.sqrt(np.sum(((mod-sim)/sim)**2)/len(sim))
