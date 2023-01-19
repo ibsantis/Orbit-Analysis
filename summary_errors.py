@@ -87,46 +87,19 @@ per_model = np.hstack(per_model)
 
 
 
-def rmse(sim, mod):
-    return np.sqrt(np.sum((sim-mod)**2)/len(sim))
-
-print('The RMSE of d_rec is {0}'.format(rmse(d_rec_sim, d_rec_mod)))
-print('The RMSE of d_min is {0}'.format(rmse(d_min_sim, d_min_mod)))
-print('The RMSE of t_rec is {0}'.format(rmse(t_rec_sim, t_rec_mod)))
-print('The RMSE of N_r is {0}'.format(rmse(n_sim, n_mod_mod_infall)))
-print('The RMSE of N_r200 is {0}'.format(rmse(n_sim, n_mod_r200)))
-print('The RMSE of v_rec is {0}'.format(rmse(v_rec_sim, v_rec_mod)))
-print('The RMSE of v_min is {0}'.format(rmse(v_min_sim, v_min_mod)))
-print('The RMSE of d_apo is {0}'.format(rmse(dapo_rec_sim, dapo_rec_mod)))
-print('The RMSE of t_infall is {0}'.format(rmse(t_in_sim[mask_in_mod], t_in_mod[mask_in_mod])))
-print('The RMSE of t_infall,R200m is {0}'.format(rmse(t_in_sim[mask_in_mod_R200m], t_in_mod_R200m[mask_in_mod_R200m])))
-print('The RMSE of eccentricity is {0}'.format(rmse(ecc, ecc_model)))
-print('The RMSE of period is {0}'.format(rmse(per, per_model)))
-
-
-def rmse_norm(sim, mod):
-    return np.sqrt(np.sum(((mod-sim)/sim)**2)/len(sim))
-
-
-print(rmse_norm(d_rec_sim, d_rec_mod))
-print(rmse_norm(d_min_sim, d_min_mod))
-#print(rmse_norm(t_rec_sim, t_rec_mod))
-#print(rmse_norm(t_min_sim, t_min_mod))
-#print(rmse_norm(n_sim, n_mod_mod_infall))
-#print(rmse_norm(n_sim, n_mod_r200))
-#print(rmse_norm(v_rec_sim, v_rec_mod))
-#print(rmse_norm(v_min_sim, v_min_mod))
-print(rmse_norm(dapo_rec_sim, dapo_rec_mod))
-print(rmse_norm(dmax_sim, dmax_mod))
-#print(rmse_norm(tapo_rec_sim, tapo_rec_mod))
-#print(rmse_norm(t_in_sim[mask_in_mod], t_in_mod[mask_in_mod]))
-#print(rmse_norm(t_in_sim[mask_in_mod_R200m], t_in_mod_R200m[mask_in_mod_R200m]))
-#print(rmse_norm(ecc, ecc_model))
-#print(rmse_norm(per, per_model))
-
 def width_of_68(x_array):
     onesigp = 84.13
     onesigm = 15.87
+    #
+    upper = np.percentile(x_array, onesigp)
+    lower = np.percentile(x_array, onesigm)
+    #
+    #return (upper-lower, (upper-lower)/2)
+    return upper-lower
+
+def width_of_95(x_array):
+    onesigp = 97.72
+    onesigm = 2.28
     #
     upper = np.percentile(x_array, onesigp)
     lower = np.percentile(x_array, onesigm)
