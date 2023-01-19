@@ -39,6 +39,7 @@ print('Set paths')
 summary = summary_io.SummaryDataSort()
 summary_plot = summary_io.SummaryDataPlot()
 data_total = summary.data_read(directory=sim_data.home_dir, hosts='all_no_r', sim_type='baryon')
+data_mp = summary.data_read_mass_profile(directory=sim_data.home_dir, hosts='all_no_r')
 masks_infall = summary.data_mask(data_total, peri_sim=False, peri_model=False, hosts='all_no_r')
 masks_infall_peri = summary.data_mask(data_total, peri_sim=True, peri_model=False, hosts='all_no_r')
 masks_infall_apo = summary.data_mask_apo(data_total, hosts='all_no_r')
@@ -50,198 +51,9 @@ masks_infall_apo['m12f'][59] = False
 directory = sim_data.home_dir+'/orbit_data/plots/summary/paper_2'
 
 
-"""
-    Figure 1: Host M200m and R200m
-"""
-t90_values = np.array([1.27, 0.98, 1.19, 1.45, 1.49, 0.92, 0.55, 2.13, 1.57, 1.08, 1.52, 1.38, 1.89])
-t_in_sim = summary.first_infall(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
-
-masses = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
-radii = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
-i = 0
-for name in summary.host_names['all_no_r']:
-    mask = (data_total[name]['host.mass'] != -1)*np.isfinite(data_total[name]['host.mass'])
-    masses[i][:np.sum(mask)] = data_total[name]['host.mass'][mask]
-    radii[i][:np.sum(mask)] = data_total[name]['host.radius'][mask]
-    i += 1
-#
-lookback = data_total['m12b']['time.sim'][-1]-np.flip(data_total['m12b']['time.sim'])
-#
-masses_norm = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
-radii_norm = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
-for i in range(0, masses.shape[0]):
-    mask = (masses[i] != -1)
-    masses_norm[i][mask] = masses[i][mask]/masses[i][0]
-    radii_norm[i][mask] = radii[i][mask]/radii[i][0]
-
-binedges = None
-binsize = 0.1
-limits=((13.5, 0),None)
-#
-x = [lookback, lookback, lookback, lookback]
-y = [masses, masses_norm, radii, radii_norm]
-#
-medians = []
-lowers = []
-uppers = []
-lowests = []
-highests = []
-binss = []
-half_bins = []
-#
-for j in range(0, len(x)):
-    #
-    if binedges:
-        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
-        bins = np.linspace(binedges[0], binedges[1], bin_num)
-        half_bin = (bins[1]-bins[0])/2
-    else:
-        minn = binsize*np.floor(np.min(x[j])/binsize)
-        maxx = binsize*np.ceil(np.max(x[j])/binsize)
-        if minn < 0:
-            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
-        else:
-            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
-        bins = np.linspace(minn, maxx, bin_num)
-        half_bin = (bins[1]-bins[0])/2
-    #
-    onesigp = 84.13
-    onesigm = 15.87
-    twosigp = 100
-    twosigm = 0
-    #
-    med = np.zeros(len(bins)-1)
-    lower = np.zeros(len(bins)-1)
-    upper = np.zeros(len(bins)-1)
-    lowest = np.zeros(len(bins)-1)
-    highest = np.zeros(len(bins)-1)
-    #
-    for i in range(0, len(bins)-1):
-        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
-        temp_med = []
-        for k in range(0, y[j].shape[0]):
-            mask2 = (y[j][k] != -1)
-            temp_med.append(y[j][k][mask*mask2])
-        med[i] = np.nanmedian(np.hstack(temp_med))
-        upper[i] = np.nanpercentile(np.hstack(temp_med), onesigp)
-        lower[i] = np.nanpercentile(np.hstack(temp_med), onesigm)
-        highest[i] = np.nanpercentile(np.hstack(temp_med), twosigp)
-        lowest[i] = np.nanpercentile(np.hstack(temp_med), twosigm)
-    medians.append(med)
-    lowers.append(lower)
-    uppers.append(upper)
-    lowests.append(lowest)
-    highests.append(highest)
-    binss.append(bins)
-    half_bins.append(half_bin)
-#
-# PLOTTING
-plt.rcParams["font.family"] = "serif"
-f, axs = plt.subplots(1, 2, figsize=(20,8))
-# Plot the scatter for the recent and minimum pericenters
-axs[0].fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color='g', alpha=0.3)
-axs[0].fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color='g', alpha=0.15)
-axs[0].plot(binss[1][:-1]+half_bins[1], medians[1], 'k', alpha=0.5, lw=4)
-#
-onesigp = 84.13
-onesigm = 15.87
-sigma_one_op = np.nanpercentile(t_in_sim, onesigp)
-sigma_one_om = np.nanpercentile(t_in_sim, onesigm)
-axs[0].scatter(np.median(t_in_sim), 1, s=150, c='k', marker='s', label='Satellite infall times')
-axs[0].errorbar(np.median(t_in_sim), 1, xerr=np.array([[np.median(t_in_sim)-sigma_one_om],[sigma_one_op-np.median(t_in_sim)]]), color='k', lw=3, capsize=0, alpha=0.7)
-#axs[0].fill_between(x=(5.1, 7.8), y1=0.945, y2=0.955, color='b', label='Santistevan+20')
-#axs[0].fill_between(x=(0.55,2.13), y1=0.995, y2=1.005, color='r', label='Gandhi+22')
-#
-axis_y2_label = 'Median $M_{\\rm 200m}(t_{\\rm lb}) \ [10^{11} M_{\\odot}]$'
-axis_y2_tick_labels = ['14', '12', '10', '8', '6', '4', '2', '0']
-axis_y2_tick_values = [float(v) for v in axis_y2_tick_labels]
-axis_y2_tick_locations = [1.061, 0.9094, 0.7578, 0.6063, 0.4547, 0.3031, 0.1516, 0.0]
-axis_y2_minor_tick_locations = [1.06097825, 1.02308617, 0.98519409, 0.94730201, 0.90940993, 0.87151785, 0.83362577, 0.79573369, 0.7578416 , 0.71994952, 0.68205744, 0.64416536, 0.60627328, 0.5683812 , 0.53048912, 0.49259704, 0.45470496, 0.41681288, 0.3789208 , 0.34102872, 0.30313664, 0.26524456, 0.22735248, 0.1894604 , 0.15156832, 0.11367624, 0.07578416, 0.03789208, 0.]
-#axis_y2_minor_tick_locations = np.arange(0, 1.4, 0.05)[1::2]
-axy2 = axs[0].twinx()
-axy2.set_xscale('linear')
-axy2.set_yscale('linear')
-axy2.set_yticks(axis_y2_tick_locations)
-axy2.set_yticks(axis_y2_minor_tick_locations, minor=True)
-axy2.set_yticklabels(axis_y2_tick_labels, fontsize=22)
-axy2.set_ylabel(axis_y2_label, fontsize=30, labelpad=9)
-axy2.tick_params(pad=3)
-#
-cc = ut.cosmology.CosmologyClass()
-red = np.array([0, 1])
-cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
-#
-axis_z_label = 'redshift'
-axis_z_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
-axis_z_tick_values = [float(v) for v in axis_z_tick_labels]
-axis_z_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_z_tick_values)
-axz = axs[0].twiny()
-axz.set_xscale('linear')
-axz.set_yscale('linear')
-axz.set_xticks(axis_z_tick_locations)
-axz.set_xticklabels(axis_z_tick_labels, fontsize=22)
-axz.set_xlim(13.5,0)
-axz.set_xlabel(axis_z_label, fontsize=30, labelpad=9)
-axz.tick_params(pad=3)
-#
-axs[1].fill_between(binss[3][:-1]+half_bins[3], uppers[3], lowers[3], color='g', alpha=0.3)
-axs[1].fill_between(binss[3][:-1]+half_bins[3], highests[3], lowests[3], color='g', alpha=0.15)
-axs[1].plot(binss[3][:-1]+half_bins[3], medians[3], 'k', alpha=0.5, lw=4)
-axs[1].scatter(np.median(t_in_sim), 0.95, s=150, c='k', marker='s')
-axs[1].errorbar(np.median(t_in_sim), 0.95, xerr=np.array([[np.median(t_in_sim)-sigma_one_om],[sigma_one_op-np.median(t_in_sim)]]), color='k', lw=3, capsize=0, alpha=0.7)
-#
-axis2_y2_label = 'Median $R_{\\rm 200m}(t_{\\rm lb}) \ [\\rm kpc]$'
-axis2_y2_tick_labels = ['400', '300', '200', '100', '0']
-axis2_y2_tick_locations = [1.022, 0.767, 0.511, 0.256, 0.0]
-axis2_y2_minor_tick_locations = [1.02214915, 0.95826483, 0.89438051, 0.83049619, 0.76661186, 0.70272754, 0.63884322, 0.5749589 , 0.51107458, 0.44719025, 0.38330593, 0.31942161, 0.25553729, 0.19165297, 0.12776864, 0.06388432, 0.        ]
-ax2y2 = axs[1].twinx()
-ax2y2.set_xscale('linear')
-ax2y2.set_yscale('linear')
-ax2y2.set_yticks(axis2_y2_tick_locations)
-ax2y2.set_yticks(axis2_y2_minor_tick_locations, minor=True)
-ax2y2.set_yticklabels(axis2_y2_tick_labels, fontsize=22)
-ax2y2.set_ylabel(axis2_y2_label, fontsize=30, labelpad=9)
-ax2y2.tick_params(pad=3)
-#
-axis2_z_label = 'redshift'
-axis2_z_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.2', '0.1', '0']
-axis2_z_tick_values = [float(v) for v in axis2_z_tick_labels]
-axis2_z_tick_locations = cc.convert_time('time.lookback', 'redshift', axis2_z_tick_values)
-ax2z = axs[1].twiny()
-ax2z.set_xscale('linear')
-ax2z.set_yscale('linear')
-ax2z.set_xticks(axis2_z_tick_locations)
-ax2z.set_xticklabels(axis2_z_tick_labels, fontsize=22)
-ax2z.set_xlim(13.5,0)
-ax2z.set_xlabel(axis2_z_label, fontsize=30, labelpad=9)
-ax2z.tick_params(pad=3)
-#
-axs[0].set_xlim(13.5,0)
-axs[0].set_ylim(0, 1.061)
-axs[1].set_xlim(13.5,0)
-axs[1].set_ylim(0, 1.022)
-#
-axs[0].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=22, labelbottom=True)
-axs[1].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=22, labelbottom=True)
-#
-axs[0].set_ylabel('$M_{\\rm 200m}(t_{\\rm lb})\ /\ M_{\\rm 200m}(t_{\\rm lb}=0)$', fontsize=30)
-axs[0].get_yaxis().set_label_coords(-0.1,0.5)
-axs[1].set_ylabel('$R_{\\rm 200m}(t_{\\rm lb})\ /\ R_{\\rm 200m}(t_{\\rm lb}=0)$', fontsize=30)
-axs[1].get_yaxis().set_label_coords(-0.1,0.5)
-#
-axs[0].set_xlabel('Lookback Time [Gyr]', fontsize=30)
-axs[1].set_xlabel('Lookback Time [Gyr]', fontsize=30)
-axs[0].legend(prop={'size': 20}, loc='lower right')
-#
-plt.tight_layout()
-plt.subplots_adjust(wspace=0.4, hspace=0)
-plt.savefig(directory+'/host_properties.pdf')
-plt.close()
-
-
 
 """
-    Figure 2:
+    Figure 1:
         Mass profile ratio vs lookback time
 """
 # Read in the data
@@ -358,6 +170,197 @@ ax1.tick_params(axis='both', which='both', bottom=True, top=False, labelsize=26)
 ax1.legend(prop={'size': 24}, loc='lower right')
 plt.tight_layout()
 plt.savefig(directory+'/mass_profile_evolution_enclosed.pdf')
+plt.close()
+
+
+
+"""
+    Figure 2: Host M200m and R200m
+"""
+t90_values = np.array([1.27, 0.98, 1.19, 1.45, 1.49, 0.92, 0.55, 2.13, 1.57, 1.08, 1.52, 1.38, 1.89])
+t_in_sim = summary.first_infall(data_total, masks_infall, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+
+masses = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
+radii = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
+i = 0
+for name in summary.host_names['all_no_r']:
+    mask = (data_total[name]['host.mass'] != -1)*np.isfinite(data_total[name]['host.mass'])
+    masses[i][:np.sum(mask)] = data_total[name]['host.mass'][mask]
+    radii[i][:np.sum(mask)] = data_total[name]['host.radius'][mask]
+    i += 1
+#
+lookback = data_total['m12b']['time.sim'][-1]-np.flip(data_total['m12b']['time.sim'])
+#
+masses_norm = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
+radii_norm = (-1)*np.ones((len(data_total), len(data_total['m12b']['time.sim'])))
+for i in range(0, masses.shape[0]):
+    mask = (masses[i] != -1)
+    masses_norm[i][mask] = masses[i][mask]/masses[i][0]
+    radii_norm[i][mask] = radii[i][mask]/radii[i][0]
+
+binedges = None
+binsize = 0.1
+limits=((13.5, 0),None)
+#
+x = [lookback, lookback, lookback, lookback]
+y = [masses, masses_norm, radii, radii_norm]
+#
+medians = []
+lowers = []
+uppers = []
+lowests = []
+highests = []
+binss = []
+half_bins = []
+#
+for j in range(0, len(x)):
+    #
+    if binedges:
+        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
+        bins = np.linspace(binedges[0], binedges[1], bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    else:
+        minn = binsize*np.floor(np.min(x[j])/binsize)
+        maxx = binsize*np.ceil(np.max(x[j])/binsize)
+        if minn < 0:
+            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+        else:
+            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+        bins = np.linspace(minn, maxx, bin_num)
+        half_bin = (bins[1]-bins[0])/2
+    #
+    onesigp = 84.13
+    onesigm = 15.87
+    twosigp = 100
+    twosigm = 0
+    #
+    med = np.zeros(len(bins)-1)
+    lower = np.zeros(len(bins)-1)
+    upper = np.zeros(len(bins)-1)
+    lowest = np.zeros(len(bins)-1)
+    highest = np.zeros(len(bins)-1)
+    #
+    for i in range(0, len(bins)-1):
+        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
+        temp_med = []
+        for k in range(0, y[j].shape[0]):
+            mask2 = (y[j][k] != -1)
+            temp_med.append(y[j][k][mask*mask2])
+        med[i] = np.nanmedian(np.hstack(temp_med))
+        upper[i] = np.nanpercentile(np.hstack(temp_med), onesigp)
+        lower[i] = np.nanpercentile(np.hstack(temp_med), onesigm)
+        highest[i] = np.nanpercentile(np.hstack(temp_med), twosigp)
+        lowest[i] = np.nanpercentile(np.hstack(temp_med), twosigm)
+    medians.append(med)
+    lowers.append(lower)
+    uppers.append(upper)
+    lowests.append(lowest)
+    highests.append(highest)
+    binss.append(bins)
+    half_bins.append(half_bin)
+#
+# PLOTTING
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 2, figsize=(20,8))
+# Plot the scatter for the recent and minimum pericenters
+axs[0].fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color='g', alpha=0.3, zorder=-98)
+axs[0].fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color='g', alpha=0.15, zorder=-99)
+axs[0].plot(binss[1][:-1]+half_bins[1], medians[1], 'k', alpha=0.5, lw=4, zorder=-100)
+#
+onesigp = 84.13
+onesigm = 15.87
+sigma_one_op = np.nanpercentile(t_in_sim, onesigp)
+sigma_one_om = np.nanpercentile(t_in_sim, onesigm)
+axs[0].vlines(np.median(t_in_sim), 0, 1.06, color='k', alpha=0.2, label='Satellite infall times', zorder=100)
+axs[0].axvspan(sigma_one_om, sigma_one_op, alpha=0.15, color='k', zorder=100)
+#axs[0].errorbar(np.median(t_in_sim), 1, xerr=np.array([[np.median(t_in_sim)-sigma_one_om],[sigma_one_op-np.median(t_in_sim)]]), color='k', lw=3, capsize=0, alpha=0.7)
+#axs[0].fill_between(x=(5.1, 7.8), y1=0.945, y2=0.955, color='b', label='Santistevan+20')
+#axs[0].fill_between(x=(0.55,2.13), y1=0.995, y2=1.005, color='r', label='Gandhi+22')
+#
+axis_y2_label = 'Median $M_{\\rm 200m}(t_{\\rm lb}) \ [10^{11} M_{\\odot}]$'
+axis_y2_tick_labels = ['14', '12', '10', '8', '6', '4', '2', '0']
+axis_y2_tick_values = [float(v) for v in axis_y2_tick_labels]
+axis_y2_tick_locations = [1.061, 0.9094, 0.7578, 0.6063, 0.4547, 0.3031, 0.1516, 0.0]
+axis_y2_minor_tick_locations = [1.06097825, 1.02308617, 0.98519409, 0.94730201, 0.90940993, 0.87151785, 0.83362577, 0.79573369, 0.7578416 , 0.71994952, 0.68205744, 0.64416536, 0.60627328, 0.5683812 , 0.53048912, 0.49259704, 0.45470496, 0.41681288, 0.3789208 , 0.34102872, 0.30313664, 0.26524456, 0.22735248, 0.1894604 , 0.15156832, 0.11367624, 0.07578416, 0.03789208, 0.]
+#axis_y2_minor_tick_locations = np.arange(0, 1.4, 0.05)[1::2]
+axy2 = axs[0].twinx()
+axy2.set_xscale('linear')
+axy2.set_yscale('linear')
+axy2.set_yticks(axis_y2_tick_locations)
+axy2.set_yticks(axis_y2_minor_tick_locations, minor=True)
+axy2.set_yticklabels(axis_y2_tick_labels, fontsize=22)
+axy2.set_ylabel(axis_y2_label, fontsize=30, labelpad=9)
+axy2.tick_params(pad=3)
+#
+cc = ut.cosmology.CosmologyClass()
+red = np.array([0, 1])
+cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+#
+axis_z_label = 'redshift'
+axis_z_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.1', '0']
+axis_z_tick_values = [float(v) for v in axis_z_tick_labels]
+axis_z_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_z_tick_values)
+axz = axs[0].twiny()
+axz.set_xscale('linear')
+axz.set_yscale('linear')
+axz.set_xticks(axis_z_tick_locations)
+axz.set_xticklabels(axis_z_tick_labels, fontsize=22)
+axz.set_xlim(13.5,0)
+axz.set_xlabel(axis_z_label, fontsize=30, labelpad=9)
+axz.tick_params(pad=3)
+#
+axs[1].fill_between(binss[3][:-1]+half_bins[3], uppers[3], lowers[3], color='g', alpha=0.3)
+axs[1].fill_between(binss[3][:-1]+half_bins[3], highests[3], lowests[3], color='g', alpha=0.15)
+axs[1].plot(binss[3][:-1]+half_bins[3], medians[3], 'k', alpha=0.5, lw=4)
+axs[1].vlines(np.median(t_in_sim), 0, 1.02, color='k', alpha=0.2, label='Satellite infall times', zorder=100)
+axs[1].axvspan(sigma_one_om, sigma_one_op, alpha=0.15, color='k', zorder=100)
+#
+axis2_y2_label = 'Median $R_{\\rm 200m}(t_{\\rm lb}) \ [\\rm kpc]$'
+axis2_y2_tick_labels = ['400', '300', '200', '100', '0']
+axis2_y2_tick_locations = [1.022, 0.767, 0.511, 0.256, 0.0]
+axis2_y2_minor_tick_locations = [1.02214915, 0.95826483, 0.89438051, 0.83049619, 0.76661186, 0.70272754, 0.63884322, 0.5749589 , 0.51107458, 0.44719025, 0.38330593, 0.31942161, 0.25553729, 0.19165297, 0.12776864, 0.06388432, 0.        ]
+ax2y2 = axs[1].twinx()
+ax2y2.set_xscale('linear')
+ax2y2.set_yscale('linear')
+ax2y2.set_yticks(axis2_y2_tick_locations)
+ax2y2.set_yticks(axis2_y2_minor_tick_locations, minor=True)
+ax2y2.set_yticklabels(axis2_y2_tick_labels, fontsize=22)
+ax2y2.set_ylabel(axis2_y2_label, fontsize=30, labelpad=9)
+ax2y2.tick_params(pad=3)
+#
+axis2_z_label = 'redshift'
+axis2_z_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.1', '0']
+axis2_z_tick_values = [float(v) for v in axis2_z_tick_labels]
+axis2_z_tick_locations = cc.convert_time('time.lookback', 'redshift', axis2_z_tick_values)
+ax2z = axs[1].twiny()
+ax2z.set_xscale('linear')
+ax2z.set_yscale('linear')
+ax2z.set_xticks(axis2_z_tick_locations)
+ax2z.set_xticklabels(axis2_z_tick_labels, fontsize=22)
+ax2z.set_xlim(13.5,0)
+ax2z.set_xlabel(axis2_z_label, fontsize=30, labelpad=9)
+ax2z.tick_params(pad=3)
+#
+axs[0].set_xlim(13.5,0)
+axs[0].set_ylim(0, 1.061)
+axs[1].set_xlim(13.5,0)
+axs[1].set_ylim(0, 1.022)
+#
+axs[0].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=22, labelbottom=True)
+axs[1].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=22, labelbottom=True)
+#
+axs[0].set_ylabel('$M_{\\rm 200m}(t_{\\rm lb})\ /\ M_{\\rm 200m}(t_{\\rm lb}=0)$', fontsize=30)
+axs[0].get_yaxis().set_label_coords(-0.1,0.5)
+axs[1].set_ylabel('$R_{\\rm 200m}(t_{\\rm lb})\ /\ R_{\\rm 200m}(t_{\\rm lb}=0)$', fontsize=30)
+axs[1].get_yaxis().set_label_coords(-0.1,0.5)
+#
+axs[0].set_xlabel('Lookback Time [Gyr]', fontsize=30)
+axs[1].set_xlabel('Lookback Time [Gyr]', fontsize=30)
+axs[0].legend(prop={'size': 20}, loc='lower right')
+#
+plt.tight_layout()
+plt.subplots_adjust(wspace=0.4, hspace=0)
+plt.savefig(directory+'/host_properties.pdf')
 plt.close()
 
 
@@ -557,6 +560,130 @@ plt.close()
 
 
 """
+    Figure X:
+        Energy trends
+"""
+data = summary.data_read_potential_full(directory=sim_data.home_dir, hosts='all_energy_new')
+snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/m12i_res7100')
+t_in_sim = summary.first_infall(data_total, masks_infall, selection='sim', oversample=True, hosts='all_energy_new', sim_type='baryon')
+sub_energy = summary.energies(data_total, masks_infall, data, data_mp, snaps, oversample=True, hosts='all_energy_new')
+#
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 3, figsize=(30,10))
+#
+xs = [t_in_sim]
+ys = [(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['E.vir'])]
+#
+xtypes = ['t.infall.text']
+ytypes = ['E.tot']
+peri_d_colors = ['#01033C']
+#
+binsize = 1
+limits = ((0,13.5),(-3.9, 0.4))
+#
+axs[0].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
+for i in range(0, len(xs)):
+    binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=binsize)
+    med, upper, lower, highest, lowest = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
+    axs[0].fill_between(binss[:-1]+half_binss, upper, lower, color=peri_d_colors[i], alpha=0.5)
+    axs[0].fill_between(binss[:-1]+half_binss, highest, lowest, color=peri_d_colors[i], alpha=0.3)
+    #
+    # Plot the medians for the two mass bins (low-mass)
+    axs[0].plot(binss[:-1]+half_binss, med, color=peri_d_colors[i], markersize=10, alpha=0.7)
+    #
+    axs[0].set_xlim(limits[0])
+    axs[0].set_ylim(limits[1])
+#
+cc = ut.cosmology.CosmologyClass()
+red = np.array([0, 1])
+cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+#
+axis_z_label = 'redshift'
+axis_z_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.1', '0']
+axis_z_tick_values = [float(v) for v in axis_z_tick_labels]
+axis_z_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_z_tick_values)
+axz = axs[0].twiny()
+axz.set_xscale('linear')
+axz.set_yscale('linear')
+axz.set_xticks(axis_z_tick_locations)
+axz.set_xticklabels(axis_z_tick_labels, fontsize=26)
+axz.set_xlim(0,13)
+axz.set_xlabel(axis_z_label, fontsize=30, labelpad=9)
+axz.tick_params(pad=3)
+#
+sub_energy = summary.energies(data_total, masks_infall, data, data_mp, snaps, oversample=True, hosts='all_energy_new')
+Mstar_z0 = summary.mstar(data_total, masks_infall, selection='z0', oversample=True, hosts='all_energy_new', sim_type='baryon')
+dz0_tot = summary.d_z0(data_total, masks_infall, oversample=True, hosts='all_energy_new', sim_type='baryon')
+xs = [dz0_tot]
+ys = [(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['E.vir'])]
+#
+xtypes = ['d.z0']
+ytypes = ['E.tot']
+#
+binsize = 50
+limits = ((0,400),(-3.9, 0.4))
+#
+axs[1].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
+for i in range(0, len(xs)):
+    binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=binsize)
+    med, upper, lower, highest, lowest = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
+    axs[1].fill_between(binss[:-1]+half_binss, upper, lower, color=peri_d_colors[i], alpha=0.5)
+    axs[1].fill_between(binss[:-1]+half_binss, highest, lowest, color=peri_d_colors[i], alpha=0.3)
+    #
+    # Plot the medians for the two mass bins (low-mass)
+    axs[1].plot(binss[:-1]+half_binss, med, color=peri_d_colors[i], markersize=10, alpha=0.7)
+    #
+    axs[1].set_xlim(limits[0][0], limits[0][1])
+    axs[1].set_ylim(limits[1])
+#
+xs = [Mstar_z0]
+ys = [(sub_energy['energy.z0']-sub_energy['energy.infall'])/np.abs(sub_energy['E.vir'])]
+#
+xtypes = ['M.star.z0']
+ytypes = ['E.tot']
+#
+binsize = 0.5
+limits = ((4,9.5),(-2.9,0.4))
+#
+axs[2].hlines(y=0, xmin=10**limits[0][0], xmax=10**limits[0][1], linestyle='dotted', color='k', alpha=0.5)
+for i in range(0, len(xs)):
+    binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=binsize)
+    med, upper, lower, highest, lowest = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
+    axs[2].fill_between(10**(binss[:-1]+half_binss), upper, lower, color=peri_d_colors[i], alpha=0.5)
+    axs[2].fill_between(10**(binss[:-1]+half_binss), highest, lowest, color=peri_d_colors[i], alpha=0.3)
+    #
+    # Plot the medians for the two mass bins (low-mass)
+    axs[2].plot(10**(binss[:-1]+half_binss), med, color=peri_d_colors[i], markersize=10, alpha=0.7)
+    #
+    axs[2].set_xlim(10**(limits[0][0]), 10**(limits[0][1]))
+    axs[2].set_ylim(limits[1])
+    axs[2].set_xscale('log')
+#
+axs[0].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=28, labelbottom=True)
+axs[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=True)
+axs[2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=True)
+#
+axs[0].set_ylabel('($E_{\\rm z=0}$ -  $E_{\\rm infall}$) / |$E_{\\rm 200m,z=0}$|', fontsize=36)
+axs[0].get_yaxis().set_label_coords(-0.12,0.5)
+axs[1].set_ylabel(' ', fontsize=26)
+axs[1].get_yaxis().set_label_coords(-0.12,0.5)
+axs[2].set_ylabel(' ', fontsize=26)
+axs[2].get_yaxis().set_label_coords(-0.12,0.5)
+#
+axs[0].set_xlabel('Infall Lookback Time [Gyr]', fontsize=36)
+axs[1].set_xlabel('Host distance, $r$ [kpc]', fontsize=36)
+axs[2].set_xlabel('$M_{\\rm star} [M_{\\odot}]$', fontsize=36)
+#
+plt.tight_layout()
+plt.subplots_adjust(wspace=0.12, hspace=0)
+#plt.show()
+plt.savefig(directory+'/energy_vs_property.pdf')
+plt.close()
+
+
+
+
+"""
     Figure 5:
         Satellite orbits
 """
@@ -591,6 +718,10 @@ halo_ids = [28-1, 49-1, 49-1, 68-1] # 11%, 40%, 51%, 95%
 hosts = ['m12w', 'm12f', 'Romeo', 'Louise']
 
 # First column
+cc = ut.cosmology.CosmologyClass()
+red = np.array([0, 1])
+cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+#
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(4, 4, figsize=(32,22))
 #
@@ -655,6 +786,19 @@ for i in range(0, len(halo_ids)):
     # Set the labels and save the figure
     axs[0,i].label_outer()
     #
+    axis_z_label = 'redshift'
+    axis_z_tick_labels = ['6', '3', '2', '1', '0.6', '0.3', '0.1', '0']
+    axis_z_tick_values = [float(v) for v in axis_z_tick_labels]
+    axis_z_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_z_tick_values)
+    axz = axs[0,i].twiny()
+    axz.set_xscale('linear')
+    axz.set_yscale('linear')
+    axz.set_xticks(axis_z_tick_locations)
+    axz.set_xticklabels(axis_z_tick_labels, fontsize=28)
+    axz.set_xlim(13.7,0)
+    axz.set_xlabel(axis_z_label, fontsize=28, labelpad=9)
+    axz.tick_params(pad=3)
+    #
     # Plot the velocity
     axs[1,i].plot(times, v_sim, 'k')
     axs[1,i].plot(-1*times_model, v_model, alpha=0.5)
@@ -672,9 +816,9 @@ for i in range(0, len(halo_ids)):
     #
     # Plot the angular momentum
     E_vir = (6.67*10**(-11)*2*10**(30))/(1000**3*3.086*10**(16))*data_total[hosts[i]]['host.mass'][0]/data_total[hosts[i]]['host.radius'][0]
-    L_vir = np.sqrt(E_vir)*data_total[hosts[i]]['host.radius'][0]
-    axs[2,i].plot(times, L_sim/L_vir, 'k')
-    axs[2,i].plot(-1*times_model, L_model/L_vir, alpha=0.5)
+    #L_vir = np.sqrt(E_vir)*data_total[hosts[i]]['host.radius'][0]
+    axs[2,i].plot(times, L_sim/L_sim[0], 'k')
+    axs[2,i].plot(-1*times_model, L_model/L_model[0], alpha=0.5)
     #
     if infall:
         infall_time = data_total[hosts[i]]['first.infall.time.lb'][halo_ids[i]]
@@ -695,8 +839,8 @@ for i in range(0, len(halo_ids)):
     #axs[3,i].plot(t_E_model, (E_model-E_model[0])/1e4, alpha=0.5)
     #
     E_vir = (6.67*10**(-11)*2*10**(30))/(1000**3*3.086*10**(16))*data_total[hosts[i]]['host.mass'][0]/data_total[hosts[i]]['host.radius'][0]
-    axs[3,i].plot(t_E, (E_sim-E_sim[0])/E_vir, 'k')
-    axs[3,i].plot(t_E_model, (E_model-E_model[0])/E_vir, alpha=0.5)
+    axs[3,i].plot(t_E, (E_sim[0]-E_sim)/E_vir, 'k')
+    axs[3,i].plot(t_E_model, (E_model[0]-E_model)/E_vir, alpha=0.5)
     #
     if infall:
         infall_time = data_total[hosts[i]]['first.infall.time.lb'][halo_ids[i]]
@@ -709,22 +853,22 @@ for i in range(0, len(halo_ids)):
     # Set the labels and save the figure
     axs[3,i].label_outer()
     #
-axs[0,0].set_xlim(13.8,0)
-axs[1,0].set_xlim(13.8,0)
-axs[2,0].set_xlim(13.8,0)
-axs[3,0].set_xlim(13.8,0)
-axs[0,1].set_xlim(13.8,0)
-axs[1,1].set_xlim(13.8,0)
-axs[2,1].set_xlim(13.8,0)
-axs[3,1].set_xlim(13.8,0)
-axs[0,2].set_xlim(13.8,0)
-axs[1,2].set_xlim(13.8,0)
-axs[2,2].set_xlim(13.8,0)
-axs[3,2].set_xlim(13.8,0)
-axs[0,3].set_xlim(13.8,0)
-axs[1,3].set_xlim(13.8,0)
-axs[2,3].set_xlim(13.8,0)
-axs[3,3].set_xlim(13.8,0)
+axs[0,0].set_xlim(13.7,0)
+axs[1,0].set_xlim(13.7,0)
+axs[2,0].set_xlim(13.7,0)
+axs[3,0].set_xlim(13.7,0)
+axs[0,1].set_xlim(13.7,0)
+axs[1,1].set_xlim(13.7,0)
+axs[2,1].set_xlim(13.7,0)
+axs[3,1].set_xlim(13.7,0)
+axs[0,2].set_xlim(13.7,0)
+axs[1,2].set_xlim(13.7,0)
+axs[2,2].set_xlim(13.7,0)
+axs[3,2].set_xlim(13.7,0)
+axs[0,3].set_xlim(13.7,0)
+axs[1,3].set_xlim(13.7,0)
+axs[2,3].set_xlim(13.7,0)
+axs[3,3].set_xlim(13.7,0)
 #
 axs[0,0].set_ylim(0,450)
 axs[0,1].set_ylim(0,330)
@@ -734,14 +878,14 @@ axs[1,0].set_ylim(0,330)
 axs[1,1].set_ylim(0,430)
 axs[1,2].set_ylim(0,430)
 axs[1,3].set_ylim(0,340)
-axs[2,0].set_ylim(-0.1,0.9)
-axs[2,1].set_ylim(-0.10,0.59)
-axs[2,2].set_ylim(-0.1,0.9)
-axs[2,3].set_ylim(-0.10,0.59)
-axs[3,0].set_ylim(-1,3.9)
-axs[3,1].set_ylim(-1,3.9)
-axs[3,2].set_ylim(-1,7.9)
-axs[3,3].set_ylim(-1,2.9)
+axs[2,0].set_ylim(-0.1,1.9)
+axs[2,1].set_ylim(-0.1,2.2)
+axs[2,2].set_ylim(-0.1,2.25)
+axs[2,3].set_ylim(-0.1,1.1)
+#axs[3,0].set_ylim(-1,3.9)
+#axs[3,1].set_ylim(-1,3.9)
+#axs[3,2].set_ylim(-1,7.9)
+#axs[3,3].set_ylim(-1,2.9)
 #
 axs[0,0].legend(prop={'size': 24}, loc='upper right', framealpha=1)
 axs[0,1].legend(prop={'size': 24}, loc='upper right', framealpha=1)
@@ -779,10 +923,10 @@ axs[0,0].get_yaxis().set_label_coords(-0.13,0.5)
 axs[1,0].set_ylabel('Total Velocity [km s$^{-1}$]', fontsize=26)
 axs[1,0].get_yaxis().set_label_coords(-0.13,0.5)
 #axs[2,0].set_ylabel('$\\ell$ [10$^4$ kpc km s$^{-1}$]', fontsize=26)
-axs[2,0].set_ylabel('$\\ell/L_{\\rm vir}$', fontsize=26)
+axs[2,0].set_ylabel('$\\ell(t_{\\rm lb}) \ / \ \\ell(t_{\\rm lb}=0)$', fontsize=26)
 axs[2,0].get_yaxis().set_label_coords(-0.13,0.5)
 #axs[3,0].set_ylabel('$E(t_{\\rm lb}) - E(0)$ [10$^4$ km$^2$ s$^2$]', fontsize=26)
-axs[3,0].set_ylabel('[$E(t_{\\rm lb}) - E(0)]/E_{\\rm host,vir}$', fontsize=26)
+axs[3,0].set_ylabel('[$E(t_{\\rm lb}=0) - E(t_{\\rm lb})] \ / \ E_{\\rm R200m,z=0}$', fontsize=26)
 axs[3,0].get_yaxis().set_label_coords(-0.13,0.5)
 #
 r1 = mpatches.Rectangle(xy=(12.9,375),width=-1.35,height=55, color='k', alpha=0.2)
@@ -904,6 +1048,134 @@ plt.tight_layout()
 plt.subplots_adjust(wspace=0.12, hspace=0)
 #plt.show()
 plt.savefig(directory+'/infall_vs_property.pdf')
+
+
+
+"""
+    Figure X:
+        da/dr plots
+            - Takes a long fucking time
+"""
+data_mp = summary.data_read_mass_profile(directory=sim_data.home_dir, hosts='all_no_r')
+data_dadr = summary.data_read_dadr(mass_profile=data_mp, hosts='all_no_r')
+#
+dadr_max = summary.da_dr(data_total, masks_infall_peri, data_mp, data_dadr, selection='sim', oversample=True, hosts='all_no_r')
+dadr_max_mod = summary.da_dr(data_total, masks_infall_peri, data_mp, data_dadr, selection='model', oversample=True, hosts='all_no_r')
+t_in_sim = summary.first_infall(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all_no_r', sim_type='baryon')
+dz0_tot = summary.d_z0(data_total, masks_infall_peri, oversample=True, hosts='all_no_r', sim_type='baryon')
+#
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 3, figsize=(30,10))
+binedges = None
+binsize = 1
+limits=((0,13.7),(-1,1))
+#
+xs = [t_in_sim]
+ys = [(dadr_max_mod['dadr']-dadr_max['dadr'])/dadr_max['dadr']]
+#
+xtypes = ['t.infall.text']
+ytypes = ['dadr.frac']
+#
+peri_d_colors = ['#8B0000']
+#
+axs[0].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
+for i in range(0, len(xs)):
+    binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=binsize)
+    med, upper, lower, highest, lowest = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
+    axs[0].fill_between(binss[:-1]+half_binss, upper, lower, color=peri_d_colors[i], alpha=0.5)
+    axs[0].fill_between(binss[:-1]+half_binss, highest, lowest, color=peri_d_colors[i], alpha=0.3)
+    #
+    # Plot the medians for the two mass bins (low-mass)
+    axs[0].plot(binss[:-1]+half_binss, med, color=peri_d_colors[i], markersize=10, alpha=0.7)
+    #
+    axs[0].set_xlim(limits[0])
+    axs[0].set_ylim(limits[1])
+#
+cc = ut.cosmology.CosmologyClass()
+red = np.array([0, 1])
+cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+#
+axis_z_label = 'redshift'
+axis_z_tick_labels = ['6', '3', '2', '1', '0.6', '0.3', '0.1', '0']
+axis_z_tick_values = [float(v) for v in axis_z_tick_labels]
+axis_z_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_z_tick_values)
+axz = axs[0].twiny()
+axz.set_xscale('linear')
+axz.set_yscale('linear')
+axz.set_xticks(axis_z_tick_locations)
+axz.set_xticklabels(axis_z_tick_labels, fontsize=28)
+axz.set_xlim(0,13)
+axz.set_xlabel(axis_z_label, fontsize=36, labelpad=9)
+axz.tick_params(pad=3)
+#
+binedges = None
+binsize = 50
+limits=((0,400),(-1,1.5))
+#
+xs = [dz0_tot]
+ys = [(dadr_max_mod['dadr']-dadr_max['dadr'])/dadr_max['dadr']]
+#
+xtypes = ['d.z0']
+ytypes = ['dadr.frac']
+#
+axs[1].hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], linestyle='dotted', color='k', alpha=0.5)
+for i in range(0, len(xs)):
+    binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=binsize)
+    med, upper, lower, highest, lowest = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
+    axs[1].fill_between(binss[:-1]+half_binss, upper, lower, color=peri_d_colors[i], alpha=0.5)
+    axs[1].fill_between(binss[:-1]+half_binss, highest, lowest, color=peri_d_colors[i], alpha=0.3)
+    #
+    # Plot the medians for the two mass bins (low-mass)
+    axs[1].plot(binss[:-1]+half_binss, med, color=peri_d_colors[i], markersize=10, alpha=0.7)
+    #
+    axs[1].set_xlim(limits[0][0], limits[0][1])
+    axs[1].set_ylim(limits[1])
+#
+binedges = None
+binsize = 0.5
+limits=((4,9.5),(-1,1.5))
+#
+xs = [Mstar_z0]
+ys = [(dadr_max_mod['dadr']-dadr_max['dadr'])/dadr_max['dadr']]
+#
+xtypes = ['M.star.z0']
+ytypes = ['dadr.frac']
+#
+axs[2].hlines(y=0, xmin=10**limits[0][0], xmax=10**limits[0][1], linestyle='dotted', color='k', alpha=0.5)
+for i in range(0, len(xs)):
+    binss, half_binss = summary_plot.binning_scheme(x=xs[i], xtype=xtypes[i], binsize=binsize)
+    med, upper, lower, highest, lowest = summary_plot.median_and_scatter(x=xs[i], y=ys[i], xtype=xtypes[i], ytype=ytypes[i], bins=binss)
+    axs[2].fill_between(10**(binss[:-1]+half_binss), upper, lower, color=peri_d_colors[i], alpha=0.5)
+    axs[2].fill_between(10**(binss[:-1]+half_binss), highest, lowest, color=peri_d_colors[i], alpha=0.3)
+    #
+    # Plot the medians for the two mass bins (low-mass)
+    axs[2].plot(10**(binss[:-1]+half_binss), med, color=peri_d_colors[i], markersize=10, alpha=0.7)
+    #
+    axs[2].set_xlim(10**(limits[0][0]), 10**(limits[0][1]))
+    axs[2].set_ylim(limits[1])
+    axs[2].set_xscale('log')
+#
+axs[0].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=28, labelbottom=True)
+axs[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=True)
+axs[2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=True)
+#
+axs[0].set_ylabel('($|da/dr|_{\\rm model} - |da/dr|_{\\rm sim}) \ / \ |da/dr|_{\\rm sim}$', fontsize=36)
+axs[0].get_yaxis().set_label_coords(-0.12,0.5)
+axs[1].set_ylabel(' ', fontsize=26)
+axs[1].get_yaxis().set_label_coords(-0.12,0.5)
+axs[2].set_ylabel(' ', fontsize=26)
+axs[2].get_yaxis().set_label_coords(-0.12,0.5)
+#
+axs[0].set_xlabel('Infall Lookback Time [Gyr]', fontsize=36)
+axs[1].set_xlabel('Host distance, $r$ [kpc]', fontsize=36)
+axs[2].set_xlabel('$M_{\\rm star} [M_{\\odot}]$', fontsize=36)
+#
+plt.tight_layout()
+plt.subplots_adjust(wspace=0.12, hspace=0)
+#plt.show()
+plt.savefig(directory+'/dadr_vs_property.pdf')
+plt.close()
 
 
 
@@ -1687,24 +1959,17 @@ for i in range(0, np.max(x)):
     lowests[i] = np.nanpercentile(y[mask], thrsigm)
 #
 f, ax = plt.subplots(2, 1, figsize=(12,14))
-gs = gridspec.GridSpec(3, 1, height_ratios=[1,4,4])
-ax0 = plt.subplot(gs[0])
-ax1 = plt.subplot(gs[1])
-ax2 = plt.subplot(gs[2])
 #
 xbins = summary_plot.binning_scheme(x, 'N.peri', binsize=1)[0]
-ax0.hist(x, bins=xbins, density=False, color='k', alpha=0.35)
 #
-ax1.scatter(np.arange(np.max(x))+1, meds, s=75., marker='s', c=peri_d_colors[0])
-ax1.scatter(np.arange(np.max(x))+1, upper-lower, s=150., marker='*', c='k')
+ax[0].scatter(np.arange(np.max(x))+1, meds, s=75., marker='s', c=peri_d_colors[0])
+ax[0].scatter(-100,-100, s=75., marker='s', c='k', label='Model comparison')
+ax[0].scatter(np.arange(np.max(x))+1, upper-lower, s=150., marker='*', c='k', label='Width of 68th percentile')
 for j in range(0, np.max(x)):
-    ax1.errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowests[j]],[highests[j]-meds[j]]]), alpha=0.3, color=peri_d_colors[0])
-    #ax[0].errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowest[j]],[highest[j]-meds[j]]]), alpha=0.3, color=peri_d_colors[0])
-    ax1.errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lower[j]],[upper[j]-meds[j]]]), alpha=0.7, color=peri_d_colors[0])
-ax1.hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
-#ax[0].hlines(0.69, -0.5, np.max(x)+1, linestyle='solid', color='k', linewidths=2, alpha=0.1)
-#ax[0].hlines(1.42, -0.5, np.max(x)+1, linestyle='solid', color='k', linewidths=2, alpha=0.1)
-#ax[0].fill_between(x=(-0.5,10), y1=0.69, y2=1.42, color='k', alpha=0.1)
+    ax[0].errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowests[j]],[highests[j]-meds[j]]]), alpha=0.3, color=peri_d_colors[0])
+    ax[0].errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lower[j]],[upper[j]-meds[j]]]), alpha=0.7, color=peri_d_colors[0])
+ax[0].hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
+ax[0].legend(prop={'size': 24}, loc='upper left')
 #
 x = []
 y = []
@@ -1747,36 +2012,28 @@ for i in range(0, np.max(x)):
     highests[i] = np.nanpercentile(y[mask], thrsigp)
     lowests[i] = np.nanpercentile(y[mask], thrsigm)
 #
-ax2.scatter(np.arange(np.max(x))+1, meds, s=75., marker='s', c=peri_t_colors[1])
-ax2.scatter(np.arange(np.max(x))+1, upper-lower, s=150., marker='*', c='k')
+ax[1].scatter(np.arange(np.max(x))+1, meds, s=75., marker='s', c=peri_t_colors[1])
+ax[1].scatter(np.arange(np.max(x))+1, upper-lower, s=150., marker='*', c='k')
 for j in range(0, np.max(x)):
-    ax2.errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowests[j]],[highests[j]-meds[j]]]), alpha=0.3, color=peri_t_colors[1])
-    #ax[1].errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowest[j]],[highest[j]-meds[j]]]), alpha=0.3, color=peri_t_colors[1])
-    ax2.errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lower[j]],[upper[j]-meds[j]]]), alpha=0.7, color=peri_t_colors[1])
-ax2.hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
-#ax[1].fill_between(x=(-0.5,10), y1=0.87, y2=8.65, color='k', alpha=0.1)
+    ax[1].errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowests[j]],[highests[j]-meds[j]]]), alpha=0.3, color=peri_t_colors[1])
+    ax[1].errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lower[j]],[upper[j]-meds[j]]]), alpha=0.7, color=peri_t_colors[1])
+ax[1].hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
 #
-ax0.set_xticks([0,1,2,3,4,5,6,7,8,9,10])
-ax1.set_xticks([0,1,2,3,4,5,6,7,8,9,10])
-ax2.set_xticks([0,1,2,3,4,5,6,7,8,9,10])
-ax0.set_xticks(np.arange(0.5, 10.5, 1), minor=True)
-ax1.set_xticks(np.arange(0.5, 10.5, 1), minor=True)
-ax2.set_xticks(np.arange(0.5, 10.5, 1), minor=True)
-ax0.set_xlim(0, np.max(x)+0.5)
-ax1.set_xlim(0, np.max(x)+0.5)
-ax2.set_xlim(0, np.max(x)+0.5)
-ax1.set_ylim(-1.1, 2.9)
-ax2.set_ylim(-3, 3.8)
-ax0.set_yscale('log')
-ax2.set_xlabel('Lookback $N_{\\rm peri}$', fontsize=28)
-ax0.set_ylabel('N', fontsize=22)
-ax1.set_ylabel('($d_{\\rm peri,model}-d_{\\rm peri,sim}$)/$d_{\\rm peri,sim}$', fontsize=22)
-ax2.set_ylabel('$t_{\\rm peri,model}-t_{\\rm peri,sim}$ [Gyr]', fontsize=22)
-ax1.get_yaxis().set_label_coords(-0.1,0.5)
-ax2.get_yaxis().set_label_coords(-0.1,0.5)
-ax0.tick_params(axis='both', which='both', bottom=True, top=True, labelbottom=False, labelsize=24)
-ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelbottom=False, labelsize=24)
-ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
+ax[0].set_xticks([0,1,2,3,4,5,6,7,8,9,10])
+ax[1].set_xticks([0,1,2,3,4,5,6,7,8,9,10])
+ax[0].set_xticks(np.arange(0.5, 10.5, 1), minor=True)
+ax[1].set_xticks(np.arange(0.5, 10.5, 1), minor=True)
+ax[0].set_xlim(0, np.max(x)+0.5)
+ax[1].set_xlim(0, np.max(x)+0.5)
+ax[0].set_ylim(-1.1, 2.9)
+ax[1].set_ylim(-3, 3.8)
+ax[1].set_xlabel('Lookback $N_{\\rm peri}$', fontsize=28)
+ax[0].set_ylabel('($d_{\\rm peri,model}-d_{\\rm peri,sim}$)/$d_{\\rm peri,sim}$', fontsize=22)
+ax[1].set_ylabel('$t_{\\rm peri,model}-t_{\\rm peri,sim}$ [Gyr]', fontsize=22)
+ax[0].get_yaxis().set_label_coords(-0.1,0.5)
+ax[1].get_yaxis().set_label_coords(-0.1,0.5)
+ax[0].tick_params(axis='both', which='both', bottom=True, top=True, labelbottom=False, labelsize=24)
+ax[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 #
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
@@ -1828,16 +2085,12 @@ for i in range(0, np.max(x)):
     lowest[i] = np.nanpercentile(y[mask], twosigm)
 #
 f, ax = plt.subplots(2, 1, figsize=(12,14))
-gs = gridspec.GridSpec(3, 1, height_ratios=[1,4,4])
-ax0 = plt.subplot(gs[0])
-ax1 = plt.subplot(gs[1])
-ax2 = plt.subplot(gs[2])
 #
-ax1.scatter(np.arange(np.max(x))+1, meds, s=75., marker='s', c=peri_t_colors[1])
-ax1.scatter(np.arange(np.max(x))+1, upper-lower, s=150., marker='*', c='k')
+ax[0].scatter(np.arange(np.max(x))+1, meds, s=75., marker='s', c=peri_t_colors[1], label='Model comparison')
+ax[0].scatter(np.arange(np.max(x))+1, upper-lower, s=150., marker='*', c='k', label='Width of 68th percentile')
 for j in range(0, np.max(x)):
-    ax1.errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowest[j]],[highest[j]-meds[j]]]), alpha=0.3, color=peri_t_colors[1])
-    ax1.errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lower[j]],[upper[j]-meds[j]]]), alpha=0.7, color=peri_t_colors[1])
+    ax[0].errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lowest[j]],[highest[j]-meds[j]]]), alpha=0.3, color=peri_t_colors[1])
+    ax[0].errorbar(np.arange(np.max(x))[j]+1, meds[j], yerr=np.array([[meds[j]-lower[j]],[upper[j]-meds[j]]]), alpha=0.7, color=peri_t_colors[1])
 #
 x = []
 y = []
@@ -1876,310 +2129,32 @@ for i in range(0, np.max(x)):
 #
 x_points = np.arange(1, x.max()/2+1, 0.5)
 #
-#xbins = summary_plot.binning_scheme(x/2, 'dperi', binsize=0.25)[0]
-ax0.hist(x/2, bins=np.arange(0.25, 9.8, 0.5), density=False, color='k', alpha=0.35)
 #
-ax2.scatter(x_points-0.5, meds, s=75., marker='s', c=peri_d_colors[0])
-ax2.scatter(x_points-0.5, upper-lower, s=150., marker='*', c='k')
+ax[1].scatter(x_points-0.5, meds, s=75., marker='s', c=peri_d_colors[0])
+ax[1].scatter(x_points-0.5, upper-lower, s=150., marker='*', c='k')
 for j in range(0, len(x_points)):
-    ax2.errorbar(x_points[j]-0.5, meds[j], yerr=np.array([[meds[j]-lowest[j]],[highest[j]-meds[j]]]), alpha=0.3, color=peri_d_colors[0])
-    ax2.errorbar(x_points[j]-0.5, meds[j], yerr=np.array([[meds[j]-lower[j]],[upper[j]-meds[j]]]), alpha=0.7, color=peri_d_colors[0])
+    ax[1].errorbar(x_points[j]-0.5, meds[j], yerr=np.array([[meds[j]-lowest[j]],[highest[j]-meds[j]]]), alpha=0.3, color=peri_d_colors[0])
+    ax[1].errorbar(x_points[j]-0.5, meds[j], yerr=np.array([[meds[j]-lower[j]],[upper[j]-meds[j]]]), alpha=0.7, color=peri_d_colors[0])
 #
-ax1.hlines(0, -0.5, np.max(np.arange(1, x.max()/2+1, 0.5))+1, linestyle='dotted', color='k', alpha=0.5)
-ax2.hlines(0, -0.5, np.max(np.arange(1, x.max()/2+1, 0.5))+1, linestyle='dotted', color='k', alpha=0.5)
+ax[0].hlines(0, -0.5, np.max(np.arange(1, x.max()/2+1, 0.5))+1, linestyle='dotted', color='k', alpha=0.5)
+ax[1].hlines(0, -0.5, np.max(np.arange(1, x.max()/2+1, 0.5))+1, linestyle='dotted', color='k', alpha=0.5)
 #
-ax0.set_xticks([0,1,2,3,4,5,6,7,8,9,10])
-ax0.set_xticks(np.arange(0.5, 10.5, 1), minor=True)
-ax1.set_xticks([0,1,2,3,4,5,6,7,8,9,10])
-ax1.set_xticks(np.arange(0.5, 10.5, 1), minor=True)
-ax2.set_xticks([0,1,2,3,4,5,6,7,8,9,10])
-ax2.set_xticks(np.arange(0.5, 10.5, 1), minor=True)
-ax0.set_xlim(0,10)
-ax1.set_xlim(0,10)
-ax2.set_xlim(0,10)
-ax0.set_yscale('log')
-ax2.set_xlabel('Lookback $N_{\\rm peri}$', fontsize=28)
-ax0.set_ylabel('N', fontsize=22)
-ax1.set_ylabel('$T_{\\rm model} - T_{\\rm sim}$', fontsize=28)
-ax2.set_ylabel('$e_{\\rm model} - e_{\\rm sim}$', fontsize=28)
-ax1.get_yaxis().set_label_coords(-0.12,0.5)
-ax2.get_yaxis().set_label_coords(-0.12,0.5)
+ax[0].set_xticks([0,1,2,3,4,5,6,7,8,9,10])
+ax[0].set_xticks(np.arange(0.5, 10.5, 1), minor=True)
+ax[1].set_xticks([0,1,2,3,4,5,6,7,8,9,10])
+ax[1].set_xticks(np.arange(0.5, 10.5, 1), minor=True)
+ax[0].set_xlim(0,10)
+ax[1].set_xlim(0,10)
+ax[1].set_xlabel('Lookback $N_{\\rm peri}$', fontsize=28)
+ax[0].set_ylabel('$T_{\\rm model} - T_{\\rm sim}$', fontsize=28)
+ax[1].set_ylabel('$e_{\\rm model} - e_{\\rm sim}$', fontsize=28)
+ax[0].get_yaxis().set_label_coords(-0.12,0.5)
+ax[1].get_yaxis().set_label_coords(-0.12,0.5)
 #
-ax0.tick_params(axis='both', which='both', bottom=True, top=True, labelbottom=False, labelsize=24)
-ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelbottom=False, labelsize=24)
-ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
+ax[0].tick_params(axis='both', which='both', bottom=True, top=True, labelbottom=False, labelsize=24)
+ax[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
 #
 plt.savefig(directory+'/period_vs_phase_both.pdf')
-plt.close()
-
-
-"""
-    da/dr plots
-        - NEED TO FIGURE OUT HOW TO ORGANIZE THESE
-          I DON'T WANT 3 INDIVIDUAL PLOTS...
-"""
-data_mp = summary.data_read_mass_profile(directory=sim_data.home_dir, hosts='all_no_r')
-dadr = summary.da_dr(mass_profile=data_mp, hosts='all_no_r')
-#
-dadr_max = summary.da_dr_max(data_total, masks_infall_peri, data_mp, dadr, selection='sim', oversample=True, hosts='all_no_r')
-dadr_max_mod = summary.da_dr_max(data_total, masks_infall_peri, data_mp, dadr, selection='model', oversample=True, hosts='all_no_r')
-t_in_sim = summary.first_infall(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
-Mstar_z0 = summary.mstar(data_total, masks_infall_peri, selection='z0', oversample=True, hosts='all_no_r', sim_type='baryon')
-dz0_tot = summary.d_z0(data_total, masks_infall_peri, oversample=True, hosts='all_no_r', sim_type='baryon')
-#
-# Plotting vs t_infall
-f, ax1 = plt.subplots(1, 1, figsize=(10,8))
-colorss = ['#006400', '#000080']
-binedges = None
-binsize = 0.5
-limits=((0,13.8),(-1,3))
-#
-x = [t_in_sim]
-y = [(dadr_max_mod['dadr']-dadr_max['dadr'])/dadr_max['dadr']]
-#
-xtype = ['t.infall.text']
-ytype = ['dadr.frac']
-#
-medians = []
-lowers = []
-uppers = []
-lowests = []
-highests = []
-binss = []
-half_bins = []
-#
-for j in range(0, len(x)):
-    #
-    if binedges:
-        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
-        bins = np.linspace(binedges[0], binedges[1], bin_num)
-        half_bin = (bins[1]-bins[0])/2
-    else:
-        minn = binsize*np.floor(np.min(x[j])/binsize)
-        maxx = binsize*np.ceil(np.max(x[j])/binsize)
-        if minn < 0:
-            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
-        else:
-            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
-        bins = np.linspace(minn, maxx, bin_num)
-        half_bin = (bins[1]-bins[0])/2
-    #
-    onesigp = 84.13
-    onesigm = 15.87
-    twosigp = 100
-    twosigm = 0
-    #
-    med = np.zeros(len(bins)-1)
-    lower = np.zeros(len(bins)-1)
-    upper = np.zeros(len(bins)-1)
-    lowest = np.zeros(len(bins)-1)
-    highest = np.zeros(len(bins)-1)
-    #
-    for i in range(0, len(bins)-1):
-        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
-        med[i] = np.nanmedian(y[j][mask])
-        upper[i] = np.nanpercentile(y[j][mask], onesigp)
-        lower[i] = np.nanpercentile(y[j][mask], onesigm)
-        highest[i] = np.nanpercentile(y[j][mask], twosigp)
-        lowest[i] = np.nanpercentile(y[j][mask], twosigm)
-    medians.append(med)
-    lowers.append(lower)
-    uppers.append(upper)
-    lowests.append(lowest)
-    highests.append(highest)
-    binss.append(bins)
-    half_bins.append(half_bin)
-#
-# PLOTTING
-# Plot the scatter for the recent and minimum pericenters
-ax1.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[0], alpha=0.3)
-ax1.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[0], alpha=0.15)
-#
-# Plot the medians for the two mass bins (low-mass)
-ax1.plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[0], linewidth=3.5, alpha=0.9)
-#
-plt.hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], colors='k', linestyles='dotted', alpha=0.5)
-#
-ax1.set_xlabel('Lookback Infall Time [Gyr]', fontsize=30)
-ax1.set_ylabel('($|da/dr|_{\\rm model} - |da/dr|_{\\rm sim})/ |da/dr|_{\\rm sim}$', fontsize=20)
-#ax1.legend(prop={'size': 21}, loc='best')
-ax1.set_xlim(limits[0])
-ax1.set_ylim(limits[1])
-ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26)
-plt.tight_layout()
-#plt.show()
-plt.savefig(directory+'/dadr_frac_vs_t_infall.pdf')
-plt.close()
-
-
-# Plotting vs t_infall
-f, ax1 = plt.subplots(1, 1, figsize=(10,8))
-colorss = ['#006400', '#000080']
-binedges = None
-binsize = 50
-limits=((0,400),(-1,2.5))
-#
-x = [dz0_tot]
-y = [(dadr_max_mod['dadr']-dadr_max['dadr'])/dadr_max['dadr']]
-#
-xtype = ['d.z0']
-ytype = ['dadr.frac']
-#
-medians = []
-lowers = []
-uppers = []
-lowests = []
-highests = []
-binss = []
-half_bins = []
-#
-for j in range(0, len(x)):
-    #
-    if binedges:
-        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
-        bins = np.linspace(binedges[0], binedges[1], bin_num)
-        half_bin = (bins[1]-bins[0])/2
-    else:
-        minn = binsize*np.floor(np.min(x[j])/binsize)
-        maxx = binsize*np.ceil(np.max(x[j])/binsize)
-        if minn < 0:
-            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
-        else:
-            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
-        bins = np.linspace(minn, maxx, bin_num)
-        half_bin = (bins[1]-bins[0])/2
-    #
-    onesigp = 84.13
-    onesigm = 15.87
-    twosigp = 100
-    twosigm = 0
-    #
-    med = np.zeros(len(bins)-1)
-    lower = np.zeros(len(bins)-1)
-    upper = np.zeros(len(bins)-1)
-    lowest = np.zeros(len(bins)-1)
-    highest = np.zeros(len(bins)-1)
-    #
-    for i in range(0, len(bins)-1):
-        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
-        med[i] = np.nanmedian(y[j][mask])
-        upper[i] = np.nanpercentile(y[j][mask], onesigp)
-        lower[i] = np.nanpercentile(y[j][mask], onesigm)
-        highest[i] = np.nanpercentile(y[j][mask], twosigp)
-        lowest[i] = np.nanpercentile(y[j][mask], twosigm)
-    medians.append(med)
-    lowers.append(lower)
-    uppers.append(upper)
-    lowests.append(lowest)
-    highests.append(highest)
-    binss.append(bins)
-    half_bins.append(half_bin)
-#
-# PLOTTING
-# Plot the scatter for the recent and minimum pericenters
-ax1.fill_between(binss[0][:-1]+half_bins[0], uppers[0], lowers[0], color=colorss[0], alpha=0.3)
-ax1.fill_between(binss[0][:-1]+half_bins[0], highests[0], lowests[0], color=colorss[0], alpha=0.15)
-#
-# Plot the medians for the two mass bins (low-mass)
-ax1.plot(binss[0][:-1]+half_bins[0], medians[0], color=colorss[0], linewidth=3.5, alpha=0.9)
-#
-plt.hlines(y=0, xmin=limits[0][0], xmax=limits[0][1], colors='k', linestyles='dotted', alpha=0.5)
-#
-ax1.set_xlabel('Host Distance, r [kpc]', fontsize=30)
-ax1.set_ylabel('($|da/dr|_{\\rm model} - |da/dr|_{\\rm sim})/ |da/dr|_{\\rm sim}$', fontsize=20)
-#ax1.legend(prop={'size': 21}, loc='best')
-ax1.set_xlim(limits[0])
-ax1.set_ylim(limits[1])
-ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26)
-plt.tight_layout()
-#plt.show()
-plt.savefig(directory+'/dadr_frac_vs_dz0.pdf')
-plt.close()
-
-
-
-# Plotting vs t_infall
-f, ax1 = plt.subplots(1, 1, figsize=(10,8))
-colorss = ['#006400', '#000080']
-binedges = None
-binsize = 0.5
-limits=((4,9.5),(-1,1.5))
-#
-x = [np.log10(Mstar_z0)]
-y = [(dadr_max_mod['dadr']-dadr_max['dadr'])/dadr_max['dadr']]
-#
-xtype = ['M.star.z0']
-ytype = ['dadr.frac']
-#
-medians = []
-lowers = []
-uppers = []
-lowests = []
-highests = []
-binss = []
-half_bins = []
-#
-for j in range(0, len(x)):
-    #
-    if binedges:
-        bin_num = int((binedges[1]-binedges[0])/binsize + 1)
-        bins = np.linspace(binedges[0], binedges[1], bin_num)
-        half_bin = (bins[1]-bins[0])/2
-    else:
-        minn = binsize*np.floor(np.min(x[j])/binsize)
-        maxx = binsize*np.ceil(np.max(x[j])/binsize)
-        if minn < 0:
-            bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
-        else:
-            bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
-        bins = np.linspace(minn, maxx, bin_num)
-        half_bin = (bins[1]-bins[0])/2
-    #
-    onesigp = 84.13
-    onesigm = 15.87
-    twosigp = 100
-    twosigm = 0
-    #
-    med = np.zeros(len(bins)-1)
-    lower = np.zeros(len(bins)-1)
-    upper = np.zeros(len(bins)-1)
-    lowest = np.zeros(len(bins)-1)
-    highest = np.zeros(len(bins)-1)
-    #
-    for i in range(0, len(bins)-1):
-        mask = (x[j] >= bins[i]) & (x[j] <= bins[i+1])
-        med[i] = np.nanmedian(y[j][mask])
-        upper[i] = np.nanpercentile(y[j][mask], onesigp)
-        lower[i] = np.nanpercentile(y[j][mask], onesigm)
-        highest[i] = np.nanpercentile(y[j][mask], twosigp)
-        lowest[i] = np.nanpercentile(y[j][mask], twosigm)
-    medians.append(med)
-    lowers.append(lower)
-    uppers.append(upper)
-    lowests.append(lowest)
-    highests.append(highest)
-    binss.append(bins)
-    half_bins.append(half_bin)
-#
-# PLOTTING
-# Plot the scatter for the recent and minimum pericenters
-ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), uppers[0], lowers[0], color=colorss[0], alpha=0.3)
-ax1.fill_between(10**(binss[0][:-1]+half_bins[0]), highests[0], lowests[0], color=colorss[0], alpha=0.15)
-#
-# Plot the medians for the two mass bins (low-mass)
-ax1.plot(10**(binss[0][:-1]+half_bins[0]), medians[0], color=colorss[0], linewidth=3.5, alpha=0.9)
-#
-plt.hlines(y=0, xmin=10**(limits[0][0]), xmax=10**(limits[0][1]), colors='k', linestyles='dotted', alpha=0.5)
-#
-ax1.set_xlabel('$M_{\\rm star}$ [$M_{\\odot}$]', fontsize=30)
-ax1.set_ylabel('($|da/dr|_{\\rm model} - |da/dr|_{\\rm sim})/ |da/dr|_{\\rm sim}$', fontsize=20)
-ax1.set_xscale('log')
-ax1.set_xlim(10**(limits[0][0]), 10**(limits[0][1]))
-ax1.set_ylim(limits[1])
-ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26)
-plt.tight_layout()
-#plt.show()
-plt.savefig(directory+'/dadr_frac_vs_Mstar.pdf')
 plt.close()
