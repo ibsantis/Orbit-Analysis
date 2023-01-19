@@ -2698,8 +2698,8 @@ class SummaryDataPlot(SummaryDataSort):
             #
             onesigp = 84.13
             onesigm = 15.87
-            twosigp = 100
-            twosigm = 0
+            twosigp = 100 # 99.86
+            twosigm = 0   # 0.14
             #
             med = np.zeros(len(bins)-1)
             lower = np.zeros(len(bins)-1)
