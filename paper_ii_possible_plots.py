@@ -2093,7 +2093,6 @@ summary_plot.median_plot(x=dz0_tot, y=(sub_energy['energy.z0']-sub_energy['energ
 
 
 
-
 summary_plot.plot_hist(x=(d_rec_mod - d_rec_mod_aligned), xtype='d.model', x_labels='$d_{\\rm peri,unaligned} - d_{\\rm peri,aligned}$ [kpc]', title='Recent Model Pericenters', pdf=True, binsize=0.05, xlimits=(-0.6,0.6), file_path_and_name=directory+'/d_mod_recent_hist.pdf')
 summary_plot.plot_hist(x=(d_rec_mod - d_rec_mod_aligned), xtype='d.model', x_labels='$d_{\\rm peri,unaligned} - d_{\\rm peri,aligned}$ [kpc]', title='Recent Model Pericenters', pdf=False, binsize=0.05, xlimits=(-0.6,0.6), file_path_and_name=directory+'/d_mod_recent_raw.pdf')
 
