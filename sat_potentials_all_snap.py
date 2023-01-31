@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 #SBATCH --job-name=m12b_subhalo_potential_all_snaps
-#SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
+##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
+#SBATCH --partition=high2
 ##SBATCH --partition=skx-normal
-#SBATCH --mem=500G
+##SBATCH --mem=500G
+#SBATCH --mem=100G
 #SBATCH --nodes=1
 #SBATCH --ntasks=3    # processes total
 ##SBATCH --tasks-per-node=1    # MPI tasks per node
