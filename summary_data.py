@@ -54,7 +54,7 @@ loc = 'peloton'
 sim_data = orbit_io.OrbitRead(gal1=str(sys.argv[1]), location=loc)
 plotting = False
 aligned = True
-point_mass = True
+point_mass = False
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
