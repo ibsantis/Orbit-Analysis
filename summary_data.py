@@ -59,9 +59,9 @@ print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
-#halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal, assign_hosts_rotation=aligned)
-halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal, assign_hosts_rotation=aligned, catalog_hdf5_directory='catalog_hdf5_default') # This is only for m12z
-part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'snapshot', 600, simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=aligned)
+halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal, assign_hosts_rotation=aligned)
+#halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal, assign_hosts_rotation=aligned, catalog_hdf5_directory='catalog_hdf5_default') # This is only for m12z
+part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'index', 600, simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=aligned)
 
 if sim_data.num_gal == 1:
     # Find the mass ratio to multiply the host radius
@@ -136,7 +136,7 @@ if sim_data.num_gal == 1:
     eccs_galpy_pot = galpy_orbits.e(pot=potential_two_power)
     eccs_galpy_apsis = orbits.eccentricity(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
 
-    galpy_orbits_norm = galpy_orbits.r(ts)[:,:len(host_radii*mass_ratio)]/host_radii*mass_ratio
+    galpy_orbits_norm = galpy_orbits.r(ts)[:,:len(host_radii*mass_ratio)]/(host_radii*mass_ratio)
     infall_info_galpy = orbits.infall_times(galpy_orbits_norm, snaps)
     infall_info_galpy_static_R200m = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=host_radii[0])
     periods_galpy = orbits.orbit_period(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info_galpy)
@@ -366,7 +366,7 @@ if sim_data.num_gal == 2:
     eccs_galpy_pot = galpy_orbits.e(pot=potential_two_power)
     eccs_galpy_apsis = orbits.eccentricity(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
 
-    galpy_orbits_norm = galpy_orbits.r(ts)[:,:len(host_radii*mass_ratio)]/host_radii*mass_ratio
+    galpy_orbits_norm = galpy_orbits.r(ts)[:,:len(host_radii*mass_ratio)]/(host_radii*mass_ratio)
     infall_info_galpy = orbits.infall_times(galpy_orbits_norm, snaps)
     infall_info_galpy_static_R200m = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=host_radii[0])
     periods_galpy = orbits.orbit_period(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info_galpy)
@@ -594,7 +594,7 @@ if sim_data.num_gal == 2:
     eccs_galpy_pot = galpy_orbits.e(pot=potential_two_power)
     eccs_galpy_apsis = orbits.eccentricity(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
 
-    galpy_orbits_norm = galpy_orbits.r(ts)[:,:len(host_radii*mass_ratio)]/host_radii*mass_ratio
+    galpy_orbits_norm = galpy_orbits.r(ts)[:,:len(host_radii*mass_ratio)]/(host_radii*mass_ratio)
     infall_info_galpy = orbits.infall_times(galpy_orbits_norm, snaps)
     infall_info_galpy_static_R200m = orbit_gal.galpy_infall_times(galpy_orbits.r(ts), snaps, distance_threshold=host_radii[0])
     periods_galpy = orbits.orbit_period(distances=galpy_orbits.r(ts), velocities=galpy_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info_galpy)
