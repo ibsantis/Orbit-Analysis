@@ -5,7 +5,7 @@
 #SBATCH --partition=high2
 ##SBATCH --partition=skx-normal
 ##SBATCH --mem=500G
-#SBATCH --mem=120G
+#SBATCH --mem=100G
 #SBATCH --nodes=1
 #SBATCH --ntasks=3    # processes total
 ##SBATCH --tasks-per-node=1    # MPI tasks per node
@@ -63,6 +63,7 @@ orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location=loc, h
 print('Read in halo tree and set up subhalo indices')
 
 # Set up the snapshot array to loop through
+#snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
 snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
 #snaps = np.arange(int(sys.argv[1]), int(sys.argv[2]), -1)
 print('Assigned snapshot array')
@@ -106,14 +107,7 @@ def calc_sub_potential(snap, simdata, orbit_class):
         temp = np.arange(len(orbit_class.sub_inds[:,600-snap]))
         print('Set up a null dictionary for the data at snapshot {0}'.format(snap))
         #
-        if snap in host_snaps:
-            # Find the potential of the host at 100 kpc
-            ndist, nind = orbit_tree.neighbors(centers=halt['position'][host_inds[600-snap]], neigh_num_max=1e8, neigh_dist_max=100, workerss=4)
-            part_mask = (ndist[np.isfinite(ndist)] < (100+5))*(ndist[np.isfinite(ndist)] > (100-5))
-            data_dict['host.potential.100kpc'] = np.nanmean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
-            print('Calculated potential at 100 kpc at snapshot {0}'.format(snap))
         if snap not in host_snaps:
-            data_dict['host.potential.100kpc'] = np.nan
             print('No well defined host at snapshot {0}'.format(snap))
         #
         if snap == 600:
@@ -215,24 +209,10 @@ def calc_sub_potential(snap, simdata, orbit_class):
         #
         print('Set up a null dictionary for the data at snapshot {0}'.format(snap))
         #
-        if snap in host_snaps_1:
-            # Find the potential of the host at 100 kpc
-            ndist_1, nind_1 = orbit_tree_1.neighbors(centers=halt['position'][host_inds_1[600-snap]], neigh_num_max=1e8, neigh_dist_max=100, workerss=4)
-            part_mask_1 = (ndist_1[np.isfinite(ndist_1)] < (100+5))*(ndist_1[np.isfinite(ndist_1)] > (100-5))
-            data_dict_1['host.potential.100kpc'] = np.nanmean(part['dark']['potential'][::orbit_tree_1.subsampling][nind_1[np.isfinite(ndist_1)][part_mask_1]])
-            print('Calculated potential at 100 kpc at snapshot {0}'.format(snap))
         if snap not in host_snaps_1:
-            data_dict_1['host.potential.100kpc'] = np.nan
             print('No well defined host at snapshot {0}'.format(snap))
         #
-        if snap in host_snaps_2:
-            # Find the potential of the host at 100 kpc
-            ndist_2, nind_2 = orbit_tree_2.neighbors(centers=halt['position'][host_inds_2[600-snap]], neigh_num_max=1e8, neigh_dist_max=100, workerss=4)
-            part_mask_2 = (ndist_2[np.isfinite(ndist_2)] < (100+5))*(ndist_2[np.isfinite(ndist_2)] > (100-5))
-            data_dict_2['host.potential.100kpc'] = np.nanmean(part['dark']['potential'][::orbit_tree_2.subsampling][nind_2[np.isfinite(ndist_2)][part_mask_2]])
-            print('Calculated potential at 100 kpc at snapshot {0}'.format(snap))
         if snap not in host_snaps_2:
-            data_dict_2['host.potential.100kpc'] = np.nan
             print('No well defined host at snapshot {0}'.format(snap))
         #
         if snap == 600:
