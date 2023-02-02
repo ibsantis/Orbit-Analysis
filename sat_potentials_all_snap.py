@@ -63,8 +63,8 @@ orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location=loc, h
 print('Read in halo tree and set up subhalo indices')
 
 # Set up the snapshot array to loop through
-snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
-#snaps = np.arange(int(sys.argv[1]), int(sys.argv[2]), -1)
+#snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
+snaps = np.arange(int(sys.argv[1]), int(sys.argv[2]), -1)
 print('Assigned snapshot array')
 
 def calc_sub_potential(snap, simdata, orbit_class):
