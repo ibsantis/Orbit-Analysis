@@ -9,8 +9,8 @@
 #SBATCH --ntasks=1    # processes total, used to be 4...
 ##SBATCH --tasks-per-node=1
 #SBATCH --time=02:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/summary/model_potential%j.txt
-##SBATCH --output=/home1/05400/ibsantis/scripts/jobs/summary/model_potential%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potential/model_potential_%j.txt
+##SBATCH --output=/home1/05400/ibsantis/scripts/jobs/potential/model_potential_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
