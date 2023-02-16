@@ -64,6 +64,7 @@ orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location=loc, h
 #orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location=loc, host=1)
 print('Read in halo tree and set up subhalo indices')
 
+summary = summary_io.SummaryDataSort()
 data_total = summary.data_read(directory=sim_data.home_dir, hosts='all_no_r', sim_type='baryon')
 host_radius = data_total[host]['host.radius'][0]
 host_mass = data_total[host]['host.mass'][0]
