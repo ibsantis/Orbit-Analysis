@@ -67,7 +67,7 @@ def mass_evolution(snap, sim_data, rs):
         mass_array = np.zeros(len(rs)-1)
         #
         # Read in the data
-        part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'snapshot', snap, properties=['mass', 'position'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
+        part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'index', snap, properties=['mass', 'position'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
         #
         # Compute the 1D distances for all species once
         d_star_tot = part['star'].prop('host.distance.total')
@@ -96,7 +96,7 @@ def mass_evolution(snap, sim_data, rs):
         mass_array_2 = np.zeros(len(rs)-1)
         #
         # Read in the data
-        part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'snapshot', snap, properties=['mass', 'position'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
+        part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'index', snap, properties=['mass', 'position'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
         #
         # Compute the 1D distances for all species once
         d_star_tot = part['star'].prop('host.distance.total')
