@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=TL_mass_profile_all
-##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
-#SBATCH --partition=skx-normal
+#SBATCH --job-name=m12i_mass_profile_all
+#SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
+##SBATCH --partition=skx-normal
 ##SBATCH --mem=480G
 #SBATCH --nodes=1
-##SBATCH --ntasks=4    # processes total
-#SBATCH --tasks-per-node=4
-#SBATCH --time=00:10:00
-##SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/TL_mass_profile_all_%j.txt
-#SBATCH --output=/home1/05400/ibsantis/scripts/jobs/mass_profiles/TL_mass_profile_all_%j.txt
+#SBATCH --ntasks=4    # processes total
+##SBATCH --tasks-per-node=4
+#SBATCH --time=05:00:00
+#SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/m12i_mass_profile_all_%j.txt
+##SBATCH --output=/home1/05400/ibsantis/scripts/jobs/mass_profiles/TL_mass_profile_all_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -38,7 +38,7 @@ from numba import jit
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Thelma', location='stampede')
+sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
 print('Set paths')
 
 # Set up snapshot array to loop through
@@ -47,7 +47,14 @@ snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir)
 #snaps = snaps[453:] # this is where the first job left off
 
 # Create a distance array to loop through
-rs = np.logspace(np.log10(5), np.log10(500), 25)
+#rs = np.logspace(np.log10(5), np.log10(500), 25) # OLD
+rs = np.array([  0.        ,   5.        ,   6.05763829,   7.33899634,
+         8.89139705,  10.77217345,  13.05078608,  15.8113883 ,
+        19.15593425,  23.20794417,  28.11706626,  34.06460345,
+        41.27020926,  50.        ,  60.57638293,  73.38996338,
+        88.9139705 , 100.        , 107.7217345 , 130.50786078,
+       150., 158.11388301, 191.55934248, 232.07944168, 281.1706626 ,
+       340.64603453, 412.70209263, 500.        ])
 
 @jit
 def mass_evolution(snap, sim_data, rs):
