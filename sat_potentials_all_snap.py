@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=m12w_subhalo_potential_all_snaps
+#SBATCH --job-name=m12i_subhalo_potential_all_snaps
 ##SBATCH --job-name=RJ_subhalo_potential_all_snaps
 ##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --partition=high2
@@ -11,7 +11,7 @@
 ##SBATCH --tasks-per-node=1    # MPI tasks per node
 #SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
 #SBATCH --time=06:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/m12w_subhalo_potential_all_snaps_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/m12i_subhalo_potential_all_snaps_%j.txt
 ##SBATCH --output=/home1/05400/ibsantis/scripts/jobs/potentials/all_snapshots/RJ_subhalo_potential_all_snaps_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
@@ -42,6 +42,7 @@
 
 # Import packages
 import orbit_io
+import summary_io
 import halo_analysis as halo
 import gizmo_analysis as gizmo
 import utilities as ut
@@ -52,7 +53,8 @@ print('Read in the tools')
 
 ### Set path and initial parameters
 loc = 'peloton'
-sim_data = orbit_io.OrbitRead(gal1='m12w', location=loc)
+host = 'm12i'
+sim_data = orbit_io.OrbitRead(gal1='m12i', location=loc)
 print('Set paths')
 
 # Read in snapshot dictionary and the halo tree
@@ -62,12 +64,16 @@ orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location=loc, h
 #orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location=loc, host=1)
 print('Read in halo tree and set up subhalo indices')
 
+data_total = summary.data_read(directory=sim_data.home_dir, hosts='all_no_r', sim_type='baryon')
+host_radius = data_total[host]['host.radius'][0]
+host_mass = data_total[host]['host.mass'][0]
+
 # Set up the snapshot array to loop through
 snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
 #snaps = np.arange(int(sys.argv[1]), int(sys.argv[2]), -1)
 print('Assigned snapshot array')
 
-def calc_sub_potential(snap, simdata, orbit_class):
+def calc_sub_potential(snap, simdata, orbit_class, R200m, M200m, R200m2=None, M200m2=None):
     #
     if simdata.num_gal == 1:
         #
@@ -111,12 +117,12 @@ def calc_sub_potential(snap, simdata, orbit_class):
             #
             if snap == 600:
                 # Find the potential of the host within R200
-                ndist, nind = orbit_tree.neighbors(centers=halt['position'][halt['host.index'][0]], neigh_num_max=1e8, neigh_dist_max=halt['radius'][halt['host.index'][0]], workerss=4)
-                part_mask = (ndist[np.isfinite(ndist)] < (halt['radius'][halt['host.index'][0]]+5))*(ndist[np.isfinite(ndist)] > (halt['radius'][halt['host.index'][0]]-5))
+                ndist, nind = orbit_tree.neighbors(centers=halt['position'][halt['host.index'][0]]/(1+part.snapshot['redshift']), neigh_num_max=1e8, neigh_dist_max=R200m+5, workerss=4)
+                part_mask = (ndist[np.isfinite(ndist)] < (R200m+5))*(ndist[np.isfinite(ndist)] > (R200m-5))
                 data_dict['host.potential.R200m'] = np.nanmean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
                 data_dict['host.particle.num'] = np.sum(part_mask)
-                G = 6.67*10**(-11)*(1.988*10**(30))/((1000**2)*(3.086*10**(19)))
-                data_dict['KE.at.Rvir'] = 0.5*G*halt['mass'][halt['host.index'][0]]/halt['radius'][halt['host.index'][0]]
+                G = ((6.67*10**(-11)*2*10**(30))/(1000*3.086*10**(16)*1000**2))
+                data_dict['KE.at.Rvir'] = 0.5*G*(M200m/R200m)
                 #
                 print('Finished calculating host data for snapshot 600')
             #
@@ -133,11 +139,11 @@ def calc_sub_potential(snap, simdata, orbit_class):
                 # If there are halos, continue
                 if np.sum(mass_mask) != 0:
                     # Get the halo positions and max halo radius in the mass bin
-                    halo_pos = halt['position'][orbit_class.sub_inds[:,600-snap][real_halos*mass_mask]]
-                    dmax = np.around(np.max(halt['radius'][orbit_class.sub_inds[:,600-snap][real_halos*mass_mask]]))
+                    halo_pos = halt['position'][orbit_class.sub_inds[:,600-snap][real_halos*mass_mask]]/(1+part.snapshot['redshift'])
+                    dmax = np.around(np.max(halt['radius'][orbit_class.sub_inds[:,600-snap][real_halos*mass_mask]]))+5
                     #
                     # Query the particle tree and save the distances and indices
-                    ndist, nind = orbit_tree.neighbors(centers=halo_pos, neigh_num_max=1e6, neigh_dist_max=dmax, workerss=4)
+                    ndist, nind = orbit_tree.neighbors(centers=halo_pos, neigh_num_max=1e7, neigh_dist_max=dmax, workerss=4)
                     #
                     # Loop over the number of halos
                     for j in range(0, len(halo_pos)):
@@ -219,30 +225,30 @@ def calc_sub_potential(snap, simdata, orbit_class):
         #
         if snap == 600:
             # Find the potential of the host within R200
-            ndist_1, nind_1 = orbit_tree_1.neighbors(centers=halt['position'][halt['host.index'][0]], neigh_num_max=1e8, neigh_dist_max=halt['radius'][halt['host.index'][0]], workerss=4)
-            part_mask_1 = (ndist_1[np.isfinite(ndist_1)] < (halt['radius'][halt['host.index'][0]]+5))*(ndist_1[np.isfinite(ndist_1)] > (halt['radius'][halt['host.index'][0]]-5))
+            ndist_1, nind_1 = orbit_tree_1.neighbors(centers=halt['position'][halt['host.index'][0]]/(1+part.snapshot['redshift']), neigh_num_max=1e8, neigh_dist_max=R200m+5, workerss=4)
+            part_mask_1 = (ndist_1[np.isfinite(ndist_1)] < (R200m+5))*(ndist_1[np.isfinite(ndist_1)] > (R200m-5))
             data_dict_1['host.potential.R200m'] = np.nanmean(part['dark']['potential'][::orbit_tree_1.subsampling][nind_1[np.isfinite(ndist_1)][part_mask_1]])
             data_dict_1['host.particle.num'] = np.sum(part_mask_1)
-            G = 6.67*10**(-11)*(1.988*10**(30))/((1000**2)*(3.086*10**(19)))
-            data_dict_1['KE.at.Rvir'] = 0.5*G*halt['mass'][halt['host.index'][0]]/halt['radius'][halt['host.index'][0]]
+            G = ((6.67*10**(-11)*2*10**(30))/(1000*3.086*10**(16)*1000**2))
+            data_dict_1['KE.at.Rvir'] = 0.5*G*(M200m/R200m)
             #
             # Find the potential of the host at 100 kpc
-            ndist_1, nind_1 = orbit_tree_1.neighbors(centers=halt['position'][halt['host.index'][0]], neigh_num_max=1e8, neigh_dist_max=100, workerss=4)
-            part_mask_1 = (ndist_1[np.isfinite(ndist_1)] < (100+5))*(ndist_1[np.isfinite(ndist_1)] > (100-5))
-            data_dict_1['host.potential.100kpc'] = np.nanmean(part['dark']['potential'][::orbit_tree_1.subsampling][nind_1[np.isfinite(ndist_1)][part_mask_1]])
+            #ndist_1, nind_1 = orbit_tree_1.neighbors(centers=halt['position'][halt['host.index'][0]]/(1+part.snapshot['redshift']), neigh_num_max=1e8, neigh_dist_max=100+5, workerss=4)
+            #part_mask_1 = (ndist_1[np.isfinite(ndist_1)] < (100+5))*(ndist_1[np.isfinite(ndist_1)] > (100-5))
+            #data_dict_1['host.potential.100kpc'] = np.nanmean(part['dark']['potential'][::orbit_tree_1.subsampling][nind_1[np.isfinite(ndist_1)][part_mask_1]])
             #
             # Find the potential of the host within R200
-            ndist_2, nind_2 = orbit_tree_2.neighbors(centers=halt['position'][halt['host2.index'][0]], neigh_num_max=1e8, neigh_dist_max=halt['radius'][halt['host2.index'][0]], workerss=4)
-            part_mask_2 = (ndist_2[np.isfinite(ndist_2)] < (halt['radius'][halt['host2.index'][0]]+5))*(ndist_2[np.isfinite(ndist_2)] > (halt['radius'][halt['host2.index'][0]]-5))
+            ndist_2, nind_2 = orbit_tree_2.neighbors(centers=halt['position'][halt['host2.index'][0]]/(1+part.snapshot['redshift']), neigh_num_max=1e8, neigh_dist_max=R200m2, workerss=4)
+            part_mask_2 = (ndist_2[np.isfinite(ndist_2)] < (R200m2+5))*(ndist_2[np.isfinite(ndist_2)] > (R200m2-5))
             data_dict_2['host.potential.R200m'] = np.nanmean(part['dark']['potential'][::orbit_tree_2.subsampling][nind_2[np.isfinite(ndist_2)][part_mask_2]])
             data_dict_2['host.particle.num'] = np.sum(part_mask_2)
-            G = 6.67*10**(-11)*(1.988*10**(30))/((1000**2)*(3.086*10**(19)))
-            data_dict_2['KE.at.Rvir'] = 0.5*G*halt['mass'][halt['host2.index'][0]]/halt['radius'][halt['host2.index'][0]]
+            G = ((6.67*10**(-11)*2*10**(30))/(1000*3.086*10**(16)*1000**2))
+            data_dict_2['KE.at.Rvir'] = 0.5*G*(M200m2/R200m2)
             #
             # Find the potential of the host at 100 kpc
-            ndist_2, nind_2 = orbit_tree_2.neighbors(centers=halt['position'][halt['host2.index'][0]], neigh_num_max=1e8, neigh_dist_max=100, workerss=4)
-            part_mask_2 = (ndist_2[np.isfinite(ndist_2)] < (100+5))*(ndist_2[np.isfinite(ndist_2)] > (100-5))
-            data_dict_2['host.potential.100kpc'] = np.nanmean(part['dark']['potential'][::orbit_tree_2.subsampling][nind_2[np.isfinite(ndist_2)][part_mask_2]])
+            #ndist_2, nind_2 = orbit_tree_2.neighbors(centers=halt['position'][halt['host2.index'][0]], neigh_num_max=1e8, neigh_dist_max=100, workerss=4)
+            #part_mask_2 = (ndist_2[np.isfinite(ndist_2)] < (100+5))*(ndist_2[np.isfinite(ndist_2)] > (100-5))
+            #data_dict_2['host.potential.100kpc'] = np.nanmean(part['dark']['potential'][::orbit_tree_2.subsampling][nind_2[np.isfinite(ndist_2)][part_mask_2]])
             #
             print('Finished calculating host data for snapshot 600')
         #
@@ -266,11 +272,11 @@ def calc_sub_potential(snap, simdata, orbit_class):
             # If there are halos, continue
             if np.sum(mass_mask_1) != 0:
                 # Get the halo positions and max halo radius in the mass bin
-                halo_pos_1 = halt['position'][orbit_class_1.sub_inds[:,600-snap][real_halos_1*mass_mask_1]]
-                dmax_1 = np.around(np.max(halt['radius'][orbit_class_1.sub_inds[:,600-snap][real_halos_1*mass_mask_1]]))
+                halo_pos_1 = halt['position'][orbit_class_1.sub_inds[:,600-snap][real_halos_1*mass_mask_1]]/(1+part.snapshot['redshift'])
+                dmax_1 = np.around(np.max(halt['radius'][orbit_class_1.sub_inds[:,600-snap][real_halos_1*mass_mask_1]]))+5
                 #
                 # Query the particle tree and save the distances and indices
-                ndist_1, nind_1 = orbit_tree_1.neighbors(centers=halo_pos_1, neigh_num_max=1e6, neigh_dist_max=dmax_1, workerss=4)
+                ndist_1, nind_1 = orbit_tree_1.neighbors(centers=halo_pos_1, neigh_num_max=1e7, neigh_dist_max=dmax_1, workerss=4)
                 #
                 # Loop over the number of halos
                 for j in range(0, len(halo_pos_1)):
@@ -281,11 +287,11 @@ def calc_sub_potential(snap, simdata, orbit_class):
             #
             if np.sum(mass_mask_2) != 0:
                 # Get the halo positions and max halo radius in the mass bin
-                halo_pos_2 = halt['position'][orbit_class_2.sub_inds[:,600-snap][real_halos_2*mass_mask_2]]
-                dmax_2 = np.around(np.max(halt['radius'][orbit_class_2.sub_inds[:,600-snap][real_halos_2*mass_mask_2]]))
+                halo_pos_2 = halt['position'][orbit_class_2.sub_inds[:,600-snap][real_halos_2*mass_mask_2]]/(1+part.snapshot['redshift'])
+                dmax_2 = np.around(np.max(halt['radius'][orbit_class_2.sub_inds[:,600-snap][real_halos_2*mass_mask_2]]))+5
                 #
                 # Query the particle tree and save the distances and indices
-                ndist_2, nind_2 = orbit_tree_2.neighbors(centers=halo_pos_2, neigh_num_max=1e6, neigh_dist_max=dmax_2, workerss=4)
+                ndist_2, nind_2 = orbit_tree_2.neighbors(centers=halo_pos_2, neigh_num_max=1e7, neigh_dist_max=dmax_2, workerss=4)
                 #
                 # Loop over the number of halos
                 for j in range(0, len(halo_pos_2)):
@@ -307,7 +313,7 @@ def calc_sub_potential(snap, simdata, orbit_class):
 
 print('Setting up arguments')
 # Create an array of arguments for the function above
-args_list = [(snapshot, sim_data, orbits) for snapshot in snaps]
+args_list = [(snapshot, sim_data, orbits, host_radius, host_mass) for snapshot in snaps]
 
 print('Starting to run on data')
 # Run the function using the arguments above in parallel
