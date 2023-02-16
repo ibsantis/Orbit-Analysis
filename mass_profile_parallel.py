@@ -43,7 +43,7 @@ print('Set paths')
 
 # Set up snapshot array to loop through
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir)
-#snaps = snaps['index']
+snaps = snaps['index']
 #snaps = snaps[453:] # this is where the first job left off
 
 # Create a distance array to loop through
