@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=m12i_subhalo_potential_all_snaps
+#SBATCH --job-name=subhalo_potential_all_snaps
 ##SBATCH --job-name=RJ_subhalo_potential_all_snaps
 ##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --partition=high2
@@ -11,7 +11,7 @@
 ##SBATCH --tasks-per-node=1    # MPI tasks per node
 #SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
 #SBATCH --time=06:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/m12i_subhalo_potential_all_snaps_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/subhalo_potential_all_snaps_%j.txt
 ##SBATCH --output=/home1/05400/ibsantis/scripts/jobs/potentials/all_snapshots/RJ_subhalo_potential_all_snaps_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
@@ -53,8 +53,8 @@ print('Read in the tools')
 
 ### Set path and initial parameters
 loc = 'peloton'
-host = 'm12i'
-sim_data = orbit_io.OrbitRead(gal1='m12i', location=loc)
+host = sys.argv[1]
+sim_data = orbit_io.OrbitRead(gal1=str(host), location=loc)
 print('Set paths')
 
 # Read in snapshot dictionary and the halo tree
@@ -66,8 +66,8 @@ print('Read in halo tree and set up subhalo indices')
 
 summary = summary_io.SummaryDataSort()
 data_total = summary.data_read(directory=sim_data.home_dir, hosts='all_no_r', sim_type='baryon')
-host_radius = data_total[host]['host.radius'][0]
-host_mass = data_total[host]['host.mass'][0]
+host_radius = data_total[str(host)]['host.radius'][0]
+host_mass = data_total[str(host)]['host.mass'][0]
 
 # Set up the snapshot array to loop through
 snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
