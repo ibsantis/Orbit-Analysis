@@ -45,7 +45,7 @@ print('Set paths')
 # Set up snapshot array to loop through
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir)
 #snaps = snaps['index']
-snaps = np.arange(int(sys.argv[2]), int(601), -1)
+snaps = np.arange(int(sys.argv[2]), int(601), 1)
 
 # Create a distance array to loop through
 #rs = np.logspace(np.log10(5), np.log10(500), 25) # OLD
