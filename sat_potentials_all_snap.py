@@ -70,8 +70,8 @@ host_radius = data_total[str(host)]['host.radius'][0]
 host_mass = data_total[str(host)]['host.mass'][0]
 
 # Set up the snapshot array to loop through
-snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
-#snaps = np.arange(int(sys.argv[1]), int(sys.argv[2]), -1)
+#snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
+snaps = np.arange(int(sys.argv[2]), int(sys.argv[3]), -1)
 print('Assigned snapshot array')
 
 def calc_sub_potential(snap, simdata, orbit_class, R200m, M200m, R200m2=None, M200m2=None):
