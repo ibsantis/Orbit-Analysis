@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=subhalo_potential_all_snaps
-##SBATCH --job-name=RJ_subhalo_potential_all_snaps
+##SBATCH --job-name=subhalo_potential_all_snaps
+#SBATCH --job-name=LG_subhalo_potential_all_snaps
 ##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
-#SBATCH --partition=high2
-##SBATCH --partition=skx-normal
+##SBATCH --partition=high2
+#SBATCH --partition=skx-normal
 ##SBATCH --mem=500G
-#SBATCH --mem=100G
+##SBATCH --mem=100G
 #SBATCH --nodes=1
-#SBATCH --ntasks=3    # processes total
-##SBATCH --tasks-per-node=1    # MPI tasks per node
-#SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
-#SBATCH --time=06:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/subhalo_potential_all_snaps_%j.txt
-##SBATCH --output=/home1/05400/ibsantis/scripts/jobs/potentials/all_snapshots/RJ_subhalo_potential_all_snaps_%j.txt
+##SBATCH --ntasks=3    # processes total
+#SBATCH --tasks-per-node=1    # MPI tasks per node
+##SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
+#SBATCH --time=03:00:00
+##SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/subhalo_potential_all_snaps_%j.txt
+#SBATCH --output=/home1/05400/ibsantis/scripts/jobs/potentials/all_snapshots/LG_subhalo_potential_all_snaps_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
 #SBATCH --mail-type=begin
-##SBATCH --account=TG-AST140064
+#SBATCH --account=TG-AST140064
 
 """
 
@@ -52,7 +52,7 @@ import sys
 print('Read in the tools')
 
 ### Set path and initial parameters
-loc = 'peloton'
+loc = 'stampede'
 host = sys.argv[1]
 sim_data = orbit_io.OrbitRead(gal1=str(host), location=loc)
 print('Set paths')
@@ -68,6 +68,9 @@ summary = summary_io.SummaryDataSort()
 data_total = summary.data_read(directory=sim_data.home_dir, hosts='all_no_r', sim_type='baryon')
 host_radius = data_total[str(host)]['host.radius'][0]
 host_mass = data_total[str(host)]['host.mass'][0]
+if sim_data.num_gal == 2:
+    host_radius2 = data_total[str(host)]['host2.radius'][0]
+    host_mass2 = data_total[str(host)]['host2.mass'][0]
 
 # Set up the snapshot array to loop through
 #snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
@@ -239,7 +242,7 @@ def calc_sub_potential(snap, simdata, orbit_class, R200m, M200m, R200m2=None, M2
             #data_dict_1['host.potential.100kpc'] = np.nanmean(part['dark']['potential'][::orbit_tree_1.subsampling][nind_1[np.isfinite(ndist_1)][part_mask_1]])
             #
             # Find the potential of the host within R200
-            ndist_2, nind_2 = orbit_tree_2.neighbors(centers=halt['position'][halt['host2.index'][0]]/(1+part.snapshot['redshift']), neigh_num_max=1e8, neigh_dist_max=R200m2, workerss=4)
+            ndist_2, nind_2 = orbit_tree_2.neighbors(centers=halt['position'][halt['host2.index'][0]]/(1+part.snapshot['redshift']), neigh_num_max=1e8, neigh_dist_max=R200m2+5, workerss=4)
             part_mask_2 = (ndist_2[np.isfinite(ndist_2)] < (R200m2+5))*(ndist_2[np.isfinite(ndist_2)] > (R200m2-5))
             data_dict_2['host.potential.R200m'] = np.nanmean(part['dark']['potential'][::orbit_tree_2.subsampling][nind_2[np.isfinite(ndist_2)][part_mask_2]])
             data_dict_2['host.particle.num'] = np.sum(part_mask_2)
@@ -314,8 +317,10 @@ def calc_sub_potential(snap, simdata, orbit_class, R200m, M200m, R200m2=None, M2
 
 print('Setting up arguments')
 # Create an array of arguments for the function above
-args_list = [(snapshot, sim_data, orbits, host_radius, host_mass) for snapshot in snaps]
-
+if sim_data.num_gal == 1:
+    args_list = [(snapshot, sim_data, orbits, host_radius, host_mass) for snapshot in snaps]
+if sim_data.num_gal == 2:
+    args_list = [(snapshot, sim_data, orbits, host_radius, host_mass, host_radius2, host_mass2) for snapshot in snaps]
 print('Starting to run on data')
 # Run the function using the arguments above in parallel
 ut.io.run_in_parallel(calc_sub_potential, args_list, proc_number=1, verbose=True) # ADD VERBOSE
