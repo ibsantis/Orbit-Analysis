@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
-##SBATCH --job-name=subhalo_potential_all_snaps
-#SBATCH --job-name=LG_subhalo_potential_all_snaps
+#SBATCH --job-name=subhalo_potential_all_snaps
+##SBATCH --job-name=LG_subhalo_potential_all_snaps
 ##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
-##SBATCH --partition=high2
-#SBATCH --partition=skx-normal
+#SBATCH --partition=high2
+##SBATCH --partition=skx-normal
 ##SBATCH --mem=500G
-##SBATCH --mem=100G
+#SBATCH --mem=100G
 #SBATCH --nodes=1
-##SBATCH --ntasks=3    # processes total
-#SBATCH --tasks-per-node=1    # MPI tasks per node
-##SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
+#SBATCH --ntasks=3    # processes total
+##SBATCH --tasks-per-node=1    # MPI tasks per node
+#SBATCH --cpus-per-task=1    # OpenMP threads per MPI task
 #SBATCH --time=03:00:00
-##SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/subhalo_potential_all_snaps_%j.txt
-#SBATCH --output=/home1/05400/ibsantis/scripts/jobs/potentials/all_snapshots/LG_subhalo_potential_all_snaps_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/potentials/all_snapshots/subhalo_potential_all_snaps_%j.txt
+##SBATCH --output=/home1/05400/ibsantis/scripts/jobs/potentials/all_snapshots/LG_subhalo_potential_all_snaps_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
 #SBATCH --mail-type=begin
-#SBATCH --account=TG-AST140064
+##SBATCH --account=TG-AST140064
 
 """
 
@@ -52,7 +52,7 @@ import sys
 print('Read in the tools')
 
 ### Set path and initial parameters
-loc = 'stampede'
+loc = 'peloton'
 host = sys.argv[1]
 sim_data = orbit_io.OrbitRead(gal1=str(host), location=loc)
 print('Set paths')
