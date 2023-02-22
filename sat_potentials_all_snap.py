@@ -66,11 +66,11 @@ print('Read in halo tree and set up subhalo indices')
 
 summary = summary_io.SummaryDataSort()
 data_total = summary.data_read(directory=sim_data.home_dir, hosts='iso_dmo', sim_type='baryon')
-host_radius = data_total[str(host)]['host.radius'][0]
-host_mass = data_total[str(host)]['host.mass'][0]
+host_radius = data_total[sim_data.gal_1]['host.radius'][0]
+host_mass = data_total[sim_data.gal_1]['host.mass'][0]
 if sim_data.num_gal == 2:
-    host_radius2 = data_total[str(host)]['host2.radius'][0]
-    host_mass2 = data_total[str(host)]['host2.mass'][0]
+    host_radius2 = data_total[sim_data.gal_2]['host.radius'][0]
+    host_mass2 = data_total[sim_data.gal_2]['host.mass'][0]
 
 # Set up the snapshot array to loop through
 #snaps = np.flip(snaps['index'])[:len(orbits.sub_inds[0])]
