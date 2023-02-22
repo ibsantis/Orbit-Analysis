@@ -6,7 +6,7 @@
 #SBATCH --nodes=1
 ##SBATCH --ntasks=4    # processes total
 #SBATCH --tasks-per-node=4
-#SBATCH --time=03:00:00
+#SBATCH --time=04:00:00
 ##SBATCH --output=/home/ibsantis/scripts/jobs/mass_profiles/mass_profile_all_%j.txt
 #SBATCH --output=/home1/05400/ibsantis/scripts/jobs/mass_profiles/LG_mass_profile_all_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
