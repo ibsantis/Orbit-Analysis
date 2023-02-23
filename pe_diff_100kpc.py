@@ -26,7 +26,7 @@ from matplotlib import pyplot as plt
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12i', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12f', location='peloton')
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
 times = np.arange(13.8, 2.55, -0.25)
 indices = np.zeros(len(times), int)
