@@ -24,7 +24,7 @@ print('Read in the tools')
 
 ### Set path and initial parameters
 loc = 'peloton'
-host = 'm12w'
+host = 'Thelma'
 sim_data = orbit_io.OrbitRead(gal1=host, location=loc)
 print('Set paths')
 
@@ -40,7 +40,7 @@ if sim_data.num_gal == 1:
     part = gizmo.io.Read.read_snapshots(['star', 'gas', 'dark'], 'index', 600, properties=['mass', 'position', 'potential'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
     #
     # Set up the distance array of interest and empty arrays to save to
-    ds = np.array([30, 50, 100, 300, 500])
+    ds = np.array([100, 110, 200, 210, 300, 310, 500, 510])
     data_dict = dict()
     data_dict['mass.enclosed'] = np.zeros(len(ds))
     data_dict['potential'] = np.zeros(len(ds))
@@ -68,7 +68,7 @@ if sim_data.num_gal == 2:
     part = gizmo.io.Read.read_snapshots(['star', 'gas', 'dark'], 'index', 600, properties=['mass', 'position', 'potential'], simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True)
     #
     # Set up the distance array of interest and empty arrays to save to
-    ds = np.array([30, 50, 100, 300, 500])
+    ds = np.array([100, 110, 200, 210, 300, 310, 500, 510])
     #
     data_dict_1 = dict()
     data_dict_1['mass.enclosed'] = np.zeros(len(ds))
