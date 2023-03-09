@@ -127,10 +127,10 @@ def calc_sub_potential(snap, simdata, orbit_class, R200m, M200m, orbit_class2=No
             temp = np.arange(len(orbit_class.sub_inds[:,600-snap]))
             print('Set up a null dictionary for the data at snapshot {0}'.format(snap))
             #
-            # Calculate the host potential at 100 kpc at each snapshot
-            ndist, nind = orbit_tree.neighbors(centers=halt['position'][host_inds[600-snap]]/(1+part.snapshot['redshift']), neigh_num_max=1e8, neigh_dist_max=100+5, workerss=4)
-            part_mask = (ndist[np.isfinite(ndist)] < (100+5))*(ndist[np.isfinite(ndist)] > (100-5))
-            data_dict['host.potential.100kpc'] = np.nanmean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
+            # Calculate the host potential at 500 kpc at each snapshot
+            ndist, nind = orbit_tree.neighbors(centers=halt['position'][host_inds[600-snap]]/(1+part.snapshot['redshift']), neigh_num_max=1e8, neigh_dist_max=500+5, workerss=4)
+            part_mask = (ndist[np.isfinite(ndist)] < (500+5))*(ndist[np.isfinite(ndist)] > (500-5))
+            data_dict['host.potential.500kpc'] = np.nanmean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
             #
             if snap == 600:
                 # Find the potential of the host within R200
