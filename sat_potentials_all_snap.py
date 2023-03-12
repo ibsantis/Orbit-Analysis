@@ -64,7 +64,7 @@ print('Read in halo tree and set up subhalo indices')
 
 # Set up some of the parameters to the function
 summary = summary_io.SummaryDataSort()
-data_total = summary.data_read(directory=sim_data.home_dir, hosts='all_no_r', sim_type='baryon')
+data_total = summary.data_read(directory=sim_data.home_dir, hosts='lg', sim_type='baryon')
 #
 if sim_data.num_gal == 1:
     orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location=loc, host=1)
