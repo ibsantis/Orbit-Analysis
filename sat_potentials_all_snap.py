@@ -237,14 +237,14 @@ def calc_sub_potential(snap, simdata, orbit_class, R200m, M200m, orbit_class2=No
         if snap not in host_snaps_2:
             print('No well defined host at snapshot {0}'.format(snap))
         #
-        # Calculate the host potential at 100 kpc at each snapshot
-        ndist, nind = orbit_tree_1.neighbors(centers=halt['position'][host_inds_1[600-snap]]/(1+part.snapshot['redshift']), neigh_num_max=1e8, neigh_dist_max=100+5, workerss=4)
-        part_mask = (ndist[np.isfinite(ndist)] < (100+5))*(ndist[np.isfinite(ndist)] > (100-5))
-        data_dict_1['host.potential.100kpc'] = np.nanmean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
+        # Calculate the host potential at 500 kpc at each snapshot
+        ndist, nind = orbit_tree_1.neighbors(centers=halt['position'][host_inds_1[600-snap]]/(1+part.snapshot['redshift']), neigh_num_max=1e8, neigh_dist_max=500+5, workerss=4)
+        part_mask = (ndist[np.isfinite(ndist)] < (500+5))*(ndist[np.isfinite(ndist)] > (500-5))
+        data_dict_1['host.potential.500kpc'] = np.nanmean(part['dark']['potential'][::orbit_tree_1.subsampling][nind[np.isfinite(ndist)][part_mask]])
         #
-        ndist, nind = orbit_tree_2.neighbors(centers=halt['position'][host_inds_2[600-snap]]/(1+part.snapshot['redshift']), neigh_num_max=1e8, neigh_dist_max=100+5, workerss=4)
-        part_mask = (ndist[np.isfinite(ndist)] < (100+5))*(ndist[np.isfinite(ndist)] > (100-5))
-        data_dict_2['host.potential.100kpc'] = np.nanmean(part['dark']['potential'][::orbit_tree.subsampling][nind[np.isfinite(ndist)][part_mask]])
+        ndist, nind = orbit_tree_2.neighbors(centers=halt['position'][host_inds_2[600-snap]]/(1+part.snapshot['redshift']), neigh_num_max=1e8, neigh_dist_max=500+5, workerss=4)
+        part_mask = (ndist[np.isfinite(ndist)] < (500+5))*(ndist[np.isfinite(ndist)] > (500-5))
+        data_dict_2['host.potential.500kpc'] = np.nanmean(part['dark']['potential'][::orbit_tree_2.subsampling][nind[np.isfinite(ndist)][part_mask]])
         #
         if snap == 600:
             # Find the potential of the host within R200
@@ -255,11 +255,6 @@ def calc_sub_potential(snap, simdata, orbit_class, R200m, M200m, orbit_class2=No
             G = ((6.67*10**(-11)*2*10**(30))/(1000*3.086*10**(16)*1000**2))
             data_dict_1['KE.at.Rvir'] = 0.5*G*(M200m/R200m)
             #
-            # Find the potential of the host at 100 kpc
-            #ndist_1, nind_1 = orbit_tree_1.neighbors(centers=halt['position'][halt['host.index'][0]]/(1+part.snapshot['redshift']), neigh_num_max=1e8, neigh_dist_max=100+5, workerss=4)
-            #part_mask_1 = (ndist_1[np.isfinite(ndist_1)] < (100+5))*(ndist_1[np.isfinite(ndist_1)] > (100-5))
-            #data_dict_1['host.potential.100kpc'] = np.nanmean(part['dark']['potential'][::orbit_tree_1.subsampling][nind_1[np.isfinite(ndist_1)][part_mask_1]])
-            #
             # Find the potential of the host within R200
             ndist_2, nind_2 = orbit_tree_2.neighbors(centers=halt['position'][halt['host2.index'][0]]/(1+part.snapshot['redshift']), neigh_num_max=1e8, neigh_dist_max=R200m2+5, workerss=4)
             part_mask_2 = (ndist_2[np.isfinite(ndist_2)] < (R200m2+5))*(ndist_2[np.isfinite(ndist_2)] > (R200m2-5))
@@ -267,11 +262,6 @@ def calc_sub_potential(snap, simdata, orbit_class, R200m, M200m, orbit_class2=No
             data_dict_2['host.particle.num'] = np.sum(part_mask_2)
             G = ((6.67*10**(-11)*2*10**(30))/(1000*3.086*10**(16)*1000**2))
             data_dict_2['KE.at.Rvir'] = 0.5*G*(M200m2/R200m2)
-            #
-            # Find the potential of the host at 100 kpc
-            #ndist_2, nind_2 = orbit_tree_2.neighbors(centers=halt['position'][halt['host2.index'][0]], neigh_num_max=1e8, neigh_dist_max=100, workerss=4)
-            #part_mask_2 = (ndist_2[np.isfinite(ndist_2)] < (100+5))*(ndist_2[np.isfinite(ndist_2)] > (100-5))
-            #data_dict_2['host.potential.100kpc'] = np.nanmean(part['dark']['potential'][::orbit_tree_2.subsampling][nind_2[np.isfinite(ndist_2)][part_mask_2]])
             #
             print('Finished calculating host data for snapshot 600')
         #
