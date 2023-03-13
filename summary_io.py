@@ -17,7 +17,7 @@ import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
 import matplotlib.ticker
-from scipy.interpolate import splrep, splev
+from scipy.interpolate import splrep, splev, interp1d
 import pandas as pd
 import galpy
 
@@ -187,7 +187,7 @@ class SummaryDataSort:
         #
         return data_dict
 
-    def data_read_potential_full(self, directory, selection='sim', hosts='all'):
+    def data_read_potential_full(self, directory, selection='sim', hosts='all', new=False):
         """
         DESCRIPTION:
             Reads in the potential data and stores it in a dictionary with each
@@ -222,8 +222,12 @@ class SummaryDataSort:
         # Given the type of data, read in from the appropriate directory
         if selection == 'sim':
             for name in self.host_names[hosts]:
-                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/all_snapshots/'+name+'_potentials_all', verbose=True)
-                data_dict[name] = data
+                if new:
+                    data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials_new/all_snapshots/'+name+'_potentials_all', verbose=True)
+                    data_dict[name] = data
+                else:
+                    data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/potentials/all_snapshots/'+name+'_potentials_all', verbose=True)
+                    data_dict[name] = data
         #
         elif selection == 'model':
             for name in self.host_names[hosts]:
@@ -232,7 +236,7 @@ class SummaryDataSort:
         #
         return data_dict
 
-    def data_read_mass_profile(self, directory, hosts='all'):
+    def data_read_mass_profile(self, directory, hosts='all', new=False):
         """
         DESCRIPTION:
             Reads in the mass profile data for each host and stores it in a
@@ -256,16 +260,35 @@ class SummaryDataSort:
         # Set up an empty dictionary to save to
         data_dict = dict()
         #
-        # Loop through each host
-        for name in self.host_names[hosts]:
-            data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/mass_profiles/'+name+'_mass_profile_all', verbose=True)
-            data_dict[name] = data['mass.profile']
+        if new:
+            # Loop through each host
+            for name in self.host_names[hosts]:
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/mass_profiles_new/'+name+'_mass_profile_all', verbose=True)
+                data_dict[name] = data['mass.profile']
+            #
+            # Save extra useful information
+            data_dict['snapshot'] = data['snapshot']
+            data_dict['time'] = data['time']
+            data_dict['rs'] = np.array([  0.        ,   5.        ,   6.05763829,   7.33899634,
+                     8.89139705,  10.77217345,  13.05078608,  15.8113883 ,
+                    19.15593425,  23.20794417,  28.11706626,  34.06460345,
+                    41.27020926,  50.        ,  60.57638293,  73.38996338,
+                    88.9139705 , 100.        , 107.7217345 , 130.50786078,
+                   150., 158.11388301, 191.55934248, 232.07944168, 281.1706626 ,
+                   340.64603453, 412.70209263, 500.        ])
+            data_dict['rs.interp'] = np.logspace(np.log10(data_dict['rs'][0]+0.1), np.log10(data_dict['rs'][-1]), 1000)
         #
-        # Save extra useful information
-        data_dict['snapshot'] = data['snapshot']
-        data_dict['time'] = data['time']
-        data_dict['rs'] = np.logspace(np.log10(5), np.log10(500), 25)
-        data_dict['rs.interp'] = np.logspace(np.log10(data_dict['rs'][0]), np.log10(data_dict['rs'][-1]), 1000)
+        else:
+            # Loop through each host
+            for name in self.host_names[hosts]:
+                data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/mass_profiles/'+name+'_mass_profile_all', verbose=True)
+                data_dict[name] = data['mass.profile']
+            #
+            # Save extra useful information
+            data_dict['snapshot'] = data['snapshot']
+            data_dict['time'] = data['time']
+            data_dict['rs'] = np.logspace(np.log10(5), np.log10(500), 25)
+            data_dict['rs.interp'] = np.logspace(np.log10(data_dict['rs'][0]), np.log10(data_dict['rs'][-1]), 1000)
         #
         return data_dict
 
@@ -518,11 +541,11 @@ class SummaryDataSort:
         #
         return data
 
-    def print_keys(self, data_dict, host='m12b'):
+    def print_keys(self, data_dict):
         """
         TBD
         """
-        for i in data_dict[host].keys():
+        for i in data_dict.keys():
             print(i)
 
     def host_vir_properties(self, data_dict, hosts='all'):
@@ -2376,9 +2399,22 @@ class SummaryDataSort:
             # Set the host potential at 100 kpc at z = 0
             phi_host_z0 = potential_dict[name]['host.pot.100kpc'][-1] - potential_dict[name]['host.pot.R200m'] - potential_dict[name]['KE.at.Rvir']
             #
-            # Set up the enclosed mass ratio within 100-ish kpc
-            M_enc_100kpc_z0 = mass_profile_dict[name][-1][16]
-            M_enc_100kpc_z = mass_profile_dict[name][:,16]
+            # Set up the enclosed mass ratio within 100 kpc
+            M_enc_100kpc_z = np.zeros(len(mass_profile_dict[name]))
+            M_enc_R200m_z = np.zeros(len(mass_profile_dict[name]))
+            rs_new = np.logspace(np.log10(mass_profile_dict['rs'][1]), np.log10(mass_profile_dict['rs'][-1]), 10000)
+            r100_ind = np.where(np.min(np.abs(100-rs_new)) == np.abs(100-rs_new))[0]
+            r200m_ind = np.where(np.min(np.abs(data_dict[name]['host.radius'][0]-rs_new)) == np.abs(data_dict[name]['host.radius'][0]-rs_new))[0]
+            #
+            for j in range(0, len(mass_profile_dict[name])):
+                mass_interp = interp1d(mass_profile_dict['rs'][1:], mass_profile_dict[name][j], 'cubic')
+                M_enc_100kpc_z[j] = mass_interp(rs_new[r100_ind])
+                M_enc_R200m_z[j] = mass_interp(rs_new[r200m_ind])
+            #
+            #
+            #M_enc_100kpc_z0 = mass_profile_dict[name][-1][16]
+            #M_enc_100kpc_z = mass_profile_dict[name][:,16]
+            M_enc_100kpc_z0 = M_enc_100kpc_z[-1]
             M_enc_ratio = M_enc_100kpc_z/M_enc_100kpc_z0
             #
             # Define the host potential at 100 kpc across all snapshots
@@ -2391,7 +2427,7 @@ class SummaryDataSort:
             sub_pot_tlb = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape)
             sub_host_energy = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape[0])
             #
-            host_energies = ((6.67*10**(-11)*2*10**(30))/(10**3*3.086*10**(16)*1000**2))*(data_dict[name]['host.mass'][0]/data_dict[name]['host.radius'][0])
+            host_energies = ((6.67*10**(-11)*2*10**(30))/(10**3*3.086*10**(16)*1000**2))*(M_enc_R200m_z[-1]/rs_new[r200m_ind])
             #
             # Loop through all of the satellites
             for i in range(0, sub_pot.shape[0]):
@@ -2414,6 +2450,7 @@ class SummaryDataSort:
                 # Calculate the total orbital energy
                 sub_energy[i][mask_tot] = sub_pot[i][mask_tot] + 0.5*(data_dict[name]['v.tot.sim'][i][:len(potential_dict[name]['subhalo.pot'][i])][mask_tot])**2
                 sub_host_energy[i] = host_energies
+                #sub_host_energy[i] = phi_host_z0
             #
             # Save all energy data for the satellites.
             data_all[name] = sub_energy
@@ -2440,6 +2477,127 @@ class SummaryDataSort:
         d['energy.all'] = data_all
         d['energy.all.tlb'] = data_all_time
         d['E.vir'] = np.hstack(data_all_host)
+        #
+        return d
+
+    def energies_new(self, data_dict, mask_dict, potential_dict, mass_profile_dict, time_dict, oversample=False, hosts='all', sim_type='baryon'):
+        """
+        Need to actually generate new data because I saved the necessary data to a file
+        """
+        """
+        TBD
+        """
+        # Set up some null things to save to
+        data_z0 = []
+        data_ke_z0 = []
+        data_pe_z0 = []
+        data_infall = []
+        data_ke_infall = []
+        data_pe_infall = []
+        data_evir = []
+        #
+        data_all = dict()
+        data_all_time = dict()
+        #
+        tlb = time_dict['time'][-1] - np.flip(time_dict['time'])
+        #
+        # Loop through the hosts
+        for name in self.host_names[hosts]:
+            # Set up empty arrays to save to
+            M_enc_500kpc_z = np.zeros(len(mass_profile_dict[name]))
+            GMR_500kpc_z = np.zeros(len(mass_profile_dict[name]))
+            #
+            # Set up index for R200m, interpolate, and get the mass within R200m
+            rs_new = np.logspace(np.log10(mass_profile_dict['rs'][1]), np.log10(mass_profile_dict['rs'][-1]), 10000)
+            r200m_ind = np.where(np.min(np.abs(data_dict[name]['host.radius'][0]-rs_new)) == np.abs(data_dict[name]['host.radius'][0]-rs_new))[0]
+            mass_interp = interp1d(mass_profile_dict['rs'][1:], mass_profile_dict[name][-1], 'cubic')
+            M_enc_R200m_z0 = mass_interp(rs_new[r200m_ind])
+            #
+            # Loop through the snapshots the host existed at
+            for j in range(0, len(mass_profile_dict[name])):
+                # Get the mass within 500 kpc at each snapshot and calculate GMR within 500 kpc
+                M_enc_500kpc_z[j] = mass_profile_dict[name][j,-1]
+                GMR_500kpc_z[j] = ((6.67*10**(-11)*2*10**(30))/(10**3*3.086*10**(16)*1000**2))*M_enc_500kpc_z[j]/rs_new[r500_ind]
+            #
+            # Set up null array to save the normalized subhalo potentials to
+            sub_pot = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape)
+            sub_kin = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape)
+            sub_energy = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape)
+            sub_pot_snaps = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape, int)
+            sub_pot_tlb = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape)
+            sub_host_evir = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape[0])
+            #
+            host_energies = potential_dict[name]['host.pot.R200m']
+            #
+            # Set the sign of GMR equal to the simulation sign
+            if (host_energies < 0):
+                GMR_200m_z0 = (-1)*((6.67*10**(-11)*2*10**(30))/(10**3*3.086*10**(16)*1000**2))*(M_enc_R200m_z0/rs_new[r200m_ind])
+                GMR_500kpc_z = (-1)*GMR_500kpc_z
+            #
+            if (host_energies > 0):
+                GMR_200m_z0 = ((6.67*10**(-11)*2*10**(30))/(10**3*3.086*10**(16)*1000**2))*(M_enc_R200m_z0/rs_new[r200m_ind])
+                GMR_500kpc_z = GMR_500kpc_z
+            #
+            # Loop through all of the satellites
+            for i in range(0, sub_pot.shape[0]):
+                # Create the right masks
+                mask_pot_exist = (np.flip(potential_dict[name]['subhalo.pot'][i]) != -1)
+                mask_pot_finite = np.isfinite(np.flip(potential_dict[name]['subhalo.pot'][i]))
+                mask_vel_exist = (data_dict[name]['v.tot.sim'][i][:len(potential_dict[name]['subhalo.pot'][i])] != -1)
+                mask_vel_finite = np.isfinite(data_dict[name]['v.tot.sim'][i][:len(potential_dict[name]['subhalo.pot'][i])])
+                mask_tot = mask_pot_exist*mask_pot_finite*mask_vel_exist*mask_vel_finite
+                #
+                # Calculate the normalized subhalo potential energy
+                sub_pot[i][mask_tot] = np.flip(potential_dict[name]['subhalo.pot'][i])[mask_tot] - np.flip(potential_dict[name]['host.pot.500kpc'])[:len(potential_dict[name]['subhalo.pot'][i])][mask_tot] - GMR_500kpc_z[-1] + np.flip(GMR_500kpc_z)[:len(potential_dict[name]['subhalo.pot'][i])][mask_tot] - host_energies - potential_dict[name]['KE.at.Rvir']
+                #
+                # Keep which snapshots it has data for
+                sub_pot_snaps[i][mask_tot] = np.flip(time_dict['index'])[:len(potential_dict[name]['subhalo.pot'][i])][mask_tot]
+                sub_pot_tlb[i][mask_tot] = tlb[:len(potential_dict[name]['subhalo.pot'][i])][mask_tot]
+                #
+                # Calculate the total orbital energy
+                sub_energy[i][mask_tot] = sub_pot[i][mask_tot] + 0.5*(data_dict[name]['v.tot.sim'][i][:len(potential_dict[name]['subhalo.pot'][i])][mask_tot])**2
+                sub_host_evir[i] = GMR_200m_z0
+                sub_kin[i][mask_tot] = 0.5*(data_dict[name]['v.tot.sim'][i][:len(potential_dict[name]['subhalo.pot'][i])][mask_tot])**2
+            #
+            # Save all energy data for the satellites.
+            data_all[name] = sub_energy
+            data_all_time[name] = sub_pot_tlb
+            #
+            # Save data for the z = 0 stuff
+            if oversample:
+                data_z0.append(np.repeat(sub_energy[:,0][mask_dict[name]], self.oversample[sim_type][name]))
+                data_pe_z0.append(np.repeat(sub_pot[:,0][mask_dict[name]], self.oversample[sim_type][name]))
+                data_ke_z0.append(np.repeat(sub_kin[:,0][mask_dict[name]], self.oversample[sim_type][name]))
+                data_evir.append(np.repeat(sub_host_evir[mask_dict[name]], self.oversample[sim_type][name]))
+            else:
+                data_z0.append(sub_energy[:,0][mask_dict[name]])
+                data_pe_z0.append(sub_pot[:,0][mask_dict[name]])
+                data_ke_z0.append(sub_kin[:,0][mask_dict[name]])
+                data_evir.append(sub_host_evir[mask_dict[name]])
+            #
+            # Compute the index of infall and save the energies at infall
+            for i in range(0, len(mask_dict[name])):
+                if mask_dict[name][i]:
+                    indfall = 600-data_dict[name]['first.infall.snap'][i]
+                    if oversample:
+                        data_infall.append(np.repeat(sub_energy[i][indfall], self.oversample[sim_type][name]))
+                        data_pe_infall.append(np.repeat(sub_pot[i][indfall], self.oversample[sim_type][name]))
+                        data_ke_infall.append(np.repeat(sub_kin[i][indfall], self.oversample[sim_type][name]))
+                    else:
+                        data_infall.append(sub_energy[i][indfall])
+                        data_pe_infall.append(sub_pot[i][indfall])
+                        data_ke_infall.append(sub_kin[i][indfall])
+        #
+        d = dict()
+        d['energy.z0'] = np.hstack(data_z0)
+        d['energy.pe.z0'] = np.hstack(data_pe_z0)
+        d['energy.ke.z0'] = np.hstack(data_ke_z0)
+        d['energy.infall'] = np.hstack(data_infall)
+        d['energy.pe.infall'] = np.hstack(data_pe_infall)
+        d['energy.ke.infall'] = np.hstack(data_ke_infall)
+        d['energy.all'] = data_all
+        d['energy.all.tlb'] = data_all_time
+        d['E.vir'] = np.hstack(data_evir)
         #
         return d
 
@@ -2646,6 +2804,11 @@ class SummaryDataPlot(SummaryDataSort):
                        'N.sim': 'Pericenters',\
                        'N.model': 'Pericenters',\
                        'N.delta': 'Pericenters'}
+        #
+        self.onesigp = 84.13
+        self.onesigm = 15.87
+        self.twosigp = 97.73
+        self.twosigm = 2.27
 
     def binning_scheme(self, x, xtype, binsize, binedges=None):
         """
@@ -2696,11 +2859,6 @@ class SummaryDataPlot(SummaryDataSort):
         #
         if 'N.' not in ytype:
             #
-            onesigp = 84.13
-            onesigm = 15.87
-            twosigp = 100 # 99.86
-            twosigm = 0   # 0.14
-            #
             med = np.zeros(len(bins)-1)
             lower = np.zeros(len(bins)-1)
             upper = np.zeros(len(bins)-1)
@@ -2710,10 +2868,10 @@ class SummaryDataPlot(SummaryDataSort):
             for i in range(0, len(bins)-1):
                 mask = (x >= bins[i]) & (x <= bins[i+1])
                 med[i] = np.nanmedian(y[mask])
-                upper[i] = np.nanpercentile(y[mask], onesigp)
-                lower[i] = np.nanpercentile(y[mask], onesigm)
-                highest[i] = np.nanpercentile(y[mask], twosigp)
-                lowest[i] = np.nanpercentile(y[mask], twosigm)
+                upper[i] = np.nanpercentile(y[mask], self.onesigp)
+                lower[i] = np.nanpercentile(y[mask], self.onesigm)
+                highest[i] = np.nanpercentile(y[mask], self.twosigp)
+                lowest[i] = np.nanpercentile(y[mask], self.twosigm)
         #
         if 'N.' in ytype:
             #
@@ -3125,11 +3283,6 @@ class SummaryDataPlot(SummaryDataSort):
             bins = np.linspace(minn, maxx, bin_num)
             half_bin = (bins[1]-bins[0])/2
             #
-            onesigp = 84.13
-            onesigm = 15.87
-            twosigp = 100
-            twosigm = 0
-            #
             med_all = np.zeros(len(bins)-1)
             med_1 = np.zeros(len(bins)-1)
             med_2 = np.zeros(len(bins)-1)
@@ -3142,10 +3295,10 @@ class SummaryDataPlot(SummaryDataSort):
             for i in range(0, len(bins)-1):
                 mask_all = (x_all >= bins[i]) & (x_all <= bins[i+1])
                 med_all[i] = np.nanmedian(y_all[mask_all])
-                upper[i] = np.nanpercentile(y_all[mask_all], onesigp)
-                lower[i] = np.nanpercentile(y_all[mask_all], onesigm)
-                highest[i] = np.nanpercentile(y_all[mask_all], twosigp)
-                lowest[i] = np.nanpercentile(y_all[mask_all], twosigm)
+                upper[i] = np.nanpercentile(y_all[mask_all], self.onesigp)
+                lower[i] = np.nanpercentile(y_all[mask_all], self.onesigm)
+                highest[i] = np.nanpercentile(y_all[mask_all], self.twosigp)
+                lowest[i] = np.nanpercentile(y_all[mask_all], self.twosigm)
                 #
                 mask_1 = (x[0] >= bins[i]) & (x[0] <= bins[i+1])
                 med_1[i] = np.nanmedian(y[0][mask_1])
@@ -3160,10 +3313,6 @@ class SummaryDataPlot(SummaryDataSort):
             bins = np.linspace(minn, maxx, bin_num)
             #
             half_bin = (bins[1]-bins[0])/2
-            onesigp = 84.13
-            onesigm = 15.87
-            twosigp = 100
-            twosigm = 0
             #
             med_all = np.zeros(len(bins)-1)
             med_1 = np.zeros(len(bins)-1)
@@ -3177,10 +3326,10 @@ class SummaryDataPlot(SummaryDataSort):
             for i in range(0, len(bins)-1):
                 mask_all = (x_all >= bins[i]) & (x_all <= bins[i+1])
                 med_all[i] = np.nanmedian(y_all[mask_all])
-                upper[i] = np.nanpercentile(y_all[mask_all], onesigp)
-                lower[i] = np.nanpercentile(y_all[mask_all], onesigm)
-                highest[i] = np.nanpercentile(y_all[mask_all], twosigp)
-                lowest[i] = np.nanpercentile(y_all[mask_all], twosigm)
+                upper[i] = np.nanpercentile(y_all[mask_all], self.onesigp)
+                lower[i] = np.nanpercentile(y_all[mask_all], self.onesigm)
+                highest[i] = np.nanpercentile(y_all[mask_all], self.twosigp)
+                lowest[i] = np.nanpercentile(y_all[mask_all], self.twosigm)
                 #
                 mask_1 = (x[0] >= bins[i]) & (x[0] <= bins[i+1])
                 med_1[i] = np.nanmedian(y[0][mask_1])
@@ -3320,10 +3469,8 @@ class SummaryDataPlot(SummaryDataSort):
         if 'N.' not in xtype:
             #
             # Calculate the scatter
-            onesigp = 84.13
-            onesigm = 15.87
-            sigma_one_op = np.nanpercentile(x, onesigp)
-            sigma_one_om = np.nanpercentile(x, onesigm)
+            sigma_one_op = np.nanpercentile(x, self.onesigp)
+            sigma_one_om = np.nanpercentile(x, self.onesigm)
             #
             y_med = np.max(np.histogram(x, binss, density=pdf)[0])*1.1
             #
@@ -3399,10 +3546,8 @@ class SummaryDataPlot(SummaryDataSort):
             if 'N.' not in xtype[i]:
                 #
                 # Calculate the scatter
-                onesigp = 84.13
-                onesigm = 15.87
-                sigma_one_op = np.nanpercentile(x[i], onesigp)
-                sigma_one_om = np.nanpercentile(x[i], onesigm)
+                sigma_one_op = np.nanpercentile(x[i], self.onesigp)
+                sigma_one_om = np.nanpercentile(x[i], self.onesigm)
                 #
                 if med_location:
                     y_med = med_location[i]
