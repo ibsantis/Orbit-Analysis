@@ -2512,12 +2512,13 @@ class SummaryDataSort:
             r200m_ind = np.where(np.min(np.abs(data_dict[name]['host.radius'][0]-rs_new)) == np.abs(data_dict[name]['host.radius'][0]-rs_new))[0]
             mass_interp = interp1d(mass_profile_dict['rs'][1:], mass_profile_dict[name][-1], 'cubic')
             M_enc_R200m_z0 = mass_interp(rs_new[r200m_ind])
+            GMR_200m_z0 = ((6.67*10**(-11)*2*10**(30))/(10**3*3.086*10**(16)*1000**2))*(M_enc_R200m_z0/rs_new[r200m_ind])
             #
             # Loop through the snapshots the host existed at
             for j in range(0, len(mass_profile_dict[name])):
                 # Get the mass within 500 kpc at each snapshot and calculate GMR within 500 kpc
                 M_enc_500kpc_z[j] = mass_profile_dict[name][j,-1]
-                GMR_500kpc_z[j] = ((6.67*10**(-11)*2*10**(30))/(10**3*3.086*10**(16)*1000**2))*M_enc_500kpc_z[j]/rs_new[r500_ind]
+                GMR_500kpc_z[j] = ((6.67*10**(-11)*2*10**(30))/(10**3*3.086*10**(16)*1000**2))*M_enc_500kpc_z[j]/500
             #
             # Set up null array to save the normalized subhalo potentials to
             sub_pot = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape)
@@ -2528,15 +2529,6 @@ class SummaryDataSort:
             sub_host_evir = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape[0])
             #
             host_energies = potential_dict[name]['host.pot.R200m']
-            #
-            # Set the sign of GMR equal to the simulation sign
-            if (host_energies < 0):
-                GMR_200m_z0 = (-1)*((6.67*10**(-11)*2*10**(30))/(10**3*3.086*10**(16)*1000**2))*(M_enc_R200m_z0/rs_new[r200m_ind])
-                GMR_500kpc_z = (-1)*GMR_500kpc_z
-            #
-            if (host_energies > 0):
-                GMR_200m_z0 = ((6.67*10**(-11)*2*10**(30))/(10**3*3.086*10**(16)*1000**2))*(M_enc_R200m_z0/rs_new[r200m_ind])
-                GMR_500kpc_z = GMR_500kpc_z
             #
             # Loop through all of the satellites
             for i in range(0, sub_pot.shape[0]):
