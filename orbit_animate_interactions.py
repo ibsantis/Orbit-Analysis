@@ -22,7 +22,7 @@ import time
 
 print('Starting the script at {0}'.format(time.strftime("%H:%M:%S", time.localtime())))
 
-sim_data = orbit_io.OrbitRead(gal1='m12m', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='m12f', location='mac')
 print('Set paths')
 
 data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy)
@@ -81,7 +81,7 @@ plt.suptitle(sim_data.galaxy+' satellites', fontsize=28)
 camera = Camera(fig)
 
 # Create individual frames
-halos = np.array([81,82])
+halos = np.array([21,25])
 for j in range(1,traj_X.shape[1]+1):
     ax[0].text(-200, 200,'T = {0} Gyr'.format(np.around(data['time.sim'][j], 2)))
     for i in range(0, len(halos)):
