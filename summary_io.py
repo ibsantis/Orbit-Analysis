@@ -2625,12 +2625,12 @@ class SummaryDataSort:
             potential_two_power = disk_inner+disk_outer+halo_2p
             #
             # Set the global potential at 100 kpc
-            d100 = 100/np.sqrt(2)
+            d500 = 500/np.sqrt(2)
             d200m = data_dict[name]['host.radius'][0]/np.sqrt(2)
-            phi_model_100kpc = evaluatePotentials(potential_two_power, d100*u.kpc, d100*u.kpc)
+            phi_model_500kpc = evaluatePotentials(potential_two_power, d500*u.kpc, d500*u.kpc)
             #
             # Set the potential at z = 0
-            phi_model_z0 = evaluatePotentials(potential_two_power, d100*u.kpc, d100*u.kpc) - evaluatePotentials(potential_two_power, d200m*u.kpc, d200m*u.kpc) - potential_dict_sim[name]['KE.at.Rvir']
+            phi_model_z0 = evaluatePotentials(potential_two_power, d500*u.kpc, d500*u.kpc) - evaluatePotentials(potential_two_power, d200m*u.kpc, d200m*u.kpc) - potential_dict_sim[name]['KE.at.Rvir']
             # Set the potential across all time as just the potential at z = 0
             phi_model_z = phi_model_z0*np.ones(potential_dict_model[name]['model.potential'].shape[1])
             #
@@ -2645,7 +2645,7 @@ class SummaryDataSort:
             for j in range(0, sub_pot_model.shape[0]):
                 # Create a mask for the subhalo data
                 # Calculate the normalized subhalo energy
-                sub_pot_model[j] = potential_dict_model[name]['model.potential'][j] - phi_model_100kpc + phi_model_z
+                sub_pot_model[j] = potential_dict_model[name]['model.potential'][j] - phi_model_500kpc + phi_model_z
                 #
                 # Keep which snapshots it has data for
                 sub_pot_snaps_model[j] = np.flip(time_dict['index'])
