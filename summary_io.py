@@ -2383,107 +2383,7 @@ class SummaryDataSort:
         #s
         return d
 
-    # Needs a lot of documenting
-    def energies(self, data_dict, mask_dict, potential_dict, mass_profile_dict, time_dict, oversample=False, hosts='all', sim_type='baryon'):
-        """
-        TBD
-        """
-        data_z0 = []
-        data_infall = []
-        data_all = dict()
-        data_all_time = dict()
-        tlb = time_dict['time'][-1] - np.flip(time_dict['time'])
-        data_all_host = []
-        #
-        for name in self.host_names[hosts]:
-            # Set the host potential at 100 kpc at z = 0
-            phi_host_z0 = potential_dict[name]['host.pot.100kpc'][-1] - potential_dict[name]['host.pot.R200m'] - potential_dict[name]['KE.at.Rvir']
-            #
-            # Set up the enclosed mass ratio within 100 kpc
-            M_enc_100kpc_z = np.zeros(len(mass_profile_dict[name]))
-            M_enc_R200m_z = np.zeros(len(mass_profile_dict[name]))
-            rs_new = np.logspace(np.log10(mass_profile_dict['rs'][1]), np.log10(mass_profile_dict['rs'][-1]), 10000)
-            r100_ind = np.where(np.min(np.abs(100-rs_new)) == np.abs(100-rs_new))[0]
-            r200m_ind = np.where(np.min(np.abs(data_dict[name]['host.radius'][0]-rs_new)) == np.abs(data_dict[name]['host.radius'][0]-rs_new))[0]
-            #
-            for j in range(0, len(mass_profile_dict[name])):
-                mass_interp = interp1d(mass_profile_dict['rs'][1:], mass_profile_dict[name][j], 'cubic')
-                M_enc_100kpc_z[j] = mass_interp(rs_new[r100_ind])
-                M_enc_R200m_z[j] = mass_interp(rs_new[r200m_ind])
-            #
-            #
-            #M_enc_100kpc_z0 = mass_profile_dict[name][-1][16]
-            #M_enc_100kpc_z = mass_profile_dict[name][:,16]
-            M_enc_100kpc_z0 = M_enc_100kpc_z[-1]
-            M_enc_ratio = M_enc_100kpc_z/M_enc_100kpc_z0
-            #
-            # Define the host potential at 100 kpc across all snapshots
-            phi_host_z = np.flip(phi_host_z0*M_enc_ratio) # Goes from z = 0 to some other z
-            #
-            # Set up null array to save the normalized subhalo potentials to
-            sub_pot = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape)
-            sub_energy = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape)
-            sub_pot_snaps = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape, int)
-            sub_pot_tlb = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape)
-            sub_host_energy = (-1)*np.ones(potential_dict[name]['subhalo.pot'].shape[0])
-            #
-            host_energies = ((6.67*10**(-11)*2*10**(30))/(10**3*3.086*10**(16)*1000**2))*(M_enc_R200m_z[-1]/rs_new[r200m_ind])
-            #
-            # Loop through all of the satellites
-            for i in range(0, sub_pot.shape[0]):
-                # Create the right masks
-                mask_pot_exist = (np.flip(potential_dict[name]['subhalo.pot'][i]) != -1)
-                mask_pot_finite = np.isfinite(np.flip(potential_dict[name]['subhalo.pot'][i]))
-                mask_vel_exist = (data_dict[name]['v.tot.sim'][i][:len(potential_dict[name]['subhalo.pot'][i])] != -1)
-                mask_vel_finite = np.isfinite(data_dict[name]['v.tot.sim'][i][:len(potential_dict[name]['subhalo.pot'][i])])
-                mask_host_finite = np.isfinite(np.flip(potential_dict[name]['host.pot.100kpc']))
-                mask_host_exist = (phi_host_z[:len(potential_dict[name]['subhalo.pot'][i])] != 0)
-                mask_tot = mask_pot_exist*mask_pot_finite*mask_vel_exist*mask_vel_finite*mask_host_exist*mask_host_finite
-                #
-                # Calculate the normalized subhalo potential energy
-                sub_pot[i][mask_tot] = np.flip(potential_dict[name]['subhalo.pot'][i])[mask_tot] - np.flip(potential_dict[name]['host.pot.100kpc'])[mask_tot] + phi_host_z[:len(potential_dict[name]['subhalo.pot'][i])][mask_tot]
-                #
-                # Keep which snapshots it has data for
-                sub_pot_snaps[i][mask_tot] = np.flip(time_dict['index'])[:len(potential_dict[name]['subhalo.pot'][i])][mask_tot]
-                sub_pot_tlb[i][mask_tot] = tlb[:len(potential_dict[name]['subhalo.pot'][i])][mask_tot]
-                #
-                # Calculate the total orbital energy
-                sub_energy[i][mask_tot] = sub_pot[i][mask_tot] + 0.5*(data_dict[name]['v.tot.sim'][i][:len(potential_dict[name]['subhalo.pot'][i])][mask_tot])**2
-                sub_host_energy[i] = host_energies
-                #sub_host_energy[i] = phi_host_z0
-            #
-            # Save all energy data for the satellites.
-            data_all[name] = sub_energy
-            data_all_time[name] = sub_pot_tlb
-            #
-            # Save data for the z = 0 stuff
-            if oversample:
-                data_z0.append(np.repeat(sub_energy[:,0][mask_dict[name]], self.oversample[sim_type][name]))
-                data_all_host.append(np.repeat(sub_host_energy[mask_dict[name]], self.oversample[sim_type][name]))
-            else:
-                data_z0.append(sub_energy[:,0][mask_dict[name]])
-                data_all_host.append(sub_host_energy[mask_dict[name]])
-            #
-            for i in range(0, np.sum(mask_dict[name])):
-                infall_mask = (tlb[:len(sub_energy[mask_dict[name]][i])] <= data_dict[name]['first.infall.time.lb'][mask_dict[name]][i])
-                if oversample:
-                    data_infall.append(np.repeat(sub_energy[mask_dict[name]][i][infall_mask][-1], self.oversample[sim_type][name]))
-                else:
-                    data_infall.append(sub_energy[mask_dict[name]][i][infall_mask][-1])
-        #
-        d = dict()
-        d['energy.z0'] = np.hstack(data_z0)
-        d['energy.infall'] = np.hstack(data_infall)
-        d['energy.all'] = data_all
-        d['energy.all.tlb'] = data_all_time
-        d['E.vir'] = np.hstack(data_all_host)
-        #
-        return d
-
     def energies_new(self, data_dict, mask_dict, potential_dict, mass_profile_dict, time_dict, oversample=False, hosts='all', sim_type='baryon'):
-        """
-        Need to actually generate new data because I saved the necessary data to a file
-        """
         """
         TBD
         """
@@ -2540,7 +2440,7 @@ class SummaryDataSort:
                 mask_tot = mask_pot_exist*mask_pot_finite*mask_vel_exist*mask_vel_finite
                 #
                 # Calculate the normalized subhalo potential energy
-                sub_pot[i][mask_tot] = np.flip(potential_dict[name]['subhalo.pot'][i])[mask_tot] - np.flip(potential_dict[name]['host.pot.500kpc'])[:len(potential_dict[name]['subhalo.pot'][i])][mask_tot] - GMR_500kpc_z[-1] + np.flip(GMR_500kpc_z)[:len(potential_dict[name]['subhalo.pot'][i])][mask_tot] - host_energies - potential_dict[name]['KE.at.Rvir']
+                sub_pot[i][mask_tot] = np.flip(potential_dict[name]['subhalo.pot'][i])[mask_tot] - np.flip(potential_dict[name]['host.pot.500kpc'])[:len(potential_dict[name]['subhalo.pot'][i])][mask_tot] - GMR_500kpc_z[-1] + np.flip(GMR_500kpc_z)[:len(potential_dict[name]['subhalo.pot'][i])][mask_tot]
                 #
                 # Keep which snapshots it has data for
                 sub_pot_snaps[i][mask_tot] = np.flip(time_dict['index'])[:len(potential_dict[name]['subhalo.pot'][i])][mask_tot]
@@ -2624,15 +2524,9 @@ class SummaryDataSort:
             halo_2p = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][name]*u.solMass, a=fitting_data['a_halo'][name]*u.kpc, alpha=fitting_data['alpha'][name], beta=fitting_data['beta'][name])
             potential_two_power = disk_inner+disk_outer+halo_2p
             #
-            # Set the global potential at 100 kpc
+            # Set the global potential at 500 kpc, which doesn't change over time
             d500 = 500/np.sqrt(2)
-            d200m = data_dict[name]['host.radius'][0]/np.sqrt(2)
             phi_model_500kpc = evaluatePotentials(potential_two_power, d500*u.kpc, d500*u.kpc)
-            #
-            # Set the potential at z = 0
-            phi_model_z0 = evaluatePotentials(potential_two_power, d500*u.kpc, d500*u.kpc) - evaluatePotentials(potential_two_power, d200m*u.kpc, d200m*u.kpc) - potential_dict_sim[name]['KE.at.Rvir']
-            # Set the potential across all time as just the potential at z = 0
-            phi_model_z = phi_model_z0*np.ones(potential_dict_model[name]['model.potential'].shape[1])
             #
             # Set up null array to save the normalized subhalo potentials to
             sub_pot_model = (-1)*np.ones(potential_dict_model[name]['model.potential'].shape)
@@ -2645,7 +2539,7 @@ class SummaryDataSort:
             for j in range(0, sub_pot_model.shape[0]):
                 # Create a mask for the subhalo data
                 # Calculate the normalized subhalo energy
-                sub_pot_model[j] = potential_dict_model[name]['model.potential'][j] - phi_model_500kpc + phi_model_z
+                sub_pot_model[j] = potential_dict_model[name]['model.potential'][j] - phi_model_500kpc
                 #
                 # Keep which snapshots it has data for
                 sub_pot_snaps_model[j] = np.flip(time_dict['index'])
