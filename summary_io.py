@@ -2316,7 +2316,7 @@ class SummaryDataSort:
     # Needs dox
     def da_dr(self, data_dict, mask_dict, mass_profile_dict, da_dr_dict, selection='sim', oversample=False, hosts='all', sim_type='baryon'):
         """
-        Finding da_dr at d_peri,min
+        Finding max da_dr
         """
         data = []
         data_dist = []
@@ -2380,7 +2380,7 @@ class SummaryDataSort:
         d['dadr.dist.interp'] =  np.hstack(data_dist)
         d['dadr.time.interp'] =  np.hstack(data_time)
         d['dadr.time.lb.interp'] =  np.hstack(mass_profile_dict['time'][-1] - data_time)
-        #s
+        #
         return d
 
     def energies_new(self, data_dict, mask_dict, potential_dict, mass_profile_dict, time_dict, oversample=False, hosts='all', sim_type='baryon'):
