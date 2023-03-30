@@ -207,15 +207,15 @@ for j in range(0, len(x)):
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 2, figsize=(20,8))
 # Plot the scatter for the recent and minimum pericenters
-axs[0].fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color='g', alpha=0.3, zorder=-98)
-axs[0].fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color='g', alpha=0.15, zorder=-99)
-axs[0].plot(binss[1][:-1]+half_bins[1], medians[1], 'k', alpha=0.5, lw=4, zorder=-100)
+axs[0].fill_between(binss[1][:-1]+half_bins[1], uppers[1], lowers[1], color='g', alpha=0.3, zorder=2)
+axs[0].fill_between(binss[1][:-1]+half_bins[1], highests[1], lowests[1], color='g', alpha=0.15, zorder=1)
+axs[0].plot(binss[1][:-1]+half_bins[1], medians[1], 'k', alpha=0.5, lw=4, zorder=3)
 #
 sigma_one_op = np.nanpercentile(t_in_sim, onesigp)
 sigma_one_om = np.nanpercentile(t_in_sim, onesigm)
 #
-axs[0].vlines(np.median(t_in_sim), 0, 1.06, color='k', alpha=0.2, label='Satellite infall times', zorder=100)
-axs[0].axvspan(sigma_one_om, sigma_one_op, alpha=0.15, color='k', zorder=100)
+axs[0].vlines(np.median(t_in_sim), 0, 1.06, color='k', alpha=0.2, zorder=4)
+axs[0].axvspan(sigma_one_om, sigma_one_op, alpha=0.1, color='k', zorder=0)
 #axs[0].errorbar(np.median(t_in_sim), 1, xerr=np.array([[np.median(t_in_sim)-sigma_one_om],[sigma_one_op-np.median(t_in_sim)]]), color='k', lw=3, capsize=0, alpha=0.7)
 #axs[0].fill_between(x=(5.1, 7.8), y1=0.945, y2=0.955, color='b', label='Santistevan+20')
 #axs[0].fill_between(x=(0.55,2.13), y1=0.995, y2=1.005, color='r', label='Gandhi+22')
@@ -252,11 +252,11 @@ axz.set_xlim(13.5,0)
 axz.set_xlabel(axis_z_label, fontsize=30, labelpad=9)
 axz.tick_params(pad=3)
 #
-axs[1].fill_between(binss[3][:-1]+half_bins[3], uppers[3], lowers[3], color='g', alpha=0.3)
-axs[1].fill_between(binss[3][:-1]+half_bins[3], highests[3], lowests[3], color='g', alpha=0.15)
-axs[1].plot(binss[3][:-1]+half_bins[3], medians[3], 'k', alpha=0.5, lw=4)
-axs[1].vlines(np.median(t_in_sim), 0, 1.02, color='k', alpha=0.2, label='Satellite infall times', zorder=100)
-axs[1].axvspan(sigma_one_om, sigma_one_op, alpha=0.15, color='k', zorder=100)
+axs[1].fill_between(binss[3][:-1]+half_bins[3], uppers[3], lowers[3], color='g', alpha=0.3, zorder=2)
+axs[1].fill_between(binss[3][:-1]+half_bins[3], highests[3], lowests[3], color='g', alpha=0.15, zorder=1)
+axs[1].plot(binss[3][:-1]+half_bins[3], medians[3], 'k', alpha=0.5, lw=4, zorder=3)
+axs[1].vlines(np.median(t_in_sim), 0, 1.02, color='k', alpha=0.2, label='Satellite infall times', zorder=4)
+axs[1].axvspan(sigma_one_om, sigma_one_op, alpha=0.1, color='k', zorder=0)
 #
 axis2_y2_label = 'Median $R_{\\rm 200m}(t_{\\rm lb}) \ [\\rm kpc]$'
 axis2_y2_tick_labels = ['400', '300', '200', '100', '0']
@@ -299,7 +299,7 @@ axs[1].get_yaxis().set_label_coords(-0.1,0.5)
 #
 axs[0].set_xlabel('Lookback Time [Gyr]', fontsize=30)
 axs[1].set_xlabel('Lookback Time [Gyr]', fontsize=30)
-axs[0].legend(prop={'size': 20}, loc='lower right')
+axs[0].text(9.3, 0.97, 'Satellite infall times', fontsize=20)
 #
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.4, hspace=0)
@@ -396,8 +396,8 @@ f, ax1 = plt.subplots(1, 1, figsize=(10,8))
 #
 sigma_one_op = np.nanpercentile(t_in_sim, onesigp)
 sigma_one_om = np.nanpercentile(t_in_sim, onesigm)
-ax1.vlines(np.median(t_in_sim), -0.05, 1.3, color='k', alpha=0.2, label='Satellite infall times', zorder=100)
-ax1.axvspan(sigma_one_om, sigma_one_op, alpha=0.15, color='k', zorder=100)
+ax1.vlines(np.median(t_in_sim), -0.05, 1.3, color='k', alpha=0.2, zorder=100)
+ax1.axvspan(sigma_one_om, sigma_one_op, alpha=0.1, color='k', zorder=-100)
 #
 ax1.plot(times, med_50[:,-1], color=colorss[0], alpha=1, label='$r < 50$ kpc')
 ax1.fill_between(times, upper_two_50, lower_two_50, color=colorss[0], alpha=0.15)
@@ -570,7 +570,7 @@ ax2.set_ylabel('$\\sigma_{\\rm 2\ Gyr \ avg}$', fontsize=20)
 ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
 ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
 plt.tight_layout()
-plt.subplots_adjust(wspace=0, hspace=0)
+plt.subplots_adjust(wspace=0, hspace=0.13)
 plt.savefig(directory+'/long_short_evolution_sigma.pdf')
 #plt.show()
 plt.close()
@@ -876,23 +876,23 @@ plt.close()
 """
 snap_e = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/m12i_r7100')
 tlb = snap_e['time'][-1] - np.flip(snap_e['time'])
-data = summary.data_read_potential_full(directory=sim_data.home_dir, hosts='all_no_r', selection='sim', new=True)
-data_model = summary.data_read_potential_full(directory=sim_data.home_dir, hosts='all_no_r', selection='model')
-data_mp = summary.data_read_mass_profile(directory=sim_data.home_dir, hosts='all_no_r', new=True)
+data = summary.data_read_potential_full(directory=sim_data.home_dir, hosts='all_energy_new', selection='sim', new=True)
+data_model = summary.data_read_potential_full(directory=sim_data.home_dir, hosts='all_energy_new', selection='model')
+data_mp = summary.data_read_mass_profile(directory=sim_data.home_dir, hosts='all_energy_new', new=True)
 #
-d_rec_sim = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=False, hosts='all_no_r', sim_type='baryon')
-d_min_sim = summary.dperi_min(data_total, masks_infall_peri, selection='sim', oversample=False, hosts='all_no_r', sim_type='baryon')
-d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model', oversample=False, hosts='all_no_r', sim_type='baryon')
-d_min_mod = summary.dperi_min(data_total, masks_infall_peri, selection='model', oversample=False, hosts='all_no_r', sim_type='baryon')
-sub_energy = summary.energies_new(data_total, masks_infall_peri, data, data_mp, snap_e, oversample=False, hosts='all_no_r', sim_type='baryon')
-sub_energy_model = summary.energies_model(data_total, masks_infall_peri, data, data_model, snap_e, oversample=False, hosts='all_no_r', sim_type='baryon')
+d_rec_sim = summary.dperi_recent(data_total, masks_infall_peri, selection='sim', oversample=False, hosts='all_energy_new', sim_type='baryon')
+d_min_sim = summary.dperi_min(data_total, masks_infall_peri, selection='sim', oversample=False, hosts='all_energy_new', sim_type='baryon')
+d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model', oversample=False, hosts='all_energy_new', sim_type='baryon')
+d_min_mod = summary.dperi_min(data_total, masks_infall_peri, selection='model', oversample=False, hosts='all_energy_new', sim_type='baryon')
+sub_energy = summary.energies_new(data_total, masks_infall_peri, data, data_mp, snap_e, oversample=False, hosts='all_energy_new', sim_type='baryon')
+sub_energy_model = summary.energies_model(data_total, masks_infall_peri, data, data_model, snap_e, oversample=False, hosts='all_energy_new', sim_type='baryon')
 #
 frac_d = np.abs((d_rec_mod-d_rec_sim)/d_rec_sim)
-names = summary.halo_id(data_total, masks_infall_peri, hosts='all_no_r')
-
-m1 = (frac_d > 0.25)*(frac_d < 0.5)
-halo_index = np.random.randint(low=0, high=np.sum(m1))
-print(names['host'][m1][halo_index], names['ids'][m1][halo_index], frac_d[m1][halo_index])
+names = summary.halo_id(data_total, masks_infall_peri, hosts='all_energy_new')
+#
+#m1 = (frac_d > 0.25)*(frac_d < 0.5)
+#halo_index = np.random.randint(low=0, high=np.sum(m1))
+#print(names['host'][m1][halo_index], names['ids'][m1][halo_index], frac_d[m1][halo_index])
 
 from galpy.potential import DoubleExponentialDiskPotential # For disks
 from galpy.potential import TwoPowerSphericalPotential # For DM halos
@@ -1110,14 +1110,14 @@ axs[2,0].get_yaxis().set_label_coords(-0.13,0.5)
 axs[3,0].set_ylabel('[$E(t_{\\rm lb}=0) - E(t_{\\rm lb})] \ / \ U_{\\rm R200m,z=0}$', fontsize=26)
 axs[3,0].get_yaxis().set_label_coords(-0.13,0.5)
 #
-r1 = mpatches.Rectangle(xy=(12.9,375),width=-1.35,height=55, color='k', alpha=0.2)
-r2 = mpatches.Rectangle(xy=(12.9,330),width=-1.35,height=50, color='k', alpha=0.2)
-r3 = mpatches.Rectangle(xy=(12.9,245),width=-1.35,height=40, color='k', alpha=0.2)
-r4 = mpatches.Rectangle(xy=(12.9,330),width=-1.35,height=50, color='k', alpha=0.2)
-axs[0,0].text(12.5,388,'A',fontsize=28)
-axs[0,1].text(12.5,345,'B',fontsize=28)
-axs[0,2].text(12.5,255,'C',fontsize=28)
-axs[0,3].text(12.5,345,'D',fontsize=28)
+r1 = mpatches.Rectangle(xy=(12.9,375),width=-2.64,height=55, facecolor='#D3D3D3', alpha=1, zorder=10)
+r2 = mpatches.Rectangle(xy=(12.9,330),width=-2.85,height=50, facecolor='#D3D3D3', alpha=1, zorder=10)
+r3 = mpatches.Rectangle(xy=(12.9,245),width=-2.4,height=40, facecolor='#D3D3D3', alpha=1, zorder=10)
+r4 = mpatches.Rectangle(xy=(12.9,330),width=-3.12,height=50, facecolor='#D3D3D3', alpha=1, zorder=10)
+axs[0,0].text(12.5,388,'Best',fontsize=28, zorder=11)
+axs[0,1].text(12.5,345,'Good',fontsize=28, zorder=11)
+axs[0,2].text(12.5,255,'Bad',fontsize=28, zorder=11)
+axs[0,3].text(12.5,345,'Worst',fontsize=28, zorder=11)
 axs[0,0].add_patch(r1)
 axs[0,1].add_patch(r2)
 axs[0,2].add_patch(r3)
@@ -1783,6 +1783,23 @@ for i in range(0, len(xs)):
     axs[0,0].set_xlim(limits[0])
     axs[0,0].set_ylim(limits[1])
 #
+cc = ut.cosmology.CosmologyClass()
+red = np.array([0, 1])
+cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+#
+axis_z_label = 'redshift'
+axis_z_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.1', '0']
+axis_z_tick_values = [float(v) for v in axis_z_tick_labels]
+axis_z_tick_locations = cc.convert_time('time.lookback', 'redshift', axis_z_tick_values)
+axz = axs[0,0].twiny()
+axz.set_xscale('linear')
+axz.set_yscale('linear')
+axz.set_xticks(axis_z_tick_locations)
+axz.set_xticklabels(axis_z_tick_labels, fontsize=26)
+axz.set_xlim(0,13)
+axz.set_xlabel(axis_z_label, fontsize=30, labelpad=9)
+axz.tick_params(pad=3)
+#
 # Period vs t_infall
 period_mod = []
 period_sim = []
@@ -2058,7 +2075,7 @@ for i in range(0, len(xs)):
     axs[2,2].set_ylim(limits[1])
     axs[2,2].set_xscale('log')
 #
-axs[0,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26, labelbottom=False)
+axs[0,0].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=26, labelbottom=False)
 axs[1,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26, labelbottom=False)
 axs[2,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26, labelbottom=True)
 axs[0,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=26, labelbottom=False)
@@ -2085,9 +2102,111 @@ plt.subplots_adjust(wspace=0.18, hspace=0)
 plt.savefig(directory+'/other_orbit_properties.pdf')
 
 
+"""
+    Figrue 11:
+        Summary plots
+"""
+# Plotting the fractional median offset (values from Table 3 in the paper)
+labels = ['$d_{\\rm peri,rec}$', '$d_{\\rm peri,min}$', '$t_{\\rm peri,rec}$', '$N_{\\rm peri}$', '$N_{\\rm peri,fixed}$', '$v_{\\rm peri,rec}$', '$v_{\\rm peri,min}$', '$d_{\\rm apo,rec}$', '$t_{\\rm infall,lb}$', '$t_{\\rm infall,lb,fixed}$', '$e_{\\rm rec}$', '$T_{\\rm rec}$', '$|da/dr|_{\\rm max}$']
+sum_color = '#D36F5C'
+#fractions = np.array([])
+#
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 3, figsize=(30,10))
+#
+med_offset = np.array([-0.025, 0.066, -0.028, 0.246, 0.259, 0.030, 0.012, -0.013, -0.067, 0.441, 0.005, -0.071, -0.017])
+xs = np.arange(1, 14)
+sort_mask = np.argsort(med_offset)
+axs[0].scatter(xs, med_offset[sort_mask], s=50, c=sum_color, marker='o')
+axs[0].hlines(y=0, xmin=xs[0]-0.5, xmax=xs[-1]+0.5, linestyle='dotted', color='k', alpha=0.5)
+#axs[0].set_xticks(xs, np.asarray(labels)[sort_mask], rotation=45)
+axs[0].set_xticks(xs, minor=False)
+axs[0].set_xticklabels(np.asarray(labels)[sort_mask], rotation=90)
+#
+# Width of the 68 percent scatter
+width_68 = np.array([ 0.424, 1.067, 0.179, 0.486, 0.486, 0.202, 0.330, 0.116, 0.820, 1.088, 0.288, 0.267, 1.320])
+sort_mask = np.argsort(width_68)
+axs[1].scatter(xs, width_68[sort_mask], s=50, c=sum_color, marker='o')
+axs[1].set_xticks(xs, minor=False)
+axs[1].set_xticklabels(np.asarray(labels)[sort_mask], rotation=90)
+#
+# Width of the 95 percent scatter
+width_95 = np.array([ 2.383, 7.112, 1.290, 1.944, 1.944, 0.747, 0.861, 0.754, 5.338, 5.842, 1.082, 0.820, 8.400])
+sort_mask = np.argsort(width_95)
+axs[2].scatter(xs, width_95[sort_mask], s=50, c=sum_color, marker='o')
+axs[2].set_xticks(xs, minor=False)
+axs[2].set_xticklabels(np.asarray(labels)[sort_mask], rotation=90)
+#
+axs[0].tick_params(axis='x', which='minor', bottom=False, top=False)
+axs[1].tick_params(axis='x', which='minor', bottom=False, top=False)
+axs[2].tick_params(axis='x', which='minor', bottom=False, top=False)
+axs[0].tick_params(axis='both', which='major', bottom=True, top=False, labelsize=28)
+axs[1].tick_params(axis='both', which='major', bottom=True, top=False, labelsize=28)
+axs[2].tick_params(axis='both', which='major', bottom=True, top=False, labelsize=28)
+#
+axs[0].set_ylabel('Median fractional offset', fontsize=38)
+axs[1].set_ylabel('Width of 68% scatter', fontsize=38)
+axs[2].set_ylabel('Width of 95% scatter', fontsize=38)
+#
+axs[0].set_ylim(-0.1, 0.5)
+axs[0].set_xlim(xs[0]-0.5, xs[-1]+0.5)
+axs[1].set_xlim(xs[0]-0.5, xs[-1]+0.5)
+axs[2].set_xlim(xs[0]-0.5, xs[-1]+0.5)
+#
+plt.tight_layout()
+plt.subplots_adjust(wspace=0.18, hspace=0)
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_2/summary.pdf')
+plt.close()
+
+
+# Plotting the fractional median offset (values from Table 3 in the paper)
+labels = ['$d_{\\rm peri,rec}$', '$d_{\\rm peri,min}$', '$t_{\\rm peri,rec}$', '$N_{\\rm peri}$', '$N_{\\rm peri,fixed}$', '$v_{\\rm peri,rec}$', '$v_{\\rm peri,min}$', '$d_{\\rm apo,rec}$', '$t_{\\rm infall,lb}$', '$t_{\\rm infall,lb,fixed}$', '$e_{\\rm rec}$', '$T_{\\rm rec}$', '$|da/dr|_{\\rm max}$']
+sum_color = '#D36F5C'
+#fractions = np.array([])
+#
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 2, figsize=(20,10))
+#
+med_offset = np.array([-0.025, 0.066, -0.028, 0.246, 0.259, 0.030, 0.012, -0.013, -0.067, 0.441, 0.005, -0.071, -0.017])
+xs = np.arange(1, 14)
+sort_mask = np.argsort(med_offset)
+axs[0].scatter(xs, med_offset[sort_mask], s=50, c=sum_color, marker='o')
+axs[0].hlines(y=0, xmin=xs[0]-0.5, xmax=xs[-1]+0.5, linestyle='dotted', color='k', alpha=0.5)
+#axs[0].set_xticks(xs, np.asarray(labels)[sort_mask], rotation=45)
+axs[0].set_xticks(xs, minor=False)
+axs[0].set_xticklabels(np.asarray(labels)[sort_mask], rotation=90)
+#
+# Width of the 68 percent scatter
+width_68 = np.array([ 0.424, 1.067, 0.179, 0.486, 0.486, 0.202, 0.330, 0.116, 0.820, 1.088, 0.288, 0.267, 1.320])
+width_95 = np.array([ 2.383, 7.112, 1.290, 1.944, 1.944, 0.747, 0.861, 0.754, 5.338, 5.842, 1.082, 0.820, 8.400])
+sort_mask = np.argsort(width_68)
+axs[1].scatter(xs, width_68[sort_mask], s=50, c=sum_color, marker='o', label='68th')
+axs[1].scatter(xs, width_95[sort_mask], s=50, c=sum_color, marker='s', label='95th')
+axs[1].set_xticks(xs, minor=False)
+axs[1].set_xticklabels(np.asarray(labels)[sort_mask], rotation=90)
+#
+axs[0].tick_params(axis='x', which='minor', bottom=False, top=False)
+axs[1].tick_params(axis='x', which='minor', bottom=False, top=False)
+axs[0].tick_params(axis='both', which='major', bottom=True, top=False, labelsize=28)
+axs[1].tick_params(axis='both', which='major', bottom=True, top=False, labelsize=28)
+#
+axs[0].set_ylabel('Median fractional offset', fontsize=38)
+axs[1].set_ylabel('Width of %-ile', fontsize=38)
+#
+axs[0].set_ylim(-0.1, 0.5)
+axs[0].set_xlim(xs[0]-0.5, xs[-1]+0.5)
+axs[1].set_xlim(xs[0]-0.5, xs[-1]+0.5)
+axs[1].legend(prop={'size': 24}, loc='upper left')
+#
+plt.tight_layout()
+plt.subplots_adjust(wspace=0.18, hspace=0)
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_2/summary_other.pdf')
+plt.close()
+
+
 
 """
-    Figure 11:
+    Appendix Figure X:
         Pericenter phase plots
 """
 # Plot both of them on the same plot
@@ -2219,7 +2338,7 @@ plt.close()
 
 
 """
-    Figure 12:
+    Appendix Figure X:
         Other phase plots
 """
 peri_d_colors = ['#337422']
