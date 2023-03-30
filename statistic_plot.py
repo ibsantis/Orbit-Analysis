@@ -32,11 +32,11 @@ sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
 print('Set paths')
 
 
-labels = ['$d_{\\rm peri,rec}$', '$d_{\\rm peri,min}$', '$t_{\\rm peri,rec}$', '$N_{\\rm peri}$', '$N_{\\rm peri,fixed}$', '$v_{\\rm peri,rec}$', '$v_{\\rm peri,min}$', '$d_{\\rm apo,rec}$', '$t_{\\rm infall,lb}$', '$t_{\\rm infall,lb,fixed}$', '$e_{\\rm rec}$', '$T_{\\rm rec}$']
-med_offset = np.array([-0.025, 0.066, -0.028, 0.246, 0.259, 0.030, 0.012, -0.013, -0.067, 0.441, 0.005, -0.071])
+labels = ['$d_{\\rm peri,rec}$', '$d_{\\rm peri,min}$', '$t_{\\rm peri,rec}$', '$N_{\\rm peri}$', '$N_{\\rm peri,fixed}$', '$v_{\\rm peri,rec}$', '$v_{\\rm peri,min}$', '$d_{\\rm apo,rec}$', '$t_{\\rm infall,lb}$', '$t_{\\rm infall,lb,fixed}$', '$e_{\\rm rec}$', '$T_{\\rm rec}$', '$|da/dr|_{\\rm max}$']
+med_offset = np.array([-0.025, 0.066, -0.028, 0.246, 0.259, 0.030, 0.012, -0.013, -0.067, 0.441, 0.005, -0.071, -0.017])
 xs = np.arange(1, 13)
 
-sort_mask = np.argsort(med_offset)
+sort_mask = np.argsort(np.abs(med_offset))
 
 fig = plt.figure(figsize=(10, 8))
 ax1 = fig.add_subplot(1,1,1)
@@ -53,7 +53,7 @@ plt.close()
 
 
 # Width of the 68 percent scatter
-width_68 = np.array([ 0.424, 1.067, 0.179, 0.486, 0.486, 0.202, 0.330, 0.116, 0.820, 1.088, 0.288, 0.267])
+width_68 = np.array([ 0.424, 1.067, 0.179, 0.486, 0.486, 0.202, 0.330, 0.116, 0.820, 1.088, 0.288, 0.267, 1.320])
 sort_mask = np.argsort(width_68)
 fig = plt.figure(figsize=(10, 8))
 ax1 = fig.add_subplot(1,1,1)
@@ -70,7 +70,7 @@ plt.close()
 
 
 # Width of the 95 percent scatter
-width_95 = np.array([ 2.383, 7.112, 1.290, 1.944, 1.944, 0.747, 0.861, 0.754, 5.338, 5.842, 1.082, 0.820])
+width_95 = np.array([ 2.383, 7.112, 1.290, 1.944, 1.944, 0.747, 0.861, 0.754, 5.338, 5.842, 1.082, 0.820, 8.400])
 sort_mask = np.argsort(width_95)
 fig = plt.figure(figsize=(10, 8))
 ax1 = fig.add_subplot(1,1,1)
