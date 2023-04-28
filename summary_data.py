@@ -2,10 +2,10 @@
 #SBATCH --job-name=summary_data_point
 ##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --partition=high2    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
-#SBATCH --mem=30G
+#SBATCH --mem=40G
 ##SBATCH --mem=480G
 #SBATCH --nodes=1
-#SBATCH --ntasks=4    # processes total
+#SBATCH --ntasks=1    # processes total
 #SBATCH --time=02:00:00
 #SBATCH --output=/home/ibsantis/scripts/jobs/summary/summary_data_point_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
