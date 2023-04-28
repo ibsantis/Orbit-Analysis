@@ -2076,7 +2076,7 @@ plt.savefig(directory+'/other_orbit_properties.pdf')
         Summary plots
 """
 # Plotting the fractional median offset (values from Table 3 in the paper)
-labels = ['$d_{\\rm peri,rec}$', '$d_{\\rm peri,min}$', '$t_{\\rm peri,rec}$', '$N_{\\rm peri}$', '$N_{\\rm peri,fixed}$', '$v_{\\rm peri,rec}$', '$v_{\\rm peri,min}$', '$d_{\\rm apo,rec}$', '$t_{\\rm infall,lb}$', '$t_{\\rm infall,lb,fixed}$', '$e_{\\rm rec}$', '$T_{\\rm rec}$', '$|da/dr|_{\\rm max}$', '$E_{\\rm infall}$', '$\\ell_{\\rm infall}$']
+labels = ['$d_{\\rm peri,rec}$', '$d_{\\rm peri,min}$', '$t_{\\rm peri,rec}$', '$N_{\\rm peri}$', '$N_{\\rm peri,fixed}$', '$v_{\\rm peri,rec}$', '$v_{\\rm peri,min}$', '$d_{\\rm apo,rec}$', '$t_{\\rm inf}$', '$t_{\\rm inf,fixed}$', '$e_{\\rm rec}$', '$T_{\\rm rec}$', '$|da/dr|$', '$E_{\\rm inf}$', '$\\ell_{\\rm inf}$']
 sum_color = '#D36F5C'
 #
 plt.rcParams["font.family"] = "serif"

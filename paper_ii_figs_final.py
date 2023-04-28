@@ -548,7 +548,7 @@ axz = axs[0,0].twiny()
 axz.set_xscale('linear')
 axz.set_yscale('linear')
 axz.set_xticks(axis_z_tick_locations)
-axz.set_xticklabels(axis_z_tick_labels, fontsize=26)
+axz.set_xticklabels(axis_z_tick_labels, fontsize=28)
 axz.set_xlim(0,13)
 axz.set_xlabel(axis_z_label, fontsize=30, labelpad=9)
 axz.tick_params(pad=3)
@@ -706,8 +706,8 @@ axs[1,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize
 axs[0,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=False)
 axs[1,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=28, labelbottom=True)
 #
-axs[0,0].set_ylabel('($E_0$ -  $E_{\\rm infall}$) / $U_{\\rm 200m,z=0}$', fontsize=28)
-axs[1,0].set_ylabel('($\\ell_0 - \\ell_{\\rm infall}$)/$\\ell_0$', fontsize=30)
+axs[0,0].set_ylabel('($E_0$ -  $E_{\\rm infall}$) / $U_{\\rm 200m,0}$', fontsize=30)
+axs[1,0].set_ylabel('($\\ell_0 - \\ell_{\\rm infall}$)/$\\ell_0$', fontsize=32)
 #
 axs[0,0].get_yaxis().set_label_coords(-0.12,0.5)
 axs[0,1].set_ylabel(' ', fontsize=26)
@@ -856,22 +856,22 @@ axs[1].plot(temp_t1, all_l_norm_med, c='#6769A8', linewidth=4, alpha=0.7, label=
 axs[1].plot(temp_t3, diff, c='#6769A8', linewidth=2.5, linestyle='dashed', alpha=0.6, label='width of 68% scatter')
 axs[1].hlines(0, 0, 13.8, linestyle='dotted', color='k', alpha=0.5)
 #
-axs[0].set_ylabel('$(E(t) - E_0) \ / \ U_{\\rm 200m, z=0}$', fontsize=26)
-axs[0].get_yaxis().set_label_coords(-0.08,0.5)
-axs[0].set_ylim(-0.1, 1.5)
+axs[0].set_ylabel('$(E(t) - E_0) \ / \ U_{\\rm 200m, 0}$', fontsize=30)
+axs[0].get_yaxis().set_label_coords(-0.12,0.5)
+axs[0].set_ylim(-0.05, 1.5)
 axs[0].set_xlim(0,13.5)
 #
-axs[1].set_xlabel('Lookback time [Gyr]', fontsize=30)
-axs[1].set_ylabel('$(\\ell(t) - \\ell_0) \ / \ \\ell_0$', fontsize=26)
-axs[1].get_yaxis().set_label_coords(-0.08,0.5)
+axs[1].set_ylabel('$(\\ell(t) - \\ell_0) \ / \ \\ell_0$', fontsize=30)
+axs[1].get_yaxis().set_label_coords(-0.12,0.5)
 axs[1].set_ylim(-0.6, 1.2)
 axs[1].set_xlim(0,13.5)
 #
 axs[0].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=24, labelbottom=False)
 axs[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=True)
+axs[1].set_xlabel('Lookback time [Gyr]', fontsize=30)
 #
 plt.tight_layout()
-plt.subplots_adjust(wspace=0, hspace=0.13)
+plt.subplots_adjust(wspace=0, hspace=0.05)
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_2/energy_and_ell_conservation.pdf')
 plt.close()
 
@@ -1185,11 +1185,14 @@ diff = (all_d_frac_upper-all_d_frac_lower)
 temp_t2 = tlb[:len(diff)]
 temp_t2[~np.isfinite(diff)] = np.nan
 #
-axs.plot(temp_t1, np.abs(all_d_frac_med), c='#01033C', linewidth=4, alpha=0.7, label='median')
-axs.plot(temp_t2, diff, c='#01033C', linewidth=2.5, linestyle='dashed', alpha=0.6, label='width of 68%-ile')
+axs.plot(temp_t1, np.abs(all_d_frac_med), c='#2C0E2C', linewidth=4, alpha=0.7, label='median')
+axs.plot(temp_t2, diff, c='#2C0E2C', linewidth=2.5, linestyle='dashed', alpha=0.6, label='width of 68%-ile')
 axs.hlines(0, 0, 13.5, linestyle='dotted', color='k', alpha=0.5)
 axs.legend(prop={'size': 22}, loc='best')
 #
+cc = ut.cosmology.CosmologyClass()
+red = np.array([0, 1])
+cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
 axis_z_label = 'redshift'
 axis_z_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.1', '0']
 axis_z_tick_values = [float(v) for v in axis_z_tick_labels]
@@ -1198,22 +1201,21 @@ axz = axs.twiny()
 axz.set_xscale('linear')
 axz.set_yscale('linear')
 axz.set_xticks(axis_z_tick_locations)
-axz.set_xticklabels(axis_z_tick_labels, fontsize=24)
+axz.set_xticklabels(axis_z_tick_labels, fontsize=26)
 axz.set_xlim(0,13.5)
-axz.set_xlabel(axis_z_label, fontsize=24, labelpad=9)
+axz.set_xlabel(axis_z_label, fontsize=28, labelpad=9)
 axz.tick_params(pad=3)
 #
-axs.set_ylabel('$|d_{\\rm model} - d_{\\rm sim}| \ / \ d_{\\rm sim}$', fontsize=24)
+axs.set_ylabel('$|d_{\\rm model} - d_{\\rm sim}| \ / \ d_{\\rm sim}$', fontsize=30)
 axs.set_xlabel('Lookback time [Gyr]', fontsize=30)
-axs.get_yaxis().set_label_coords(-0.08,0.5)
-axs.set_ylim(-0.1, 0.1)
+axs.get_yaxis().set_label_coords(-0.12,0.5)
+axs.set_ylim(-0.1, 1.5)
 axs.set_xlim(0,13.5)
 #
-axs.tick_params(axis='both', which='both', bottom=True, top=False, labelsize=24, labelbottom=True)
+axs.tick_params(axis='both', which='both', bottom=True, top=False, labelsize=26, labelbottom=True)
 #
 plt.tight_layout()
-plt.subplots_adjust(wspace=0, hspace=0.13)
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_2/d_conservation_zoom.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_2/orbit_conservation.pdf')
 plt.close()
 
 
@@ -1814,8 +1816,109 @@ plt.savefig(directory+'/dadr_vs_property.pdf')
 plt.close()
 
 
+
 """
-    Figure 11:
+    Appendix Figure 11:
+        Pericenter phase plots
+"""
+# Plot both of them on the same plot
+peri_d_colors = ['#337422']
+peri_t_colors = ['#476258', '#624751']
+x = []
+y = []
+# Loop over hosts
+for name in summary.host_names['all_no_r']:
+    # Loop over satellites
+    for i in range(0, len(data_total[name]['pericenter.dist.sim'][masks_infall_peri[name]])):
+        # Loop over the phase
+        for j in range(0, np.min((len(data_total[name]['pericenter.dist.sim'][masks_infall_peri[name]][i]), len(data_total[name]['pericenter.dist.model'][masks_infall_peri[name]][i])))):
+            # Make sure there is an event in both the sim and model
+            if (data_total[name]['pericenter.dist.sim'][masks_infall_peri[name]][i][j] != -1) & (data_total[name]['pericenter.dist.model'][masks_infall_peri[name]][i][j] != -1):
+                # Save the phase
+                x.append(j+1)
+                # Save the fractional difference
+                y.append((data_total[name]['pericenter.dist.model'][masks_infall_peri[name]][i][j]-data_total[name]['pericenter.dist.sim'][masks_infall_peri[name]][i][j])/data_total[name]['pericenter.dist.sim'][masks_infall_peri[name]][i][j])
+x = np.asarray(x)
+y = np.asarray(y)
+#
+onesigp = 84.13
+onesigm = 15.87
+meds = np.zeros(np.max(x))
+upper = np.zeros(np.max(x))
+lower = np.zeros(np.max(x))
+for i in range(0, np.max(x)):
+    mask = (x == i+1)
+    meds[i] = np.nanmedian(y[mask])
+    upper[i] = np.nanpercentile(y[mask], onesigp)
+    lower[i] = np.nanpercentile(y[mask], onesigm)
+#
+f, ax = plt.subplots(2, 1, figsize=(12,14))
+#
+ax[0].scatter(np.arange(8)+1, meds[:8], s=75., marker='s', c=peri_d_colors[0])
+ax[0].scatter(-100,-100, s=75., marker='s', c='k', label='Model comparison')
+ax[0].scatter(np.arange(8)+1, (upper-lower)[:8], s=150., marker='*', c='k', label='Width of 68th percentile')
+ax[0].hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
+ax[0].legend(prop={'size': 24}, loc='upper left')
+#
+x = []
+y = []
+# Loop over hosts
+for name in summary.host_names['all_no_r']:
+    # Loop over satellites
+    for i in range(0, len(data_total[name]['pericenter.time.lb.sim'][masks_infall_peri[name]])):
+        # Loop over the phase
+        for j in range(0, np.min((len(data_total[name]['pericenter.time.lb.sim'][masks_infall_peri[name]][i]), len(data_total[name]['pericenter.time.lb.model'][masks_infall_peri[name]][i])))):
+            # Make sure there is an event in both the sim and model
+            if (data_total[name]['pericenter.time.lb.sim'][masks_infall_peri[name]][i][j] != -1) & (data_total[name]['pericenter.time.lb.model'][masks_infall_peri[name]][i][j] != -1):
+                # Save the phase
+                x.append(j+1)
+                # Save the fractional difference
+                y.append(data_total[name]['pericenter.time.lb.model'][masks_infall_peri[name]][i][j]-data_total[name]['pericenter.time.lb.sim'][masks_infall_peri[name]][i][j])
+x = np.asarray(x)
+y = np.asarray(y)
+#
+onesigp = 84.13
+onesigm = 15.87
+meds = np.zeros(np.max(x))
+upper = np.zeros(np.max(x))
+lower = np.zeros(np.max(x))
+for i in range(0, np.max(x)):
+    mask = (x == i+1)
+    meds[i] = np.nanmedian(y[mask])
+    upper[i] = np.nanpercentile(y[mask], onesigp)
+    lower[i] = np.nanpercentile(y[mask], onesigm)
+#
+ax[1].scatter(np.arange(8)+1, meds[:8], s=75., marker='s', c=peri_t_colors[1])
+ax[1].scatter(np.arange(8)+1, (upper-lower)[:8], s=150., marker='*', c='k')
+ax[1].hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
+#
+ax[0].set_xticks([0,1,2,3,4,5,6,7,8])
+ax[1].set_xticks([0,1,2,3,4,5,6,7,8])
+#ax[0].set_xticks(np.arange(0.5, 8.5, 1), minor=True)
+#ax[1].set_xticks(np.arange(0.5, 8.5, 1), minor=True)
+ax[0].set_xlim(0, 8.5)
+ax[1].set_xlim(0, 8.5)
+ax[0].set_ylim(-0.25, 1.2)
+ax[1].set_ylim(-2, 2.7)
+ax[1].set_xlabel('Lookback Pericenter Event', fontsize=30)
+ax[0].set_ylabel('($d_{\\rm peri,model}-d_{\\rm peri,sim}$)/$d_{\\rm peri,sim}$', fontsize=30)
+ax[1].set_ylabel('$t_{\\rm peri,model}-t_{\\rm peri,sim}$ [Gyr]', fontsize=30)
+ax[0].get_yaxis().set_label_coords(-0.12,0.5)
+ax[1].get_yaxis().set_label_coords(-0.12,0.5)
+ax[0].tick_params(axis='both', which='major', bottom=True, top=True, labelbottom=False, labelsize=28)
+ax[1].tick_params(axis='both', which='major', bottom=True, top=True, labelsize=28)
+ax[0].tick_params(axis='x', which='minor', bottom=False, top=False)
+ax[1].tick_params(axis='x', which='minor', bottom=False, top=False)
+#
+plt.tight_layout()
+plt.subplots_adjust(wspace=0, hspace=0)
+plt.savefig(directory+'/peri_info_vs_phase_zoom.pdf')
+plt.close()
+
+
+
+"""
+    Figure 12:
         Apocenter + Period + eccentricity
 """
 plt.rcParams["font.family"] = "serif"
@@ -2160,11 +2263,11 @@ plt.savefig(directory+'/other_orbit_properties.pdf')
 
 
 """
-    Figrue 12:
+    Figrue 13:
         Summary plots
 """
 # Plotting the fractional median offset (values from Table 3 in the paper)
-labels = ['$d_{\\rm peri,rec}$', '$d_{\\rm peri,min}$', '$t_{\\rm peri,rec}$', '$N_{\\rm peri}$', '$N_{\\rm peri,fixed}$', '$v_{\\rm peri,rec}$', '$v_{\\rm peri,min}$', '$d_{\\rm apo,rec}$', '$t_{\\rm infall,lb}$', '$t_{\\rm infall,lb,fixed}$', '$e_{\\rm rec}$', '$T_{\\rm rec}$', '$|da/dr|_{\\rm max}$', '$E_{\\rm infall}$', '$\\ell_{\\rm infall}$']
+labels = ['$d_{\\rm peri,rec}$', '$d_{\\rm peri,min}$', '$t_{\\rm peri,rec}$', '$N_{\\rm peri}$', '$N_{\\rm peri,fixed}$', '$v_{\\rm peri,rec}$', '$v_{\\rm peri,min}$', '$d_{\\rm apo,rec}$', '$t_{\\rm inf}$', '$t_{\\rm inf,fixed}$', '$e_{\\rm rec}$', '$T_{\\rm rec}$', '$|da/dr|$', '$E_{\\rm inf}$', '$\\ell_{\\rm inf}$']
 sum_color = '#D36F5C'
 #
 plt.rcParams["font.family"] = "serif"
@@ -2215,106 +2318,6 @@ axs[2].set_xlim(xs[0]-0.5, xs[-1]+0.5)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.2, hspace=0)
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_2/summary.pdf')
-plt.close()
-
-
-
-"""
-    Appendix Figure X:
-        Pericenter phase plots
-"""
-# Plot both of them on the same plot
-peri_d_colors = ['#337422']
-peri_t_colors = ['#476258', '#624751']
-x = []
-y = []
-# Loop over hosts
-for name in summary.host_names['all_no_r']:
-    # Loop over satellites
-    for i in range(0, len(data_total[name]['pericenter.dist.sim'][masks_infall_peri[name]])):
-        # Loop over the phase
-        for j in range(0, np.min((len(data_total[name]['pericenter.dist.sim'][masks_infall_peri[name]][i]), len(data_total[name]['pericenter.dist.model'][masks_infall_peri[name]][i])))):
-            # Make sure there is an event in both the sim and model
-            if (data_total[name]['pericenter.dist.sim'][masks_infall_peri[name]][i][j] != -1) & (data_total[name]['pericenter.dist.model'][masks_infall_peri[name]][i][j] != -1):
-                # Save the phase
-                x.append(j+1)
-                # Save the fractional difference
-                y.append((data_total[name]['pericenter.dist.model'][masks_infall_peri[name]][i][j]-data_total[name]['pericenter.dist.sim'][masks_infall_peri[name]][i][j])/data_total[name]['pericenter.dist.sim'][masks_infall_peri[name]][i][j])
-x = np.asarray(x)
-y = np.asarray(y)
-#
-onesigp = 84.13
-onesigm = 15.87
-meds = np.zeros(np.max(x))
-upper = np.zeros(np.max(x))
-lower = np.zeros(np.max(x))
-for i in range(0, np.max(x)):
-    mask = (x == i+1)
-    meds[i] = np.nanmedian(y[mask])
-    upper[i] = np.nanpercentile(y[mask], onesigp)
-    lower[i] = np.nanpercentile(y[mask], onesigm)
-#
-f, ax = plt.subplots(2, 1, figsize=(12,14))
-#
-xbins = summary_plot.binning_scheme(x, 'N.peri', binsize=1)[0]
-#
-ax[0].scatter(np.arange(np.max(x))+1, meds, s=75., marker='s', c=peri_d_colors[0])
-ax[0].scatter(-100,-100, s=75., marker='s', c='k', label='Model comparison')
-ax[0].scatter(np.arange(np.max(x))+1, upper-lower, s=150., marker='*', c='k', label='Width of 68th percentile')
-ax[0].hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
-ax[0].legend(prop={'size': 24}, loc='upper left')
-#
-x = []
-y = []
-# Loop over hosts
-for name in summary.host_names['all_no_r']:
-    # Loop over satellites
-    for i in range(0, len(data_total[name]['pericenter.time.lb.sim'][masks_infall_peri[name]])):
-        # Loop over the phase
-        for j in range(0, np.min((len(data_total[name]['pericenter.time.lb.sim'][masks_infall_peri[name]][i]), len(data_total[name]['pericenter.time.lb.model'][masks_infall_peri[name]][i])))):
-            # Make sure there is an event in both the sim and model
-            if (data_total[name]['pericenter.time.lb.sim'][masks_infall_peri[name]][i][j] != -1) & (data_total[name]['pericenter.time.lb.model'][masks_infall_peri[name]][i][j] != -1):
-                # Save the phase
-                x.append(j+1)
-                # Save the fractional difference
-                y.append(data_total[name]['pericenter.time.lb.model'][masks_infall_peri[name]][i][j]-data_total[name]['pericenter.time.lb.sim'][masks_infall_peri[name]][i][j])
-x = np.asarray(x)
-y = np.asarray(y)
-#
-onesigp = 84.13
-onesigm = 15.87
-meds = np.zeros(np.max(x))
-upper = np.zeros(np.max(x))
-lower = np.zeros(np.max(x))
-for i in range(0, np.max(x)):
-    mask = (x == i+1)
-    meds[i] = np.nanmedian(y[mask])
-    upper[i] = np.nanpercentile(y[mask], onesigp)
-    lower[i] = np.nanpercentile(y[mask], onesigm)
-#
-ax[1].scatter(np.arange(np.max(x))+1, meds, s=75., marker='s', c=peri_t_colors[1])
-ax[1].scatter(np.arange(np.max(x))+1, upper-lower, s=150., marker='*', c='k')
-ax[1].hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
-#
-ax[0].set_xticks([0,1,2,3,4,5,6,7,8,9,10])
-ax[1].set_xticks([0,1,2,3,4,5,6,7,8,9,10])
-ax[0].set_xticks(np.arange(0.5, 10.5, 1), minor=True)
-ax[1].set_xticks(np.arange(0.5, 10.5, 1), minor=True)
-ax[0].set_xlim(0, np.max(x)+0.5)
-ax[1].set_xlim(0, np.max(x)+0.5)
-ax[0].set_ylim(-1.1, 2.9)
-ax[1].set_ylim(-3, 3.8)
-ax[1].set_xlabel('Lookback $N_{\\rm peri}$', fontsize=28)
-ax[0].set_ylabel('($d_{\\rm peri,model}-d_{\\rm peri,sim}$)/$d_{\\rm peri,sim}$', fontsize=22)
-ax[1].set_ylabel('$t_{\\rm peri,model}-t_{\\rm peri,sim}$ [Gyr]', fontsize=22)
-ax[0].get_yaxis().set_label_coords(-0.1,0.5)
-ax[1].get_yaxis().set_label_coords(-0.1,0.5)
-ax[0].tick_params(axis='both', which='both', bottom=True, top=True, labelbottom=False, labelsize=24)
-ax[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24)
-#
-plt.tight_layout()
-plt.subplots_adjust(wspace=0, hspace=0)
-plt.savefig(directory+'/peri_info_vs_phase_zoom.pdf')
 plt.close()
 
 
