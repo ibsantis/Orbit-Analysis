@@ -2,7 +2,7 @@
 #SBATCH --job-name=summary_data_point
 ##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --partition=high2    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
-#SBATCH --mem=40G
+#SBATCH --mem=80G
 ##SBATCH --mem=480G
 #SBATCH --nodes=1
 #SBATCH --ntasks=1    # processes total
