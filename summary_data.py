@@ -102,7 +102,7 @@ if sim_data.num_gal == 1:
         from galpy.potential import KeplerPotential # For disks
         from galpy.potential import TwoPowerSphericalPotential # For DM halos
         #
-        mod = model_io.Profiles('scripts')
+        mod = model_io.Profiles('/home/ibsantis/scripts')
         disk_mass = mods.disk_radial_mass(20, sim_data.galaxy)*u.solMass # Chose 20 kpc because that's what I originally fit the model to
         #
         disk_point_pot = KeplerPotential(amp=disk_mass)
@@ -331,7 +331,7 @@ if sim_data.num_gal == 2:
         from galpy.potential import KeplerPotential # For disks
         from galpy.potential import TwoPowerSphericalPotential # For DM halos
         #
-        mod = model_io.Profiles('scripts')
+        mod = model_io.Profiles('/home/ibsantis/scripts')
         disk_mass = mods.disk_radial_mass(20, sim_data.gal_1)*u.solMass # Chose 20 kpc because that's what I originally fit the model to
         #
         disk_point_pot = KeplerPotential(amp=disk_mass)
@@ -558,7 +558,7 @@ if sim_data.num_gal == 2:
         from galpy.potential import KeplerPotential # For disks
         from galpy.potential import TwoPowerSphericalPotential # For DM halos
         #
-        mod = model_io.Profiles('scripts')
+        mod = model_io.Profiles('/home/ibsantis/scripts')
         disk_mass = mods.disk_radial_mass(20, sim_data.gal_2)*u.solMass # Chose 20 kpc because that's what I originally fit the model to
         #
         disk_point_pot = KeplerPotential(amp=disk_mass)
