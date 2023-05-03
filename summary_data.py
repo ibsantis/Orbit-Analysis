@@ -103,7 +103,7 @@ if sim_data.num_gal == 1:
         from galpy.potential import TwoPowerSphericalPotential # For DM halos
         #
         mods = model_io.Profiles('/home/ibsantis/scripts')
-        disk_mass = mods.disk_radial_mass(20, sim_data.galaxy)*u.solMass # Chose 20 kpc because that's what I originally fit the model to
+        disk_mass = mods.disk_radial_mass(50, sim_data.galaxy)*u.solMass # Chose 50 kpc because that's where the enclosed mass converges
         #
         disk_point_pot = KeplerPotential(amp=disk_mass)
         halo_2p = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data['alpha'][sim_data.galaxy], beta=fitting_data['beta'][sim_data.galaxy])
@@ -332,7 +332,7 @@ if sim_data.num_gal == 2:
         from galpy.potential import TwoPowerSphericalPotential # For DM halos
         #
         mods = model_io.Profiles('/home/ibsantis/scripts')
-        disk_mass = mods.disk_radial_mass(20, sim_data.gal_1)*u.solMass # Chose 20 kpc because that's what I originally fit the model to
+        disk_mass = mods.disk_radial_mass(50, sim_data.gal_1)*u.solMass # Chose 50 kpc because that's where the enclosed mass converges
         #
         disk_point_pot = KeplerPotential(amp=disk_mass)
         halo_2p = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][sim_data.gal_1]*u.solMass, a=fitting_data['a_halo'][sim_data.gal_1]*u.kpc, alpha=fitting_data['alpha'][sim_data.gal_1], beta=fitting_data['beta'][sim_data.gal_1])
@@ -559,7 +559,7 @@ if sim_data.num_gal == 2:
         from galpy.potential import TwoPowerSphericalPotential # For DM halos
         #
         mods = model_io.Profiles('/home/ibsantis/scripts')
-        disk_mass = mods.disk_radial_mass(20, sim_data.gal_2)*u.solMass # Chose 20 kpc because that's what I originally fit the model to
+        disk_mass = mods.disk_radial_mass(50, sim_data.gal_2)*u.solMass # Chose 20 kpc because that's where the enclosed mass converges
         #
         disk_point_pot = KeplerPotential(amp=disk_mass)
         halo_2p = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][sim_data.gal_2]*u.solMass, a=fitting_data['a_halo'][sim_data.gal_2]*u.kpc, alpha=fitting_data['alpha'][sim_data.gal_2], beta=fitting_data['beta'][sim_data.gal_2])
