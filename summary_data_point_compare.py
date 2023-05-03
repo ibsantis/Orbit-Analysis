@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=summary_data_point_10_percent
+#SBATCH --job-name=summary_data_point_50_percent
 ##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --partition=high2    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=200G
@@ -7,7 +7,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1    # processes total
 #SBATCH --time=02:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/summary/summary_data_point_10_percent_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/summary/summary_data_point_50_percent_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -101,8 +101,8 @@ if sim_data.num_gal == 1:
         from galpy.potential import DoubleExponentialDiskPotential # For disks
         from galpy.potential import TwoPowerSphericalPotential # For DM halos
         #
-        disk_outer = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_out'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=(fitting_data['r_out'][sim_data.galaxy]*u.kpc)*0.1, hz=(fitting_data['h_z'][sim_data.galaxy]*u.kpc)*0.1)
-        disk_inner = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_in'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=(fitting_data['r_in'][sim_data.galaxy]*u.kpc)*0.1, hz=(fitting_data['h_z'][sim_data.galaxy]*u.kpc)*0.1)
+        disk_outer = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_out'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=(fitting_data['r_out'][sim_data.galaxy]*u.kpc)*0.5, hz=(fitting_data['h_z'][sim_data.galaxy]*u.kpc)*0.5)
+        disk_inner = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_in'][sim_data.galaxy]*u.solMass/u.kpc**3, hr=(fitting_data['r_in'][sim_data.galaxy]*u.kpc)*0.5, hz=(fitting_data['h_z'][sim_data.galaxy]*u.kpc)*0.5)
         halo_2p = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data['alpha'][sim_data.galaxy], beta=fitting_data['beta'][sim_data.galaxy])
         potential_two_power = disk_inner+disk_outer+halo_2p
 
@@ -262,7 +262,7 @@ if sim_data.num_gal == 1:
     data_dict['host.mass.ratio'] = mass_ratio
 
     if point_mass:
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/point_mass_compare/data_'+sim_data.galaxy+'_10p_scale', dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/point_mass_compare/data_'+sim_data.galaxy+'_50p_scale', dict_or_array_to_write=data_dict, verbose=True)
 
 if sim_data.num_gal == 2:
     #
@@ -305,8 +305,8 @@ if sim_data.num_gal == 2:
         from galpy.potential import DoubleExponentialDiskPotential # For disks
         from galpy.potential import TwoPowerSphericalPotential # For DM halos
         #
-        disk_outer = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_out'][sim_data.gal_1]*u.solMass/u.kpc**3, hr=(fitting_data['r_out'][sim_data.gal_1]*u.kpc)*0.1, hz=(fitting_data['h_z'][sim_data.gal_1]*u.kpc)*0.1)
-        disk_inner = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_in'][sim_data.gal_1]*u.solMass/u.kpc**3, hr=(fitting_data['r_in'][sim_data.gal_1]*u.kpc)*0.1, hz=(fitting_data['h_z'][sim_data.gal_1]*u.kpc)*0.1)
+        disk_outer = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_out'][sim_data.gal_1]*u.solMass/u.kpc**3, hr=(fitting_data['r_out'][sim_data.gal_1]*u.kpc)*0.5, hz=(fitting_data['h_z'][sim_data.gal_1]*u.kpc)*0.5)
+        disk_inner = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_in'][sim_data.gal_1]*u.solMass/u.kpc**3, hr=(fitting_data['r_in'][sim_data.gal_1]*u.kpc)*0.5, hz=(fitting_data['h_z'][sim_data.gal_1]*u.kpc)*0.5)
         halo_2p = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][sim_data.gal_1]*u.solMass, a=fitting_data['a_halo'][sim_data.gal_1]*u.kpc, alpha=fitting_data['alpha'][sim_data.gal_1], beta=fitting_data['beta'][sim_data.gal_1])
         potential_two_power = disk_inner+disk_outer+halo_2p
 
@@ -467,7 +467,7 @@ if sim_data.num_gal == 2:
     #
 
     if point_mass:
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/point_mass_compare/data_'+sim_data.gal_1+'_10p_scale', dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/point_mass_compare/data_'+sim_data.gal_1+'_50p_scale', dict_or_array_to_write=data_dict, verbose=True)
     #
     ### GALAXY 2
     # Find the mass ratio to multiply the host radius
@@ -508,8 +508,8 @@ if sim_data.num_gal == 2:
         from galpy.potential import DoubleExponentialDiskPotential # For disks
         from galpy.potential import TwoPowerSphericalPotential # For DM halos
         #
-        disk_outer = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_out'][sim_data.gal_2]*u.solMass/u.kpc**3, hr=(fitting_data['r_out'][sim_data.gal_2]*u.kpc)*0.1, hz=(fitting_data['h_z'][sim_data.gal_2]*u.kpc)*0.1)
-        disk_inner = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_in'][sim_data.gal_2]*u.solMass/u.kpc**3, hr=(fitting_data['r_in'][sim_data.gal_2]*u.kpc)*0.1, hz=(fitting_data['h_z'][sim_data.gal_2]*u.kpc)*0.1)
+        disk_outer = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_out'][sim_data.gal_2]*u.solMass/u.kpc**3, hr=(fitting_data['r_out'][sim_data.gal_2]*u.kpc)*0.5, hz=(fitting_data['h_z'][sim_data.gal_2]*u.kpc)*0.5)
+        disk_inner = DoubleExponentialDiskPotential(amp=fitting_data['A_disk_in'][sim_data.gal_2]*u.solMass/u.kpc**3, hr=(fitting_data['r_in'][sim_data.gal_2]*u.kpc)*0.5, hz=(fitting_data['h_z'][sim_data.gal_2]*u.kpc)*0.5)
         halo_2p = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][sim_data.gal_2]*u.solMass, a=fitting_data['a_halo'][sim_data.gal_2]*u.kpc, alpha=fitting_data['alpha'][sim_data.gal_2], beta=fitting_data['beta'][sim_data.gal_2])
         potential_two_power = disk_inner+disk_outer+halo_2p
     #
@@ -670,4 +670,4 @@ if sim_data.num_gal == 2:
     data_dict['host.mass.ratio'] = mass_ratio
     #
     if point_mass:
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/point_mass_compare/data_'+sim_data.gal_2+'_10p_scale', dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/point_mass_compare/data_'+sim_data.gal_2+'_50p_scale', dict_or_array_to_write=data_dict, verbose=True)
