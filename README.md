@@ -9,12 +9,12 @@ methods.
 
 # Requirements
 
-This package makes use of:
+This package makes use of the following:
 
 - Python 3
-- gizmo_analysis
-- halo_analysis
-- utilities
+- [gizmo_analysis](https://bitbucket.org/awetzel/gizmo_analysis)
+- [halo_analysis](https://bitbucket.org/awetzel/halo_analysis)
+- [utilities](https://bitbucket.org/awetzel/utilities)
 - numpy
 - scipy
 - astropy
