@@ -81,7 +81,7 @@ class SummaryDataSort:
                                    'm12r': 16, 'm12w': 16, 'm12z': 0, 'Romeo': 0, 'Juliet': 0,\
                                    'Thelma': 0, 'Louise': 0, 'Romulus': 0, 'Remus': 0}}
 
-    def data_read(self, directory, sim_type='baryon', hosts='all', point_mass=False):
+    def data_read(self, directory, sim_type='baryon', hosts='all', point_mass=False, percent=None):
         """
         DESCRIPTION:
             Reads in the summary data and stores it in a dictionary with each
@@ -116,9 +116,15 @@ class SummaryDataSort:
         if sim_type == 'baryon':
             #
             if point_mass:
-                for name in self.host_names[hosts]:
-                    data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/point_mass/data_'+name+'_point_mass', verbose=True)
-                    data_dict[name] = data
+                if percent is not None:
+                    percent = str(percent)
+                    for name in self.host_names[hosts]:
+                        data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/point_mass_'+percent+'_percent/data_'+name+'_'+percent+'p_scale', verbose=True)
+                        data_dict[name] = data
+                else:
+                    for name in self.host_names[hosts]:
+                        data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/point_mass/data_'+name+'_point_mass', verbose=True)
+                        data_dict[name] = data
             else:
                 for name in self.host_names[hosts]:
                     data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/data_'+name, verbose=True)
@@ -2984,7 +2990,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def median_plot_mult(self, x, y, xtype, ytype, labels, binsize, file_path_and_name, binedges=None, limits=None, title=None, legend_on=True, hl=False, w_scatter=False):
+    def median_plot_mult(self, x, y, xtype, ytype, labels, binsize, file_path_and_name, binedges=None, limits=None, title=None, legend_on=True, hl=False, w_scatter=False, axis_labels=None):
         """
         DESCRIPTION:
             Bins the x-axis quantity and plots either the mean or median, along
@@ -3105,8 +3111,12 @@ class SummaryDataPlot(SummaryDataSort):
             ax2.set_xlim(limits[0])
             ax2.set_xlabel(axis_2_label, labelpad=9)
             ax2.tick_params(pad=3)
-        ax.set_xlabel(self.labels[xtype[0]], fontsize=28)
-        ax.set_ylabel(self.labels[ytype[0]], fontsize=28)
+        if axis_labels:
+            ax.set_xlabel(axis_labels[0], fontsize=28)
+            ax.set_ylabel(axis_labels[1], fontsize=28)
+        else:
+            ax.set_xlabel(self.labels[xtype[0]], fontsize=28)
+            ax.set_ylabel(self.labels[ytype[0]], fontsize=28)
         if legend_on:
             ax.legend(prop={'size': 24}, loc='best')
         if title:
@@ -3386,7 +3396,7 @@ class SummaryDataPlot(SummaryDataSort):
         plt.savefig(file_path_and_name)
         plt.close()
 
-    def plot_hist_mult(self, x, xtype, labels, binsize, file_path_and_name, med_location=None, pdf=False, xlimits=None, title=None, legend_on=True, leg_loc=None, binedges=None):
+    def plot_hist_mult(self, x, xtype, labels, binsize, file_path_and_name, med_location=None, pdf=False, xlimits=None, title=None, legend_on=True, leg_loc=None, binedges=None, x_label=None):
         """
         DESCRIPTION:
             Plots a histogram of a given property.
@@ -3457,7 +3467,10 @@ class SummaryDataPlot(SummaryDataSort):
                 plt.scatter(np.mean(x[i]), y_mean, s=250, marker='s', c=colorss[i])
         #
         plt.xlim(xlimits)
-        plt.xlabel(self.labels[xtype[0]], fontsize=28)
+        if x_label:
+            plt.xlabel(x_label, fontsize=28)
+        else:
+            plt.xlabel(self.labels[xtype[0]], fontsize=28)
         plt.ylabel(y_label, fontsize=28)
         if legend_on:
             if leg_loc:
