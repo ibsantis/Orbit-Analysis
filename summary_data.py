@@ -335,7 +335,7 @@ if sim_data.num_gal == 2:
         mods = model_io.Profiles('/home/ibsantis/scripts')
         #disk_mass = mods.disk_radial_mass(30, sim_data.gal_1)*u.solMass # Chose 30 kpc because that's where the enclosed mass converges (for most)
         #
-        amp_point = (fitting_data['A_disk_out'][sim_data.gal_1]*u.solMass/u.kpc**3)*np.pi*(fitting_data['r_out'][sim_data.gal_1]*u.kpc)**2*(fitting_data['h_z'][sim_data.gal_1]*u.kpc)
+        disk_mass = (fitting_data['A_disk_out'][sim_data.gal_1]*u.solMass/u.kpc**3)*np.pi*(fitting_data['r_out'][sim_data.gal_1]*u.kpc)**2*(fitting_data['h_z'][sim_data.gal_1]*u.kpc)
         disk_point_pot = KeplerPotential(amp=disk_mass)
         halo_2p = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][sim_data.gal_1]*u.solMass, a=fitting_data['a_halo'][sim_data.gal_1]*u.kpc, alpha=fitting_data['alpha'][sim_data.gal_1], beta=fitting_data['beta'][sim_data.gal_1])
         #
@@ -563,7 +563,7 @@ if sim_data.num_gal == 2:
         mods = model_io.Profiles('/home/ibsantis/scripts')
         #disk_mass = mods.disk_radial_mass(30, sim_data.gal_2)*u.solMass # Chose 30 kpc because that's where the enclosed mass converges (for most)
         #
-        amp_point = (fitting_data['A_disk_out'][sim_data.gal_2]*u.solMass/u.kpc**3)*np.pi*(fitting_data['r_out'][sim_data.gal_2]*u.kpc)**2*(fitting_data['h_z'][sim_data.gal_2]*u.kpc)
+        disk_mass = (fitting_data['A_disk_out'][sim_data.gal_2]*u.solMass/u.kpc**3)*np.pi*(fitting_data['r_out'][sim_data.gal_2]*u.kpc)**2*(fitting_data['h_z'][sim_data.gal_2]*u.kpc)
         disk_point_pot = KeplerPotential(amp=disk_mass)
         halo_2p = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][sim_data.gal_2]*u.solMass, a=fitting_data['a_halo'][sim_data.gal_2]*u.kpc, alpha=fitting_data['alpha'][sim_data.gal_2], beta=fitting_data['beta'][sim_data.gal_2])
         #
