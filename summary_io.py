@@ -123,7 +123,7 @@ class SummaryDataSort:
                         data_dict[name] = data
                 else:
                     for name in self.host_names[hosts]:
-                        data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/point_mass/data_'+name+'_point_mass', verbose=True)
+                        data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/point_mass/data_'+name+'_point_mass_same', verbose=True) # change back if necessary
                         data_dict[name] = data
             else:
                 for name in self.host_names[hosts]:
