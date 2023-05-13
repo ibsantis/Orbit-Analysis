@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"name": "orbit_analysis",
+			"path": "."
+		},
+		{
+			"name": "gizmo_analysis",
+			"path": "../../gizmo_analysis/gizmo_analysis"
+		},
+		{
+			"name": "halo_analysis",
+			"path": "../../halo_analysis/halo_analysis"
+		},
+		{
+			"name": "utilities",
+			"path": "../../utilities/utilities"
+		}
+	],
+	"settings": {}
+}
