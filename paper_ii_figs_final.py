@@ -5,7 +5,7 @@
     = Paper II Final Figures =
     ==========================
 
-    Create the final plots for Paper II
+    Create the final plots for Paper II 
 """
 
 import halo_analysis as halo
