@@ -242,7 +242,7 @@ plt.close()
 
 
 """
-    Figure 1:
+    Figure 2:
         Mass profile ratio vs lookback time
 """
 # Read in the data
@@ -1818,7 +1818,7 @@ plt.close()
 
 
 """
-    Appendix Figure 11:
+    Figure 11:
         Pericenter phase plots
 """
 # Plot both of them on the same plot
@@ -1852,13 +1852,13 @@ for i in range(0, np.max(x)):
     upper[i] = np.nanpercentile(y[mask], onesigp)
     lower[i] = np.nanpercentile(y[mask], onesigm)
 #
-f, ax = plt.subplots(2, 1, figsize=(12,14))
+f, ax = plt.subplots(2, 1, figsize=(12,10))
 #
-ax[0].scatter(np.arange(8)+1, meds[:8], s=75., marker='s', c=peri_d_colors[0])
-ax[0].scatter(-100,-100, s=75., marker='s', c='k', label='Model comparison')
-ax[0].scatter(np.arange(8)+1, (upper-lower)[:8], s=150., marker='*', c='k', label='Width of 68th percentile')
+ax[0].scatter(np.arange(6)+1, meds[:6], s=100., marker='s', c=peri_d_colors[0])
+ax[0].scatter(-100,-100, s=100., marker='s', c='k', label='Model comparison')
+ax[0].scatter(np.arange(6)+1, (upper-lower)[:6], s=200., marker='*', c='k', label='Width of 68th percentile')
 ax[0].hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
-ax[0].legend(prop={'size': 24}, loc='upper left')
+ax[0].legend(prop={'size': 24}, loc='best')
 #
 x = []
 y = []
@@ -1888,25 +1888,25 @@ for i in range(0, np.max(x)):
     upper[i] = np.nanpercentile(y[mask], onesigp)
     lower[i] = np.nanpercentile(y[mask], onesigm)
 #
-ax[1].scatter(np.arange(8)+1, meds[:8], s=75., marker='s', c=peri_t_colors[1])
-ax[1].scatter(np.arange(8)+1, (upper-lower)[:8], s=150., marker='*', c='k')
+ax[1].scatter(np.arange(6)+1, meds[:6], s=100., marker='s', c=peri_t_colors[1])
+ax[1].scatter(np.arange(6)+1, (upper-lower)[:6], s=200., marker='*', c='k')
 ax[1].hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
 #
-ax[0].set_xticks([0,1,2,3,4,5,6,7,8])
-ax[1].set_xticks([0,1,2,3,4,5,6,7,8])
+ax[0].set_xticks([0,1,2,3,4,5,6])
+ax[1].set_xticks([0,1,2,3,4,5,6])
 #ax[0].set_xticks(np.arange(0.5, 8.5, 1), minor=True)
 #ax[1].set_xticks(np.arange(0.5, 8.5, 1), minor=True)
-ax[0].set_xlim(0, 8.5)
-ax[1].set_xlim(0, 8.5)
-ax[0].set_ylim(-0.25, 1.2)
-ax[1].set_ylim(-2, 2.7)
+ax[0].set_xlim(0, 6.5)
+ax[1].set_xlim(0, 6.5)
+ax[0].set_ylim(-0.25, 1.1)
+ax[1].set_ylim(-1.5, 2.5)
 ax[1].set_xlabel('Lookback Pericenter Event', fontsize=30)
-ax[0].set_ylabel('($d_{\\rm peri,model}-d_{\\rm peri,sim}$)/$d_{\\rm peri,sim}$', fontsize=30)
-ax[1].set_ylabel('$t_{\\rm peri,model}-t_{\\rm peri,sim}$ [Gyr]', fontsize=30)
+ax[0].set_ylabel('($d_{\\rm peri,model}-d_{\\rm peri,sim}$)/$d_{\\rm peri,sim}$', fontsize=22)
+ax[1].set_ylabel('$t_{\\rm peri,model}-t_{\\rm peri,sim}$ [Gyr]', fontsize=22)
 ax[0].get_yaxis().set_label_coords(-0.12,0.5)
 ax[1].get_yaxis().set_label_coords(-0.12,0.5)
-ax[0].tick_params(axis='both', which='major', bottom=True, top=True, labelbottom=False, labelsize=28)
-ax[1].tick_params(axis='both', which='major', bottom=True, top=True, labelsize=28)
+ax[0].tick_params(axis='both', which='major', bottom=True, top=True, labelbottom=False, labelsize=24)
+ax[1].tick_params(axis='both', which='major', bottom=True, top=True, labelsize=24)
 ax[0].tick_params(axis='x', which='minor', bottom=False, top=False)
 ax[1].tick_params(axis='x', which='minor', bottom=False, top=False)
 #
