@@ -54,7 +54,7 @@ loc = 'peloton'
 sim_data = orbit_io.OrbitRead(gal1=str(sys.argv[1]), location=loc)
 plotting = False
 aligned = True
-point_mass = True
+point_mass = False
 rotate = True
 print('Set paths')
 
@@ -285,7 +285,7 @@ if sim_data.num_gal == 1:
 
     if point_mass:
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_point_mass_same', dict_or_array_to_write=data_dict, verbose=True)
-    elif point_mass:
+    elif rotate:
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_90deg', dict_or_array_to_write=data_dict, verbose=True)
     else:
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
