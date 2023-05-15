@@ -1181,7 +1181,7 @@ class OrbitGalpy(OrbitAnalysis):
         """
         OrbitAnalysis.__init__(self, tree, gal1, location, host, dmo=dmo)
 
-    def galpy_orbit_init(self, tree, host=1):
+    def galpy_orbit_init(self, tree, host=1, rotate=False):
         """
         DESCRIPTION:
             Reads in the halo tree and subhalo indices, then returns a list of
@@ -1206,27 +1206,73 @@ class OrbitGalpy(OrbitAnalysis):
         sub_orbits = []
         #
         # Loop through each subhalo and save the 6D initial conditions
-        if host == 1:
-            for i in range(0, len(self.sub_inds)):
-                R = tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][0])[0]
-                vR = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][0])[0]
-                vT = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][0])[1] # This is really vphi
-                z = tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][0])[2]
-                vz = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][0])[2]
-                phi = np.rad2deg(np.arctan(tree.prop('host.distance.principal', self.sub_inds[i][0])[1]/tree.prop('host.distance.principal', self.sub_inds[i][0])[0]))
-                #
-                sub_orbits.append(Orbit([R*u.kpc, vR*u.km/u.s, vT*u.km/u.s, z*u.kpc, vz*u.km/u.s, phi*u.deg]))
-        #
-        elif host == 2:
-            for i in range(0, len(self.sub_inds)):
-                R = tree.prop('host2.distance.principal.cylindrical', self.sub_inds[i][0])[0]
-                vR = tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][0])[0]
-                vT = tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][0])[1]
-                z = tree.prop('host2.distance.principal.cylindrical', self.sub_inds[i][0])[2]
-                vz = tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][0])[2]
-                phi = np.rad2deg(np.arctan(tree.prop('host2.distance.principal', self.sub_inds[i][0])[1]/tree.prop('host2.distance.principal', self.sub_inds[i][0])[0]))
-                #
-                sub_orbits.append(Orbit([R*u.kpc, vR*u.km/u.s, vT*u.km/u.s, z*u.kpc, vz*u.km/u.s, phi*u.deg]))
+        if rotate:
+            if host == 1:
+                for i in range(0, len(self.sub_inds)):
+                    # Get the cartesian coordinates
+                    cart_pos = tree.prop('host.distance.principal', self.sub_inds[i][0])
+                    cart_vel = tree.prop('host.velocity.principal', self.sub_inds[i][0])
+                    #
+                    # Rotate the cartesian coordinates by 90 deg
+                    cart_pos_rot = ut.coordinate.get_coordinates_rotated(cart_pos, rotation_angles=np.array([np.pi/2, 0, 0]))
+                    cart_vel_rot = ut.coordinate.get_coordinates_rotated(cart_vel, rotation_angles=np.array([np.pi/2, 0, 0]))
+                    #
+                    # Get the cylindrical coordinates
+                    cyl_pos = ut.coordinate.get_positions_in_coordinate_system(cart_pos_rot, system_from='cartesian', system_to='cylindrical')
+                    cyl_vel = ut.coordinate.get_positions_in_coordinate_system(cart_vel_rot, system_from='cartesian', system_to='cylindrical')
+                    #
+                    R = cyl_pos[:,0]
+                    vR = cyl_vel[:,0]
+                    vT = cyl_vel[:,1]
+                    z = cyl_pos[:,2]
+                    vz = cyl_vel[:,2]
+                    phi = np.rad2deg(cyl_pos[:,1])
+                    #
+                    sub_orbits.append(Orbit([R*u.kpc, vR*u.km/u.s, vT*u.km/u.s, z*u.kpc, vz*u.km/u.s, phi*u.deg]))
+            elif host == 2:
+                for i in range(0, len(self.sub_inds)):
+                    # Get the cartesian coordinates
+                    cart_pos = tree.prop('host2.distance.principal', self.sub_inds[i][0])
+                    cart_vel = tree.prop('host2.velocity.principal', self.sub_inds[i][0])
+                    #
+                    # Rotate the cartesian coordinates by 90 deg
+                    cart_pos_rot = ut.coordinate.get_coordinates_rotated(cart_pos, rotation_angles=np.array([np.pi/2, 0, 0]))
+                    cart_vel_rot = ut.coordinate.get_coordinates_rotated(cart_vel, rotation_angles=np.array([np.pi/2, 0, 0]))
+                    #
+                    # Get the cylindrical coordinates
+                    cyl_pos = ut.coordinate.get_positions_in_coordinate_system(cart_pos_rot, system_from='cartesian', system_to='cylindrical')
+                    cyl_vel = ut.coordinate.get_positions_in_coordinate_system(cart_vel_rot, system_from='cartesian', system_to='cylindrical')
+                    #
+                    R = cyl_pos[:,0]
+                    vR = cyl_vel[:,0]
+                    vT = cyl_vel[:,1]
+                    z = cyl_pos[:,2]
+                    vz = cyl_vel[:,2]
+                    phi = np.rad2deg(cyl_pos[:,1])
+                    #
+                    sub_orbits.append(Orbit([R*u.kpc, vR*u.km/u.s, vT*u.km/u.s, z*u.kpc, vz*u.km/u.s, phi*u.deg]))
+        else:
+            if host == 1:
+                for i in range(0, len(self.sub_inds)):
+                    R = tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][0])[0]
+                    vR = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][0])[0]
+                    vT = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][0])[1] # This is really vphi
+                    z = tree.prop('host.distance.principal.cylindrical', self.sub_inds[i][0])[2]
+                    vz = tree.prop('host.velocity.principal.cylindrical', self.sub_inds[i][0])[2]
+                    phi = np.rad2deg(np.arctan(tree.prop('host.distance.principal', self.sub_inds[i][0])[1]/tree.prop('host.distance.principal', self.sub_inds[i][0])[0]))
+                    #
+                    sub_orbits.append(Orbit([R*u.kpc, vR*u.km/u.s, vT*u.km/u.s, z*u.kpc, vz*u.km/u.s, phi*u.deg]))
+            #
+            elif host == 2:
+                for i in range(0, len(self.sub_inds)):
+                    R = tree.prop('host2.distance.principal.cylindrical', self.sub_inds[i][0])[0]
+                    vR = tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][0])[0]
+                    vT = tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][0])[1]
+                    z = tree.prop('host2.distance.principal.cylindrical', self.sub_inds[i][0])[2]
+                    vz = tree.prop('host2.velocity.principal.cylindrical', self.sub_inds[i][0])[2]
+                    phi = np.rad2deg(np.arctan(tree.prop('host2.distance.principal', self.sub_inds[i][0])[1]/tree.prop('host2.distance.principal', self.sub_inds[i][0])[0]))
+                    #
+                    sub_orbits.append(Orbit([R*u.kpc, vR*u.km/u.s, vT*u.km/u.s, z*u.kpc, vz*u.km/u.s, phi*u.deg]))
         #
         return Orbit(sub_orbits)
 
