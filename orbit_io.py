@@ -1221,12 +1221,12 @@ class OrbitGalpy(OrbitAnalysis):
                     cyl_pos = ut.coordinate.get_positions_in_coordinate_system(cart_pos_rot, system_from='cartesian', system_to='cylindrical')
                     cyl_vel = ut.coordinate.get_positions_in_coordinate_system(cart_vel_rot, system_from='cartesian', system_to='cylindrical')
                     #
-                    R = cyl_pos[:,0]
-                    vR = cyl_vel[:,0]
-                    vT = cyl_vel[:,1]
-                    z = cyl_pos[:,2]
-                    vz = cyl_vel[:,2]
-                    phi = np.rad2deg(cyl_pos[:,1])
+                    R = cyl_pos[0]
+                    vR = cyl_vel[0]
+                    vT = cyl_vel[1]
+                    z = cyl_pos[2]
+                    vz = cyl_vel[2]
+                    phi = np.rad2deg(cyl_pos[1])
                     #
                     sub_orbits.append(Orbit([R*u.kpc, vR*u.km/u.s, vT*u.km/u.s, z*u.kpc, vz*u.km/u.s, phi*u.deg]))
             elif host == 2:
@@ -1243,12 +1243,12 @@ class OrbitGalpy(OrbitAnalysis):
                     cyl_pos = ut.coordinate.get_positions_in_coordinate_system(cart_pos_rot, system_from='cartesian', system_to='cylindrical')
                     cyl_vel = ut.coordinate.get_positions_in_coordinate_system(cart_vel_rot, system_from='cartesian', system_to='cylindrical')
                     #
-                    R = cyl_pos[:,0]
-                    vR = cyl_vel[:,0]
-                    vT = cyl_vel[:,1]
-                    z = cyl_pos[:,2]
-                    vz = cyl_vel[:,2]
-                    phi = np.rad2deg(cyl_pos[:,1])
+                    R = cyl_pos[0]
+                    vR = cyl_vel[0]
+                    vT = cyl_vel[1]
+                    z = cyl_pos[2]
+                    vz = cyl_vel[2]
+                    phi = np.rad2deg(cyl_pos[1])
                     #
                     sub_orbits.append(Orbit([R*u.kpc, vR*u.km/u.s, vT*u.km/u.s, z*u.kpc, vz*u.km/u.s, phi*u.deg]))
         else:
