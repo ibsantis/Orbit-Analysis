@@ -56,6 +56,10 @@ plotting = False
 aligned = True
 point_mass = False
 rotate = True
+#
+if rotate and point_mass:
+    raise AssertionError('Do not rotate point mass model!')
+#
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
@@ -104,9 +108,9 @@ if sim_data.num_gal == 1:
         from galpy.potential import TwoPowerSphericalPotential # For DM halos
         #
         mods = model_io.Profiles('/home/ibsantis/scripts')
-        #disk_mass = mods.disk_radial_mass(30, sim_data.galaxy)*u.solMass # Chose 30 kpc because that's where the enclosed mass converges (for most)
+        disk_mass = mods.disk_radial_mass(30, sim_data.galaxy)*u.solMass # Chose 30 kpc because that's where the enclosed mass converges (for most)
         #
-        disk_mass = (fitting_data['A_disk_out'][sim_data.galaxy]*u.solMass/u.kpc**3)*np.pi*(fitting_data['r_out'][sim_data.galaxy]*u.kpc)**2*(fitting_data['h_z'][sim_data.galaxy]*u.kpc)
+        # disk_mass = (fitting_data['A_disk_out'][sim_data.galaxy]*u.solMass/u.kpc**3)*np.pi*(fitting_data['r_out'][sim_data.galaxy]*u.kpc)**2*(fitting_data['h_z'][sim_data.galaxy]*u.kpc)
         disk_point_pot = KeplerPotential(amp=disk_mass)
         halo_2p = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][sim_data.galaxy]*u.solMass, a=fitting_data['a_halo'][sim_data.galaxy]*u.kpc, alpha=fitting_data['alpha'][sim_data.galaxy], beta=fitting_data['beta'][sim_data.galaxy])
         #
@@ -284,7 +288,7 @@ if sim_data.num_gal == 1:
     print('The mass ratio is:', mass_ratio)
 
     if point_mass:
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_point_mass_same', dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_point_mass', dict_or_array_to_write=data_dict, verbose=True)
     elif rotate:
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_90deg', dict_or_array_to_write=data_dict, verbose=True)
     else:
@@ -336,9 +340,9 @@ if sim_data.num_gal == 2:
         from galpy.potential import TwoPowerSphericalPotential # For DM halos
         #
         mods = model_io.Profiles('/home/ibsantis/scripts')
-        #disk_mass = mods.disk_radial_mass(30, sim_data.gal_1)*u.solMass # Chose 30 kpc because that's where the enclosed mass converges (for most)
+        disk_mass = mods.disk_radial_mass(30, sim_data.gal_1)*u.solMass # Chose 30 kpc because that's where the enclosed mass converges (for most)
         #
-        disk_mass = (fitting_data['A_disk_out'][sim_data.gal_1]*u.solMass/u.kpc**3)*np.pi*(fitting_data['r_out'][sim_data.gal_1]*u.kpc)**2*(fitting_data['h_z'][sim_data.gal_1]*u.kpc)
+        # disk_mass = (fitting_data['A_disk_out'][sim_data.gal_1]*u.solMass/u.kpc**3)*np.pi*(fitting_data['r_out'][sim_data.gal_1]*u.kpc)**2*(fitting_data['h_z'][sim_data.gal_1]*u.kpc) # Used for the "point mass same" files
         disk_point_pot = KeplerPotential(amp=disk_mass)
         halo_2p = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][sim_data.gal_1]*u.solMass, a=fitting_data['a_halo'][sim_data.gal_1]*u.kpc, alpha=fitting_data['alpha'][sim_data.gal_1], beta=fitting_data['beta'][sim_data.gal_1])
         #
@@ -516,7 +520,7 @@ if sim_data.num_gal == 2:
     print('The mass ratio is:', mass_ratio)
 
     if point_mass:
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_point_mass_same', dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_point_mass', dict_or_array_to_write=data_dict, verbose=True)
     elif rotate:
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_90deg', dict_or_array_to_write=data_dict, verbose=True)
     else:
@@ -566,9 +570,9 @@ if sim_data.num_gal == 2:
         from galpy.potential import TwoPowerSphericalPotential # For DM halos
         #
         mods = model_io.Profiles('/home/ibsantis/scripts')
-        #disk_mass = mods.disk_radial_mass(30, sim_data.gal_2)*u.solMass # Chose 30 kpc because that's where the enclosed mass converges (for most)
+        disk_mass = mods.disk_radial_mass(30, sim_data.gal_2)*u.solMass # Chose 30 kpc because that's where the enclosed mass converges (for most)
         #
-        disk_mass = (fitting_data['A_disk_out'][sim_data.gal_2]*u.solMass/u.kpc**3)*np.pi*(fitting_data['r_out'][sim_data.gal_2]*u.kpc)**2*(fitting_data['h_z'][sim_data.gal_2]*u.kpc)
+        # disk_mass = (fitting_data['A_disk_out'][sim_data.gal_2]*u.solMass/u.kpc**3)*np.pi*(fitting_data['r_out'][sim_data.gal_2]*u.kpc)**2*(fitting_data['h_z'][sim_data.gal_2]*u.kpc)
         disk_point_pot = KeplerPotential(amp=disk_mass)
         halo_2p = TwoPowerSphericalPotential(amp=fitting_data['A_halo'][sim_data.gal_2]*u.solMass, a=fitting_data['a_halo'][sim_data.gal_2]*u.kpc, alpha=fitting_data['alpha'][sim_data.gal_2], beta=fitting_data['beta'][sim_data.gal_2])
         #
@@ -747,7 +751,7 @@ if sim_data.num_gal == 2:
 
 
     if point_mass:
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_point_mass_same', dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_point_mass', dict_or_array_to_write=data_dict, verbose=True)
     elif rotate:
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_90deg', dict_or_array_to_write=data_dict, verbose=True)
     else:
