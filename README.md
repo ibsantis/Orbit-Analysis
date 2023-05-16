@@ -20,6 +20,8 @@ This package makes use of the following:
 - astropy
 - matplotlib
 
+Most importantly, this package uses the FIRE-2 simulations. A handful of snapshot data, and halo catalogs, for the MW-mass galaxies are hosted [here](https://flathub.flatironinstitute.org/fire) at the Flatiron Institute. For a brief description of the simulations and everything included in the publically available data, see this [public data release paper](https://ui.adsabs.harvard.edu/abs/2023ApJS..265...44W/abstract).
+
 ---
 
 # Contents
@@ -48,11 +50,11 @@ This package makes use of the following:
 
 Unless otherwise explicitly stated, all units in these packages follow the same convention as the FIRE-2 simulations. Here are some of the most common property units:
 
-- mass: $M_{\odot}$
+- mass: M_sun
 - distance: kpc
 - time: Gyr
-- velocity: km s$^{-1}$
-- energy: km$^2$ s$^{-2}$
+- velocity: km s^{-1}
+- energy: km^2 s^{-2}
 
 ---
 
