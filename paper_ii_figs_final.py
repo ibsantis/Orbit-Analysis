@@ -16,6 +16,7 @@ import matplotlib
 from matplotlib.ticker import LogLocator
 from matplotlib.ticker import AutoLocator
 from matplotlib.ticker import ScalarFormatter
+from matplotlib.colors import ListedColormap
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib import pyplot as plt
 import orbit_io
@@ -958,11 +959,11 @@ for i in range(0, len(halo_ids)):
     # Plot the distances
     if i == 0:
         axs[0,i].plot(times, d_sim, 'k', label='Simulation')
-        axs[0,i].plot(-1*times_model, d_model, label='Model', alpha=0.5)
+        axs[0,i].plot(-1*times_model, d_model, label='Model', alpha=0.7)
         axs[0,i].plot([], [], ' ', label='$\\Delta d_{\\rm peri}/d_{\\rm peri}$: '+str(np.around(frac_d[np.where((halo_ids[i]+1 == names['ids'])&(hosts[i] == names['host']))[0][0]], decimals=2)))
     else:
         axs[0,i].plot(times, d_sim, 'k')
-        axs[0,i].plot(-1*times_model, d_model, alpha=0.5)
+        axs[0,i].plot(-1*times_model, d_model, alpha=0.7)
         axs[0,i].plot([], [], ' ', label='$\\Delta d_{\\rm peri}/d_{\\rm peri}$: '+str(np.around(frac_d[np.where((halo_ids[i]+1 == names['ids'])&(hosts[i] == names['host']))[0][0]], decimals=2)))
     axs[0,i].plot(times, data_total[hosts[i]]['host.radius'][:len(times)], 'k', alpha=0.3)
     #
@@ -977,7 +978,7 @@ for i in range(0, len(halo_ids)):
     #
     if peri:
         for j in data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]][data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]] != -1]:
-            axs[0,i].axvline(x=j, ymin=0, ymax=1, color=peri_color, linestyle=':', alpha=0.3)
+            axs[0,i].axvline(x=j, ymin=0, ymax=1, color=peri_color, linestyle=':', alpha=0.5)
     #
     # Set the labels and save the figure
     axs[0,i].label_outer()
@@ -997,7 +998,7 @@ for i in range(0, len(halo_ids)):
     #
     # Plot the velocity
     axs[1,i].plot(times, v_sim, 'k')
-    axs[1,i].plot(-1*times_model, v_model, alpha=0.5)
+    axs[1,i].plot(-1*times_model, v_model, alpha=0.7)
     #
     if infall:
         infall_time = data_total[hosts[i]]['first.infall.time.lb'][halo_ids[i]]
@@ -1005,7 +1006,7 @@ for i in range(0, len(halo_ids)):
     #
     if peri:
         for j in data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]][data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]] != -1]:
-            axs[1,i].axvline(x=j, ymin=0, ymax=1, color=peri_color, linestyle=':', alpha=0.3)
+            axs[1,i].axvline(x=j, ymin=0, ymax=1, color=peri_color, linestyle=':', alpha=0.5)
     #
     # Set the labels and save the figure
     axs[1,i].label_outer()
@@ -1014,7 +1015,7 @@ for i in range(0, len(halo_ids)):
     E_vir = (6.67*10**(-11)*2*10**(30))/(1000**3*3.086*10**(16))*data_total[hosts[i]]['host.mass'][0]/data_total[hosts[i]]['host.radius'][0]
     #L_vir = np.sqrt(E_vir)*data_total[hosts[i]]['host.radius'][0]
     axs[2,i].plot(times, (L_sim-L_sim[0])/L_sim[0], 'k')
-    axs[2,i].plot(-1*times_model, (L_model-L_model[0])/L_model[0], alpha=0.5)
+    axs[2,i].plot(-1*times_model, (L_model-L_model[0])/L_model[0], alpha=0.7)
     #
     if infall:
         infall_time = data_total[hosts[i]]['first.infall.time.lb'][halo_ids[i]]
@@ -1022,7 +1023,7 @@ for i in range(0, len(halo_ids)):
     #
     if peri:
         for j in data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]][data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]] != -1]:
-            axs[2,i].axvline(x=j, ymin=0, ymax=1, color=peri_color, linestyle=':', alpha=0.3)
+            axs[2,i].axvline(x=j, ymin=0, ymax=1, color=peri_color, linestyle=':', alpha=0.5)
     #
     # Set the labels and save the figure
     axs[2,i].label_outer()
@@ -1030,7 +1031,7 @@ for i in range(0, len(halo_ids)):
     # Plot the energy
     E_vir = (6.67*10**(-11)*2*10**(30))/(1000**3*3.086*10**(16))*data_total[hosts[i]]['host.mass'][0]/data_total[hosts[i]]['host.radius'][0]
     axs[3,i].plot(t_E, (E_sim-E_sim[0])/E_vir, 'k')
-    axs[3,i].plot(t_E_model, (E_model-E_model[0])/E_vir, alpha=0.5)
+    axs[3,i].plot(t_E_model, (E_model-E_model[0])/E_vir, alpha=0.7)
     #
     if infall:
         infall_time = data_total[hosts[i]]['first.infall.time.lb'][halo_ids[i]]
@@ -1038,7 +1039,7 @@ for i in range(0, len(halo_ids)):
     #
     if peri:
         for j in data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]][data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]] != -1]:
-            axs[3,i].axvline(x=j, ymin=0, ymax=1, color=peri_color, linestyle=':', alpha=0.3)
+            axs[3,i].axvline(x=j, ymin=0, ymax=1, color=peri_color, linestyle=':', alpha=0.5)
     #
     # Set the labels and save the figure
     axs[3,i].label_outer()
@@ -2276,7 +2277,7 @@ f, axs = plt.subplots(1, 3, figsize=(30,12))
 med_offset = np.array([-0.025, 0.066, -0.028, 0.246, 0.259, 0.030, 0.012, -0.013, -0.067, 0.441, 0.005, -0.071, -0.017, np.abs(-0.537), -0.015])
 xs = np.arange(1, 16)
 sort_mask = np.argsort(med_offset)
-axs[0].scatter(xs, med_offset[sort_mask], s=50, c=sum_color, marker='o')
+axs[0].scatter(xs, med_offset[sort_mask], s=200, c=sum_color, marker='o')
 axs[0].hlines(y=0, xmin=xs[0]-0.5, xmax=xs[-1]+0.5, linestyle='dotted', color='k', alpha=0.5)
 axs[0].set_xticks(xs, minor=False)
 axs[0].set_xticklabels(np.asarray(labels)[sort_mask], rotation=90)
@@ -2284,7 +2285,7 @@ axs[0].set_xticklabels(np.asarray(labels)[sort_mask], rotation=90)
 # Width of the 68 percent scatter
 width_68 = np.array([ 0.424, 1.067, 0.179, 0.486, 0.486, 0.202, 0.330, 0.116, 0.820, 1.088, 0.288, 0.267, 1.320, 1.628, 0.838])
 sort_mask = np.argsort(width_68)
-axs[1].scatter(xs, width_68[sort_mask], s=50, c=sum_color, marker='o')
+axs[1].scatter(xs, width_68[sort_mask], s=200, c=sum_color, marker='o')
 axs[1].hlines(y=0, xmin=xs[0]-0.5, xmax=xs[-1]+0.5, linestyle='dotted', color='k', alpha=0.5)
 axs[1].set_xticks(xs, minor=False)
 axs[1].set_xticklabels(np.asarray(labels)[sort_mask], rotation=90)
@@ -2292,7 +2293,7 @@ axs[1].set_xticklabels(np.asarray(labels)[sort_mask], rotation=90)
 # Width of the 95 percent scatter
 width_95 = np.array([ 2.383, 7.112, 1.290, 1.944, 1.944, 0.747, 0.861, 0.754, 5.338, 5.842, 1.082, 0.820, 8.400, 3.648, 3.359])
 sort_mask = np.argsort(width_95)
-axs[2].scatter(xs, width_95[sort_mask], s=50, c=sum_color, marker='o')
+axs[2].scatter(xs, width_95[sort_mask], s=200, c=sum_color, marker='o')
 axs[2].hlines(y=0, xmin=xs[0]-0.5, xmax=xs[-1]+0.5, linestyle='dotted', color='k', alpha=0.5)
 axs[2].set_xticks(xs, minor=False)
 axs[2].set_xticklabels(np.asarray(labels)[sort_mask], rotation=90)
