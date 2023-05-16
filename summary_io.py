@@ -135,7 +135,7 @@ class SummaryDataSort:
                             data_dict[name] = data
             elif rotated:
                 for name in self.host_names[hosts]:
-                            data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/rotated/data_'+name+'_'+str(rotation[1])+'deg'+str(rotation[0]), verbose=True)
+                            data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/rotated/data_'+name+'_'+str(rotation[1])+'deg_axis'+str(rotation[0]), verbose=True)
                             data_dict[name] = data
             else:
                 for name in self.host_names[hosts]:
