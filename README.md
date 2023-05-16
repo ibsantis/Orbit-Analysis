@@ -46,6 +46,14 @@ This package makes use of the following:
 
 # Units
 
+Unless otherwise explicitly stated, all units in these packages follow the same convention as the FIRE-2 simulations. Here are some of the most common property units:
+
+- mass: $M_{\odot}$
+- distance: kpc
+- time: Gyr
+- velocity: km s$^{-1}$
+- energy: km$^2$ s$^{-2}$
+
 ---
 
 # Installing
