@@ -33,9 +33,15 @@
         - Finally, does a check to see whether or not a satellite nears a "pole",
           which could cause numerical problems in Galpy.
 
+    OrbitTree:
+        - Something...
+
     OrbitPlot:
         - Includes methods to plot different orbital properties.
           [I don't really use this anymore, but this could be improved and useful later.]
+    
+    OrbitMatch:
+        - Something...
 
 """
 
