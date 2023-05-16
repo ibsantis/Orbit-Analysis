@@ -81,7 +81,7 @@ class SummaryDataSort:
                                    'm12r': 16, 'm12w': 16, 'm12z': 0, 'Romeo': 0, 'Juliet': 0,\
                                    'Thelma': 0, 'Louise': 0, 'Romulus': 0, 'Remus': 0}}
 
-    def data_read(self, directory, sim_type='baryon', hosts='all', point_mass=False, percent=None, same=False, rotated=False):
+    def data_read(self, directory, sim_type='baryon', hosts='all', point_mass=False, percent=None, same=False, rotated=False, rotation=(None,None)):
         """
         DESCRIPTION:
             Reads in the summary data and stores it in a dictionary with each
@@ -135,7 +135,7 @@ class SummaryDataSort:
                             data_dict[name] = data
             elif rotated:
                 for name in self.host_names[hosts]:
-                            data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/rotated_90/data_'+name+'_90deg', verbose=True)
+                            data = ut.io.file_hdf5(directory+'/orbit_data/hdf5_files/summary_data/rotated/data_'+name+'_'+str(rotation[1])+'deg'+str(rotation[0]), verbose=True)
                             data_dict[name] = data
             else:
                 for name in self.host_names[hosts]:
