@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=summary_data_rotate
+#SBATCH --job-name=summary_data_rotate_180
 ##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --partition=high2    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=200G
@@ -7,7 +7,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1    # processes total
 #SBATCH --time=02:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/summary/summary_data_rotate_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/summary/summary_data_rotate_180_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -56,6 +56,7 @@ plotting = False
 aligned = True
 point_mass = False
 rotate = True
+rot_axis, angle = 0, 180
 #
 if rotate and point_mass:
     raise AssertionError('Do not rotate point mass model!')
@@ -97,7 +98,7 @@ if sim_data.num_gal == 1:
     eccs = orbits.eccentricity(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
     #
     # Initialize the orbits in Galpy
-    galpy_orbits = orbit_gal.galpy_orbit_init(tree=halt, rotate=rotate)
+    galpy_orbits = orbit_gal.galpy_orbit_init(tree=halt, rotate=rotate, rotation=(rot_axis, angle))
 
     # Read in the fitting parameters
     fitting_data = pd.read_csv(sim_data.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
@@ -290,7 +291,7 @@ if sim_data.num_gal == 1:
     if point_mass:
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_point_mass', dict_or_array_to_write=data_dict, verbose=True)
     elif rotate:
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_90deg', dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_'+str(angle)+'deg'+'_axis'+str(rot_axis), dict_or_array_to_write=data_dict, verbose=True)
     else:
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
         #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
@@ -329,7 +330,7 @@ if sim_data.num_gal == 2:
     eccs = orbits.eccentricity(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
     #
     # Initialize the orbits in Galpy
-    galpy_orbits = orbit_gal.galpy_orbit_init(tree=halt, host=1, rotate=rotate)
+    galpy_orbits = orbit_gal.galpy_orbit_init(tree=halt, host=1, rotate=rotate, rotation=(rot_axis, angle))
 
     # Read in the fitting parameters
     fitting_data = pd.read_csv(sim_data.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
@@ -522,7 +523,7 @@ if sim_data.num_gal == 2:
     if point_mass:
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_point_mass', dict_or_array_to_write=data_dict, verbose=True)
     elif rotate:
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_90deg', dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_'+str(angle)+'deg'+str(rot_axis), dict_or_array_to_write=data_dict, verbose=True)
     else:
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1, dict_or_array_to_write=data_dict, verbose=True)
         #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_1+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
@@ -559,7 +560,7 @@ if sim_data.num_gal == 2:
     eccs = orbits.eccentricity(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
     #
     # Initialize the orbits in Galpy
-    galpy_orbits = orbit_gal.galpy_orbit_init(tree=halt, host=2, rotate=rotate)
+    galpy_orbits = orbit_gal.galpy_orbit_init(tree=halt, host=2, rotate=rotate, rotation=(rot_axis, angle))
 
     # Read in the fitting parameters
     fitting_data = pd.read_csv(sim_data.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
@@ -753,7 +754,7 @@ if sim_data.num_gal == 2:
     if point_mass:
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_point_mass', dict_or_array_to_write=data_dict, verbose=True)
     elif rotate:
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_90deg', dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_'+str(angle)+'deg'+str(rot_axis), dict_or_array_to_write=data_dict, verbose=True)
     else:
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2, dict_or_array_to_write=data_dict, verbose=True)
         #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)

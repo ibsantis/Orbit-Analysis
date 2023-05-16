@@ -1187,7 +1187,7 @@ class OrbitGalpy(OrbitAnalysis):
         """
         OrbitAnalysis.__init__(self, tree, gal1, location, host, dmo=dmo)
 
-    def galpy_orbit_init(self, tree, host=1, rotate=False):
+    def galpy_orbit_init(self, tree, host=1, rotate=False, rotation=(None, None)):
         """
         DESCRIPTION:
             Reads in the halo tree and subhalo indices, then returns a list of
@@ -1213,6 +1213,11 @@ class OrbitGalpy(OrbitAnalysis):
         #
         # Loop through each subhalo and save the 6D initial conditions
         if rotate:
+            #
+            rot_angle = rotation[1]
+            rot_array = np.zeros(3)
+            rot_array[rotation[0]] = np.deg2rad(rot_angle)
+            #
             if host == 1:
                 for i in range(0, len(self.sub_inds)):
                     # Get the cartesian coordinates
@@ -1220,8 +1225,8 @@ class OrbitGalpy(OrbitAnalysis):
                     cart_vel = tree.prop('host.velocity.principal', self.sub_inds[i][0])
                     #
                     # Rotate the cartesian coordinates by 90 deg
-                    cart_pos_rot = ut.coordinate.get_coordinates_rotated(cart_pos, rotation_angles=np.array([np.pi/2, 0, 0]))
-                    cart_vel_rot = ut.coordinate.get_coordinates_rotated(cart_vel, rotation_angles=np.array([np.pi/2, 0, 0]))
+                    cart_pos_rot = ut.coordinate.get_coordinates_rotated(cart_pos, rotation_angles=rot_array)
+                    cart_vel_rot = ut.coordinate.get_coordinates_rotated(cart_vel, rotation_angles=rot_array)
                     #
                     # Get the cylindrical coordinates
                     cyl_pos = ut.coordinate.get_positions_in_coordinate_system(cart_pos_rot, system_from='cartesian', system_to='cylindrical')
@@ -1242,8 +1247,8 @@ class OrbitGalpy(OrbitAnalysis):
                     cart_vel = tree.prop('host2.velocity.principal', self.sub_inds[i][0])
                     #
                     # Rotate the cartesian coordinates by 90 deg
-                    cart_pos_rot = ut.coordinate.get_coordinates_rotated(cart_pos, rotation_angles=np.array([np.pi/2, 0, 0]))
-                    cart_vel_rot = ut.coordinate.get_coordinates_rotated(cart_vel, rotation_angles=np.array([np.pi/2, 0, 0]))
+                    cart_pos_rot = ut.coordinate.get_coordinates_rotated(cart_pos, rotation_angles=rot_array)
+                    cart_vel_rot = ut.coordinate.get_coordinates_rotated(cart_vel, rotation_angles=rot_array)
                     #
                     # Get the cylindrical coordinates
                     cyl_pos = ut.coordinate.get_positions_in_coordinate_system(cart_pos_rot, system_from='cartesian', system_to='cylindrical')
