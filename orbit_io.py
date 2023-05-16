@@ -1230,7 +1230,7 @@ class OrbitGalpy(OrbitAnalysis):
                     #
                     # Get the cylindrical coordinates
                     cyl_pos = ut.coordinate.get_positions_in_coordinate_system(cart_pos_rot, system_from='cartesian', system_to='cylindrical')
-                    cyl_vel = ut.coordinate.get_positions_in_coordinate_system(cart_vel_rot, system_from='cartesian', system_to='cylindrical')
+                    cyl_vel = ut.coordinate.get_velocities_in_coordinate_system(cart_vel_rot, cart_pos_rot, system_from='cartesian', system_to='cylindrical')
                     #
                     R = cyl_pos[0]
                     vR = cyl_vel[0]
@@ -1252,7 +1252,7 @@ class OrbitGalpy(OrbitAnalysis):
                     #
                     # Get the cylindrical coordinates
                     cyl_pos = ut.coordinate.get_positions_in_coordinate_system(cart_pos_rot, system_from='cartesian', system_to='cylindrical')
-                    cyl_vel = ut.coordinate.get_positions_in_coordinate_system(cart_vel_rot, system_from='cartesian', system_to='cylindrical')
+                    cyl_vel = ut.coordinate.get_velocities_in_coordinate_system(cart_vel_rot, cart_pos_rot, system_from='cartesian', system_to='cylindrical')
                     #
                     R = cyl_pos[0]
                     vR = cyl_vel[0]
