@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#SBATCH --job-name=summary_data_rotate_90y
+#SBATCH --job-name=summary_data_rotate_180x
 ##SBATCH --partition=high2m    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --partition=high2    # peloton high-mem node: 32 cores, 15.6 GB per core, 500 GB total
 #SBATCH --mem=200G
@@ -7,7 +7,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1    # processes total
 #SBATCH --time=02:00:00
-#SBATCH --output=/home/ibsantis/scripts/jobs/summary/summary_data_rotate_90y_%j.txt
+#SBATCH --output=/home/ibsantis/scripts/jobs/summary/summary_data_rotate_180x_%j.txt
 #SBATCH --mail-user=ibsantistevan@ucdavis.edu
 #SBATCH --mail-type=fail
 #SBATCH --mail-type=end
@@ -56,7 +56,7 @@ plotting = False
 aligned = True
 point_mass = False
 rotate = True
-rot_axis, angle = 1, 90
+rot_axis, angle = 0, 180
 #
 if rotate and point_mass:
     raise AssertionError('Do not rotate point mass model!')
