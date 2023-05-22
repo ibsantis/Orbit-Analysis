@@ -439,7 +439,7 @@ norm = matplotlib.colors.Normalize(vmin=times[-1], vmax=times[0])
 sm = plt.cm.ScalarMappable(cmap=newcmap, norm=norm)
 cbar = plt.colorbar(sm, ax=ax1, location='top', orientation='horizontal', pad=0.03)
 cbar.set_label('Lookback time [Gyr]', fontsize=26)
-
+#cbar.ax.tick_params(labelsize=20)
 
 # Cumulatively sum each and put them all in one array
 mass_prof_avg_all = np.array([np.cumsum(mass_m12b['mass.profile'][:21],axis=1)/np.average(np.cumsum(mass_m12b['mass.profile'][:21], axis=1), axis=0),\
@@ -492,7 +492,7 @@ ax1.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
 ax2.tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0.13)
-plt.savefig(directory+'/long_short_evolution_sigma.pdf')
+plt.savefig(directory+'/long_short_evolution_sigma_test.pdf')
 plt.close()
 
 
