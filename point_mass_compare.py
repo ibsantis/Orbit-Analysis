@@ -116,7 +116,7 @@ d_rec_mod_50p = summary.dperi_recent(data_total_50p, masks_infall_peri_50p, sele
 d_rec_mod_10p = summary.dperi_recent(data_total_10p, masks_infall_peri_10p, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 d_rec_mod_1p = summary.dperi_recent(data_total_1p, masks_infall_peri_1p, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 
-mask = (d_rec_mod != 0)
+mask = (d_rec_mod != 0)*(d_rec_mod < 30)
 print(np.nanmedian((d_rec_mod_kep[mask]-d_rec_mod[mask])/d_rec_mod[mask]))
 print(np.nanmedian((d_rec_mod_90p[mask]-d_rec_mod[mask])/d_rec_mod[mask]))
 print(np.nanmedian((d_rec_mod_50p[mask]-d_rec_mod[mask])/d_rec_mod[mask]))
@@ -137,7 +137,7 @@ t_rec_mod_50p = summary.tperi_recent(data_total_50p, masks_infall_peri_50p, sele
 t_rec_mod_10p = summary.tperi_recent(data_total_10p, masks_infall_peri_10p, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 t_rec_mod_1p = summary.tperi_recent(data_total_1p, masks_infall_peri_1p, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 
-mask = (d_rec_mod != 0)*(t_rec_mod != 0)
+mask = (d_rec_mod != 0)*(t_rec_mod != 0)*(d_rec_mod < 30)
 print(np.nanmedian((t_rec_mod_kep[mask]-t_rec_mod[mask])/t_rec_mod[mask]))
 print(np.nanmedian((t_rec_mod_90p[mask]-t_rec_mod[mask])/t_rec_mod[mask]))
 print(np.nanmedian((t_rec_mod_50p[mask]-t_rec_mod[mask])/t_rec_mod[mask]))
@@ -158,7 +158,7 @@ n_mod_50p = summary.nperi_model(data_total_50p, masks_infall_peri_50p, selection
 n_mod_10p = summary.nperi_model(data_total_10p, masks_infall_peri_10p, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 n_mod_1p = summary.nperi_model(data_total_1p, masks_infall_peri_1p, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 
-mask = (d_rec_mod != 0)*(n_mod != 0)
+mask = (d_rec_mod != 0)*(n_mod != 0)*(d_rec_mod < 30)
 print(np.nanmedian((n_mod_kep[mask]-n_mod[mask])/n_mod[mask]))
 print(np.nanmedian((n_mod_90p[mask]-n_mod[mask])/n_mod[mask]))
 print(np.nanmedian((n_mod_50p[mask]-n_mod[mask])/n_mod[mask]))
@@ -178,7 +178,7 @@ n_mod_r200_50p = summary.nperi_model(data_total_50p, masks_infall_peri_50p, sele
 n_mod_r200_10p = summary.nperi_model(data_total_10p, masks_infall_peri_10p, selection='model.R200m', oversample=True, hosts='all_no_r', sim_type='baryon')
 n_mod_r200_1p = summary.nperi_model(data_total_1p, masks_infall_peri_1p, selection='model.R200m', oversample=True, hosts='all_no_r', sim_type='baryon')
 
-mask = (d_rec_mod != 0)*(n_mod_r200 != 0)
+mask = (d_rec_mod != 0)*(n_mod_r200 != 0)*(d_rec_mod < 30)
 print(np.nanmedian((n_mod_r200_kep[mask]-n_mod_r200[mask])/n_mod_r200[mask]))
 print(np.nanmedian((n_mod_r200_90p[mask]-n_mod_r200[mask])/n_mod_r200[mask]))
 print(np.nanmedian((n_mod_r200_50p[mask]-n_mod_r200[mask])/n_mod_r200[mask]))
@@ -199,7 +199,7 @@ v_rec_mod_50p = summary.vperi_recent(data_total_50p, masks_infall_peri_50p, sele
 v_rec_mod_10p = summary.vperi_recent(data_total_10p, masks_infall_peri_10p, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 v_rec_mod_1p = summary.vperi_recent(data_total_1p, masks_infall_peri_1p, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 
-mask = (d_rec_mod != 0)
+mask = (d_rec_mod != 0)*(d_rec_mod < 30)
 print(np.nanmedian((v_rec_mod_kep[mask]-v_rec_mod[mask])/v_rec_mod[mask]))
 print(np.nanmedian((v_rec_mod_90p[mask]-v_rec_mod[mask])/v_rec_mod[mask]))
 print(np.nanmedian((v_rec_mod_50p[mask]-v_rec_mod[mask])/v_rec_mod[mask]))
@@ -219,8 +219,9 @@ dapo_rec_mod_90p = summary.dapo_recent(data_total_90p, masks_infall_apo_90p, sel
 dapo_rec_mod_50p = summary.dapo_recent(data_total_50p, masks_infall_apo_50p, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 dapo_rec_mod_10p = summary.dapo_recent(data_total_10p, masks_infall_apo_10p, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 dapo_rec_mod_1p = summary.dapo_recent(data_total_1p, masks_infall_apo_1p, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
-
-mask = (dapo_rec_mod != 0)
+#
+d_rec_mod = summary.dperi_recent(data_total, masks_infall_apo, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
+mask = (dapo_rec_mod != 0)*(d_rec_mod < 30)
 print(np.nanmedian((dapo_rec_mod_kep[mask]-dapo_rec_mod[mask])/dapo_rec_mod[mask]))
 print(np.nanmedian((dapo_rec_mod_90p[mask]-dapo_rec_mod[mask])/dapo_rec_mod[mask]))
 print(np.nanmedian((dapo_rec_mod_50p[mask]-dapo_rec_mod[mask])/dapo_rec_mod[mask]))
@@ -242,12 +243,12 @@ t_in_mod_10p = summary.first_infall(data_total_10p, masks_infall_10p, selection=
 t_in_mod_1p = summary.first_infall(data_total_1p, masks_infall_1p, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 
 d_rec_mod = summary.dperi_recent(data_total, masks_infall, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
-mask = (t_in_mod != 0)*(d_rec_mod != 0)
-print(np.median((t_in_mod_kep[mask]-t_in_mod[mask])/t_in_mod[mask]))
-print(np.median((t_in_mod_90p[mask]-t_in_mod[mask])/t_in_mod[mask]))
-print(np.median((t_in_mod_50p[mask]-t_in_mod[mask])/t_in_mod[mask]))
-print(np.median((t_in_mod_10p[mask]-t_in_mod[mask])/t_in_mod[mask]))
-print(np.median((t_in_mod_1p[mask]-t_in_mod[mask])/t_in_mod[mask]))
+mask = (t_in_mod != 0)*(d_rec_mod != 0)*(d_rec_mod < 30)
+print(np.nanmedian((t_in_mod_kep[mask]-t_in_mod[mask])/t_in_mod[mask]))
+print(np.nanmedian((t_in_mod_90p[mask]-t_in_mod[mask])/t_in_mod[mask]))
+print(np.nanmedian((t_in_mod_50p[mask]-t_in_mod[mask])/t_in_mod[mask]))
+print(np.nanmedian((t_in_mod_10p[mask]-t_in_mod[mask])/t_in_mod[mask]))
+print(np.nanmedian((t_in_mod_1p[mask]-t_in_mod[mask])/t_in_mod[mask]))
 print(width_of_68((t_in_mod_kep[mask]-t_in_mod[mask])/t_in_mod[mask]))
 print(width_of_68((t_in_mod_90p[mask]-t_in_mod[mask])/t_in_mod[mask]))
 print(width_of_68((t_in_mod_50p[mask]-t_in_mod[mask])/t_in_mod[mask]))
@@ -264,7 +265,7 @@ t_in_mod_r200_10p = summary.infall_fixed(data_total_10p, masks_infall_10p, overs
 t_in_mod_r200_1p = summary.infall_fixed(data_total_1p, masks_infall_1p, oversample=True, hosts='all_no_r', sim_type='baryon')
 
 d_rec_mod = summary.dperi_recent(data_total, masks_infall, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
-mask = (t_in_mod_r200 != 0)*(d_rec_mod != 0)
+mask = (t_in_mod_r200 != 0)*(d_rec_mod != 0)*(d_rec_mod < 30)
 print(np.nanmedian((t_in_mod_r200_kep[mask]-t_in_mod_r200[mask])/t_in_mod_r200[mask]))
 print(np.nanmedian((t_in_mod_r200_90p[mask]-t_in_mod_r200[mask])/t_in_mod_r200[mask]))
 print(np.nanmedian((t_in_mod_r200_50p[mask]-t_in_mod_r200[mask])/t_in_mod_r200[mask]))
@@ -338,7 +339,7 @@ d_rec_mod3 = np.hstack(d_rec_mod3)
 d_rec_mod4 = np.hstack(d_rec_mod4)
 d_rec_mod5 = np.hstack(d_rec_mod5)
 
-mask1 = (d_rec_mod1 != 0)#*(d_rec_mod1 < 50)
+mask1 = (d_rec_mod1 != 0)*(d_rec_mod1 < 30)
 mask2 = (d_rec_mod2 != 0)#*(d_rec_mod2 < 50)
 mask3 = (d_rec_mod3 != 0)#*(d_rec_mod3 < 50)
 mask4 = (d_rec_mod4 != 0)
@@ -416,7 +417,7 @@ d_rec_mod3 = np.hstack(d_rec_mod3)
 d_rec_mod4 = np.hstack(d_rec_mod4)
 d_rec_mod5 = np.hstack(d_rec_mod5)
 
-mask1 = (d_rec_mod1 != 0)#*(d_rec_mod1 < 50)
+mask1 = (d_rec_mod1 != 0)*(d_rec_mod1 < 30)
 mask2 = (d_rec_mod2 != 0)#*(d_rec_mod2 < 50)
 mask3 = (d_rec_mod3 != 0)#*(d_rec_mod3 < 50)
 mask4 = (d_rec_mod4 != 0)
@@ -453,7 +454,7 @@ dadr_max_mod_1p = summary.da_dr(data_total_1p, masks_infall_peri_1p, data_mp, da
 print('1% model done')
 
 d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
-mask = (d_rec_mod != 0)#*(d_rec_mod < 50)
+mask = (d_rec_mod != 0)*(d_rec_mod < 30)
 
 print(np.nanmedian((dadr_max_mod_kep['dadr'][mask]-dadr_max_mod['dadr'][mask])/dadr_max_mod['dadr'][mask]))
 print(np.nanmedian((dadr_max_mod_90p['dadr'][mask]-dadr_max_mod['dadr'][mask])/dadr_max_mod['dadr'][mask]))
