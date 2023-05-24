@@ -118,7 +118,7 @@ n_mod_rot_90y = summary.nperi_model(data_total_rot_90y, masks_infall_rot_90y, se
 n_mod_rot_180x = summary.nperi_model(data_total_rot_180x, masks_infall_rot_180x, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
 d_rec_mod = summary.dperi_recent(data_total, masks_infall, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
-mask = (n_mod != 0)*(d_rec_mod != 0)*(d_rec_mod < 30)
+mask = (n_mod != 0)*(d_rec_mod != 0)#*(d_rec_mod < 30)
 print(np.nanmedian((n_mod_rot_90x[mask]-n_mod[mask])/n_mod[mask]))
 print(np.nanmedian((n_mod_rot_90y[mask]-n_mod[mask])/n_mod[mask]))
 print(np.nanmedian((n_mod_rot_180x[mask]-n_mod[mask])/n_mod[mask]))
@@ -131,7 +131,7 @@ n_mod_r200_rot_90x = summary.nperi_model(data_total_rot_90x, masks_infall_rot_90
 n_mod_r200_rot_90y = summary.nperi_model(data_total_rot_90y, masks_infall_rot_90y, selection='model.R200m', oversample=True, hosts='all_no_r', sim_type='baryon')
 n_mod_r200_rot_180x = summary.nperi_model(data_total_rot_180x, masks_infall_rot_180x, selection='model.R200m', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
-mask = (n_mod_r200!= 0)*(d_rec_mod != 0)*(d_rec_mod < 30)
+mask = (n_mod_r200!= 0)*(d_rec_mod != 0)#*(d_rec_mod < 30)
 print(np.nanmedian((n_mod_r200_rot_90x[mask]-n_mod_r200[mask])/n_mod_r200[mask]))
 print(np.nanmedian((n_mod_r200_rot_90y[mask]-n_mod_r200[mask])/n_mod_r200[mask]))
 print(np.nanmedian((n_mod_r200_rot_180x[mask]-n_mod_r200[mask])/n_mod_r200[mask]))
@@ -313,7 +313,7 @@ dadr_max_mod_rot_180x = summary.da_dr(data_total_rot_180x, masks_infall_peri_rot
 print('180x model done')
 
 d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
-mask = (d_rec_mod != 0)*(d_rec_mod < 30)
+mask = (d_rec_mod != 0)#*(d_rec_mod < 30)
 
 print(np.nanmedian((dadr_max_mod_rot_90x['dadr'][mask]-dadr_max_mod['dadr'][mask])/dadr_max_mod['dadr'][mask]))
 print(np.nanmedian((dadr_max_mod_rot_90y['dadr'][mask]-dadr_max_mod['dadr'][mask])/dadr_max_mod['dadr'][mask]))
