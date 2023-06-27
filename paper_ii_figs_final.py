@@ -745,6 +745,11 @@ Mstar_z0 = summary.mstar(data_total, masks_infall, selection='z0', oversample=Tr
 dz0_tot = summary.d_z0(data_total, masks_infall, oversample=True, hosts='all_energy_new', sim_type='baryon')
 sub_energy = summary.energies_new(data_total, masks_infall, data, data_mp, snaps, oversample=True, hosts='all_energy_new')
 
+cc = ut.cosmology.CosmologyClass()
+red = np.array([0, 1])
+cc.convert_time(time_name_get='time.lookback', time_name_input='redshift', values=red)
+
+
 count = 0
 lengths = []
 for name in summary.host_names['all_energy_new']:
@@ -825,8 +830,8 @@ diff = (all_e_norm_upper-all_e_norm_lower)
 temp_t3 = tlb[:len(diff)]
 temp_t3[~np.isfinite(diff)] = np.nan
 #
-axs[0].plot(temp_t1, all_e_norm_med, c='#01033C', linewidth=4, alpha=0.7, label='median')
-axs[0].plot(temp_t3, diff, c='#01033C', linewidth=2.5, linestyle='dashed', alpha=0.6, label='width of 68%-ile')
+axs[0].plot(temp_t1, all_e_norm_med, c='#01033C', linewidth=4, alpha=0.7, linestyle='dashed', label='median')
+axs[0].plot(temp_t3, diff, c='#01033C', linewidth=2.5, alpha=0.6, label='width of 68%-ile')
 axs[0].hlines(0, 0, 13.5, linestyle='dotted', color='k', alpha=0.5)
 axs[0].legend(prop={'size': 22}, loc='best')
 #
@@ -853,8 +858,8 @@ diff = (all_l_norm_upper-all_l_norm_lower)
 temp_t3 = tlb[:len(diff)]
 temp_t3[~np.isfinite(diff)] = np.nan
 #
-axs[1].plot(temp_t1, all_l_norm_med, c='#6769A8', linewidth=4, alpha=0.7, label='median')
-axs[1].plot(temp_t3, diff, c='#6769A8', linewidth=2.5, linestyle='dashed', alpha=0.6, label='width of 68% scatter')
+axs[1].plot(temp_t1, all_l_norm_med, c='#6769A8', linewidth=4, linestyle='dashed', alpha=0.7, label='median')
+axs[1].plot(temp_t3, diff, c='#6769A8', linewidth=2.5, alpha=0.6, label='width of 68% scatter')
 axs[1].hlines(0, 0, 13.8, linestyle='dotted', color='k', alpha=0.5)
 #
 axs[0].set_ylabel('$(E(t) - E_0) \ / \ U_{\\rm 200m, 0}$', fontsize=30)
@@ -974,7 +979,7 @@ for i in range(0, len(halo_ids)):
     # If there were, plot when they occurred
     if infall:
         infall_time = data_total[hosts[i]]['first.infall.time.lb'][halo_ids[i]]
-        axs[0,i].axvline(x=infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+        axs[0,i].axvline(x=infall_time, ymin=0, ymax=1, color='k', linestyle='--')
     #
     if peri:
         for j in data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]][data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]] != -1]:
@@ -1002,7 +1007,7 @@ for i in range(0, len(halo_ids)):
     #
     if infall:
         infall_time = data_total[hosts[i]]['first.infall.time.lb'][halo_ids[i]]
-        axs[1,i].axvline(x=infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+        axs[1,i].axvline(x=infall_time, ymin=0, ymax=1, color='k', linestyle='--')
     #
     if peri:
         for j in data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]][data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]] != -1]:
@@ -1019,7 +1024,7 @@ for i in range(0, len(halo_ids)):
     #
     if infall:
         infall_time = data_total[hosts[i]]['first.infall.time.lb'][halo_ids[i]]
-        axs[2,i].axvline(x=infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+        axs[2,i].axvline(x=infall_time, ymin=0, ymax=1, color='k', linestyle='--')
     #
     if peri:
         for j in data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]][data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]] != -1]:
@@ -1035,7 +1040,7 @@ for i in range(0, len(halo_ids)):
     #
     if infall:
         infall_time = data_total[hosts[i]]['first.infall.time.lb'][halo_ids[i]]
-        axs[3,i].axvline(x=infall_time, ymin=0, ymax=1, color='k', linestyle=':')
+        axs[3,i].axvline(x=infall_time, ymin=0, ymax=1, color='k', linestyle='--')
     #
     if peri:
         for j in data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]][data_total[hosts[i]]['pericenter.time.lb.sim'][halo_ids[i]] != -1]:
@@ -1069,6 +1074,13 @@ axs[1,0].set_ylim(0,330)
 axs[1,1].set_ylim(0,290)
 axs[1,2].set_ylim(0,440)
 axs[1,3].set_ylim(0,299)
+#
+xticks = np.array([0, 2, 4, 6, 8, 10, 12])
+xtick_labels = np.array(['0', '2', '4', '6', '8', '10', '12'])
+axs[3,0].set_xticks(xticks, xtick_labels, fontsize=28)
+axs[3,1].set_xticks(xticks, xtick_labels, fontsize=28)
+axs[3,2].set_xticks(xticks, xtick_labels, fontsize=28)
+axs[3,3].set_xticks(xticks, xtick_labels, fontsize=28)
 #
 axs[0,0].legend(prop={'size': 25}, loc='upper right', framealpha=1)
 axs[0,1].legend(prop={'size': 25}, loc='upper right', framealpha=1)
@@ -1107,7 +1119,7 @@ axs[1,0].set_ylabel('Total Velocity [km s$^{-1}$]', fontsize=28)
 axs[1,0].get_yaxis().set_label_coords(-0.14,0.5)
 axs[2,0].set_ylabel('$(\\ell(t) - \\ell_0) \ / \ \\ell_0$', fontsize=28)
 axs[2,0].get_yaxis().set_label_coords(-0.14,0.5)
-axs[3,0].set_ylabel('$(E(t) - E_0) \ / \ U_{\\rm R200m,z=0}$', fontsize=28)
+axs[3,0].set_ylabel('$(E(t) - E_0) \ / \ U_{\\rm R200m,0}$', fontsize=28)
 axs[3,0].get_yaxis().set_label_coords(-0.14,0.5)
 #
 r1 = mpatches.Rectangle(xy=(0.8,375),width=2.64,height=55, facecolor='#D3D3D3', alpha=1, zorder=10)
@@ -1186,8 +1198,8 @@ diff = (all_d_frac_upper-all_d_frac_lower)
 temp_t2 = tlb[:len(diff)]
 temp_t2[~np.isfinite(diff)] = np.nan
 #
-axs.plot(temp_t1, np.abs(all_d_frac_med), c='#2C0E2C', linewidth=4, alpha=0.7, label='median')
-axs.plot(temp_t2, diff, c='#2C0E2C', linewidth=2.5, linestyle='dashed', alpha=0.6, label='width of 68%-ile')
+axs.plot(temp_t1, np.abs(all_d_frac_med), c='#2C0E2C', linestyle='dashed', linewidth=4, alpha=0.7, label='median')
+axs.plot(temp_t2, diff, c='#2C0E2C', linewidth=2.5, alpha=0.6, label='width of 68%-ile')
 axs.hlines(0, 0, 13.5, linestyle='dotted', color='k', alpha=0.5)
 axs.legend(prop={'size': 22}, loc='best')
 #
