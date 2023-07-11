@@ -119,7 +119,7 @@ class OrbitRead:
         #
         elif location == 'peloton' and self.num_gal == 1:
             self.home_dir = '/home/ibsantis/scripts'
-            self.simulation_dir = '/share/wetzellab/'+self.galaxy+'/'+self.galaxy+resolution
+            self.simulation_dir = '/group/awetzelgrp/'+self.galaxy+'/'+self.galaxy+resolution
             self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
         elif location == 'peloton' and self.num_gal == 2:
             self.home_dir = '/home/ibsantis/scripts'
