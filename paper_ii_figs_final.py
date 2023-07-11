@@ -826,14 +826,18 @@ temp_t1[~np.isfinite(all_e_norm_med)] = np.nan
 temp_t2 = tlb[:len(all_e_norm_mean)]
 temp_t2[~np.isfinite(all_e_norm_mean)] = np.nan
 #
-diff = (all_e_norm_upper-all_e_norm_lower)
+diff = (all_e_norm_upper-all_e_norm_lower)/2
 temp_t3 = tlb[:len(diff)]
 temp_t3[~np.isfinite(diff)] = np.nan
 #
 axs[0].plot(temp_t1, all_e_norm_med, c='#01033C', linewidth=4, alpha=0.7, linestyle='dashed', label='median')
-axs[0].plot(temp_t3, diff, c='#01033C', linewidth=2.5, alpha=0.6, label='width of 68%-ile')
+axs[0].plot(temp_t3, diff, c='#01033C', linewidth=2.5, alpha=0.6, label='half-width of 68%')
 axs[0].hlines(0, 0, 13.5, linestyle='dotted', color='k', alpha=0.5)
 axs[0].legend(prop={'size': 22}, loc='best')
+axs[0].vlines(np.median(t_in_sim), -1, 2, color='k', alpha=0.2, zorder=4)
+sigma_one_op = np.nanpercentile(t_in_sim, summary_plot.onesigp)
+sigma_one_om = np.nanpercentile(t_in_sim, summary_plot.onesigm)
+axs[0].axvspan(sigma_one_om, sigma_one_op, alpha=0.1, color='k', zorder=0)
 #
 axis_z_label = 'redshift'
 axis_z_tick_labels = ['6', '3', '2', '1', '0.7', '0.5', '0.3', '0.1', '0']
@@ -854,13 +858,15 @@ temp_t1[~np.isfinite(all_l_norm_med)] = np.nan
 temp_t2 = tlb[:len(all_l_norm_mean)]
 temp_t2[~np.isfinite(all_l_norm_mean)] = np.nan
 #
-diff = (all_l_norm_upper-all_l_norm_lower)
+diff = (all_l_norm_upper-all_l_norm_lower)/2
 temp_t3 = tlb[:len(diff)]
 temp_t3[~np.isfinite(diff)] = np.nan
 #
 axs[1].plot(temp_t1, all_l_norm_med, c='#6769A8', linewidth=4, linestyle='dashed', alpha=0.7, label='median')
 axs[1].plot(temp_t3, diff, c='#6769A8', linewidth=2.5, alpha=0.6, label='width of 68% scatter')
 axs[1].hlines(0, 0, 13.8, linestyle='dotted', color='k', alpha=0.5)
+axs[1].vlines(np.median(t_in_sim), -2, 2, color='k', alpha=0.2, zorder=4)
+axs[1].axvspan(sigma_one_om, sigma_one_op, alpha=0.1, color='k', zorder=0)
 #
 axs[0].set_ylabel('$(E(t) - E_0) \ / \ U_{\\rm 200m, 0}$', fontsize=30)
 axs[0].get_yaxis().set_label_coords(-0.12,0.5)
@@ -875,10 +881,11 @@ axs[1].set_xlim(0,13.5)
 axs[0].tick_params(axis='both', which='both', bottom=True, top=False, labelsize=24, labelbottom=False)
 axs[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=24, labelbottom=True)
 axs[1].set_xlabel('Lookback time [Gyr]', fontsize=30)
+axs[0].text(3.75, 0.97, 'Satellite infall times', fontsize=20)
 #
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0.05)
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_2/energy_and_ell_conservation.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_2/half_width/energy_and_ell_conservation.pdf')
 plt.close()
 
 
@@ -1194,13 +1201,18 @@ tlb = snaps['time'][-1] - np.flip(snaps['time'])
 temp_t1 = tlb[:len(all_d_frac_med)]
 temp_t1[~np.isfinite(all_d_frac_med)] = np.nan
 #
-diff = (all_d_frac_upper-all_d_frac_lower)
+diff = (all_d_frac_upper-all_d_frac_lower)/2
 temp_t2 = tlb[:len(diff)]
 temp_t2[~np.isfinite(diff)] = np.nan
 #
 axs.plot(temp_t1, np.abs(all_d_frac_med), c='#2C0E2C', linestyle='dashed', linewidth=4, alpha=0.7, label='median')
 axs.plot(temp_t2, diff, c='#2C0E2C', linewidth=2.5, alpha=0.6, label='width of 68%-ile')
 axs.hlines(0, 0, 13.5, linestyle='dotted', color='k', alpha=0.5)
+axs.vlines(np.median(t_in_sim), -1, 2, color='k', alpha=0.2, zorder=4)
+sigma_one_op = np.nanpercentile(t_in_sim, summary_plot.onesigp)
+sigma_one_om = np.nanpercentile(t_in_sim, summary_plot.onesigm)
+axs.axvspan(sigma_one_om, sigma_one_op, alpha=0.1, color='k', zorder=0)
+
 axs.legend(prop={'size': 22}, loc='best')
 #
 cc = ut.cosmology.CosmologyClass()
@@ -1226,9 +1238,10 @@ axs.set_ylim(-0.1, 1.5)
 axs.set_xlim(0,13.5)
 #
 axs.tick_params(axis='both', which='both', bottom=True, top=False, labelsize=26, labelbottom=True)
+axs.text(3.75, 1.05, 'Satellite infall times', fontsize=20)
 #
 plt.tight_layout()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_2/orbit_conservation.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_2/half_width/orbit_conservation.pdf')
 plt.close()
 
 
@@ -1867,9 +1880,14 @@ for i in range(0, np.max(x)):
 #
 f, ax = plt.subplots(2, 1, figsize=(12,10))
 #
+# lines
+ax[0].plot(np.arange(6)+1, meds[:6], color=peri_d_colors[0])
+ax[0].plot(np.arange(6)+1, (upper-lower)[:6]/2, color='k')
+#
+# scatters
 ax[0].scatter(np.arange(6)+1, meds[:6], s=100., marker='s', c=peri_d_colors[0])
 ax[0].scatter(-100,-100, s=100., marker='s', c='k', label='Model comparison')
-ax[0].scatter(np.arange(6)+1, (upper-lower)[:6], s=200., marker='*', c='k', label='Width of 68th percentile')
+ax[0].scatter(np.arange(6)+1, (upper-lower)[:6]/2, s=200., marker='*', c='k', label='Half-width of 68%')
 ax[0].hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
 ax[0].legend(prop={'size': 24}, loc='best')
 #
@@ -1901,8 +1919,10 @@ for i in range(0, np.max(x)):
     upper[i] = np.nanpercentile(y[mask], onesigp)
     lower[i] = np.nanpercentile(y[mask], onesigm)
 #
+ax[1].plot(np.arange(6)+1, meds[:6], color=peri_t_colors[1])
+ax[1].plot(np.arange(6)+1, (upper-lower)[:6]/2, color='k')
 ax[1].scatter(np.arange(6)+1, meds[:6], s=100., marker='s', c=peri_t_colors[1])
-ax[1].scatter(np.arange(6)+1, (upper-lower)[:6], s=200., marker='*', c='k')
+ax[1].scatter(np.arange(6)+1, (upper-lower)[:6]/2, s=200., marker='*', c='k')
 ax[1].hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
 #
 ax[0].set_xticks([0,1,2,3,4,5,6])
@@ -1911,8 +1931,8 @@ ax[1].set_xticks([0,1,2,3,4,5,6])
 #ax[1].set_xticks(np.arange(0.5, 8.5, 1), minor=True)
 ax[0].set_xlim(0, 6.5)
 ax[1].set_xlim(0, 6.5)
-ax[0].set_ylim(-0.25, 1.1)
-ax[1].set_ylim(-1.5, 2.5)
+ax[0].set_ylim(-0.25, 0.75)
+ax[1].set_ylim(-1.5, 1.2)
 ax[1].set_xlabel('Lookback Pericenter Event', fontsize=30)
 ax[0].set_ylabel('($d_{\\rm peri,model}-d_{\\rm peri,sim}$)/$d_{\\rm peri,sim}$', fontsize=22)
 ax[1].set_ylabel('$t_{\\rm peri,model}-t_{\\rm peri,sim}$ [Gyr]', fontsize=22)
@@ -1925,7 +1945,7 @@ ax[1].tick_params(axis='x', which='minor', bottom=False, top=False)
 #
 plt.tight_layout()
 plt.subplots_adjust(wspace=0, hspace=0)
-plt.savefig(directory+'/peri_info_vs_phase_zoom.pdf')
+plt.savefig(directory+'/half_width/peri_info_vs_phase_zoom.pdf')
 plt.close()
 
 
@@ -2261,8 +2281,8 @@ axs[2,2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize
 #
 axs[0,0].set_ylabel('$(d_{\\rm apo,model}-d_{\\rm apo,sim})/d_{\\rm apo,sim}$', fontsize=30)
 axs[0,0].get_yaxis().set_label_coords(-0.15,0.5)
-axs[1,0].set_ylabel('$T_{\\rm model}-T_{\\rm sim}$ [Gyr]', fontsize=30)
-axs[1,0].get_yaxis().set_label_coords(-0.15,0.5)
+axs[1,0].set_ylabel('$t_{\\rm orbit,model}-t_{\\rm orbit,sim}$ \n [Gyr]', fontsize=30)
+axs[1,0].get_yaxis().set_label_coords(-0.1,0.5)
 axs[2,0].set_ylabel('$e_{\\rm model}-e_{\\rm sim}$', fontsize=34)
 axs[2,0].get_yaxis().set_label_coords(-0.15,0.5)
 #
