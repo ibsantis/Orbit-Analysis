@@ -75,7 +75,29 @@ def width_of_68(x_array):
     upper = np.nanpercentile(x_array, onesigp)
     lower = np.nanpercentile(x_array, onesigm)
     #
-    return upper-lower
+    return (upper-lower)/2
+
+def combine(x1, x2, n=False):
+    y = []
+    #
+    for i in range(0, len(x1)):
+        if (x1[i] == 0) and (x2[i] == 0):
+            y.append(0)
+        elif (x1[i] == 0) and (x2[i] != 0):
+            y.append(x2[i])
+        else:
+            y.append((x2[i] - x1[i])/x1[i])
+    #
+    onesigp = 84.13
+    onesigm = 15.87
+    #
+    upper = np.nanpercentile(y, onesigp)
+    lower = np.nanpercentile(y, onesigm)
+    #
+    if n:
+        return np.nanmean(y), np.std(y)
+    else:
+        return np.nanmedian(y), (upper-lower)/2
 
 # Recent pericenter distance
 d_rec_mod = summary.dperi_recent(data_total, masks_infall_peri, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
@@ -83,7 +105,7 @@ d_rec_mod_rot_90x = summary.dperi_recent(data_total_rot_90x, masks_infall_peri_r
 d_rec_mod_rot_90y = summary.dperi_recent(data_total_rot_90y, masks_infall_peri_rot_90y, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 d_rec_mod_rot_180x = summary.dperi_recent(data_total_rot_180x, masks_infall_peri_rot_180x, selection='model', oversample=True, hosts='all_no_r', sim_type='baryon')
 #
-mask = (d_rec_mod != 0)*(d_rec_mod < 30)
+mask = (d_rec_mod != 0)#*(d_rec_mod < 30)
 print(np.nanmedian((d_rec_mod_rot_90x[mask]-d_rec_mod[mask])/d_rec_mod[mask]))
 print(np.nanmedian((d_rec_mod_rot_90y[mask]-d_rec_mod[mask])/d_rec_mod[mask]))
 print(np.nanmedian((d_rec_mod_rot_180x[mask]-d_rec_mod[mask])/d_rec_mod[mask]))
