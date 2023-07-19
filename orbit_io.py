@@ -81,67 +81,53 @@ class OrbitRead:
             - Depending on the variables you enter, sets the number of galaxies,
               the simulation directory, the home directory, and the galaxy name.
         """
+        # Set up a dictionary of galaxy information
+        galaxy_info = {
+            'Romeo': ('Juliet', 'm12_elvis_RomeoJuliet', '_r3500', 2),
+            'Thelma': ('Louise', 'm12_elvis_ThelmaLouise', '_r4000', 2),
+            'Romulus': ('Remus', 'm12_elvis_RomulusRemus', '_r3000', 2),
+            'm12z': (None, 'm12z', '_r4200', 1),
+            'm12i_lr': (None, 'm12i', '_r57000', 1),
+            'm12i_hr': (None, 'm12i', '_r880', 1)
+        }
         # Depending on the galaxy name, set up a few variables
-        if gal1 == 'Romeo':
-            gal2 = 'Juliet'
-            self.galaxy = 'm12_elvis_'+gal1+gal2
-            resolution = '_r3500'
-            self.num_gal = 2
-        elif gal1 == 'Thelma':
-            gal2 = 'Louise'
-            self.galaxy = 'm12_elvis_'+gal1+gal2
-            resolution = '_r4000'
-            self.num_gal = 2
-        elif gal1 == 'Romulus':
-            gal2 = 'Remus'
-            self.galaxy = 'm12_elvis_'+gal1+gal2
-            resolution = '_r4000'
-            self.num_gal = 2
-        elif gal1 == 'm12z':
-            self.galaxy = gal1
-            resolution = '_r4200'
-            self.num_gal = 1
+        if gal1 in galaxy_info:
+            gal2, self.galaxy, resolution, self.num_gal = galaxy_info[gal1]
         else:
+            gal2 = None
             self.galaxy = gal1
             resolution = '_r7100'
             self.num_gal = 1
-
+        #
         # Set up the important paths
-        if location == 'mac' and self.num_gal == 1:
+        if location == 'mac':
             self.home_dir = '/Users/isaiahsantistevan/simulation'
-            self.simulation_dir = self.home_dir+'/galaxies/'+self.galaxy+resolution # maybe this is a good place for a try-except statement?
-            self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
-        elif location == 'mac' and self.num_gal == 2:
-            self.home_dir = '/Users/isaiahsantistevan/simulation'
-            self.gal_1 = gal1
-            self.gal_2 = gal2
-            self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
+            if self.num_gal == 2:
+                self.gal_1 = gal1
+                self.gal_2 = gal2
+            else:
+                self.simulation_dir = self.home_dir+'/galaxies/'+self.galaxy+resolution
         #
-        elif location == 'peloton' and self.num_gal == 1:
+        elif location == 'peloton':
             self.home_dir = '/home/ibsantis/scripts'
-            self.simulation_dir = '/group/awetzelgrp/'+self.galaxy+'/'+self.galaxy+resolution
-            self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
-        elif location == 'peloton' and self.num_gal == 2:
-            self.home_dir = '/home/ibsantis/scripts'
-            self.simulation_dir = '/share/wetzellab/m12_elvis/'+self.galaxy+resolution
-            self.gal_1 = gal1
-            self.gal_2 = gal2
-            self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
+            if self.num_gal == 2:
+                self.simulation_dir = '/group/awetzelgrp/m12_elvis/'+self.galaxy+resolution
+                self.gal_1 = gal1
+                self.gal_2 = gal2
+            else:
+                self.simulation_dir = '/group/awetzelgrp/'+self.galaxy+'/'+self.galaxy+resolution
         #
-        elif location == 'stampede' and self.num_gal == 1:
+        elif location == 'stampede':
             self.home_dir = '/home1/05400/ibsantis/scripts'
             self.simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+self.galaxy+resolution
-            self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
-        elif location == 'stampede' and self.num_gal == 2:
-            self.home_dir = '/home1/05400/ibsantis/scripts'
-            self.simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+self.galaxy+resolution
-            self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
-            self.gal_1 = gal1
-            self.gal_2 = gal2
+            if self.num_gal == 2:
+                self.gal_1 = gal1
+                self.gal_2 = gal2
+        #
+        self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
         #
         if dmo:
-            self.simulation_dir = self.simulation_dir+'_dm'
-
+            self.simulation_dir += '_dm'
 
 class OrbitAnalysis:
 
