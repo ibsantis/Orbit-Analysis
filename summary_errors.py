@@ -95,7 +95,7 @@ def width_of_68(x_array):
     lower = np.percentile(x_array, onesigm)
     #
     #return (upper-lower, (upper-lower)/2)
-    return upper-lower
+    return (upper-lower)/2
 
 def width_of_95(x_array):
     onesigp = 97.72
@@ -105,20 +105,50 @@ def width_of_95(x_array):
     lower = np.percentile(x_array, onesigm)
     #
     #return (upper-lower, (upper-lower)/2)
-    return upper-lower
+    return (upper-lower)/2
 
-print('The width of the 68-ile for d_rec is {}'.format(width_of_68(x_array=(d_rec_mod-d_rec_sim)/d_rec_sim)))
-print('The width of the 68-ile for d_min is {}'.format(width_of_68(x_array=(d_min_mod-d_min_sim)/d_min_sim)))
+print('The width of the 68-ile for d_rec is {}'.format(width_of_68(x_array=(d_rec_mod-d_rec_sim))))
+print('The width of the 68-ile for d_min is {}'.format(width_of_68(x_array=(d_min_mod-d_min_sim))))
 print('The width of the 68-ile for t_rec is {}'.format(width_of_68(x_array=(t_rec_mod-t_rec_sim))))
-#print('The width of the 68-ile for t_min is {}'.format(width_of_68(x_array=(t_min_mod-t_min_sim))))
 print('The width of the 68-ile for N_r is {}'.format(width_of_68(x_array=(n_sim-n_mod_mod_infall))))
 print('The width of the 68-ile for N_r200 is {}'.format(width_of_68(x_array=(n_sim-n_mod_r200))))
 print('The width of the 68-ile for v_rec is {}'.format(width_of_68(x_array=(v_rec_mod-v_rec_sim))))
 print('The width of the 68-ile for v_min is {}'.format(width_of_68(x_array=(v_min_mod-v_min_sim))))
-print('The width of the 68-ile for d_apo is {}'.format(width_of_68(x_array=(dapo_rec_mod-dapo_rec_sim)/dapo_rec_sim)))
-#print('The width of the 68-ile for d_max is {}'.format(width_of_68(x_array=(dmax_mod-dmax_sim)/dmax_sim)))
-#print('The width of the 68-ile for t_apo is {}'.format(width_of_68(x_array=(tapo_rec_mod-tapo_rec_sim))))
+print('The width of the 68-ile for d_apo is {}'.format(width_of_68(x_array=(dapo_rec_mod-dapo_rec_sim))))
 print('The width of the 68-ile for t_infall is {}'.format(width_of_68(x_array=(t_in_mod[mask_in_mod]-t_in_sim[mask_in_mod]))))
 print('The width of the 68-ile for t_infall,R200m is {}'.format(width_of_68(x_array=(t_in_mod_R200m[mask_in_mod_R200m]-t_in_sim[mask_in_mod_R200m]))))
-print('The width of the 68-ile for eccentricity is {}'.format(width_of_68(x_array=(ecc_model-ecc))))
-print('The width of the 68-ile for period is {}'.format(width_of_68(x_array=(per_model-per))))
+#print('The width of the 68-ile for eccentricity is {}'.format(width_of_68(x_array=(ecc_model-ecc))))
+#print('The width of the 68-ile for period is {}'.format(width_of_68(x_array=(per_model-per))))
+
+print('The width of the 68-ile for d_rec is {}'.format(width_of_68(x_array=(d_rec_mod-d_rec_sim)/d_rec_sim)))
+print('The width of the 68-ile for d_min is {}'.format(width_of_68(x_array=(d_min_mod-d_min_sim)/d_min_sim)))
+print('The width of the 68-ile for t_rec is {}'.format(width_of_68(x_array=(t_rec_mod-t_rec_sim)/t_rec_sim)))
+print('The width of the 68-ile for N_r is {}'.format(width_of_68(x_array=(n_sim-n_mod_mod_infall)/n_mod_mod_infall)))
+print('The width of the 68-ile for N_r200 is {}'.format(width_of_68(x_array=(n_sim-n_mod_r200)/n_mod_r200)))
+print('The width of the 68-ile for v_rec is {}'.format(width_of_68(x_array=(v_rec_mod-v_rec_sim)/v_rec_sim)))
+print('The width of the 68-ile for v_min is {}'.format(width_of_68(x_array=(v_min_mod-v_min_sim)/v_min_sim)))
+print('The width of the 68-ile for d_apo is {}'.format(width_of_68(x_array=(dapo_rec_mod-dapo_rec_sim)/dapo_rec_sim)))
+print('The width of the 68-ile for t_infall is {}'.format(width_of_68(x_array=(t_in_mod[mask_in_mod]-t_in_sim[mask_in_mod])/t_in_sim[mask_in_mod])))
+print('The width of the 68-ile for t_infall,R200m is {}'.format(width_of_68(x_array=(t_in_mod_R200m[mask_in_mod_R200m]-t_in_sim[mask_in_mod_R200m])/t_in_sim[mask_in_mod_R200m])))
+
+print('The width of the 95-ile for d_rec is {}'.format(width_of_95(x_array=(d_rec_mod-d_rec_sim))))
+print('The width of the 95-ile for d_min is {}'.format(width_of_95(x_array=(d_min_mod-d_min_sim))))
+print('The width of the 95-ile for t_rec is {}'.format(width_of_95(x_array=(t_rec_mod-t_rec_sim))))
+print('The width of the 95-ile for N_r is {}'.format(width_of_95(x_array=(n_sim-n_mod_mod_infall))))
+print('The width of the 95-ile for N_r200 is {}'.format(width_of_95(x_array=(n_sim-n_mod_r200))))
+print('The width of the 95-ile for v_rec is {}'.format(width_of_95(x_array=(v_rec_mod-v_rec_sim))))
+print('The width of the 95-ile for v_min is {}'.format(width_of_95(x_array=(v_min_mod-v_min_sim))))
+print('The width of the 95-ile for d_apo is {}'.format(width_of_95(x_array=(dapo_rec_mod-dapo_rec_sim))))
+print('The width of the 95-ile for t_infall is {}'.format(width_of_95(x_array=(t_in_mod[mask_in_mod]-t_in_sim[mask_in_mod]))))
+print('The width of the 95-ile for t_infall,R200m is {}'.format(width_of_95(x_array=(t_in_mod_R200m[mask_in_mod_R200m]-t_in_sim[mask_in_mod_R200m]))))
+
+print('The width of the 95-ile for d_rec is {}'.format(width_of_95(x_array=(d_rec_mod-d_rec_sim)/d_rec_sim)))
+print('The width of the 95-ile for d_min is {}'.format(width_of_95(x_array=(d_min_mod-d_min_sim)/d_min_sim)))
+print('The width of the 95-ile for t_rec is {}'.format(width_of_95(x_array=(t_rec_mod-t_rec_sim)/t_rec_sim)))
+print('The width of the 95-ile for N_r is {}'.format(width_of_95(x_array=(n_sim-n_mod_mod_infall)/n_mod_mod_infall)))
+print('The width of the 95-ile for N_r200 is {}'.format(width_of_95(x_array=(n_sim-n_mod_r200)/n_mod_r200)))
+print('The width of the 95-ile for v_rec is {}'.format(width_of_95(x_array=(v_rec_mod-v_rec_sim)/v_rec_sim)))
+print('The width of the 95-ile for v_min is {}'.format(width_of_95(x_array=(v_min_mod-v_min_sim)/v_min_sim)))
+print('The width of the 95-ile for d_apo is {}'.format(width_of_95(x_array=(dapo_rec_mod-dapo_rec_sim)/dapo_rec_sim)))
+print('The width of the 95-ile for t_infall is {}'.format(width_of_95(x_array=(t_in_mod[mask_in_mod]-t_in_sim[mask_in_mod])/t_in_sim[mask_in_mod])))
+print('The width of the 95-ile for t_infall,R200m is {}'.format(width_of_95(x_array=(t_in_mod_R200m[mask_in_mod_R200m]-t_in_sim[mask_in_mod_R200m])/t_in_sim[mask_in_mod_R200m])))

@@ -1206,7 +1206,7 @@ temp_t2 = tlb[:len(diff)]
 temp_t2[~np.isfinite(diff)] = np.nan
 #
 axs.plot(temp_t1, np.abs(all_d_frac_med), c='#2C0E2C', linestyle='dashed', linewidth=4, alpha=0.7, label='median')
-axs.plot(temp_t2, diff, c='#2C0E2C', linewidth=2.5, alpha=0.6, label='width of 68%-ile')
+axs.plot(temp_t2, diff, c='#2C0E2C', linewidth=2.5, alpha=0.6, label='half-width of 68%')
 axs.hlines(0, 0, 13.5, linestyle='dotted', color='k', alpha=0.5)
 axs.vlines(np.median(t_in_sim), -1, 2, color='k', alpha=0.2, zorder=4)
 sigma_one_op = np.nanpercentile(t_in_sim, summary_plot.onesigp)
@@ -2300,13 +2300,13 @@ plt.savefig(directory+'/other_orbit_properties.pdf')
         Summary plots
 """
 # Plotting the fractional median offset (values from Table 3 in the paper)
-labels = ['$d_{\\rm peri,rec}$', '$d_{\\rm peri,min}$', '$t_{\\rm peri,rec}$', '$N_{\\rm peri}$', '$N_{\\rm peri,fixed}$', '$v_{\\rm peri,rec}$', '$v_{\\rm peri,min}$', '$d_{\\rm apo,rec}$', '$t_{\\rm inf}$', '$t_{\\rm inf,fixed}$', '$e_{\\rm rec}$', '$T_{\\rm rec}$', '$|da/dr|$', '$E_{\\rm inf}$', '$\\ell_{\\rm inf}$']
+labels = ['$d_{\\rm peri,rec}$', '$d_{\\rm peri,min}$', '$t_{\\rm peri,rec}$', '$N_{\\rm peri}$', '$N_{\\rm peri,fixed}$', '$v_{\\rm peri,rec}$', '$v_{\\rm peri,min}$', '$d_{\\rm apo,rec}$', '$t_{\\rm inf}$', '$t_{\\rm inf,fixed}$', '$e_{\\rm rec}$', '$t_{\\rm orbit,rec}$', '$|da/dr|$', '$E_{\\rm inf}$', '$\\ell_{\\rm inf}$']
 sum_color = '#D36F5C'
 #
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 3, figsize=(30,12))
 #
-med_offset = np.array([-0.025, 0.066, -0.028, 0.246, 0.259, 0.030, 0.012, -0.013, -0.067, 0.441, 0.005, -0.071, -0.017, np.abs(-0.537), -0.015])
+med_offset = np.array([-0.025, 0.066, -0.028, 0.32, 0.24, 0.030, 0.012, -0.013, 0.09, 0.441, 0.005, -0.071, -0.017, np.abs(-0.537), -0.015])
 xs = np.arange(1, 16)
 sort_mask = np.argsort(med_offset)
 axs[0].scatter(xs, med_offset[sort_mask], s=200, c=sum_color, marker='o')
@@ -2315,7 +2315,7 @@ axs[0].set_xticks(xs, minor=False)
 axs[0].set_xticklabels(np.asarray(labels)[sort_mask], rotation=90)
 #
 # Width of the 68 percent scatter
-width_68 = np.array([ 0.424, 1.067, 0.179, 0.486, 0.486, 0.202, 0.330, 0.116, 0.820, 1.088, 0.288, 0.267, 1.320, 1.628, 0.838])
+width_68 = np.array([ 0.21, 0.53, 0.09, 0.72, 0.74, 0.10, 0.17, 0.06, 0.41, 0.55, 0.15, 0.13, 0.66, 0.82, 0.42])
 sort_mask = np.argsort(width_68)
 axs[1].scatter(xs, width_68[sort_mask], s=200, c=sum_color, marker='o')
 axs[1].hlines(y=0, xmin=xs[0]-0.5, xmax=xs[-1]+0.5, linestyle='dotted', color='k', alpha=0.5)
@@ -2323,7 +2323,7 @@ axs[1].set_xticks(xs, minor=False)
 axs[1].set_xticklabels(np.asarray(labels)[sort_mask], rotation=90)
 #
 # Width of the 95 percent scatter
-width_95 = np.array([ 2.383, 7.112, 1.290, 1.944, 1.944, 0.747, 0.861, 0.754, 5.338, 5.842, 1.082, 0.820, 8.400, 3.648, 3.359])
+width_95 = np.array([ 1.19, 3.56, 0.64, 1.44, 1.48, 0.38, 0.43, 0.38, 2.50, 2.92, 0.54, 0.41, 4.2, 1.83, 1.68])
 sort_mask = np.argsort(width_95)
 axs[2].scatter(xs, width_95[sort_mask], s=200, c=sum_color, marker='o')
 axs[2].hlines(y=0, xmin=xs[0]-0.5, xmax=xs[-1]+0.5, linestyle='dotted', color='k', alpha=0.5)
@@ -2338,8 +2338,8 @@ axs[1].tick_params(axis='both', which='major', bottom=True, top=False, labelsize
 axs[2].tick_params(axis='both', which='major', bottom=True, top=False, labelsize=28)
 #
 axs[0].set_ylabel('Median fractional offset', fontsize=38)
-axs[1].set_ylabel('Width of 68% scatter', fontsize=38)
-axs[2].set_ylabel('Width of 95% scatter', fontsize=38)
+axs[1].set_ylabel('Half-width of 68%', fontsize=38)
+axs[2].set_ylabel('Half-width of 95%', fontsize=38)
 #
 axs[0].set_ylim(-0.1, 0.6)
 axs[1].set_ylim(bottom=-0.1)
