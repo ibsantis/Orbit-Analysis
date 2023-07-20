@@ -68,6 +68,8 @@ snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir) # S
 halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal, assign_hosts_rotation=aligned, catalog_hdf5_directory='catalog_hdf5')
 part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'index', 600, simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=aligned)
 
+sim_data.galaxy = 'm12i_lr'
+
 if sim_data.num_gal == 1:
     # Find the mass ratio to multiply the host radius
     mass_ratio = ut.particle.get_halo_properties(part)['mass']/halt['mass'][halt['host.index'][0]]
@@ -293,7 +295,7 @@ if sim_data.num_gal == 1:
         ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_'+str(angle)+'deg_axis'+str(rot_axis), dict_or_array_to_write=data_dict, verbose=True)
     else:
         #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
-        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_lr', dict_or_array_to_write=data_dict, verbose=True)
+        ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
         #ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_dmo_selection', dict_or_array_to_write=data_dict, verbose=True)
 
     if plotting:
