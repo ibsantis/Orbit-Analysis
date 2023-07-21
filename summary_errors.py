@@ -15,7 +15,7 @@ print('Read in the tools')
 
 ### Set path and initial parameters
 sim_data = orbit_io.OrbitRead(gal1='m12i', location='mac')
-print('Set paths')
+print('Set paths.')
 
 
 # Initialize the classes, read in the data, and create data masks
