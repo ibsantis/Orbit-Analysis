@@ -20,7 +20,7 @@ print('Set paths')
 # Initialize the classes, read in the data, and create data masks
 summary = summary_io.SummaryDataSort()
 summary_plot = summary_io.SummaryDataPlot()
-data_total = summary.data_read(directory=sim_data.home_dir, hosts='all_no_r', sim_type='baryon')
+data_total = summary.data_read(directory=sim_data.home_dir, hosts='all', sim_type='baryon')
 #
 lgd = pd.read_csv(sim_data.home_dir+'/orbit_data/paper_III/localgroup_galaxies.csv')
 
@@ -54,6 +54,45 @@ for name in summary.host_names['all_no_r']:
                         w4 = ((np.log10(data_total[name]['M.star.z0'][i]) - np.log10(mass))/1)**2
                         weights.append(np.sqrt(w1 + w2 + w3 + w4))
 print(count)
+
+
+def matching(name, threshold=3):
+    #
+    sat_ind = np.where(lgd['Name'] == str(name))[0][0]
+    mass = lgd['Mstar [Msun]'][sat_ind]
+    dist = lgd['d_host [kpc]'][sat_ind]
+    vrad = lgd['Velocity Radial wrt Nearest Host [km/s]'][sat_ind]
+    vtan = lgd['Velocity Tangential wrt Host [km/s]'][sat_ind]
+    #
+    dist_err = threshold*lgd['Uncertainty.6'][sat_ind]
+    vrad_err = threshold*lgd['Uncertainty.8'][sat_ind]
+    vtan_err = threshold*lgd['Uncertainty.9'][sat_ind]
+    #
+    count = 0
+    sats = []
+    weights = []
+    for name in summary.host_names['all']:
+        for i in range(0, len(data_total[name]['indices.z0'])):
+            if (np.log10(data_total[name]['M.star.z0'][i]) > (np.log10(mass)-1)) and (np.log10(data_total[name]['M.star.z0'][i]) < (np.log10(mass)+1)):
+                if (data_total[name]['d.tot.sim'][i][0] > (dist-dist_err)) and (data_total[name]['d.tot.sim'][i][0] < (dist+dist_err)):
+                    if (data_total[name]['v.rad.sim'][i][0] > (vrad-vrad_err)) and (data_total[name]['v.rad.sim'][i][0] < (vrad+vrad_err)):
+                        if (data_total[name]['v.tan.sim'][i][0] > (vtan-vtan_err)) and (data_total[name]['v.tan.sim'][i][0] < (vtan+vtan_err)):
+                            count += 1
+                            sats.append((name, i))
+                            w1 = ((data_total[name]['d.tot.sim'][i][0] - dist)/dist_err/3)**2
+                            w2 = ((data_total[name]['v.rad.sim'][i][0] - vrad)/vrad_err/3)**2
+                            w3 = ((data_total[name]['v.tan.sim'][i][0] - vtan)/vtan_err/3)**2
+                            w4 = ((np.log10(data_total[name]['M.star.z0'][i]) - np.log10(mass))/1)**2
+                            weights.append(np.sqrt(w1 + w2 + w3 + w4))
+
+
+
+
+
+
+
+
+
 
 peri_dist = []
 infall_time = []
