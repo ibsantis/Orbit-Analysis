@@ -830,8 +830,8 @@ diff = (all_e_norm_upper-all_e_norm_lower)/2
 temp_t3 = tlb[:len(diff)]
 temp_t3[~np.isfinite(diff)] = np.nan
 #
-axs[0].plot(temp_t1, all_e_norm_med, c='#01033C', linewidth=4, alpha=0.7, linestyle='dashed', label='median')
-axs[0].plot(temp_t3, diff, c='#01033C', linewidth=2.5, alpha=0.6, label='half-width of 68%')
+axs[0].plot(temp_t1, all_e_norm_med, c='#01033C', linewidth=4, alpha=0.7, linestyle='dashed', label='Median')
+axs[0].plot(temp_t3, diff, c='#01033C', linewidth=2.5, alpha=0.6, label='$1-\\sigma$ scatter')
 axs[0].hlines(0, 0, 13.5, linestyle='dotted', color='k', alpha=0.5)
 axs[0].legend(prop={'size': 22}, loc='best')
 axs[0].vlines(np.median(t_in_sim), -1, 2, color='k', alpha=0.2, zorder=4)
@@ -862,8 +862,8 @@ diff = (all_l_norm_upper-all_l_norm_lower)/2
 temp_t3 = tlb[:len(diff)]
 temp_t3[~np.isfinite(diff)] = np.nan
 #
-axs[1].plot(temp_t1, all_l_norm_med, c='#6769A8', linewidth=4, linestyle='dashed', alpha=0.7, label='median')
-axs[1].plot(temp_t3, diff, c='#6769A8', linewidth=2.5, alpha=0.6, label='width of 68% scatter')
+axs[1].plot(temp_t1, all_l_norm_med, c='#6769A8', linewidth=4, linestyle='dashed', alpha=0.7, label='Median')
+axs[1].plot(temp_t3, diff, c='#6769A8', linewidth=2.5, alpha=0.6, label='$1-\\sigma$ scatter')
 axs[1].hlines(0, 0, 13.8, linestyle='dotted', color='k', alpha=0.5)
 axs[1].vlines(np.median(t_in_sim), -2, 2, color='k', alpha=0.2, zorder=4)
 axs[1].axvspan(sigma_one_om, sigma_one_op, alpha=0.1, color='k', zorder=0)
@@ -1205,8 +1205,8 @@ diff = (all_d_frac_upper-all_d_frac_lower)/2
 temp_t2 = tlb[:len(diff)]
 temp_t2[~np.isfinite(diff)] = np.nan
 #
-axs.plot(temp_t1, np.abs(all_d_frac_med), c='#2C0E2C', linestyle='dashed', linewidth=4, alpha=0.7, label='median')
-axs.plot(temp_t2, diff, c='#2C0E2C', linewidth=2.5, alpha=0.6, label='half-width of 68%')
+axs.plot(temp_t1, np.abs(all_d_frac_med), c='#2C0E2C', linestyle='dashed', linewidth=4, alpha=0.7, label='Median')
+axs.plot(temp_t2, diff, c='#2C0E2C', linewidth=2.5, alpha=0.6, label='$1-\\sigma$ scatter')
 axs.hlines(0, 0, 13.5, linestyle='dotted', color='k', alpha=0.5)
 axs.vlines(np.median(t_in_sim), -1, 2, color='k', alpha=0.2, zorder=4)
 sigma_one_op = np.nanpercentile(t_in_sim, summary_plot.onesigp)
@@ -1887,7 +1887,7 @@ ax[0].plot(np.arange(6)+1, (upper-lower)[:6]/2, color='k')
 # scatters
 ax[0].scatter(np.arange(6)+1, meds[:6], s=100., marker='s', c=peri_d_colors[0])
 ax[0].scatter(-100,-100, s=100., marker='s', c='k', label='Model comparison')
-ax[0].scatter(np.arange(6)+1, (upper-lower)[:6]/2, s=200., marker='*', c='k', label='Half-width of 68%')
+ax[0].scatter(np.arange(6)+1, (upper-lower)[:6]/2, s=200., marker='*', c='k', label='$1-\\sigma$ scatter')
 ax[0].hlines(0, -0.5, np.max(x)+1, linestyle='dotted', color='k', alpha=0.5)
 ax[0].legend(prop={'size': 24}, loc='best')
 #
@@ -2338,8 +2338,8 @@ axs[1].tick_params(axis='both', which='major', bottom=True, top=False, labelsize
 axs[2].tick_params(axis='both', which='major', bottom=True, top=False, labelsize=28)
 #
 axs[0].set_ylabel('Median fractional offset', fontsize=38)
-axs[1].set_ylabel('Half-width of 68%', fontsize=38)
-axs[2].set_ylabel('Half-width of 95%', fontsize=38)
+axs[1].set_ylabel('$1-\\sigma$ scatter', fontsize=38)
+axs[2].set_ylabel('$2-\\sigma$ scatter', fontsize=38)
 #
 axs[0].set_ylim(-0.1, 0.6)
 axs[1].set_ylim(bottom=-0.1)
