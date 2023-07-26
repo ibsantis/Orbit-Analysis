@@ -88,11 +88,15 @@ class SatelliteRead:
                 self.gal_2 = gal2
         #
         self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
+        self.lg_data = pd.read_csv(self.home_dir+'/orbit_data/paper_III/localgroup_galaxies.csv')
         #
         if dmo:
             self.simulation_dir += '_dm'
-        
-    def satellite_indices(self, tree, gal1, location, host=1, minimum_mass=1e8):
+
+# Have a class that matches the satellites
+class SatelliteMatch:
+
+    def __init__(self, tree, gal1, location, host=1, minimum_mass=1e8):
         """
         DESCRIPTION:
             Returns the indices of satellites along with their progenitor
@@ -133,6 +137,9 @@ class SatelliteRead:
             - Each row has a length of 597. There are no halos that exist in
               snapshots 0,1,2,3.
         """
+        # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
+        SatelliteRead.__init__(self, gal1, location, dmo=False)
+        #
         # Selection criteria for the DMO simulations or for non-luminous satellites in the baryonic simulations
         if host == 2:
             hindex = 'host2'
@@ -151,28 +158,24 @@ class SatelliteRead:
         #
         z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds), [minimum_mass, np.inf])]
         z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
-        self.sub_inds = z0_inds_w_prog
         #
+        self.sub_inds = z0_inds_w_prog
         self.shape = self.sub_inds.shape
-
-# Have a class that matches the satellites
-class SatelliteMatch:
-
-    def __init__(self):
-        """
-        TBD
-
-        Just constants for now...
-        """
+        #
         self.smhm_constant = -15.21177826 # From fitting the SMHMR from paper I, in mstar_mhalo_fitting.py
         self.smhm_slope = 2.2111824
 
-
-    def satellite_select(self, mstar):
+    def satellite_mhalo(self, mstar):
         """
         TBD
 
         Want to add more criteria, like a minimum mass, particle number, etc
         """
-        mhalo = self.smhm_constant + mstar*self.smhm_slope
+        mhalo = (mstar - self.smhm_constant)/self.smhm_slope
+        return mhalo # this is the log of the halo mass actually...
+    
+    def satellite_match(self):
+        """
+        Select satellites based on their halo mass
+        """
         pass
