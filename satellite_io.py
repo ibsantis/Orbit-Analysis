@@ -88,7 +88,7 @@ class SatelliteRead:
                 self.gal_2 = gal2
         #
         self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
-        self.lg_data = pd.read_csv(self.home_dir+'/orbit_data/paper_III/localgroup_galaxies.csv')
+        self.lg_data = pd.read_csv(self.home_dir+'/orbit_data/paper_III/localgroup_galaxies_condensed.csv')
         #
         if dmo:
             self.simulation_dir += '_dm'
