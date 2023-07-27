@@ -87,9 +87,6 @@ class SatelliteRead:
                 self.gal_1 = gal1
                 self.gal_2 = gal2
         #
-        self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
-        self.lg_data = pd.read_csv(self.home_dir+'/orbit_data/paper_III/localgroup_galaxies_condensed.csv')
-        #
         if dmo:
             self.simulation_dir += '_dm'
 
@@ -174,8 +171,21 @@ class SatelliteMatch:
         mhalo = (mstar - self.smhm_constant)/self.smhm_slope
         return mhalo # this is the log of the halo mass actually...
     
-    def satellite_match(self):
+    def lg_satellite_properties(self, lg_data, galaxy_name):
         """
-        Select satellites based on their halo mass
+        TBD
+
+        Create a dictionary of properties for a given LG satellite from the CSV table
         """
-        pass
+        #
+        satellite_dict = {}
+        #
+        if galaxy_name in lg_data.keys():
+            print('* galaxy name = {0}'.format(galaxy_name))
+        else:
+            raise ValueError('* galaxy name = {0} not in the input catalog!'.format(galaxy_name))
+        #
+        for prop_name in lg_data[galaxy_name].keys():
+            satellite_dict[prop_name] = lg_data[galaxy_name][prop_name]
+        #
+        return satellite_dict
