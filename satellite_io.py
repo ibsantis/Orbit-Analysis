@@ -188,7 +188,7 @@ class SatelliteMatch:
         for prop_name in lg_data[galaxy_name].keys():
             satellite_dict[prop_name] = lg_data[galaxy_name][prop_name]
         #
-        log_mass_halo = self.satellite_mhalo(np.log10(match['mass.star']))
+        log_mass_halo = self.satellite_mhalo(np.log10(satellite_dict['mass.star']))
         mass_halo = 10**(log_mass_halo)
         satellite_dict['mass.peak'] = mass_halo
         satellite_dict['mass.peak.err'] = mass_err
