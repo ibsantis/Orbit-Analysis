@@ -196,35 +196,35 @@ class SatelliteMatch:
         return satellite_dict
 
     def subhalo_data(self, tree):
-            """
-            TBD
-            """
-            # Create a sub-dictionary for the properties of interest
-            sim_sats = {}
-            #
-            # Set up empty arrays to save to
-            distances = (-1)*np.ones(self.shape)
-            velocity_rad = (-1)*np.ones(self.shape)
-            velocity_tan = (-1)*np.ones(self.shape)
-            sat_snapshots = (-1)*np.ones(self.shape, int)
-            masses = (-1)*np.ones(self.shape[0])
-            #
-            # Loop through the number of satellites and save values to the empty arrays
-            for i in range(0, self.shape[0]):
-                mask = (self.sub_inds[i] >= 0)
-                distances[i][mask] = tree.prop('host.distance.total', self.sub_inds[i][mask])
-                velocity_rad[i][mask] = tree.prop('host.velocity.rad', self.sub_inds[i][mask])
-                velocity_tan[i][mask] = tree.prop('host.velocity.tan', self.sub_inds[i][mask])
-                sat_snapshots[i][mask] = tree.prop('snapshot', self.sub_inds[i][mask])
-                masses[i] = tree.prop('mass.peak', self.sub_inds[i,0])
-            distances[np.isnan(distances)] = -1 # This is to take care of instances in which the subhalos existed before the host
-            velocity_rad[np.isnan(velocity_rad)] = -1
-            velocity_tan[np.isnan(velocity_tan)] = -1
-            #
-            sim_sats['host.distance.total'] = distances
-            sim_sats['host.velocity.rad'] = velocity_rad
-            sim_sats['host.velocity.tan'] = velocity_tan
-            sim_sats['snapshot'] = sat_snapshots
-            sim_sats['mass.peak'] = masses
-            #
-            return sim_sats
+        """
+        TBD
+        """
+        # Create a sub-dictionary for the properties of interest
+        sim_sats = {}
+        #
+        # Set up empty arrays to save to
+        distances = (-1)*np.ones(self.shape)
+        velocity_rad = (-1)*np.ones(self.shape)
+        velocity_tan = (-1)*np.ones(self.shape)
+        sat_snapshots = (-1)*np.ones(self.shape, int)
+        masses = (-1)*np.ones(self.shape[0])
+        #
+        # Loop through the number of satellites and save values to the empty arrays
+        for i in range(0, self.shape[0]):
+            mask = (self.sub_inds[i] >= 0)
+            distances[i][mask] = tree.prop('host.distance.total', self.sub_inds[i][mask])
+            velocity_rad[i][mask] = tree.prop('host.velocity.rad', self.sub_inds[i][mask])
+            velocity_tan[i][mask] = tree.prop('host.velocity.tan', self.sub_inds[i][mask])
+            sat_snapshots[i][mask] = tree.prop('snapshot', self.sub_inds[i][mask])
+            masses[i] = tree.prop('mass.peak', self.sub_inds[i,0])
+        distances[np.isnan(distances)] = -1 # This is to take care of instances in which the subhalos existed before the host
+        velocity_rad[np.isnan(velocity_rad)] = -1
+        velocity_tan[np.isnan(velocity_tan)] = -1
+        #
+        sim_sats['host.distance.total'] = distances
+        sim_sats['host.velocity.rad'] = velocity_rad
+        sim_sats['host.velocity.tan'] = velocity_tan
+        sim_sats['snapshot'] = sat_snapshots
+        sim_sats['mass.peak'] = masses
+        #
+        return sim_sats
