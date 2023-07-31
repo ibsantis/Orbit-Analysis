@@ -5,16 +5,13 @@
 			"path": "."
 		},
 		{
-			"name": "gizmo_analysis",
-			"path": "../../gizmo_analysis/gizmo_analysis"
+			"path": "../../gizmo_analysis"
 		},
 		{
-			"name": "halo_analysis",
-			"path": "../../halo_analysis/halo_analysis"
+			"path": "../../halo_analysis"
 		},
 		{
-			"name": "utilities",
-			"path": "../../utilities/utilities"
+			"path": "../../utilities"
 		}
 	],
 	"settings": {}

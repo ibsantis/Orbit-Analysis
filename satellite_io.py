@@ -161,6 +161,34 @@ class SatelliteMatch:
         #
         self.smhm_constant = -15.21177826 # From fitting the SMHMR from paper I, in mstar_mhalo_fitting.py
         self.smhm_slope = 2.2111824
+        #
+        # Create a sub-dictionary for the properties of interest
+        self.sim_sats = {}
+
+        # Set up empty arrays to save to
+        distances = (-1)*np.ones(self.shape)
+        velocity_rad = (-1)*np.ones(self.shape)
+        velocity_tan = (-1)*np.ones(self.shape)
+        sat_snapshots = (-1)*np.ones(self.shape, int)
+        masses = (-1)*np.ones(self.shape[0])
+        #
+        # Loop through the number of satellites and save values to the empty arrays
+        for i in range(0, self.shape[0]):
+            mask = (self.sub_inds[i] >= 0)
+            distances[i][mask] = tree.prop('host.distance.total', self.sub_inds[i][mask])
+            velocity_rad[i][mask] = tree.prop('host.velocity.rad', self.sub_inds[i][mask])
+            velocity_tan[i][mask] = tree.prop('host.velocity.tan', self.sub_inds[i][mask])
+            sat_snapshots[i][mask] = tree.prop('snapshot', self.sub_inds[i][mask])
+            masses[i] = tree.prop('mass.peak', self.sub_inds[i,0])
+        distances[np.isnan(distances)] = -1 # This is to take care of instances in which the subhalos existed before the host
+        velocity_rad[np.isnan(velocity_rad)] = -1
+        velocity_tan[np.isnan(velocity_tan)] = -1
+        #
+        self.sim_sats['host.distance.total'] = distances
+        self.sim_sats['host.velocity.rad'] = velocity_rad
+        self.sim_sats['host.velocity.tan'] = velocity_tan
+        self.sim_sats['snapshot'] = sat_snapshots
+        self.sim_sats['mass.peak'] = masses
 
     def satellite_mhalo(self, mstar):
         """
@@ -171,7 +199,7 @@ class SatelliteMatch:
         mhalo = (mstar - self.smhm_constant)/self.smhm_slope
         return mhalo # this is the log of the halo mass actually...
     
-    def lg_satellite_properties(self, lg_data, galaxy_name):
+    def lg_satellite_properties(self, lg_data, galaxy_name, mass_err=0.25):
         """
         TBD
 
@@ -188,4 +216,10 @@ class SatelliteMatch:
         for prop_name in lg_data[galaxy_name].keys():
             satellite_dict[prop_name] = lg_data[galaxy_name][prop_name]
         #
+        log_mass_halo = self.satellite_mhalo(np.log10(match['mass.star']))
+        mass_halo = 10**(log_mass_halo)
+        satellite_dict['mass.peak'] = mass_halo
+        satellite_dict['mass.peak.err'] = mass_err
+        #
         return satellite_dict
+
