@@ -59,7 +59,7 @@ import sys
 
 class OrbitRead:
 
-    def __init__(self, gal1, location, dmo=False):
+    def __init__(self, gal1, location, selection='star'):
         """
         Set the home directory, simulation directory, and number of galaxies
 
@@ -126,12 +126,12 @@ class OrbitRead:
         #
         self.fitting_data = pd.read_csv(self.home_dir+'/orbit_data/fitting_param.csv', index_col=0)
         #
-        if dmo:
+        if selection == 'dmo':
             self.simulation_dir += '_dm'
 
 class OrbitAnalysis:
 
-    def __init__(self, tree, gal1, location, host, dmo=False):
+    def __init__(self, tree, gal1, location, host, selection='star'):
         """
         DESCRIPTION:
             Returns the indices of luminous subhalos along with their progenitor
@@ -174,7 +174,7 @@ class OrbitAnalysis:
               snapshots 0,1,2,3.
         """
         # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
-        OrbitRead.__init__(self, gal1, location, dmo=dmo)
+        OrbitRead.__init__(self, gal1, location, selection=selection)
         #
         # Selection criteria for the DMO simulations or for non-luminous satellites in the baryonic simulations
         if host == 2:
@@ -188,17 +188,23 @@ class OrbitAnalysis:
         z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
         #
         # Select subhalos based on their halo mass
-        if dmo:
+        if selection == 'dmo':
             self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega_matter']
             z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds)*(1-self.baryon_frac), [1e8,np.inf])]
             z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
             self.sub_inds = z0_inds_w_prog
         #
         # Select subhalos based on their stellar mass
-        else:
+        elif selection == 'star':
             z0_inds_w_star = ut.array.get_indices(tree['star.mass'], [3e4, np.inf], z0_inds)
             z0_inds_w_star_prog = tree.prop('progenitor.main.indices', z0_inds_w_star)
             self.sub_inds = z0_inds_w_star_prog
+        #
+        # Select subhalos based on their halo mass
+        elif selection == 'halo':
+            z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds), [1e8, np.inf])]
+            z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
+            self.sub_inds = z0_inds_w_prog
         #
         self.shape = self.sub_inds.shape
 
@@ -1166,12 +1172,12 @@ class OrbitAnalysis:
 # Pick up here when documenting again...
 class OrbitGalpy(OrbitAnalysis):
 
-    def __init__(self, tree, gal1, location, host, dmo=False):
+    def __init__(self, tree, gal1, location, host, selection='star'):
         """
         This is required to inherit the subhalo indices defined from
         OrbitAnalysis.__init__()
         """
-        OrbitAnalysis.__init__(self, tree, gal1, location, host, dmo=dmo)
+        OrbitAnalysis.__init__(self, tree, gal1, location, host, selection=selection)
 
     def galpy_orbit_init(self, tree, host=1, rotate=False, rotation=(None, None)):
         """
@@ -1767,7 +1773,7 @@ class OrbitGalpy(OrbitAnalysis):
 
 class OrbitTree(OrbitAnalysis):
 
-    def __init__(self, tree, gal1, location, host, particles, subsampling, dmo=False):
+    def __init__(self, tree, gal1, location, host, particles, subsampling, selection='star'):
         """
         DESCRIPTION:
             Creates a "tree" structure to efficiently select particles within
@@ -1787,7 +1793,7 @@ class OrbitTree(OrbitAnalysis):
             - This is used in conjunction with the "neighbors" method to select
               particles within certain subhalos.
         """
-        OrbitAnalysis.__init__(self, tree, gal1, location, host, dmo=dmo)
+        OrbitAnalysis.__init__(self, tree, gal1, location, host, selection=selection)
         #
         # Build the tree
         self.kdtree = spatial.KDTree(data=particles['dark']['position'][::subsampling].astype(np.float32)/(1+particles.snapshot['redshift']))
@@ -1824,12 +1830,12 @@ class OrbitTree(OrbitAnalysis):
 
 class OrbitPlot(OrbitAnalysis):
 
-    def __init__(self, tree, gal1, location, host, dmo=False):
+    def __init__(self, tree, gal1, location, host, selection='star'):
         """
         This is required to inherit the subhalo indices defined from
         OrbitAnalysis.__init__()
         """
-        OrbitAnalysis.__init__(self, tree, gal1, location, host, dmo=dmo)
+        OrbitAnalysis.__init__(self, tree, gal1, location, host, selection=selection)
 
     def multi_plot(self, host_rads, infall_dict, peri_dict, time_dict, sim_dist, sim_vel, sim_ell, model_orbits, model_times, host=1):
         #
@@ -1923,13 +1929,3 @@ class OrbitPlot(OrbitAnalysis):
                     if host == 2:
                         plt.savefig(self.home_dir+'/orbit_data/plots/subhalo_integration/'+self.gal_2+'/'+self.gal_2+'_sub_'+str(i+1)+'.pdf')
                 plt.close()
-
-# Testing out some of what Shea wrote in elvis_analysis.elvis_plot.OrbitPropertyClass().get_subhalos_match()
-class OrbitMatch(OrbitAnalysis):
-
-    def __init__(self, tree, gal1, location, host, dmo=False):
-        """
-        This is required to inherit the subhalo indices defined from
-        OrbitAnalysis.__init__()
-        """
-        OrbitAnalysis.__init__(self, tree, gal1, location, host, dmo=dmo)
