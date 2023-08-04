@@ -311,16 +311,12 @@ class SatelliteMatch:
         properties = [prop_name for prop_name in sorted(subhalos.keys()) if prop_name != 'snapshot']
         #
         for snap_ind in range(0, n_snapshots):
-            print(snap_ind)
             match_inds = mass_inds
             print(match_inds)
             for prop_name in coord_names:
                 prop_limits = ut.binning.get_bin_limits([satellite[prop_name], max_sigma*satellite[prop_name+'.err']], 'error')
-                print(prop_limits)
                 prop_values = subhalos[prop_name][:,snap_ind]
-                print(prop_values)
                 match_inds = ut.array.get_indices(prop_values, prop_limits, match_inds)
-                print(match_inds)
             if len(match_inds) != 0:
                 #
                 sigma_difs_z = np.zeros(len(match_inds))
