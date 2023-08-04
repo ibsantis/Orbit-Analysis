@@ -85,7 +85,7 @@ class OrbitRead:
         galaxy_info = {
             'Romeo': ('Juliet', 'm12_elvis_RomeoJuliet', '_r3500', 2),
             'Thelma': ('Louise', 'm12_elvis_ThelmaLouise', '_r4000', 2),
-            'Romulus': ('Remus', 'm12_elvis_RomulusRemus', '_r3000', 2),
+            'Romulus': ('Remus', 'm12_elvis_RomulusRemus', '_r4000', 2),
             'm12z': (None, 'm12z', '_r4200', 1),
             'm12i_lr': (None, 'm12i', '_r57000', 1),
             'm12i_hr': (None, 'm12i', '_r880', 1)
