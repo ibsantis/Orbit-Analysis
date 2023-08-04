@@ -48,7 +48,7 @@ class SatelliteRead:
         galaxy_info = {
             'Romeo': ('Juliet', 'm12_elvis_RomeoJuliet', '_r3500', 2),
             'Thelma': ('Louise', 'm12_elvis_ThelmaLouise', '_r4000', 2),
-            'Romulus': ('Remus', 'm12_elvis_RomulusRemus', '_r3000', 2),
+            'Romulus': ('Remus', 'm12_elvis_RomulusRemus', '_r4000', 2),
             'm12z': (None, 'm12z', '_r4200', 1),
             'm12i_lr': (None, 'm12i', '_r57000', 1),
             'm12i_hr': (None, 'm12i', '_r880', 1)
@@ -148,11 +148,6 @@ class SatelliteMatch:
         z0_inds = z0_inds[z0_inds != tree[hindex+'.index'][0]]
         z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
         #
-        # Select subhalos based on their halo mass
-        # Uncomment out these lines if I need to be multiplying the subhalos by the baryon fraction
-        # self.baryon_frac = tree.Cosmology['omega_baryon']/tree.Cosmology['omega_matter']
-        # z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds)*(1-self.baryon_frac), [minimum_mass, np.inf])]
-        #
         z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds), [minimum_mass, np.inf])]
         z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
         #
@@ -195,7 +190,7 @@ class SatelliteMatch:
         #
         return satellite_dict
 
-    def subhalo_data(self, tree):
+    def subhalo_data(self, tree=None, mini=None, snapshot_data=None):
         """
         TBD
         """
@@ -209,14 +204,24 @@ class SatelliteMatch:
         sat_snapshots = (-1)*np.ones(self.shape, int)
         masses = (-1)*np.ones(self.shape[0])
         #
-        # Loop through the number of satellites and save values to the empty arrays
-        for i in range(0, self.shape[0]):
-            mask = (self.sub_inds[i] >= 0)
-            distances[i][mask] = tree.prop('host.distance.total', self.sub_inds[i][mask])
-            velocity_rad[i][mask] = tree.prop('host.velocity.rad', self.sub_inds[i][mask])
-            velocity_tan[i][mask] = tree.prop('host.velocity.tan', self.sub_inds[i][mask])
-            sat_snapshots[i][mask] = tree.prop('snapshot', self.sub_inds[i][mask])
-            masses[i] = tree.prop('mass.peak', self.sub_inds[i,0])
+        if mini:
+            # Loop through the number of satellites and save values to the empty arrays
+            for i in range(0, self.shape[0]):
+                mask = (self.sub_inds[i] >= 0)
+                distances[i][mask] = mini['d.tot.sim'][i][mask]
+                velocity_rad[i][mask] = mini['v.rad.sim'][i][mask]
+                velocity_tan[i][mask] = mini['v.tan.sim'][i][mask]
+                sat_snapshots[i][mask] = snapshot_data['index'][:self.shape[1]][mask]
+                masses[i] = mini['M.halo.peak'][i][mask]
+        else:
+            # Loop through the number of satellites and save values to the empty arrays
+            for i in range(0, self.shape[0]):
+                mask = (self.sub_inds[i] >= 0)
+                distances[i][mask] = tree.prop('host.distance.total', self.sub_inds[i][mask])
+                velocity_rad[i][mask] = tree.prop('host.velocity.rad', self.sub_inds[i][mask])
+                velocity_tan[i][mask] = tree.prop('host.velocity.tan', self.sub_inds[i][mask])
+                sat_snapshots[i][mask] = tree.prop('snapshot', self.sub_inds[i][mask])
+                masses[i] = tree.prop('mass.peak', self.sub_inds[i,0])
         distances[np.isnan(distances)] = -1 # This is to take care of instances in which the subhalos existed before the host
         velocity_rad[np.isnan(velocity_rad)] = -1
         velocity_tan[np.isnan(velocity_tan)] = -1
@@ -228,3 +233,68 @@ class SatelliteMatch:
         sim_sats['mass.peak'] = masses
         #
         return sim_sats
+    
+    def subhalo_match(self, indices, subhalos, satellite, n_snapshots=30, max_sigma=3):
+        """
+        DESCRIPTION:
+            TBD
+
+        VARIABLES:
+            indices      : 2D array
+                           The halo tree indices of subhalos in the simulations
+
+            subhalos     : dictionary
+                           This is a subset of simulation data that includes 
+                           - total distance from host
+                           - radial velocity
+                           - tangential velocity
+                           - peak subhalo mass
+                           - snapshot numbers that it existed in
+
+            satellite   : dictionary
+                          This is data for the actual satellite we want to find matches of. 
+                          Created by "lg_satellite_properties()" and includes:
+                          - total distance from host + error
+                          - radial velocity + error
+                          - tangential velocity + error
+                          - stellar mass
+                          - peak subhalo mass using the SMHM relation from Paper I and "satellite_mhalo()"
+
+            n_snapshots : integer
+                          Number of snapshots to look back in matching satellites.
+            
+            max_sigma   : integer
+                          Threshold of how much error we allow in selecting satellites
+
+        NOTES:
+            - TBD
+        """
+        # Set up an empty dictionary to save the actual matches to for a given observed satellite
+        sub_match = {}
+        sub_match['mass.index'] = (-1)*np.ones(indices.shape[0], int)
+        sub_match['tree.index'] = (-1)*np.ones(indices.shape[0], int)
+        sub_match['weight'] = (-1)*np.ones((indices.shape[0], n_snapshots))
+        sub_match['sigma.dif'] = (-1)*np.ones((indices.shape[0], n_snapshots))
+        sub_match['snapshot'] = (-1)*np.ones((indices.shape[0], n_snapshots), int)
+        #
+        properties = [prop_name for prop_name in sorted(satellite.keys()) if '.star' not in prop_name and '.err' not in prop_name]
+        #
+        dof_number = int(len(properties))
+        if dof_number == 1:
+            sigma_dif_68, sigma_dif_95 = 1.0, 2.0
+        elif dof_number == 2:
+            sigma_dif_68, sigma_dif_95 = 1.36, 2.27 # These come from integrating an n-d gaussian to these limits to return 0.68 and 0.95
+        elif dof_number == 3:
+            sigma_dif_68, sigma_dif_95 = 1.56, 2.42
+        elif dof_number == 4:
+            sigma_dif_68, sigma_dif_95 = 1.69, 2.52
+        #
+        mass_kind = 'mass.peak'
+        # Get subhalos within +/- N sigma * 0.25 dex of M_halo,peak
+        mass_halo_log = np.log10(satellite[mass_kind])
+        mass_inds = ut.array.get_indices(subhalos[mass_kind], [10**(mass_halo_log - max_sigma*satellite[mass_kind+'.err']), 10**(mass_halo_log + max_sigma*satellite[mass_kind+'.err'])])
+        #
+        coord_names = [prop_name for prop_name in sorted(subhalos.keys()) if prop_name != 'mass.peak' and prop_name != 'snapshot']
+        properties = [prop_name for prop_name in sorted(subhalos.keys()) if prop_name != 'snapshot']
+        #
+        pass
