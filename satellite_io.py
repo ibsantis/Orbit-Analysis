@@ -348,6 +348,6 @@ class SatelliteMatch:
                     print('! no subhalos within {0} percent limits at snapshot {1}'.format(probability_max, np.flip(snapshot_data['index'])[snap_ind]))
             #
             else:
-                print('! no subhalos match at snapshot {0}'.format(np.flip(snapshot_data['index'][snap_ind])))
+                print('! no subhalos match at snapshot {0}'.format(np.flip(snapshot_data['index'])[snap_ind]))
         #
         return sub_match
