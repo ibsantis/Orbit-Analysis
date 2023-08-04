@@ -302,7 +302,7 @@ class SatelliteMatch:
         else:
             sigma_dif_max = sigma_dif_95
         #
-        # Get subhalos within +/- N sigma * 0.25 dex of M_halo,peak
+        # Get subhalos within +/- N sigma * 0.25 dex of M_halo,peak 
         mass_kind = 'mass.peak'
         mass_halo_log = np.log10(satellite[mass_kind])
         mass_inds = ut.array.get_indices(subhalos[mass_kind], [10**(mass_halo_log - max_sigma*satellite[mass_kind+'.err']), 10**(mass_halo_log + max_sigma*satellite[mass_kind+'.err'])])
@@ -313,10 +313,14 @@ class SatelliteMatch:
         for snap_ind in range(0, n_snapshots):
             print(snap_ind)
             match_inds = mass_inds
+            print(match_inds)
             for prop_name in coord_names:
                 prop_limits = ut.binning.get_bin_limits([satellite[prop_name], max_sigma*satellite[prop_name+'.err']], 'error')
+                print(prop_limits)
                 prop_values = subhalos[prop_name][:,snap_ind]
+                print(prop_values)
                 match_inds = ut.array.get_indices(prop_values, prop_limits, match_inds)
+                print(match_inds)
             if len(match_inds) != 0:
                 sub_match['mass.index'][match_inds] = match_inds
                 sub_match['tree.index'][match_inds] = self.sub_inds[:,0][match_inds]
