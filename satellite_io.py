@@ -93,7 +93,7 @@ class SatelliteRead:
 # Have a class that matches the satellites
 class SatelliteMatch:
 
-    def __init__(self, gal1, location, tree=None, mini_data=None, host=1, minimum_mass=1e8):
+    def __init__(self, gal1, location, tree=None, mini=None, host=1, minimum_mass=1e8):
         """
         DESCRIPTION:
             Returns the indices of satellites along with their progenitor
@@ -218,7 +218,7 @@ class SatelliteMatch:
                 velocity_rad[i][mask] = mini['v.rad.sim'][i][mask]
                 velocity_tan[i][mask] = mini['v.tan.sim'][i][mask]
                 sat_snapshots[i][mask] = snapshot_data['index'][:self.shape[1]][mask]
-                masses[i] = mini['M.halo.peak'][i][mask]
+                masses[i] = mini['M.halo.peak'][i]
         else:
             # Loop through the number of satellites and save values to the empty arrays
             for i in range(0, self.shape[0]):
