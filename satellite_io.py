@@ -137,7 +137,7 @@ class SatelliteMatch:
         # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
         SatelliteRead.__init__(self, gal1, location, dmo=False)
         #
-        if tree and not mini_data:
+        if tree and not mini:
             # Selection criteria for the DMO simulations or for non-luminous satellites in the baryonic simulations
             if host == 2:
                 hindex = 'host2'
@@ -154,9 +154,9 @@ class SatelliteMatch:
             #
             self.sub_inds = z0_inds_w_prog
             self.shape = self.sub_inds.shape
-        elif mini_data and not tree:
-            self.sub_inds = mini_data['indices.z0']
-            self.shape = mini_data['indices.z0'].shape
+        elif mini and not tree:
+            self.sub_inds = mini['indices.z0']
+            self.shape = mini['indices.z0'].shape
         else:
             raise AssertionError('Either no data input or two many datasets.')
         #
