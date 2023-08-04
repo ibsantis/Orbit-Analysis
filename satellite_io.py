@@ -240,7 +240,7 @@ class SatelliteMatch:
         #
         return sim_sats
     
-    def subhalo_match(self, indices, subhalos, satellite, n_snapshots=30, max_sigma=3):
+    def subhalo_match(self, indices, subhalos, satellite, snapshot_data, n_snapshots=30, max_sigma=3, probability_max=95):
         """
         DESCRIPTION:
             TBD
@@ -295,12 +295,55 @@ class SatelliteMatch:
         elif dof_number == 4:
             sigma_dif_68, sigma_dif_95 = 1.69, 2.52
         #
-        mass_kind = 'mass.peak'
+        if probability_max == 68: # What is this for?
+            sigma_dif_max = sigma_dif_68
+        elif probability_max == 95:
+            sigma_dif_max = sigma_dif_95
+        else:
+            sigma_dif_max = sigma_dif_95
+        #
         # Get subhalos within +/- N sigma * 0.25 dex of M_halo,peak
+        mass_kind = 'mass.peak'
         mass_halo_log = np.log10(satellite[mass_kind])
         mass_inds = ut.array.get_indices(subhalos[mass_kind], [10**(mass_halo_log - max_sigma*satellite[mass_kind+'.err']), 10**(mass_halo_log + max_sigma*satellite[mass_kind+'.err'])])
         #
         coord_names = [prop_name for prop_name in sorted(subhalos.keys()) if prop_name != 'mass.peak' and prop_name != 'snapshot']
         properties = [prop_name for prop_name in sorted(subhalos.keys()) if prop_name != 'snapshot']
         #
-        pass
+        for snap_ind in range(0, n_snapshots):
+            match_inds = mass_inds
+            for prop_name in coord_names:
+                prop_limits = ut.binning.get_bin_limits([satellite[prop_name], max_sigma*satellite[prop_name+'.err']], 'error')
+                prop_values = subhalos[prop_name][:,snap_ind]
+                match_inds = ut.array.get_indices(prop_values, prop_limits, match_inds)
+            if len(match_inds) != 0:
+                sub_match['mass.index'][match_inds] = match_inds
+                sub_match['tree.index'][match_inds] = self.sub_inds[:,0][match_inds]
+                sub_match['snapshot'][match_inds, snap_ind] = np.flip(snapshot_data['index'])[:n_snapshots][snap_ind]
+                print('* Satellite(s) {0} are a match at snapshot {1}'.format(match_inds, np.flip(snapshot_data['index'])[:n_snapshots][snap_ind]))
+                #
+                sigma_difs_z = np.zeros(len(match_inds))
+                #
+                for prop_name in properties:
+                    if 'mass' in prop_name:
+                        prop_values = np.log10(subhalos[prop_name][match_inds])
+                        match_prop = np.log10(satellite[prop_name])
+                        sigma_difs_z += (
+                        (prop_values - match_prop) / satellite[prop_name+'.err']
+                        ) **2
+                    else:
+                        prop_values = subhalos[prop_name][match_inds, snap_ind]
+                        sigma_difs_z += (
+                            (prop_values - satellite[prop_name]) / satellite[prop_name+'.err']
+                            ) **2
+                sigma_difs_z = np.sqrt(sigma_difs_z)
+                masks = ut.array.get_indices(sigma_difs_z, [0, sigma_dif_max])
+                sigma_difs_z = sigma_difs_z[masks]
+                weights_z = ut.math.Function.gaussian_normalized(sigma_difs_z)
+                sub_match['weight'][match_inds, snap_ind] = weights_z
+            #
+            else:
+                print('! no subhalos match')
+                return sub_match
+        #
+        return sub_match
