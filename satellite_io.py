@@ -312,7 +312,6 @@ class SatelliteMatch:
         #
         for snap_ind in range(0, n_snapshots):
             match_inds = mass_inds
-            print(match_inds)
             for prop_name in coord_names:
                 prop_limits = ut.binning.get_bin_limits([satellite[prop_name], max_sigma*satellite[prop_name+'.err']], 'error')
                 prop_values = subhalos[prop_name][:,snap_ind]
@@ -346,7 +345,7 @@ class SatelliteMatch:
                     print('* Satellite(s) {0} are a match at snapshot {1}'.format(match_inds, np.flip(snapshot_data['index'])[:n_snapshots][snap_ind]))
                     print('{0}, {1} within 68 percent, 95 percent limits'.format(np.sum(sigma_difs_z < sigma_dif_68), np.sum(sigma_difs_z < sigma_dif_95)))
                 else:
-                    print('! no subhalos within {0} percent limits'.format(probability_max))
+                    print('! no subhalos within {0} percent limits at snapshot {1}'.format(probability_max, snapshot_data['index'][snap_ind]))
             #
             else:
                 print('! no subhalos match at snapshot {0}'.format(snapshot_data['index'][snap_ind]))
