@@ -322,10 +322,6 @@ class SatelliteMatch:
                 match_inds = ut.array.get_indices(prop_values, prop_limits, match_inds)
                 print(match_inds)
             if len(match_inds) != 0:
-                sub_match['mass.index'][match_inds] = match_inds
-                sub_match['tree.index'][match_inds] = self.sub_inds[:,0][match_inds]
-                sub_match['snapshot'][match_inds, snap_ind] = np.flip(snapshot_data['index'])[:n_snapshots][snap_ind]
-                print('* Satellite(s) {0} are a match at snapshot {1}'.format(match_inds, np.flip(snapshot_data['index'])[:n_snapshots][snap_ind]))
                 #
                 sigma_difs_z = np.zeros(len(match_inds))
                 #
@@ -344,8 +340,17 @@ class SatelliteMatch:
                 sigma_difs_z = np.sqrt(sigma_difs_z)
                 masks = ut.array.get_indices(sigma_difs_z, [0, sigma_dif_max])
                 sigma_difs_z = sigma_difs_z[masks]
-                weights_z = ut.math.Function.gaussian_normalized(sigma_difs_z)
-                sub_match['weight'][match_inds, snap_ind] = weights_z
+                if len(sigma_difs_z) != 0:
+                    weights_z = ut.math.Function.gaussian_normalized(sigma_difs_z)
+                    sub_match['mass.index'][match_inds] = match_inds
+                    sub_match['tree.index'][match_inds] = self.sub_inds[:,0][match_inds]
+                    sub_match['snapshot'][match_inds, snap_ind] = np.flip(snapshot_data['index'])[:n_snapshots][snap_ind]
+                    sub_match['weight'][match_inds, snap_ind] = weights_z
+                    sub_match['sigma.dif'][match_inds, snap_ind] = sigma_difs_z
+                    print('* Satellite(s) {0} are a match at snapshot {1}'.format(match_inds, np.flip(snapshot_data['index'])[:n_snapshots][snap_ind]))
+                    print('{0}, {1} within 68 percent, 95 percent limits'.format(np.sum(sigma_difs_z < sigma_dif_68), np.sum(sigma_difs_z < sigma_dif_95)))
+                else:
+                    print('! no subhalos within {0} percent limits'.format(probability_max))
             #
             else:
                 print('! no subhalos match')
