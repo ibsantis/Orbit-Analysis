@@ -343,11 +343,11 @@ class SatelliteMatch:
                     sub_match['weight'][match_inds, snap_ind] = weights_z
                     sub_match['sigma.dif'][match_inds, snap_ind] = sigma_difs_z
                     print('* Satellite(s) {0} are a match at snapshot {1}'.format(match_inds, np.flip(snapshot_data['index'])[:n_snapshots][snap_ind]))
-                    print('{0}, {1} within 68 percent, 95 percent limits'.format(np.sum(sigma_difs_z < sigma_dif_68), np.sum(sigma_difs_z < sigma_dif_95)))
+                    print('* {0}, {1} within 68 percent, 95 percent limits'.format(np.sum(sigma_difs_z < sigma_dif_68), np.sum(sigma_difs_z < sigma_dif_95)))
                 else:
-                    print('! no subhalos within {0} percent limits at snapshot {1}'.format(probability_max, snapshot_data['index'][snap_ind]))
+                    print('! no subhalos within {0} percent limits at snapshot {1}'.format(probability_max, np.flip(snapshot_data['index'])[snap_ind]))
             #
             else:
-                print('! no subhalos match at snapshot {0}'.format(snapshot_data['index'][snap_ind]))
+                print('! no subhalos match at snapshot {0}'.format(np.flip(snapshot_data['index'][snap_ind])))
         #
         return sub_match
