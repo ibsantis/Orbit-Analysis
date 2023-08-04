@@ -295,7 +295,7 @@ class SatelliteMatch:
         elif dof_number == 4:
             sigma_dif_68, sigma_dif_95 = 1.69, 2.52
         #
-        if probability_max == 68: # What is this for?
+        if probability_max == 68:
             sigma_dif_max = sigma_dif_68
         elif probability_max == 95:
             sigma_dif_max = sigma_dif_95
@@ -349,7 +349,6 @@ class SatelliteMatch:
                     print('! no subhalos within {0} percent limits'.format(probability_max))
             #
             else:
-                print('! no subhalos match')
-                return sub_match
+                print('! no subhalos match at snapshot {0}'.format(snapshot_data['index'][snap_ind]))
         #
         return sub_match
