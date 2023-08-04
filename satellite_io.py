@@ -93,7 +93,7 @@ class SatelliteRead:
 # Have a class that matches the satellites
 class SatelliteMatch:
 
-    def __init__(self, tree, gal1, location, host=1, minimum_mass=1e8):
+    def __init__(self, gal1, location, tree=None, mini_data=None, host=1, minimum_mass=1e8):
         """
         DESCRIPTION:
             Returns the indices of satellites along with their progenitor
@@ -137,22 +137,28 @@ class SatelliteMatch:
         # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
         SatelliteRead.__init__(self, gal1, location, dmo=False)
         #
-        # Selection criteria for the DMO simulations or for non-luminous satellites in the baryonic simulations
-        if host == 2:
-            hindex = 'host2'
+        if tree and not mini_data:
+            # Selection criteria for the DMO simulations or for non-luminous satellites in the baryonic simulations
+            if host == 2:
+                hindex = 'host2'
+            else:
+                hindex = 'host'
+            #
+            # Select the subhalo indices at z = 0
+            z0_inds = ut.array.get_indices(tree['snapshot'], 600)
+            z0_inds = z0_inds[z0_inds != tree[hindex+'.index'][0]]
+            z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
+            #
+            z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds), [minimum_mass, np.inf])]
+            z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
+            #
+            self.sub_inds = z0_inds_w_prog
+            self.shape = self.sub_inds.shape
+        elif mini_data and not tree:
+            self.sub_inds = mini_data['indices.z0']
+            self.shape = mini_data['indices.z0'].shape
         else:
-            hindex = 'host'
-        #
-        # Select the subhalo indices at z = 0
-        z0_inds = ut.array.get_indices(tree['snapshot'], 600)
-        z0_inds = z0_inds[z0_inds != tree[hindex+'.index'][0]]
-        z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
-        #
-        z0_inds = z0_inds[ut.array.get_indices(tree.prop('mass.peak',z0_inds), [minimum_mass, np.inf])]
-        z0_inds_w_prog = tree.prop('progenitor.main.indices', z0_inds)
-        #
-        self.sub_inds = z0_inds_w_prog
-        self.shape = self.sub_inds.shape
+            raise AssertionError('Either no data input or two many datasets.')
         #
         self.smhm_constant = -15.21177826 # From fitting the SMHMR from paper I, in mstar_mhalo_fitting.py
         self.smhm_slope = 2.2111824
