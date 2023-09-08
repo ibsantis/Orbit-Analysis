@@ -152,3 +152,32 @@ print('The width of the 95-ile for v_min is {}'.format(width_of_95(x_array=(v_mi
 print('The width of the 95-ile for d_apo is {}'.format(width_of_95(x_array=(dapo_rec_mod-dapo_rec_sim)/dapo_rec_sim)))
 print('The width of the 95-ile for t_infall is {}'.format(width_of_95(x_array=(t_in_mod[mask_in_mod]-t_in_sim[mask_in_mod])/t_in_sim[mask_in_mod])))
 print('The width of the 95-ile for t_infall,R200m is {}'.format(width_of_95(x_array=(t_in_mod_R200m[mask_in_mod_R200m]-t_in_sim[mask_in_mod_R200m])/t_in_sim[mask_in_mod_R200m])))
+
+
+
+
+t_in_sim = summary.first_infall(data_total, masks_infall_peri, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+
+mask_rec = (t_in_sim < 7.8)
+mask_early = (t_in_sim > 7.8)
+
+np.median((d_rec_mod[mask_rec] - d_rec_sim[mask_rec])/d_rec_sim[mask_rec])
+np.median((d_rec_mod[mask_early] - d_rec_sim[mask_early])/d_rec_sim[mask_early])
+np.median((d_min_mod[mask_rec] - d_min_sim[mask_rec])/d_min_sim[mask_rec])
+np.median((d_min_mod[mask_early] - d_min_sim[mask_early])/d_min_sim[mask_early])
+np.median((t_rec_mod[mask_rec] - t_rec_sim[mask_rec])/t_rec_sim[mask_rec])
+np.median((t_rec_mod[mask_early] - t_rec_sim[mask_early])/t_rec_sim[mask_early])
+
+np.median((v_rec_mod[mask_rec] - v_rec_sim[mask_rec])/v_rec_sim[mask_rec])
+np.median((v_rec_mod[mask_early] - v_rec_sim[mask_early])/v_rec_sim[mask_early])
+np.median((v_min_mod[mask_rec] - v_min_sim[mask_rec])/v_min_sim[mask_rec])
+np.median((v_min_mod[mask_early] - v_min_sim[mask_early])/v_min_sim[mask_early])
+
+
+t_in_sim = summary.first_infall(data_total, masks_infall_apo, selection='sim', oversample=True, hosts='all_no_r', sim_type='baryon')
+
+mask_rec = (t_in_sim < 7.4)
+mask_early = (t_in_sim > 7.4)
+
+np.median((dapo_rec_mod[mask_rec] - dapo_rec_sim[mask_rec])/dapo_rec_sim[mask_rec])
+np.median((dapo_rec_mod[mask_early] - dapo_rec_sim[mask_early])/dapo_rec_sim[mask_early])
