@@ -21,19 +21,50 @@ print('Set paths')
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/m12i_r7100') # Saves snapshots, redshifts, lookback times, etc. to an array
 #halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal, assign_hosts_rotation=aligned, catalog_hdf5_directory='catalog_hdf5')
 lg_data = pd.read_csv(sim_data.home_dir+'/orbit_data/paper_III/localgroup_galaxies_condensed.csv', index_col=0)
-mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_all_subhalos', verbose=True)
 
-# Get the indices of the satellites that are above a given minimum halo mass (1e8 for now)
-sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1=sim_data.galaxy, location=loc)
+galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'm12z', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus']
 
-# Get the phase-space coordinates of these satellites across all snapshots
-subhalo_dict = sat_match.subhalo_data(tree=None, mini=mini_data, snapshot_data=snaps)
+final_dict = dict()
+
+tree_index = []
+mass_array = []
+weight = []
+sigma_dif = []
+snapshot = []
+#
+hosts = []
+
+for name in galaxies:
+    mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=True)
+
+    # Get the indices of the satellites that are above a given minimum halo mass (1e8 for now)
+    sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1=name, location=loc)
+
+    # Get a match for a given LG satellite
+    match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name='Sculptor', mass_err=0.25)
+
+    # Get the phase-space coordinates of these satellites across all snapshots
+    subhalo_dict = sat_match.subhalo_data(tree=None, mini=mini_data, snapshot_data=snaps)
+
+    satellite_match = sat_match.subhalo_match(sat_match.sub_inds, subhalos=subhalo_dict, satellite=match, snapshot_data=snaps)
+
+    mask = (satellite_match['mass.index'] != -1)
+    for i in range(0, len(satellite_match['mass.index'][mask])):
+        hosts.append(name)
+        tree_index.append(satellite_match['tree.index'][mask][i])
+        mass_array.append(subhalo_dict['mass.peak'][mask][i])
+        #
+        mask_w = (satellite_match['weight'][mask][i] > 0)
+        ind_w = np.where(np.max(satellite_match['weight'][mask][i][mask_w]) == satellite_match['weight'][mask][i][mask_w])[0][0]
+        weight.append(satellite_match['weight'][mask][i][mask_w][ind_w])
+        snapshot.append(satellite_match['snapshot'][mask][i][mask_w][ind_w])
+        sigma_dif.append(satellite_match['sigma.dif'][mask][i][mask_w][ind_w])
 
 
-# Get a match for a given LG satellite
-match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name='Sculptor', mass_err=0.25)
 
-satellite_match = sat_match.subhalo_match(sat_match.sub_inds, subhalos=subhalo_dict, satellite=match, snapshot_data=snaps)
+
+
+
 
 
 #### Add this stuff to the subhalo_match function when I can!
@@ -46,6 +77,18 @@ weights_m /= weights_m.sum()  # normalize
 temp = np.max(satellite_match['weight'][satellite_match['mass.index'][585]]) 
 temp *= weights_m # save this as the final weight for the subhalo!
 temp /= temp.sum() # This step just turns the weight into one because there is only one match.....
+
+
+
+
+
+
+
+
+
+
+
+
 
 ########################
 """
