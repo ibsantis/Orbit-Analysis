@@ -18,6 +18,7 @@ import matplotlib.ticker
 from scipy.interpolate import splrep, splev, interp1d
 import pandas as pd
 import galpy
+import os
 
 # Have a class that reads in the data
 class SatelliteRead:
@@ -293,7 +294,7 @@ class SatelliteMatch:
         elif dof_number == 3:
             sigma_dif_68, sigma_dif_95 = 1.56, 2.42
         elif dof_number == 4:
-            sigma_dif_68, sigma_dif_95 = 1.69, 2.52
+            sigma_dif_68, sigma_dif_95 = 1.69, 2.52 # 3.4 results in 99.7%
         #
         if probability_max == 68:
             sigma_dif_max = sigma_dif_68
@@ -358,6 +359,8 @@ class SatelliteMatch:
                     weights_z = ut.math.Function.gaussian_normalized(sigma_difs_z)
                     # Save all of the data to the arrays
                     sub_match['mass.index'][match_inds] = match_inds
+                    sub_match['mass.peak'][match_inds] = subhalos['mass.peak'][match_inds]
+                    sub_match['mass.peak.log'][match_inds] = np.log10(subhalos['mass.peak'][match_inds])
                     sub_match['tree.index'][match_inds] = self.sub_inds[:,0][match_inds]
                     sub_match['snapshot'][match_inds, snap_ind] = np.flip(snapshot_data['index'])[:n_snapshots][snap_ind]
                     sub_match['weight'][match_inds, snap_ind] = weights_z
@@ -379,3 +382,60 @@ class SatelliteMatch:
                 print('! no subhalos match at snapshot {0}'.format(np.flip(snapshot_data['index'])[snap_ind]))
         #
         return sub_match
+    
+    def mass_weighting(self, weights, mass_array_subs, mass_sat, SMHM_slope=0.44):
+        """
+        DESCRIPTION:
+            TBD
+
+        VARIABLES:
+            TBD
+
+        NOTES:
+            - TBD
+        """
+        # Take the log of the masses
+        mass_log_sub = np.log10(mass_array_subs)
+        mass_log_sat = np.log10(mass_sat)
+        #
+        # Calculate the mass weights
+        weights_m = 10 ** (SMHM_slope * (mass_log_sub - mass_log_sat)) 
+        weights_m /= weights_m.sum()  # normalize
+        #
+        weights *= weights_m 
+        weights /= weights.sum() 
+        #
+        return weights
+    
+    def write_subhalo_matches(self, satellite, hosts, indices, weights, snapshots):
+        """
+        DESCRIPTION:
+            Want this to be the middle step where I save files that include:
+                - Host
+                - Tree index
+                - Weight (after re-weighting by mass)
+                - Snapshot at match
+                - sigma_dif ( I actually don't think I need this one... )
+
+        VARIABLES:
+            TBD
+
+        NOTES:
+            - TBD
+        """
+        # If the file exists, then append to it, otherwise create it
+        file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/'
+        if os.path.isfile(file_path+satellite+'_weights.txt'):
+            print('File exists. Delete or move it elsewhere.')
+            pass
+        else:
+            file_name = satellite+'_weights.txt'
+            file_object = open(file_path+file_name, 'w')
+            #
+            file_object.write('# {0}\n'.format(satellite))
+            file_object.write('# Host, Halo tree index, Weight, Snapshot at match\n')
+            for i in range(0, len(weights)):
+                file_object.write('{0}, {1}, {2}, {3} \n'.format(hosts[i], indices[i], weights[i], snapshots[i]))
+            file_object.close()
+        print('Finished writing to file.')
+        return file_object
