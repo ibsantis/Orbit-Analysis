@@ -440,4 +440,3 @@ class SatelliteMatch:
                 file_object.write('{0}, {1}, {2}, {3} \n'.format(hosts[i], indices[i], weights[i], snapshots[i]))
             file_object.close()
         print('Finished writing to file.')
-        return file_object
