@@ -429,7 +429,7 @@ class SatelliteMatch:
         file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/'
         if os.path.isfile(file_path+satellite+'_weights.txt'):
             print('File exists. Delete or move it elsewhere.')
-            pass
+            return
         else:
             file_name = satellite+'_weights.txt'
             file_object = open(file_path+file_name, 'w')
@@ -439,4 +439,4 @@ class SatelliteMatch:
             for i in range(0, len(weights)):
                 file_object.write('{0}, {1}, {2}, {3} \n'.format(hosts[i], indices[i], weights[i], snapshots[i]))
             file_object.close()
-        print('Finished writing to file.')
+            print('Finished writing to file.')
