@@ -279,6 +279,8 @@ class SatelliteMatch:
         # Set up an empty dictionary to save the actual matches to for a given observed satellite
         sub_match = {}
         sub_match['mass.index'] = (-1)*np.ones(indices.shape[0], int)
+        sub_match['mass.peak'] = (-1)*np.ones(indices.shape[0], int)
+        sub_match['mass.peak.log'] = (-1)*np.ones(indices.shape[0], int)
         sub_match['tree.index'] = (-1)*np.ones(indices.shape[0], int)
         sub_match['weight'] = (-1)*np.ones((indices.shape[0], n_snapshots))
         sub_match['sigma.dif'] = (-1)*np.ones((indices.shape[0], n_snapshots))
