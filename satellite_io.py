@@ -434,7 +434,7 @@ class SatelliteMatch:
             file_name = 'weights_'+satellite+'.txt'
             file_object = open(file_path+file_name, 'w')
             #
-            file_object.write('# {0}\n'.format(satellite))
+            file_object.write('# {0}\n'.format(satellite)) ############################# add more header info like the snapshot window I used and other parameters
             file_object.write('# Host, Halo tree index, Weight, Snapshot at match\n')
             for i in range(0, len(weights)):
                 file_object.write('{0}, {1}, {2}, {3} \n'.format(hosts[i], indices[i], weights[i], snapshots[i]))
