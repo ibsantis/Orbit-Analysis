@@ -417,7 +417,7 @@ class SatelliteMatch:
                 - Tree index
                 - Weight (after re-weighting by mass)
                 - Snapshot at match
-                - sigma_dif ( I actually don't think I need this one... )
+                - sigma_dif ( I actually don't think I need this one... ) 
 
         VARIABLES:
             TBD
@@ -431,7 +431,7 @@ class SatelliteMatch:
             print('File exists. Delete or move it elsewhere.')
             return
         else:
-            file_name = satellite+'_weights.txt'
+            file_name = 'weights_'+satellite+'.txt'
             file_object = open(file_path+file_name, 'w')
             #
             file_object.write('# {0}\n'.format(satellite))
