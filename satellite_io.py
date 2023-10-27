@@ -241,41 +241,45 @@ class SatelliteMatch:
         #
         return sim_sats
     
-    def subhalo_match(self, indices, subhalos, satellite, snapshot_data, n_snapshots=30, max_sigma=3, probability_max=95):
+    def subhalo_match(self, indices, subhalos, satellite, snapshot_data, lookback_window=1, max_sigma=3, probability_max=95):
         """
         DESCRIPTION:
             TBD
 
         VARIABLES:
-            indices      : 2D array
-                           The halo tree indices of subhalos in the simulations
+            indices         : 2D array
+                              The halo tree indices of subhalos in the simulations
 
-            subhalos     : dictionary
-                           This is a subset of simulation data that includes 
-                           - total distance from host
-                           - radial velocity
-                           - tangential velocity
-                           - peak subhalo mass
-                           - snapshot numbers that it existed in
+            subhalos        : dictionary
+                              This is a subset of simulation data that includes 
+                              - total distance from host
+                              - radial velocity
+                              - tangential velocity
+                              - peak subhalo mass
+                              - snapshot numbers that it existed in
 
-            satellite   : dictionary
-                          This is data for the actual satellite we want to find matches of. 
-                          Created by "lg_satellite_properties()" and includes:
-                          - total distance from host + error
-                          - radial velocity + error
-                          - tangential velocity + error
-                          - stellar mass
-                          - peak subhalo mass using the SMHM relation from Paper I and "satellite_mhalo()"
+            satellite       : dictionary
+                              This is data for the actual satellite we want to find matches of. 
+                              Created by "lg_satellite_properties()" and includes:
+                              - total distance from host + error
+                              - radial velocity + error
+                              - tangential velocity + error
+                              - stellar mass
+                              - peak subhalo mass using the SMHM relation from Paper I and "satellite_mhalo()"
 
-            n_snapshots : integer
-                          Number of snapshots to look back in matching satellites.
+            lookback_window : integer
+                              Lookback time (Gyr) to search for satellite analogs
             
-            max_sigma   : integer
-                          Threshold of how much error we allow in selecting satellites
+            max_sigma       : integer
+                              Threshold of how much error we allow in selecting satellites
 
         NOTES:
             - TBD
         """
+        # Figure out how many snapshots to search for satellites from the snapshot file
+        max_time_window = snapshot_data['time'][-1] - lookback_window
+        n_snapshots = snapshot_data['index'][-1] - np.where(np.min(np.abs(max_time_window - snapshot_data['time'])) == np.abs(max_time_window - snapshot_data['time']))[0][0]
+        #
         # Set up an empty dictionary to save the actual matches to for a given observed satellite
         sub_match = {}
         sub_match['mass.index'] = (-1)*np.ones(indices.shape[0], int)
@@ -290,18 +294,20 @@ class SatelliteMatch:
         #
         dof_number = int(len(properties))
         if dof_number == 1:
-            sigma_dif_68, sigma_dif_95 = 1.0, 2.0
+            sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.0, 2.0, 3.0
         elif dof_number == 2:
-            sigma_dif_68, sigma_dif_95 = 1.36, 2.27 # These come from integrating an n-d gaussian to these limits to return 0.68 and 0.95
+            sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.36, 2.27, 3.206
         elif dof_number == 3:
-            sigma_dif_68, sigma_dif_95 = 1.56, 2.42
+            sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.56, 2.42, 3.32
         elif dof_number == 4:
-            sigma_dif_68, sigma_dif_95 = 1.69, 2.52 # 3.4 results in 99.7%
+            sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.69, 2.52, 3.4 results in 99.7%
         #
         if probability_max == 68:
             sigma_dif_max = sigma_dif_68
         elif probability_max == 95:
             sigma_dif_max = sigma_dif_95
+        elif probability_max == 99:
+            sigma_dif_max = sigma_dif_99
         else:
             sigma_dif_max = sigma_dif_95
         #
