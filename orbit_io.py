@@ -59,7 +59,7 @@ import sys
 
 class OrbitRead:
 
-    def __init__(self, gal1, location, selection='star'):
+    def __init__(self, gal1, location, selection='star', fire3=False):
         """
         Set the home directory, simulation directory, and number of galaxies
 
@@ -87,6 +87,7 @@ class OrbitRead:
             'Thelma': ('Louise', 'm12_elvis_ThelmaLouise', '_r4000', 2),
             'Romulus': ('Remus', 'm12_elvis_RomulusRemus', '_r4000', 2),
             'm12z': (None, 'm12z', '_r4200', 1),
+            'm12x': (None, 'm12x', '_r3500', 1),
             'm12i_lr': (None, 'm12i', '_r57000', 1),
             'm12i_hr': (None, 'm12i', '_r880', 1)
         }
@@ -119,7 +120,10 @@ class OrbitRead:
         #
         elif location == 'stampede':
             self.home_dir = '/home1/05400/ibsantis/scripts'
-            self.simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+self.galaxy+resolution
+            if fire3:
+                self.simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/fire3/m12_new/'+self.galaxy+resolution
+            else:
+                self.simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+self.galaxy+resolution
             if self.num_gal == 2:
                 self.gal_1 = gal1
                 self.gal_2 = gal2
