@@ -28,44 +28,7 @@ from scipy import special
 print('Read in the tools')
 
 ### Set path and initial parameters
-gal1 = 'm12z'
-loc = 'peloton'
-
-if gal1 == 'Romeo':
-    gal2 = 'Juliet'
-    galaxy = 'm12_elvis_'+gal1+gal2
-    resolution = '_res3500'
-    num_gal = 2
-elif gal1 == 'Thelma':
-    gal2 = 'Louise'
-    galaxy = 'm12_elvis_'+gal1+gal2
-    resolution = '_res4000'
-    num_gal = 2
-elif gal1 == 'Romulus':
-    gal2 = 'Remus'
-    galaxy = 'm12_elvis_'+gal1+gal2
-    resolution = '_res4000'
-    num_gal = 2
-elif gal1 == 'm12z':
-    galaxy = gal1
-    resolution = '_res4200'
-    num_gal = 1
-else:
-    galaxy = gal1
-    resolution = '_res7100'
-    num_gal = 1
-
-if loc == 'mac':
-    home_dir = '/Users/isaiahsantistevan/simulation'
-elif loc == 'peloton' and num_gal == 1:
-    home_dir = '/home/ibsantis/scripts'
-    simulation_dir = '/home/awetzel/scratch/'+galaxy+'/'+galaxy+resolution
-elif loc == 'peloton' and num_gal == 2:
-    home_dir = '/home/ibsantis/scripts'
-    simulation_dir = '/home/awetzel/scratch/m12_elvis/'+galaxy+resolution
-else:
-    home_dir = '/home1/05400/ibsantis/scripts'
-    simulation_dir = '/scratch/projects/xsede/GalaxiesOnFIRE/metal_diffusion/'+galaxy+resolution
+sim_data = orbit_io.OrbitRead(gal1='m12g', location='stampede')
 print('Set paths')
 
 # Read in the data
