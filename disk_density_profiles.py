@@ -73,7 +73,7 @@ ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting/disk/'+g
 
 # Model the vertical profile
 # This profile is going to be cumulative already, no need to cumulatively sum the mass or density at all...
-zs = np.linspace(0, 5, 51)
+zs = np.linspace(0, 3, 51)
 #
 mass_tot = np.zeros(len(zs)-1)
 density_tot = np.zeros(len(zs)-1)
@@ -99,7 +99,7 @@ d_z['density.total'] = density_tot
 d_z['mass.total'] = mass_tot
 d_z['zs'] = zs
 #
-ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting/disk/'+gal1+'_disk_vertical_profile_fitting_z5', dict_or_array_to_write=d_z, verbose=True)
+ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting/disk/'+gal1+'_disk_vertical_profile_fitting_z3', dict_or_array_to_write=d_z, verbose=True)
 
 
 if num_gal == 2:
