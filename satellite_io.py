@@ -274,7 +274,7 @@ class SatelliteMatch:
                               Threshold of how much error we allow in selecting satellites
 
         NOTES:
-            - TBD
+            - Temporarily adding notes so that I can get VS Code to accept another commit
         """
         # Figure out how many snapshots to search for satellites from the snapshot file
         max_time_window = snapshot_data['time'][-1] - lookback_window
@@ -300,7 +300,7 @@ class SatelliteMatch:
         elif dof_number == 3:
             sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.56, 2.42, 3.32
         elif dof_number == 4:
-            sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.69, 2.52, 3.4 #results in 99.7%
+            sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.69, 2.52, 3.4
         #
         if probability_max == 68:
             sigma_dif_max = sigma_dif_68
