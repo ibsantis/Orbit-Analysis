@@ -300,7 +300,7 @@ class SatelliteMatch:
         elif dof_number == 3:
             sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.56, 2.42, 3.32
         elif dof_number == 4:
-            sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.69, 2.52, 3.4 results in 99.7%
+            sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.69, 2.52, 3.4 #results in 99.7%
         #
         if probability_max == 68:
             sigma_dif_max = sigma_dif_68
