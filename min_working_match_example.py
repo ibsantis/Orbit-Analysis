@@ -130,8 +130,15 @@ plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/sculptor_3sig_n
 plt.close()
 
 
-
-
+# How to integrate the 1D gaussian
+f = lambda x: (1 / (np.sqrt(2*np.pi)*1)) * np.exp(-x**2/(2*1**2))
+#
+# How to integrate the 2D gaussian
+f = lambda x,y: (1 / (np.sqrt(2*np.pi)*1)) * np.exp(-x**2/(2*1**2))*(1 / (np.sqrt(2*np.pi)*1)) * np.exp(-y**2/(2*1**2))
+#
+# How to integrate the 3D gaussian
+f = lambda x,y,z: (1 / (np.sqrt(2*np.pi)*1)) * np.exp(-x**2/(2*1**2))*(1 / (np.sqrt(2*np.pi)*1)) * np.exp(-y**2/(2*1**2))*(1 / (np.sqrt(2*np.pi)*1)) * np.exp(-z**2/(2*1**2))
+#
 # How to integrate the 4D gaussian
 f = lambda x,y,z,w: (1 / (np.sqrt(2*np.pi)*1)) * np.exp(-x**2/(2*1**2))*(1 / (np.sqrt(2*np.pi)*1)) * np.exp(-y**2/(2*1**2))*(1 / (np.sqrt(2*np.pi)*1)) * np.exp(-z**2/(2*1**2))*(1 / (np.sqrt(2*np.pi)*1)) * np.exp(-w**2/(2*1**2))
 
