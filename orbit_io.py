@@ -193,7 +193,7 @@ class OrbitAnalysis:
             snap = 600
         #
         # Select the subhalo indices at z = 0
-        z0_inds = ut.array.get_indices(tree['snapshot'], 600)
+        z0_inds = ut.array.get_indices(tree['snapshot'], snap)
         z0_inds = z0_inds[z0_inds != tree[hindex+'.index'][0]]
         z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
         #
