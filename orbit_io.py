@@ -135,7 +135,7 @@ class OrbitRead:
 
 class OrbitAnalysis:
 
-    def __init__(self, tree, gal1, location, host, selection='star'):
+    def __init__(self, tree, gal1, location, host, selection='star', fire3=False):
         """
         DESCRIPTION:
             Returns the indices of luminous subhalos along with their progenitor
@@ -185,6 +185,12 @@ class OrbitAnalysis:
             hindex = 'host2'
         else:
             hindex = 'host'
+        #
+        # Account for different snapshot numbers in FIRE-3
+        if fire3:
+            snap = 500
+        else:
+            snap = 600
         #
         # Select the subhalo indices at z = 0
         z0_inds = ut.array.get_indices(tree['snapshot'], 600)
