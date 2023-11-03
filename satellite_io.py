@@ -327,8 +327,8 @@ class SatelliteMatch:
         mass_inds = ut.array.get_indices(subhalos[mass_kind], [10**(mass_halo_log - max_sigma*satellite[mass_kind+'.err']), 10**(mass_halo_log + max_sigma*satellite[mass_kind+'.err'])])
         #
         # Create a list of coordinate names and property names to loop through
-        coord_names = [prop_name for prop_name in sorted(subhalos.keys()) if prop_name != 'mass.peak' and prop_name != 'snapshot']
-        properties = [prop_name for prop_name in sorted(subhalos.keys()) if prop_name != 'snapshot']
+        coord_names = [prop_name for prop_name in properties if prop_name != 'mass.peak']
+        #properties = [prop_name for prop_name in sorted(subhalos.keys()) if prop_name != 'snapshot']
         #
         # Loop through snapshots
         for snap_ind in range(0, n_snapshots):
@@ -384,20 +384,20 @@ class SatelliteMatch:
                     sub_match['weight'][match_inds, snap_ind] = weights_z
                     sub_match['sigma.dif'][match_inds, snap_ind] = sigma_difs_z
                     # Print out the satellites that are matches for a given snapshot
-                    print('* Satellite(s) {0} are a match at snapshot {1}'.format(match_inds, np.flip(snapshot_data['index'])[:n_snapshots][snap_ind]))
+                    #print('* Satellite(s) {0} are a match at snapshot {1}'.format(match_inds, np.flip(snapshot_data['index'])[:n_snapshots][snap_ind]))
                     # Print out how many of them are within the max errors allowed
-                    print('* {0}, {1} within 68 percent, 95 percent limits'.format(np.sum(sigma_difs_z < sigma_dif_68), np.sum(sigma_difs_z < sigma_dif_95)))
+                    #print('* {0}, {1} within 68 percent, 95 percent limits'.format(np.sum(sigma_difs_z < sigma_dif_68), np.sum(sigma_difs_z < sigma_dif_95)))
                 #
                 # If there are no matches, print that out for the current snapshot
-                else:
-                    print('! no subhalos within {0} percent limits at snapshot {1}'.format(probability_max, np.flip(snapshot_data['index'])[snap_ind]))
+                #else:
+                    #print('! no subhalos within {0} percent limits at snapshot {1}'.format(probability_max, np.flip(snapshot_data['index'])[snap_ind]))
                 #
                 # Now re-weight the subhalos so that the centroid is near the middle of the bin
                 # If I don't, then I will likely be assigning more weight to lower mass subhalos
             #
             # If there are no matches, print that out
-            else:
-                print('! no subhalos match at snapshot {0}'.format(np.flip(snapshot_data['index'])[snap_ind]))
+            #else:
+                #print('! no subhalos match at snapshot {0}'.format(np.flip(snapshot_data['index'])[snap_ind]))
         #
         return sub_match
     
