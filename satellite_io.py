@@ -173,7 +173,7 @@ class SatelliteMatch:
         mhalo = (mstar - self.smhm_constant)/self.smhm_slope
         return mhalo # this is the log of the halo mass actually...
     
-    def lg_satellite_properties(self, lg_data, galaxy_name, mass_err=0.25):
+    def lg_satellite_properties(self, lg_data, galaxy_name, mass_err=0.35):
         """
         TBD
 
@@ -241,7 +241,7 @@ class SatelliteMatch:
         #
         return sim_sats
     
-    def subhalo_match(self, indices, subhalos, satellite, snapshot_data, lookback_window=1, max_sigma=3, probability_max=95):
+    def subhalo_match(self, indices, subhalos, satellite, snapshot_data, lookback_window=1, max_sigma=3, probability_max=99):
         """
         DESCRIPTION:
             TBD
@@ -311,7 +311,7 @@ class SatelliteMatch:
         else:
             sigma_dif_max = sigma_dif_95
         #
-        # Get subhalos within +/- N sigma * 0.25 dex of M_halo,peak 
+        # Get subhalos within +/- N sigma * 0.35 dex of M_halo,peak 
         mass_kind = 'mass.peak'
         mass_halo_log = np.log10(satellite[mass_kind])
         mass_inds = ut.array.get_indices(subhalos[mass_kind], [10**(mass_halo_log - max_sigma*satellite[mass_kind+'.err']), 10**(mass_halo_log + max_sigma*satellite[mass_kind+'.err'])])
