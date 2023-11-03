@@ -25,7 +25,7 @@ print('Read in the tools')
 
 ### Set path and initial parameters
 loc = 'stampede'
-sim_data = orbit_io.OrbitRead(gal1='m12g', location=loc)
+sim_data = orbit_io.OrbitRead(gal1='m12j', location=loc, fire3=True)
 plotting = False
 aligned = True
 point_mass = False
@@ -46,8 +46,7 @@ part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'redshift', 0, simula
 mass_ratio = ut.particle.get_halo_properties(part)['mass']/halt['mass'][halt['host.index'][0]]
 #
 # This initializes the classes and makes sure they inherit from the OrbitRead class
-orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location=loc, host=1, selection='halo')
-orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location=loc, host=1, selection='halo')
+orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location=loc, host=1, selection='halo', fire3=True)
 #
 # Run the pipeline on the simulation data
 halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
@@ -165,4 +164,4 @@ print('The host mass at z=0 with the mass ratio is:', halt['mass'][halt['host.in
 print('The host radius at z=0 with the mass ratio is:', halt['radius'][halt['host.index'][0]]*mass_ratio)
 print('The mass ratio is:', mass_ratio)
 
-ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_all_subhalos', dict_or_array_to_write=data_dict, verbose=True)
+ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
