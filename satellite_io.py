@@ -290,9 +290,19 @@ class SatelliteMatch:
         sub_match['sigma.dif'] = (-1)*np.ones((indices.shape[0], n_snapshots))
         sub_match['snapshot'] = (-1)*np.ones((indices.shape[0], n_snapshots), int)
         #
-        properties = [prop_name for prop_name in sorted(satellite.keys()) if '.star' not in prop_name and '.err' not in prop_name]
+        properties = [prop_name for prop_name in sorted(satellite.keys()) if '.star' not in prop_name and '.err' not in prop_name and ~np.isnan(satellite[prop_name])]
         #
-        dof_number = int(len(properties))
+        #dof_number = int(len(properties))
+        #
+        dof_number = len([i for i in range(0, len(properties)) if ~np.isnan(satellite[properties[i]])])
+        #
+        for prop_name in properties:
+            if ~np.isnan(satellite[prop_name]) and np.isnan(satellite[prop_name+'.err']):
+                if 'dist' in prop_name:
+                    satellite[prop_name+'.err'] = 5
+                if 'vel' in prop_name:
+                    satellite[prop_name+'.err'] = 5
+        #
         if dof_number == 1:
             sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.0, 2.0, 3.0
         elif dof_number == 2:
