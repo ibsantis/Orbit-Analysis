@@ -53,7 +53,7 @@ for name in galaxies:
     sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1=name, location=loc, minimum_mass=min_m)
 
     # Get a match for a given LG satellite
-    match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name='Draco', mass_err=mass_dex)
+    match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name='Leo T', mass_err=mass_dex)
     satellite = match
 
     # Get the phase-space coordinates of these satellites across all snapshots
@@ -73,9 +73,20 @@ for name in galaxies:
     sub_match['sigma.dif'] = (-1)*np.ones((indices.shape[0], n_snapshots))
     sub_match['snapshot'] = (-1)*np.ones((indices.shape[0], n_snapshots), int)
     #
-    properties = [prop_name for prop_name in sorted(satellite.keys()) if '.star' not in prop_name and '.err' not in prop_name]
+    properties = [prop_name for prop_name in sorted(satellite.keys()) if '.star' not in prop_name and '.err' not in prop_name and ~np.isnan(satellite[prop_name])]
     #
-    dof_number = int(len(properties))
+    print(len(properties))
+    #dof_number = int(len(properties))
+    dof_number = len([i for i in range(0, len(properties)) if ~np.isnan(satellite[properties[i]])])
+    print(dof_number)
+    #
+    for prop_name in properties:
+        if ~np.isnan(satellite[prop_name]) and np.isnan(satellite[prop_name+'.err']):
+            if 'dist' in prop_name:
+                satellite[prop_name+'.err'] = 5
+            if 'vel' in prop_name:
+                satellite[prop_name+'.err'] = 5
+    #
     if dof_number == 1:
         sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.0, 2.0, 3.0
     elif dof_number == 2:
@@ -101,8 +112,7 @@ for name in galaxies:
     #print('* The number of satellites within +/- {0}*{1} dex: {2}'.format(max_sigma, satellite[mass_kind+'.err'], len(mass_inds)))
     #
     # Create a list of coordinate names and property names to loop through
-    coord_names = [prop_name for prop_name in sorted(subhalos.keys()) if prop_name != 'mass.peak' and prop_name != 'snapshot']
-    properties = [prop_name for prop_name in sorted(subhalos.keys()) if prop_name != 'snapshot']
+    coord_names = [prop_name for prop_name in properties if prop_name != 'mass.peak']
     #
     # Loop through snapshots
     for snap_ind in range(0, n_snapshots):
