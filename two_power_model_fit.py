@@ -31,7 +31,7 @@ import orbit_io
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='Romulus', location='peloton')
+sim_data = orbit_io.OrbitRead(gal1='m12x', location='stampede', fire3=True)
 print('Set paths')
 
 
@@ -69,7 +69,7 @@ d1['density'] = density
 d1['mass'] = mass
 d1['rs'] = rs
 
-ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting/halo/'+gal1+'_halo_fitting', dict_or_array_to_write=d1, verbose=True)
+ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting/halo/'+sim_data.galaxy+'_halo_fitting', dict_or_array_to_write=d1, verbose=True)
 
 
 if num_gal == 2:
@@ -106,48 +106,48 @@ if num_gal == 2:
 
 
 
-"""
- Generate data for the model
-    - Want hot gas (T > 1e5 K) and dark matter within the virial radius
-        - For now, I'm just testing out to 300 kpc
-"""
-# Need to calculate density on my own, the particles won't help
-rs = np.logspace(np.log10(0.1), np.log10(500), 100)
-mass = np.zeros(len(rs)-1)
-density = np.zeros(len(rs)-1)
-gas_temp_inds = ut.array.get_indices(part['gas']['temperature'], [1e5, np.inf])
-for i in range(0, len(rs)-1):
-    gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [rs[i], rs[i+1]], gas_temp_inds)
-    dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [rs[i], rs[i+1]])
-    mass[i] = np.sum(part['gas']['mass'][gas_inds]) + np.sum(part['dark']['mass'][dark_inds])
-    density[i] = mass[i]/(4/3*np.pi*(rs[i+1]**3-rs[i]**3))
-    print('done with step', i)
+# """
+#  Generate data for the model
+#     - Want hot gas (T > 1e5 K) and dark matter within the virial radius
+#         - For now, I'm just testing out to 300 kpc
+# """
+# # Need to calculate density on my own, the particles won't help
+# rs = np.logspace(np.log10(0.1), np.log10(500), 100)
+# mass = np.zeros(len(rs)-1)
+# density = np.zeros(len(rs)-1)
+# gas_temp_inds = ut.array.get_indices(part['gas']['temperature'], [1e5, np.inf])
+# for i in range(0, len(rs)-1):
+#     gas_inds = ut.array.get_indices(part['gas'].prop('host.distance.total'), [rs[i], rs[i+1]], gas_temp_inds)
+#     dark_inds = ut.array.get_indices(part['dark'].prop('host.distance.total'), [rs[i], rs[i+1]])
+#     mass[i] = np.sum(part['gas']['mass'][gas_inds]) + np.sum(part['dark']['mass'][dark_inds])
+#     density[i] = mass[i]/(4/3*np.pi*(rs[i+1]**3-rs[i]**3))
+#     print('done with step', i)
 
-d1 = dict()
-d1['density'] = density
-d1['mass'] = mass
-d1['rs'] = rs
+# d1 = dict()
+# d1['density'] = density
+# d1['mass'] = mass
+# d1['rs'] = rs
 
-ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting/halo/'+sim_data.gal_1+'_halo_profile_fitting', dict_or_array_to_write=d1, verbose=True)
+# ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting/halo/'+sim_data.gal_1+'_halo_profile_fitting', dict_or_array_to_write=d1, verbose=True)
 
-if sim_data.num_gal == 2:
-    rs = np.logspace(np.log10(0.1), np.log10(500), 100)
-    mass = np.zeros(len(rs)-1)
-    density = np.zeros(len(rs)-1)
-    gas_temp_inds = ut.array.get_indices(part['gas']['temperature'], [1e5, np.inf])
-    for i in range(0, len(rs)-1):
-        gas_inds = ut.array.get_indices(part['gas'].prop('host2.distance.total'), [rs[i], rs[i+1]], gas_temp_inds)
-        dark_inds = ut.array.get_indices(part['dark'].prop('host2.distance.total'), [rs[i], rs[i+1]])
-        mass[i] = np.sum(part['gas']['mass'][gas_inds]) + np.sum(part['dark']['mass'][dark_inds])
-        density[i] = mass[i]/(4/3*np.pi*(rs[i+1]**3-rs[i]**3))
-        print('done with step', i)
+# if sim_data.num_gal == 2:
+#     rs = np.logspace(np.log10(0.1), np.log10(500), 100)
+#     mass = np.zeros(len(rs)-1)
+#     density = np.zeros(len(rs)-1)
+#     gas_temp_inds = ut.array.get_indices(part['gas']['temperature'], [1e5, np.inf])
+#     for i in range(0, len(rs)-1):
+#         gas_inds = ut.array.get_indices(part['gas'].prop('host2.distance.total'), [rs[i], rs[i+1]], gas_temp_inds)
+#         dark_inds = ut.array.get_indices(part['dark'].prop('host2.distance.total'), [rs[i], rs[i+1]])
+#         mass[i] = np.sum(part['gas']['mass'][gas_inds]) + np.sum(part['dark']['mass'][dark_inds])
+#         density[i] = mass[i]/(4/3*np.pi*(rs[i+1]**3-rs[i]**3))
+#         print('done with step', i)
 
-    d2 = dict()
-    d2['density'] = density
-    d2['mass'] = mass
-    d2['rs'] = rs
+#     d2 = dict()
+#     d2['density'] = density
+#     d2['mass'] = mass
+#     d2['rs'] = rs
 
-    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting/halo/'+sim_data.gal_2+'_halo_profile_fitting', dict_or_array_to_write=d2, verbose=True)
+#     ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting/halo/'+sim_data.gal_2+'_halo_profile_fitting', dict_or_array_to_write=d2, verbose=True)
 
 
 ###############################################################################

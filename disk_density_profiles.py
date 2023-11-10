@@ -24,15 +24,18 @@ from matplotlib import pyplot as plt
 from astropy import units as u
 from astropy.modeling.models import custom_model
 from astropy.modeling.fitting import LevMarLSQFitter
+from astropy.constants import G
 from scipy import special
+import orbit_io
+import model_io
 print('Read in the tools')
 
 ### Set path and initial parameters
-sim_data = orbit_io.OrbitRead(gal1='m12g', location='stampede')
+sim_data = orbit_io.OrbitRead(gal1='m12x', location='stampede', fire3=True)
 print('Set paths')
 
 # Read in the data
-part = gizmo.io.Read.read_snapshots(['star','gas'], 'redshift', 0, simulation_directory=simulation_dir, assign_hosts_rotation=True, assign_formation_coordinates=True)
+part = gizmo.io.Read.read_snapshots(['star','gas'], 'redshift', 0, simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=True, assign_formation_coordinates=True)
 print('Particles at z = 0 read in')
 
 
@@ -68,12 +71,12 @@ d_r['density'] = density
 d_r['mass'] = mass
 d_r['rs'] = rs
 #
-ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting/disk/'+gal1+'_disk_radial_profile_fitting_z5', dict_or_array_to_write=d_r, verbose=True)
+ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting/disk/'+sim_data.galaxy+'_disk_radial_profile_fitting_z5', dict_or_array_to_write=d_r, verbose=True)
 
 
 # Model the vertical profile
 # This profile is going to be cumulative already, no need to cumulatively sum the mass or density at all...
-zs = np.linspace(0, 3, 51)
+zs = np.linspace(0, 3, 31)
 #
 mass_tot = np.zeros(len(zs)-1)
 density_tot = np.zeros(len(zs)-1)
@@ -99,7 +102,7 @@ d_z['density.total'] = density_tot
 d_z['mass.total'] = mass_tot
 d_z['zs'] = zs
 #
-ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting/disk/'+gal1+'_disk_vertical_profile_fitting_z3', dict_or_array_to_write=d_z, verbose=True)
+ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting/disk/'+sim_data.galaxy+'_disk_vertical_profile_fitting_z3', dict_or_array_to_write=d_z, verbose=True)
 
 
 if num_gal == 2:
