@@ -311,6 +311,8 @@ class SatelliteMatch:
             sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.56, 2.42, 3.32
         elif dof_number == 4:
             sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.69, 2.52, 3.4
+        else:
+            raise AssertionError('* DOF number must be between 1-4!')
         #
         if probability_max == 68:
             sigma_dif_max = sigma_dif_68
