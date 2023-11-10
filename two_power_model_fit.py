@@ -72,7 +72,7 @@ d1['rs'] = rs
 ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting/halo/'+sim_data.galaxy+'_halo_fitting', dict_or_array_to_write=d1, verbose=True)
 
 
-if num_gal == 2:
+if sim_data.num_gal == 2:
     """
      Generate data for the model
         - Want ALL particles
@@ -102,7 +102,7 @@ if num_gal == 2:
     d2['mass'] = mass
     d2['rs'] = rs
     #
-    ut.io.file_hdf5(file_name_base=home_dir+'/orbit_data/hdf5_files/fitting/halo/'+gal2+'_halo_fitting', dict_or_array_to_write=d2, verbose=True)
+    ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/fitting/halo/'+sim_data.gal_2+'_halo_fitting', dict_or_array_to_write=d2, verbose=True)
 
 
 
