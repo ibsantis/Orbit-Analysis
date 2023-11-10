@@ -444,8 +444,8 @@ class SatelliteMatch:
             - TBD
         """
         # If the file exists, then append to it, otherwise create it
-        file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/'
-        if os.path.isfile(file_path+'weights_'+satellite+'.txt'):
+        file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching'
+        if os.path.isfile(file_path+'/weights_'+satellite+'.txt'):
             print('File exists. Delete or move it elsewhere.')
             return
         else:
