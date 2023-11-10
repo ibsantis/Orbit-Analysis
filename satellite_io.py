@@ -427,7 +427,7 @@ class SatelliteMatch:
         #
         return weights
     
-    def write_subhalo_matches(self, satellite, hosts, indices, weights, snapshots):
+    def write_subhalo_matches(self, satellite, hosts, indices, weights, snapshots, params):
         """
         DESCRIPTION:
             Want this to be the middle step where I save files that include:
@@ -453,6 +453,9 @@ class SatelliteMatch:
             file_object = open(file_path+file_name, 'w')
             #
             file_object.write('# {0}\n'.format(satellite)) ############################# add more header info like the snapshot window I used and other parameters
+            file_object.write('# M_halo,peak bin width: {0} [dex]\n'.format(2*params[0]))
+            file_object.write('# {0} sigma error in phase-space coordinates\n'.format(params[1]))
+            file_object.write('# {0}% selection in N-D Gaussian\n'.format(params[2]))
             file_object.write('# Host, Halo tree index, Weight, Snapshot at match\n')
             for i in range(0, len(weights)):
                 file_object.write('{0}, {1}, {2}, {3} \n'.format(hosts[i], indices[i], weights[i], snapshots[i]))
