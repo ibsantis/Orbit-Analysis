@@ -443,11 +443,12 @@ class SatelliteMatch:
         """
         # If the file exists, then append to it, otherwise create it
         file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/'
-        if os.path.isfile(file_path+'weights_'+satellite+'.txt'):
+        satellite_name = satellite.replace(' ', '_')
+        if os.path.isfile(file_path+'weights_'+satellite_name+'.txt'):
             print('File exists. Delete or move it elsewhere.')
             return
         else:
-            file_name = 'weights_'+satellite+'.txt'
+            file_name = 'weights_'+satellite_name+'.txt'
             file_object = open(file_path+file_name, 'w')
             #
             file_object.write('# {0}\n'.format(satellite)) ############################# add more header info like the snapshot window I used and other parameters
@@ -472,7 +473,8 @@ class SatelliteMatch:
             - TBD
         """
         # If the file exists, then open it
-        file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/weights_'+satellite+'.txt'
+        satellite_name = satellite.replace(' ', '_')
+        file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/weights_'+satellite_name+'.txt'
         header_info = ['Host', 'Halo tree index', 'Weight', 'Snapshot at match']
         data = pd.read_csv(file_path, skiprows=5, names=header_info)
         #
