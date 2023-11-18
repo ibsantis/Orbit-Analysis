@@ -459,3 +459,22 @@ class SatelliteMatch:
                 file_object.write('{0}, {1}, {2}, {3} \n'.format(hosts[i], indices[i], weights[i], snapshots[i]))
             file_object.close()
             print('Finished writing to file.')
+
+    def read_subhalo_matches(self, satellite, home_dir=None):
+        """
+        DESCRIPTION:
+            Read in the files with the weights and put the data in a dictionary or something like that.
+
+        VARIABLES:
+            TBD
+
+        NOTES:
+            - TBD
+        """
+        # If the file exists, then open it
+        file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/weights_'+satellite+'.txt'
+        header_info = ['Host', 'Halo tree index', 'Weight', 'Snapshot at match']
+        data = pd.read_csv(file_path, skiprows=5, names=header_info)
+        #
+        return data
+    
