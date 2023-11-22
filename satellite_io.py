@@ -463,7 +463,7 @@ class SatelliteMatch:
 
 class SatelliteAnalysis(SatelliteRead):
 
-    def __init__(self, gal1, location, tree=None, mini=None, host=1, minimum_mass=1e8):
+    def __init__(self, gal1, location):
         """
         DESCRIPTION:
             TBD
