@@ -12,6 +12,9 @@
 		},
 		{
 			"path": "../../utilities"
+		},
+		{
+			"path": "../../elvis_analysis"
 		}
 	],
 	"settings": {}

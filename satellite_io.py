@@ -461,6 +461,22 @@ class SatelliteMatch:
             file_object.close()
             print('Finished writing to file.')
 
+class SatelliteAnalysis(SatelliteMatch):
+
+    def __init__(self, gal1, location, tree=None, mini=None, host=1, minimum_mass=1e8):
+        """
+        DESCRIPTION:
+            TBD
+
+        VARIABLES:
+            TBD
+
+        NOTES:
+            TBD
+        """
+        # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
+        SatelliteMatch.__init__(self, gal1, location, tree=tree, mini=mini, host=host, minimum_mass=minimum_mass)
+
     def read_subhalo_matches(self, satellite, home_dir=None):
         """
         DESCRIPTION:
