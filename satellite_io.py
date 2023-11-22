@@ -475,7 +475,7 @@ class SatelliteAnalysis(SatelliteRead):
             TBD
         """
         # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
-        SatelliteRead.__init__(self, gal1, location, dmo=dmo)
+        SatelliteRead.__init__(self, gal1, location, dmo=False)
 
     def read_subhalo_matches(self, satellite, home_dir=None):
         """
