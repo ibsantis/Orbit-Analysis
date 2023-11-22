@@ -420,10 +420,10 @@ class SatelliteMatch:
         weights_m = 10 ** (SMHM_slope * (mass_log_sub - mass_log_sat)) 
         weights_m /= weights_m.sum()  # normalize
         #
-        weights *= weights_m 
-        weights /= weights.sum() 
+        weights_new = weights*weights_m 
+        weights_new /= weights_new.sum() 
         #
-        return weights
+        return weights_new
     
     def write_subhalo_matches(self, satellite, hosts, indices, weights, snapshots, params):
         """
@@ -474,9 +474,15 @@ class SatelliteMatch:
         """
         # If the file exists, then open it
         satellite_name = satellite.replace(' ', '_')
-        file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/weights_'+satellite_name+'.txt'
+        if home_dir:
+            file_path = home_dir+'/weights_'+satellite_name+'.txt'
+        else:
+            file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/weights_'+satellite_name+'.txt'
         header_info = ['Host', 'Halo tree index', 'Weight', 'Snapshot at match']
         data = pd.read_csv(file_path, skiprows=5, names=header_info)
         #
         return data
     
+    def orbit_property_distribution(self):
+        props = {None}
+        pass
