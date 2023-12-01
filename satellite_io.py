@@ -499,6 +499,45 @@ class SatelliteAnalysis(SatelliteRead):
         #
         return data
     
-    def orbit_property_distribution(self):
-        props = {None}
-        pass
+    def orbit_property_distribution(self, sim_name, mini_sim_data, sat_match_data, time_array):
+        """
+            Probably want to save all of these to a dictionary, then combine the dictionary with a master dictionary later in a master script
+        """
+        d = dict()
+        #
+        # get the matches for a simulation host
+        mask = (sat_match_data['Host'] == sim_name)
+        # get an array of the tree indices that are matches in m12m
+        subhalo_inds = np.asarray(sat_match_data['Halo tree index'][mask])
+        # Get indices within the mini data to select properties
+        mini_data_match_inds = np.asarray([np.where(i == mini_sim_data['indices.z0'][:,0])[0][0] for i in subhalo_inds])
+        #
+        # Need to check if subhalo fell in after match. If so, then don't count it.
+        mini_data_match_inds = (mini_data_match_inds[mini_sim_data['first.infall.snap'][mini_data_match_inds] < sat_match_data['Snapshot at match'][mask]])
+        #
+        # Find the infall time
+        # Snapshot at match
+        time_at_match = time_array['time'][sat_match_data['Snapshot at match'][mask]]
+        #
+        time_since_infall_and_match = time_at_match - mini_sim_data['first.infall.time'][mini_data_match_inds] # First property to save
+        #
+        # Find the most recent pericenter
+        d['pericenter.time.lb'] = (-1)*np.ones(len(mini_data_match_inds)) ## Second property to save - the lookback time to the most recent pericenter.
+        d['pericenter.dist'] = (-1)*np.ones(len(mini_data_match_inds))
+        d['pericenter.vel'] = (-1)*np.ones(len(mini_data_match_inds))
+        d['apocenter.time.lb'] = (-1)*np.ones(len(mini_data_match_inds))
+        d['apocenter.dist'] = (-1)*np.ones(len(mini_data_match_inds))
+        for i in range(0, len(mini_data_match_inds)):
+            mask_peri = (mini_sim_data['pericenter.time.sim'][mini_data_match_inds][i] != -1)
+            time_since_dperi_rec = time_at_match[i] - mini_sim_data['pericenter.time.sim'][mini_data_match_inds][i][mask_peri]
+            if (np.sum(time_since_dperi_rec > 0) != 0):
+                d['pericenter.time.lb'][i] = time_since_dperi_rec[time_since_dperi_rec > 0][0]
+                d['pericenter.dist'][i] = mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][i][mask_peri][0]
+                d['pericenter.vel'][i] = mini_sim_data['pericenter.vel.sim'][mini_data_match_inds][i][mask_peri][0]
+            mask_apo = (mini_sim_data['apocenter.time.sim'][mini_data_match_inds][i] != -1)
+            time_since_dapo_rec = time_at_match[i] - mini_sim_data['apocenter.time.sim'][mini_data_match_inds][i][mask_apo]
+            if (np.sum(time_since_dapo_rec > 0) != 0):
+                d['apocenter.time.lb'][i] = time_since_dapo_rec[time_since_dapo_rec > 0][0]
+                d['apocenter.dist'][i] = mini_sim_data['apocenter.dist.sim'][mini_data_match_inds][i][mask_apo][0]
+        #
+        return d
