@@ -550,5 +550,8 @@ class SatelliteAnalysis(SatelliteRead):
             d['distance'][i] = mini_sim_data['d.tot.sim'][mini_data_match_inds][i][time_ind]
             d['velocity.rad'][i] = mini_sim_data['v.rad.sim'][mini_data_match_inds][i][time_ind]
             d['velocity.tan'][i] = mini_sim_data['v.tan.sim'][mini_data_match_inds][i][time_ind]
+            #
+            # Get the peak halo mass of the satellite
+            d['halo.mass.peak'] = mini_sim_data['M.halo.peak'][mini_data_match_inds][i]
         #
         return d
