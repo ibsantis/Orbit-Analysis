@@ -520,6 +520,7 @@ class SatelliteAnalysis(SatelliteRead):
         time_at_match = time_array['time'][sat_match_data['Snapshot at match'][mask]]
         #
         time_since_infall_and_match = time_at_match - mini_sim_data['first.infall.time'][mini_data_match_inds] # First property to save
+        d['first.infall.time.lb'] = time_since_infall_and_match
         #
         # Find the most recent pericenter
         d['pericenter.time.lb'] = (-1)*np.ones(len(mini_data_match_inds)) ## Second property to save - the lookback time to the most recent pericenter.
