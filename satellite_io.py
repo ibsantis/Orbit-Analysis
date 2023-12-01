@@ -528,6 +528,10 @@ class SatelliteAnalysis(SatelliteRead):
         d['pericenter.vel'] = (-1)*np.ones(len(mini_data_match_inds))
         d['apocenter.time.lb'] = (-1)*np.ones(len(mini_data_match_inds))
         d['apocenter.dist'] = (-1)*np.ones(len(mini_data_match_inds))
+        d['halo.mass.peak'] = (-1)*np.ones(len(mini_data_match_inds))
+        d['distance'] = (-1)*np.ones(len(mini_data_match_inds))
+        d['velocity.rad'] = (-1)*np.ones(len(mini_data_match_inds))
+        d['velocity.tan'] = (-1)*np.ones(len(mini_data_match_inds))
         for i in range(0, len(mini_data_match_inds)):
             mask_peri = (mini_sim_data['pericenter.time.sim'][mini_data_match_inds][i] != -1)
             time_since_dperi_rec = time_at_match[i] - mini_sim_data['pericenter.time.sim'][mini_data_match_inds][i][mask_peri]
@@ -540,5 +544,11 @@ class SatelliteAnalysis(SatelliteRead):
             if (np.sum(time_since_dapo_rec > 0) != 0):
                 d['apocenter.time.lb'][i] = time_since_dapo_rec[time_since_dapo_rec > 0][0]
                 d['apocenter.dist'][i] = mini_sim_data['apocenter.dist.sim'][mini_data_match_inds][i][mask_apo][0]
+            #
+            # Get the "lookback" snapshot to the match to get the radial and tangential velocity information
+            time_ind = snaps['index'][-1] - np.where(np.min(np.abs(time_at_match[i] - snaps['time'])) == np.abs(time_at_match[i] - snaps['time']))[0][0]
+            d['distance'][i] = mini_sim_data['d.tot.sim'][mini_data_match_inds][i][time_ind]
+            d['vel.rad'][i] = mini_sim_data['v.rad.sim'][mini_data_match_inds][i][time_ind]
+            d['vel.tan'][i] = mini_sim_data['v.tan.sim'][mini_data_match_inds][i][time_ind]
         #
         return d
