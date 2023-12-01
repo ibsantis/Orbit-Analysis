@@ -546,7 +546,7 @@ class SatelliteAnalysis(SatelliteRead):
                 d['apocenter.dist'][i] = mini_sim_data['apocenter.dist.sim'][mini_data_match_inds][i][mask_apo][0]
             #
             # Get the "lookback" snapshot to the match to get the radial and tangential velocity information
-            time_ind = snaps['index'][-1] - np.where(np.min(np.abs(time_at_match[i] - snaps['time'])) == np.abs(time_at_match[i] - snaps['time']))[0][0]
+            time_ind = time_array['index'][-1] - np.where(np.min(np.abs(time_at_match[i] - time_array['time'])) == np.abs(time_at_match[i] - time_array['time']))[0][0]
             d['distance'][i] = mini_sim_data['d.tot.sim'][mini_data_match_inds][i][time_ind]
             d['vel.rad'][i] = mini_sim_data['v.rad.sim'][mini_data_match_inds][i][time_ind]
             d['vel.tan'][i] = mini_sim_data['v.tan.sim'][mini_data_match_inds][i][time_ind]
