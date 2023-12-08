@@ -533,7 +533,6 @@ class SatelliteAnalysis(SatelliteRead):
         d['pericenter.vel'] = (-1)*np.ones(len(mini_data_match_inds))
         d['apocenter.time.lb'] = (-1)*np.ones(len(mini_data_match_inds))
         d['apocenter.dist'] = (-1)*np.ones(len(mini_data_match_inds))
-        d['halo.mass.peak'] = (-1)*np.ones(len(mini_data_match_inds))
         d['distance'] = (-1)*np.ones(len(mini_data_match_inds))
         d['velocity.rad'] = (-1)*np.ones(len(mini_data_match_inds))
         d['velocity.tan'] = (-1)*np.ones(len(mini_data_match_inds))
