@@ -503,7 +503,20 @@ class SatelliteAnalysis(SatelliteRead):
         """
             Probably want to save all of these to a dictionary, then combine the dictionary with a master dictionary later in a master script
         """
-        d = dict()
+        # dict_final = dict()
+        # #
+        # list_infall = []
+        # list_dperi = []
+        # list_vperi = []
+        # list_tperi = []
+        # list_dapo = []
+        # list_tapo = []
+        # list_d = []
+        # list_vrad = []
+        # list_vtan = []
+        # list_mhalo = []
+        #
+        # for sim_name in galaxy_name_list: ############# Nex time incorporate the loop over all hosts into the function
         #
         # get the matches for a simulation host
         mask = (sat_match_data['Host'] == sim_name)
@@ -521,6 +534,9 @@ class SatelliteAnalysis(SatelliteRead):
         #
         time_since_infall_and_match = time_at_match - mini_sim_data['first.infall.time'][mini_data_match_inds] # First property to save
         d['first.infall.time.lb'] = time_since_infall_and_match
+        #
+        # Get the peak halo mass of the satellite
+        d['halo.mass.peak'] = mini_sim_data['M.halo.peak'][mini_data_match_inds]
         #
         # Find the most recent pericenter
         d['pericenter.time.lb'] = (-1)*np.ones(len(mini_data_match_inds)) ## Second property to save - the lookback time to the most recent pericenter.
@@ -551,7 +567,5 @@ class SatelliteAnalysis(SatelliteRead):
             d['velocity.rad'][i] = mini_sim_data['v.rad.sim'][mini_data_match_inds][i][time_ind]
             d['velocity.tan'][i] = mini_sim_data['v.tan.sim'][mini_data_match_inds][i][time_ind]
             #
-            # Get the peak halo mass of the satellite
-            d['halo.mass.peak'] = mini_sim_data['M.halo.peak'][mini_data_match_inds][i]
         #
         return d
