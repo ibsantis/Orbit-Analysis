@@ -503,18 +503,7 @@ class SatelliteAnalysis(SatelliteRead):
         """
             Probably want to save all of these to a dictionary, then combine the dictionary with a master dictionary later in a master script
         """
-        # dict_final = dict()
-        # #
-        # list_infall = []
-        # list_dperi = []
-        # list_vperi = []
-        # list_tperi = []
-        # list_dapo = []
-        # list_tapo = []
-        # list_d = []
-        # list_vrad = []
-        # list_vtan = []
-        # list_mhalo = []
+        d = dict()
         #
         # for sim_name in galaxy_name_list: ############# Nex time incorporate the loop over all hosts into the function
         #
