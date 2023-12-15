@@ -526,11 +526,15 @@ class SatelliteAnalysis(SatelliteRead):
         #
         # Get the peak halo mass of the satellite
         d['halo.mass.peak'] = mini_sim_data['M.halo.peak'][mini_data_match_inds]
+        d['pericenter.num'] = mini_sim_data['N.peri.sim'][mini_data_match_inds]
         #
         # Find the most recent pericenter
-        d['pericenter.time.lb'] = (-1)*np.ones(len(mini_data_match_inds)) ## Second property to save - the lookback time to the most recent pericenter.
-        d['pericenter.dist'] = (-1)*np.ones(len(mini_data_match_inds))
-        d['pericenter.vel'] = (-1)*np.ones(len(mini_data_match_inds))
+        d['pericenter.rec.time.lb'] = (-1)*np.ones(len(mini_data_match_inds))
+        d['pericenter.rec.dist'] = (-1)*np.ones(len(mini_data_match_inds))
+        d['pericenter.rec.vel'] = (-1)*np.ones(len(mini_data_match_inds))
+        d['pericenter.min.time.lb'] = (-1)*np.ones(len(mini_data_match_inds)) 
+        d['pericenter.min.dist'] = (-1)*np.ones(len(mini_data_match_inds))
+        d['pericenter.min.vel'] = (-1)*np.ones(len(mini_data_match_inds))
         d['apocenter.time.lb'] = (-1)*np.ones(len(mini_data_match_inds))
         d['apocenter.dist'] = (-1)*np.ones(len(mini_data_match_inds))
         d['distance'] = (-1)*np.ones(len(mini_data_match_inds))
@@ -540,9 +544,13 @@ class SatelliteAnalysis(SatelliteRead):
             mask_peri = (mini_sim_data['pericenter.time.sim'][mini_data_match_inds][i] != -1)
             time_since_dperi_rec = time_at_match[i] - mini_sim_data['pericenter.time.sim'][mini_data_match_inds][i][mask_peri]
             if (np.sum(time_since_dperi_rec > 0) != 0):
-                d['pericenter.time.lb'][i] = time_since_dperi_rec[time_since_dperi_rec > 0][0]
-                d['pericenter.dist'][i] = mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][i][mask_peri][0]
-                d['pericenter.vel'][i] = mini_sim_data['pericenter.vel.sim'][mini_data_match_inds][i][mask_peri][0]
+                d['pericenter.rec.time.lb'][i] = time_since_dperi_rec[time_since_dperi_rec > 0][0]
+                d['pericenter.rec.dist'][i] = mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][i][mask_peri][0]
+                d['pericenter.rec.vel'][i] = mini_sim_data['pericenter.vel.sim'][mini_data_match_inds][i][mask_peri][0]
+                min_ind = np.where(np.min(mini_data['pericenter.dist.sim'][mini_data_match_inds][0][mask_peri]) == mini_data['pericenter.dist.sim'][mini_data_match_inds][0][mask_peri])[0][0]
+                d['pericenter.min.time.lb'][i] = time_since_dperi_rec[time_since_dperi_rec > 0][min_ind]
+                d['pericenter.min.dist'][i] = mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][i][mask_peri][min_ind]
+                d['pericenter.min.vel'][i] = mini_sim_data['pericenter.vel.sim'][mini_data_match_inds][i][mask_peri][min_ind]
             mask_apo = (mini_sim_data['apocenter.time.sim'][mini_data_match_inds][i] != -1)
             time_since_dapo_rec = time_at_match[i] - mini_sim_data['apocenter.time.sim'][mini_data_match_inds][i][mask_apo]
             if (np.sum(time_since_dapo_rec > 0) != 0):
