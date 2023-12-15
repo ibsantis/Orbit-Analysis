@@ -547,7 +547,7 @@ class SatelliteAnalysis(SatelliteRead):
                 d['pericenter.rec.time.lb'][i] = time_since_dperi_rec[time_since_dperi_rec > 0][0]
                 d['pericenter.rec.dist'][i] = mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][i][mask_peri][0]
                 d['pericenter.rec.vel'][i] = mini_sim_data['pericenter.vel.sim'][mini_data_match_inds][i][mask_peri][0]
-                min_ind = np.where(np.min(mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][0][mask_peri]) == mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][0][mask_peri])[0][0]
+                min_ind = np.where(np.min(mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][i][mask_peri]) == mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][i][mask_peri])[0][0]
                 d['pericenter.min.time.lb'][i] = time_since_dperi_rec[time_since_dperi_rec > 0][min_ind]
                 d['pericenter.min.dist'][i] = mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][i][mask_peri][min_ind]
                 d['pericenter.min.vel'][i] = mini_sim_data['pericenter.vel.sim'][mini_data_match_inds][i][mask_peri][min_ind]
