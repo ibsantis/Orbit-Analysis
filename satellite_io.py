@@ -521,8 +521,11 @@ class SatelliteAnalysis(SatelliteRead):
         # Snapshot at match
         time_at_match = time_array['time'][sat_match_data['Snapshot at match'][mask]]
         #
-        time_since_infall_and_match = time_at_match - mini_sim_data['first.infall.time'][mini_data_match_inds] # First property to save
-        d['first.infall.time.lb'] = time_since_infall_and_match
+        d['first.infall.time.lb'] = (-1)*np.ones(len(mini_data_match_inds))
+        for i in range(0, len(mini_data_match_inds)):
+            if (mini_sim_data['first.infall.time'][mini_data_match_inds][i] != -1):
+                time_since_infall_and_match = time_at_match - mini_sim_data['first.infall.time'][mini_data_match_inds] # First property to save
+                d['first.infall.time.lb'][i] = time_since_infall_and_match
         #
         # Get the peak halo mass of the satellite
         d['halo.mass.peak'] = mini_sim_data['M.halo.peak'][mini_data_match_inds]
