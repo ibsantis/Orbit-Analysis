@@ -515,7 +515,7 @@ class SatelliteAnalysis(SatelliteRead):
         mini_data_match_inds = np.asarray([np.where(i == mini_sim_data['indices.z0'][:,0])[0][0] for i in subhalo_inds])
         #
         # Need to check if subhalo fell in after match. If so, then don't count it.
-        mini_data_match_inds = (mini_data_match_inds[mini_sim_data['first.infall.snap'][mini_data_match_inds] < sat_match_data['Snapshot at match'][mask]])
+        #mini_data_match_inds = (mini_data_match_inds[mini_sim_data['first.infall.snap'][mini_data_match_inds] < sat_match_data['Snapshot at match'][mask]])
         #
         # Find the infall time
         # Snapshot at match
@@ -523,7 +523,7 @@ class SatelliteAnalysis(SatelliteRead):
         #
         d['first.infall.time.lb'] = (-1)*np.ones(len(mini_data_match_inds))
         for i in range(0, len(mini_data_match_inds)):
-            if (mini_sim_data['first.infall.time'][mini_data_match_inds][i] != -1):
+            if (mini_sim_data['first.infall.time'][mini_data_match_inds][i] != -1) and (mini_sim_data['first.infall.snap'][mini_data_match_inds][i] < np.asarray(sat_match_data['Snapshot at match'][mask])[i]):
                 time_since_infall_and_match = time_at_match[i] - mini_sim_data['first.infall.time'][mini_data_match_inds][i] # First property to save
                 d['first.infall.time.lb'][i] = time_since_infall_and_match
         #
@@ -543,22 +543,28 @@ class SatelliteAnalysis(SatelliteRead):
         d['distance'] = (-1)*np.ones(len(mini_data_match_inds))
         d['velocity.rad'] = (-1)*np.ones(len(mini_data_match_inds))
         d['velocity.tan'] = (-1)*np.ones(len(mini_data_match_inds))
+        #
         for i in range(0, len(mini_data_match_inds)):
             mask_peri = (mini_sim_data['pericenter.time.sim'][mini_data_match_inds][i] != -1)
-            time_since_dperi_rec = time_at_match[i] - mini_sim_data['pericenter.time.sim'][mini_data_match_inds][i][mask_peri]
-            if (np.sum(time_since_dperi_rec > 0) != 0):
-                d['pericenter.rec.time.lb'][i] = time_since_dperi_rec[time_since_dperi_rec > 0][0]
-                d['pericenter.rec.dist'][i] = mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][i][mask_peri][0]
-                d['pericenter.rec.vel'][i] = mini_sim_data['pericenter.vel.sim'][mini_data_match_inds][i][mask_peri][0]
-                min_ind = np.where(np.min(mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][i][mask_peri]) == mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][i][mask_peri])[0][0]
-                d['pericenter.min.time.lb'][i] = time_since_dperi_rec[time_since_dperi_rec > 0][min_ind]
-                d['pericenter.min.dist'][i] = mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][i][mask_peri][min_ind]
-                d['pericenter.min.vel'][i] = mini_sim_data['pericenter.vel.sim'][mini_data_match_inds][i][mask_peri][min_ind]
+            if (np.sum(mask_peri) != 0):
+                time_since_dperi_rec = time_at_match[i] - mini_sim_data['pericenter.time.sim'][mini_data_match_inds][i][mask_peri]
+                mask_peri_t = (time_since_dperi_rec > 0)
+                if (np.sum(mask_peri_t) != 0):
+                    d['pericenter.rec.time.lb'][i] = time_since_dperi_rec[mask_peri_t][0]
+                    d['pericenter.rec.dist'][i] = mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][i][mask_peri][mask_peri_t][0]
+                    d['pericenter.rec.vel'][i] = mini_sim_data['pericenter.vel.sim'][mini_data_match_inds][i][mask_peri][mask_peri_t][0]
+                    min_ind = np.where(np.min(mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][i][mask_peri][mask_peri_t]) == mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][i][mask_peri][mask_peri_t])[0][0]
+                    d['pericenter.min.time.lb'][i] = time_since_dperi_rec[mask_peri_t][min_ind]
+                    d['pericenter.min.dist'][i] = mini_sim_data['pericenter.dist.sim'][mini_data_match_inds][i][mask_peri][mask_peri_t][min_ind]
+                    d['pericenter.min.vel'][i] = mini_sim_data['pericenter.vel.sim'][mini_data_match_inds][i][mask_peri][mask_peri_t][min_ind]
+            #
             mask_apo = (mini_sim_data['apocenter.time.sim'][mini_data_match_inds][i] != -1)
-            time_since_dapo_rec = time_at_match[i] - mini_sim_data['apocenter.time.sim'][mini_data_match_inds][i][mask_apo]
-            if (np.sum(time_since_dapo_rec > 0) != 0):
-                d['apocenter.time.lb'][i] = time_since_dapo_rec[time_since_dapo_rec > 0][0]
-                d['apocenter.dist'][i] = mini_sim_data['apocenter.dist.sim'][mini_data_match_inds][i][mask_apo][0]
+            if (np.sum(mask_apo) != 0):
+                time_since_dapo_rec = time_at_match[i] - mini_sim_data['apocenter.time.sim'][mini_data_match_inds][i][mask_apo]
+                mask_apo_t = (time_since_dapo_rec > 0)
+                if (np.sum(mask_apo_t) != 0):
+                    d['apocenter.time.lb'][i] = time_since_dapo_rec[mask_apo_t][0]
+                    d['apocenter.dist'][i] = mini_sim_data['apocenter.dist.sim'][mini_data_match_inds][i][mask_apo][mask_apo_t][0]
             #
             # Get the "lookback" snapshot to the match to get the radial and tangential velocity information
             time_ind = time_array['index'][-1] - np.where(np.min(np.abs(time_at_match[i] - time_array['time'])) == np.abs(time_at_match[i] - time_array['time']))[0][0]
