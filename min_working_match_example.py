@@ -20,7 +20,7 @@ aligned = True
 print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
-snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/m12i_r7100') # Saves snapshots, redshifts, lookback times, etc. to an array
+#snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/m12i_r7100') # Saves snapshots, redshifts, lookback times, etc. to an array
 #halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal, assign_hosts_rotation=aligned, catalog_hdf5_directory='catalog_hdf5')
 lg_data = pd.read_csv(sim_data.home_dir+'/orbit_data/paper_III/localgroup_galaxies_condensed.csv', index_col=0)
 
@@ -50,6 +50,8 @@ for sat_name in mw_sats:
     count = 0
     #
     for name in galaxies:
+        snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+name) # Saves snapshots, redshifts, lookback times, etc. to an array
+
         mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=True)
 
         # Get the indices of the satellites that are above a given minimum halo mass (1e8 for now)
@@ -67,16 +69,16 @@ for sat_name in mw_sats:
         for i in range(0, len(satellite_match['mass.index'][mask])):
             hosts.append(name)
             tree_index.append(satellite_match['tree.index'][mask][i])
-            mass_array.append(subhalo_dict['mass.peak'][mask][i])
+            mass_array.append(satellite_match['mass.peak'][mask][i])
             #
             mask_w = (satellite_match['weight'][mask][i] > 0)
             ind_w = np.where(np.max(satellite_match['weight'][mask][i][mask_w]) == satellite_match['weight'][mask][i][mask_w])[0][0]
             weight.append(satellite_match['weight'][mask][i][mask_w][ind_w])
             snapshot.append(satellite_match['snapshot'][mask][i][mask_w][ind_w])
             sigma_dif.append(satellite_match['sigma.dif'][mask][i][mask_w][ind_w])
-        count += len(weight)
+    #count += len(weight)
     #
-    final_dict[sat_name] = count
+    final_dict[sat_name] = len(weight)
 
 
 

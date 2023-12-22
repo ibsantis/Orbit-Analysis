@@ -41,6 +41,7 @@ probability_max = 99
 max_sigma = 3.0
 lookback_window = 1
 min_m = 1e8
+sat_name = 'Sculptor'
 
 galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'm12z', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12j', 'm12n']
 
@@ -53,7 +54,7 @@ for name in galaxies:
     sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1=name, location=loc, minimum_mass=min_m)
 
     # Get a match for a given LG satellite
-    match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name='Leo T', mass_err=mass_dex)
+    match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name=sat, mass_err=mass_dex)
     satellite = match
 
     # Get the phase-space coordinates of these satellites across all snapshots
@@ -168,8 +169,153 @@ for name in galaxies:
                 sub_match['weight'][match_inds1, snap_ind] = weights_z
                 sub_match['sigma.dif'][match_inds1, snap_ind] = sigma_difs_z
     #print('* Number that are within infinite error of {0}: {1}'.format(np.inf, np.sum(sub_match['mass.index.all'] != -1)))
-    print('* Number that are within max allowed error of {0}: {1}'.format(sigma_dif_max, np.sum(sub_match['mass.index.cull'] != -1)))
+    #print('* Number that are within max allowed error of {0}: {1}'.format(sigma_dif_max, np.sum(sub_match['mass.index.cull'] != -1)))
 
+###################################################################################################################
+
+
+mass_dex = 0.35
+probability_max = 99
+max_sigma = 3.0
+lookback_window = 1
+min_m = 1e8
+sat_name = 'Sculptor'
+
+tree_index = []
+mass_array = []
+weight = []
+weight_norm = []
+dperi = []
+sigma_dif = []
+snapshot = []
+#
+hosts = []
+#
+for name in galaxies:
+    snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+name) # Saves snapshots, redshifts, lookback times, etc. to an array
+
+    mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=True)
+
+    # Get the indices of the satellites that are above a given minimum halo mass (1e8 for now)
+    sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1=name, location=loc)
+
+    # Get a match for a given LG satellite
+    match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name=sat_name, mass_err=0.35)
+
+    # Get the phase-space coordinates of these satellites across all snapshots
+    subhalo_dict = sat_match.subhalo_data(tree=None, mini=mini_data, snapshot_data=snaps)
+
+    satellite_match = sat_match.subhalo_match(sat_match.sub_inds, subhalos=subhalo_dict, satellite=match, snapshot_data=snaps, lookback_window=1, max_sigma=3, probability_max=99)
+
+    mask = (satellite_match['mass.index'] != -1)
+    for i in range(0, len(satellite_match['mass.index'][mask])):
+        hosts.append(name)
+        tree_index.append(satellite_match['tree.index'][mask][i])
+        mass_array.append(satellite_match['mass.peak'][mask][i])
+        dperi.append(mini_data['pericenter.dist.sim'][:,0][mask][i])
+        #
+        mask_w = (satellite_match['weight'][mask][i] > 0)
+        ind_w = np.where(np.max(satellite_match['weight'][mask][i][mask_w]) == satellite_match['weight'][mask][i][mask_w])[0][0]
+        weight.append(satellite_match['weight'][mask][i][mask_w][ind_w])
+        snapshot.append(satellite_match['snapshot'][mask][i][mask_w][ind_w])
+        sigma_dif.append(satellite_match['sigma.dif'][mask][i][mask_w][ind_w])
+
+
+# Plot the most recent pericenter distances
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 2, figsize=(20,8))
+#
+binsize = 0.01
+mass_log_sub = np.log10(mass_array)
+mass_log_sat = np.log10(match['mass.peak'])
+x = mass_log_sub
+#
+minn = binsize*np.floor(np.nanmin(x)/binsize)
+maxx = binsize*np.ceil(np.nanmax(x)/binsize)
+if minn < 0:
+    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+else:
+    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+binss = np.linspace(minn, maxx, bin_num)
+half_bin = (binss[1]-binss[0])/2
+axs[0].hist(x, binss, density=False, weights=weight, linestyle='solid', linewidth=2, histtype='stepfilled', color='k', alpha=0.4)
+axs[0].set_xlim(minn, maxx)
+axs[0].set_xlabel('log $M_{\\rm halo,peak}/M_{\\odot}$', fontsize=24)
+axs[0].tick_params(axis='both', which='major', labelsize=28)
+#
+binsize = 1
+x = dperi
+#
+minn = binsize*np.floor(np.nanmin(x)/binsize)
+maxx = binsize*np.ceil(np.nanmax(x)/binsize)
+if minn < 0:
+    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+else:
+    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+binss = np.linspace(minn, maxx, bin_num)
+half_bin = (binss[1]-binss[0])/2
+axs[1].hist(x, binss, density=False, weights=weight, linestyle='solid', linewidth=2, histtype='stepfilled', color='k', alpha=0.4)
+#
+axs[1].set_xlim(minn, maxx)
+axs[1].set_xlabel('Pericenter distance [kpc]', fontsize=24)
+axs[0].set_ylabel('Probability', fontsize=24)
+plt.suptitle('Sculptor, 3 sigma, Nsat = {0}, log Mpeak = 9.71'.format(len(weight)), fontsize=24)
+axs[1].tick_params(axis='both', which='major', labelsize=28)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/sculptor_fiducial.pdf')
+plt.close()
+
+
+
+
+
+ws = sat_match.mass_weighting(weight, mass_array, match['mass.peak'])
+
+# Plot the most recent pericenter distances
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 2, figsize=(20,8))
+#
+binsize = 0.01
+mass_log_sub = np.log10(mass_array)
+mass_log_sat = np.log10(match['mass.peak'])
+x = mass_log_sub
+#
+minn = binsize*np.floor(np.nanmin(x)/binsize)
+maxx = binsize*np.ceil(np.nanmax(x)/binsize)
+if minn < 0:
+    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+else:
+    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+binss = np.linspace(minn, maxx, bin_num)
+half_bin = (binss[1]-binss[0])/2
+axs[0].hist(x, binss, density=False, weights=ws, linestyle='solid', linewidth=2, histtype='stepfilled', color='k', alpha=0.4)
+axs[0].set_xlim(minn, maxx)
+axs[0].set_xlabel('log $M_{\\rm halo,peak}/M_{\\odot}$', fontsize=24)
+axs[0].tick_params(axis='both', which='major', labelsize=28)
+#
+binsize = 1
+x = dperi
+#
+minn = binsize*np.floor(np.nanmin(x)/binsize)
+maxx = binsize*np.ceil(np.nanmax(x)/binsize)
+if minn < 0:
+    bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+else:
+    bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
+binss = np.linspace(minn, maxx, bin_num)
+half_bin = (binss[1]-binss[0])/2
+axs[1].hist(x, binss, density=False, weights=ws, linestyle='solid', linewidth=2, histtype='stepfilled', color='k', alpha=0.4)
+#
+axs[1].set_xlim(minn, maxx)
+axs[1].set_xlabel('Pericenter distance [kpc]', fontsize=24)
+axs[0].set_ylabel('Probability', fontsize=24)
+plt.suptitle('Sculptor, 3 sigma, Nsat = {0}, log Mpeak = 9.71'.format(len(weight)), fontsize=24)
+axs[1].tick_params(axis='both', which='major', labelsize=28)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/sculptor_fiducial_mass_weighted.pdf')
+plt.close()
 
 
 
@@ -232,8 +378,8 @@ n_35_post = np.array([5, 8, 16])
 n_40_pre = np.array([15, 22, 37])
 n_40_post = np.array([5, 8, 16])
 #
-axs[0,0].plot(nsnaps, n_25_pre, marker='o', color='b', markersize=10, linestyle=':', label='Pre-2.52 max sig')
-axs[0,0].plot(nsnaps, n_25_post, marker='x', color='r', markersize=10, linestyle='--', label='Post-2.52 max sig')
+axs[0,0].plot(nsnaps, n_25_pre, marker='o', color='b', markersize=10, linestyle=':', label='Pre-2.52 max sig') # type: ignore
+axs[0,0].plot(nsnaps, n_25_post, marker='x', color='r', markersize=10, linestyle='--', label='Post-2.52 max sig') # type: ignore
 #
 axs[0,1].plot(nsnaps, n_30_pre, marker='o', color='b', markersize=10, linestyle=':')
 axs[0,1].plot(nsnaps, n_30_post, marker='x', color='r', markersize=10, linestyle='--')
