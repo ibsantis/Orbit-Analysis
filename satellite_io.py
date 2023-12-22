@@ -592,8 +592,10 @@ class SatelliteAnalysis(SatelliteRead):
             if 'N.' not in xtype:
                 minn = binsize*np.floor(np.nanmin(x)/binsize)
                 maxx = binsize*np.ceil(np.nanmax(x)/binsize)
-                if minn < 0:
+                if (minn < 0) and (maxx > 0):
                     bin_num = int(np.around((np.abs(minn)+np.abs(maxx))/binsize+1))
+                elif (minn < 0) and (maxx < 0):
+                    bin_num = np.abs(int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1)))
                 else:
                     bin_num = int(np.around((np.abs(maxx)-np.abs(minn))/binsize+1))
                 bins = np.linspace(minn, maxx, bin_num)
