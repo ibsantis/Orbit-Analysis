@@ -615,63 +615,63 @@ class SatelliteAnalysis(SatelliteRead):
         return bins, half_bin
     
     def median_and_scatter(self, x, y, xtype, ytype, bins):
-    """
-    DESCRIPTION:
-        Function that finds median and scatter... finish later.
-    """
-    onesigp = 84.13
-    onesigm = 15.87
-    twosigp = 97.73
-    twosigm = 2.27
-    #
-    if 'M.' in xtype:
-        x = np.log10(x)
-    if 'M.' in ytype:
-        y = np.log10(y)
-    #
-    if 'N.' not in ytype:
+        """
+        DESCRIPTION:
+            Function that finds median and scatter... finish later.
+        """
+        onesigp = 84.13
+        onesigm = 15.87
+        twosigp = 97.73
+        twosigm = 2.27
         #
-        med = np.zeros(len(bins)-1)
-        lower = np.zeros(len(bins)-1)
-        upper = np.zeros(len(bins)-1)
-        lowest = np.zeros(len(bins)-1)
-        highest = np.zeros(len(bins)-1)
+        if 'M.' in xtype:
+            x = np.log10(x)
+        if 'M.' in ytype:
+            y = np.log10(y)
         #
-        for i in range(0, len(bins)-1):
-            mask = (x >= bins[i]) & (x <= bins[i+1])
-            med[i] = np.nanmedian(y[mask])
-            upper[i] = np.nanpercentile(y[mask], onesigp)
-            lower[i] = np.nanpercentile(y[mask], onesigm)
-            highest[i] = np.nanpercentile(y[mask], twosigp)
-            lowest[i] = np.nanpercentile(y[mask], twosigm)
-    #
-    if 'N.' in ytype:
+        if 'N.' not in ytype:
+            #
+            med = np.zeros(len(bins)-1)
+            lower = np.zeros(len(bins)-1)
+            upper = np.zeros(len(bins)-1)
+            lowest = np.zeros(len(bins)-1)
+            highest = np.zeros(len(bins)-1)
+            #
+            for i in range(0, len(bins)-1):
+                mask = (x >= bins[i]) & (x <= bins[i+1])
+                med[i] = np.nanmedian(y[mask])
+                upper[i] = np.nanpercentile(y[mask], onesigp)
+                lower[i] = np.nanpercentile(y[mask], onesigm)
+                highest[i] = np.nanpercentile(y[mask], twosigp)
+                lowest[i] = np.nanpercentile(y[mask], twosigm)
         #
-        twosigp = 100
-        twosigm = 0
+        if 'N.' in ytype:
+            #
+            twosigp = 100
+            twosigm = 0
+            #
+            means = np.zeros(len(bins)-1)
+            scatter = np.zeros(len(bins)-1)
+            highest = np.zeros(len(bins)-1)
+            lowest = np.zeros(len(bins)-1)
+            upper = np.zeros(len(bins)-1)
+            lower = np.zeros(len(bins)-1)
+            #
+            for i in range(0, len(bins)-1):
+                mask = (x >= bins[i]) & (x <= bins[i+1])
+                means[i] = np.nanmean(y[mask])
+                scatter[i] = np.nanstd(y[mask])
+                highest[i] = np.nanpercentile(y[mask], twosigp)
+                lowest[i] = np.nanpercentile(y[mask], twosigm)
+                upper[i] = means[i]+scatter[i]
+                lower[i] = means[i]-scatter[i]
+                if (upper[i] > highest[i]):
+                    upper[i] = highest[i]
+                if (lower[i] < lowest[i]):
+                    lower[i] = lowest[i]
+            #
+            med = means
         #
-        means = np.zeros(len(bins)-1)
-        scatter = np.zeros(len(bins)-1)
-        highest = np.zeros(len(bins)-1)
-        lowest = np.zeros(len(bins)-1)
-        upper = np.zeros(len(bins)-1)
-        lower = np.zeros(len(bins)-1)
-        #
-        for i in range(0, len(bins)-1):
-            mask = (x >= bins[i]) & (x <= bins[i+1])
-            means[i] = np.nanmean(y[mask])
-            scatter[i] = np.nanstd(y[mask])
-            highest[i] = np.nanpercentile(y[mask], twosigp)
-            lowest[i] = np.nanpercentile(y[mask], twosigm)
-            upper[i] = means[i]+scatter[i]
-            lower[i] = means[i]-scatter[i]
-            if (upper[i] > highest[i]):
-                upper[i] = highest[i]
-            if (lower[i] < lowest[i]):
-                lower[i] = lowest[i]
-        #
-        med = means
-    #
-    return med, upper, lower, highest, lowest
+        return med, upper, lower, highest, lowest
 
 
