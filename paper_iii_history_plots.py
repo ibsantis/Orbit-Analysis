@@ -1,4 +1,18 @@
+#!/usr/bin/python3
 
+"""
+    =========================================
+    = Paper III Orbit History Distributions =
+    =========================================
+
+    Create the multi-panel orbit history PDFs for each satellite.
+
+    This will create a figure that shows the differential and cumulative PDFs of:
+        - Infall time
+        - Apocenter time and distance (recent)
+        - Pericenter time, distance, and velocity (recent and minimum)
+        - Disance, radial velocity, and tangential velocity
+"""
 
 # Import packages
 import orbit_io
@@ -449,11 +463,4 @@ for galaxy in mw_sats:
     #plt.show()
     plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/phase_space/'+satellite_name+'_phase_space_properties.pdf')
     plt.close()
-
-
-
-
-
-
-
 

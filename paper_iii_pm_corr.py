@@ -1,4 +1,16 @@
+#!/usr/bin/python3
 
+"""
+    ========================================
+    = Paper III Proper motion correlations =
+    ========================================
+
+    Create the multi-panel plots of various orbit properties 
+    as a function of proper motions (tangential velocity).
+
+    Includes both the scatter plot of values, as well as the
+    median and 68% scatter about the median.
+"""
 
 # Import packages
 import orbit_io

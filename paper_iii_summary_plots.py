@@ -1,4 +1,16 @@
+#!/usr/bin/python3
 
+"""
+    =============================
+    = Paper III Summary Figures =
+    =============================
+
+    Create plots showing various orbit history properties 
+    as a function of either distance or stellar mass. This will
+    plot each MW satellite as a point, and the error-bars will
+    show the 68% scatter among the subhalo analogs for that
+    MW satellite.
+"""
 
 # Import packages
 import orbit_io
