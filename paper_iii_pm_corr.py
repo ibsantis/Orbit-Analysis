@@ -98,8 +98,8 @@ for galaxy in mw_sats:
         axs[0,0].fill_between(binss[:-1]+half_binss, upper, lower, color='b', alpha=0.15)
         axs[0,0].plot(binss[:-1]+half_binss, med, color='b', markersize=10, alpha=0.6)
         axs[0,0].scatter(x, y, s=20, marker='o', c='k', alpha=0.3)
-    axs[0,0].set_ylabel('Lookback infall time [Gyr]', fontsize=12)
-    axs[0,0].tick_params(axis='both', which='major', labelsize=12)
+    axs[0,0].set_ylabel('Lookback $t_{\\rm infall}$ [Gyr]', fontsize=20)
+    axs[0,0].tick_params(axis='both', which='major', labelsize=16, labelbottom=False)
     #
     m = (orbit_dictionary['apocenter.time.lb'] != -1)
     if np.sum(m) != 0:
@@ -110,8 +110,8 @@ for galaxy in mw_sats:
         axs[0,1].fill_between(binss[:-1]+half_binss, upper, lower, color='b', alpha=0.15)
         axs[0,1].plot(binss[:-1]+half_binss, med, color='b', markersize=10, alpha=0.6)
         axs[0,1].scatter(x, y, s=20, marker='o', c='k', alpha=0.3)
-    axs[0,1].set_ylabel('Lookback apocenter time [Gyr]', fontsize=12)
-    axs[0,1].tick_params(axis='both', which='major', labelsize=12)
+    axs[0,1].set_ylabel('Lookback $t_{\\rm apo,rec}$ [Gyr]', fontsize=20)
+    axs[0,1].tick_params(axis='both', which='major', labelsize=16, labelbottom=False)
     #
     m = (orbit_dictionary['apocenter.dist'] != -1)
     if np.sum(m) != 0:
@@ -122,8 +122,8 @@ for galaxy in mw_sats:
         axs[0,2].fill_between(binss[:-1]+half_binss, upper, lower, color='b', alpha=0.15)
         axs[0,2].plot(binss[:-1]+half_binss, med, color='b', markersize=10, alpha=0.6)
         axs[0,2].scatter(x, y, s=20, marker='o', c='k', alpha=0.3)
-    axs[0,2].set_ylabel('Apocenter distance [kpc]', fontsize=12)
-    axs[0,2].tick_params(axis='both', which='major', labelsize=12)
+    axs[0,2].set_ylabel('$d_{\\rm apo,rec}$ [kpc]', fontsize=20)
+    axs[0,2].tick_params(axis='both', which='major', labelsize=16, labelbottom=False)
     #
     m = (orbit_dictionary['pericenter.rec.time.lb'] != -1)
     if np.sum(m) != 0:
@@ -134,8 +134,8 @@ for galaxy in mw_sats:
         axs[1,0].fill_between(binss[:-1]+half_binss, upper, lower, color='b', alpha=0.15)
         axs[1,0].plot(binss[:-1]+half_binss, med, color='b', markersize=10, alpha=0.6)
         axs[1,0].scatter(x, y, s=20, marker='o', c='k', alpha=0.3)
-    axs[1,0].set_ylabel('Lookback recent pericenter time [Gyr]', fontsize=12)
-    axs[1,0].tick_params(axis='both', which='major', labelsize=12)
+    axs[1,0].set_ylabel('Lookback $t_{\\rm peri,rec}$ [Gyr]', fontsize=20)
+    axs[1,0].tick_params(axis='both', which='major', labelsize=16, labelbottom=False)
     #
     m = (orbit_dictionary['pericenter.rec.dist'] != -1)
     if np.sum(m) != 0:
@@ -146,8 +146,8 @@ for galaxy in mw_sats:
         axs[1,1].fill_between(binss[:-1]+half_binss, upper, lower, color='b', alpha=0.15)
         axs[1,1].plot(binss[:-1]+half_binss, med, color='b', markersize=10, alpha=0.6)
         axs[1,1].scatter(x, y, s=20, marker='o', c='k', alpha=0.3)
-    axs[1,1].set_ylabel('Recent pericenter distance [kpc]', fontsize=12)
-    axs[1,1].tick_params(axis='both', which='major', labelsize=12)
+    axs[1,1].set_ylabel('$d_{\\rm peri,rec}$ [kpc]', fontsize=20)
+    axs[1,1].tick_params(axis='both', which='major', labelsize=16, labelbottom=False)
     #
     m = (orbit_dictionary['pericenter.rec.vel'] != -1)
     if np.sum(m) != 0:
@@ -158,8 +158,8 @@ for galaxy in mw_sats:
         axs[1,2].fill_between(binss[:-1]+half_binss, upper, lower, color='b', alpha=0.15)
         axs[1,2].plot(binss[:-1]+half_binss, med, color='b', markersize=10, alpha=0.6)
         axs[1,2].scatter(x, y, s=20, marker='o', c='k', alpha=0.3)
-    axs[1,2].set_ylabel('Recent pericenter velocity [km s$^{-1}$]', fontsize=12)
-    axs[1,2].tick_params(axis='both', which='major', labelsize=12)
+    axs[1,2].set_ylabel('$v_{\\rm peri,rec}$ [km s$^{-1}$]', fontsize=20)
+    axs[1,2].tick_params(axis='both', which='major', labelsize=16, labelbottom=False)
     #
     m = (orbit_dictionary['pericenter.min.time.lb'] != -1)
     if np.sum(m) != 0:
@@ -170,8 +170,8 @@ for galaxy in mw_sats:
         axs[2,0].fill_between(binss[:-1]+half_binss, upper, lower, color='b', alpha=0.15)
         axs[2,0].plot(binss[:-1]+half_binss, med, color='b', markersize=10, alpha=0.6)
         axs[2,0].scatter(x, y, s=20, marker='o', c='k', alpha=0.3)
-    axs[2,0].set_ylabel('Lookback minimum pericenter time [Gyr]', fontsize=12)
-    axs[2,0].tick_params(axis='both', which='major', labelsize=12)
+    axs[2,0].set_ylabel('Lookback $t_{\\rm peri,min}$ [Gyr]', fontsize=20)
+    axs[2,0].tick_params(axis='both', which='major', labelsize=16)
     #
     m = (orbit_dictionary['pericenter.min.dist'] != -1)
     if np.sum(m) != 0:
@@ -182,8 +182,8 @@ for galaxy in mw_sats:
         axs[2,1].fill_between(binss[:-1]+half_binss, upper, lower, color='b', alpha=0.15)
         axs[2,1].plot(binss[:-1]+half_binss, med, color='b', markersize=10, alpha=0.6)
         axs[2,1].scatter(x, y, s=20, marker='o', c='k', alpha=0.3)
-    axs[2,1].set_ylabel('Minimum pericenter distance [kpc]', fontsize=12)
-    axs[2,1].tick_params(axis='both', which='major', labelsize=12)
+    axs[2,1].set_ylabel('$d_{\\rm peri,min}$ [kpc]', fontsize=20)
+    axs[2,1].tick_params(axis='both', which='major', labelsize=16, labelbottom=False)
     #
     m = (orbit_dictionary['pericenter.min.vel'] != -1)
     if np.sum(m) != 0:
@@ -194,8 +194,8 @@ for galaxy in mw_sats:
         axs[2,2].fill_between(binss[:-1]+half_binss, upper, lower, color='b', alpha=0.15)
         axs[2,2].plot(binss[:-1]+half_binss, med, color='b', markersize=10, alpha=0.6)
         axs[2,2].scatter(x, y, s=20, marker='o', c='k', alpha=0.3)
-    axs[2,2].set_ylabel('Minimum pericenter velocity [km s$^{-1}$]', fontsize=12)
-    axs[2,2].tick_params(axis='both', which='major', labelsize=12)
+    axs[2,2].set_ylabel('$v_{\\rm peri,min}$ [km s$^{-1}$]', fontsize=20)
+    axs[2,2].tick_params(axis='both', which='major', labelsize=16)
     #
     m = (orbit_dictionary['pericenter.num'] != -1)
     if np.sum(m) != 0:
@@ -203,19 +203,32 @@ for galaxy in mw_sats:
         y = orbit_dictionary['pericenter.num'][m]
         binss, half_binss = sat_analysis.binning_scheme(x, 'v.tan', 50)
         med, upper, lower, highest, lowest = sat_analysis.median_and_scatter(x, y, xtype='v.tan', ytype='N.peri', bins=binss)
-        axs[3,0].fill_between(binss[:-1]+half_binss, upper, lower, color='b', alpha=0.15)
-        axs[3,0].plot(binss[:-1]+half_binss, med, color='b', markersize=10, alpha=0.6)
-        axs[3,0].scatter(x, y, s=20, marker='o', c='k', alpha=0.3)
-    axs[3,0].set_ylabel('Pericenter Number', fontsize=12)
-    axs[3,0].tick_params(axis='both', which='major', labelsize=12)
+        axs[3,1].fill_between(binss[:-1]+half_binss, upper, lower, color='b', alpha=0.15)
+        axs[3,1].plot(binss[:-1]+half_binss, med, color='b', markersize=10, alpha=0.6)
+        axs[3,1].scatter(x, y, s=20, marker='o', c='k', alpha=0.3)
+    axs[3,1].set_ylabel('Pericenter Number', fontsize=20)
+    axs[3,1].tick_params(axis='both', which='major', labelsize=16)
     #
-    axs[3,1].axison = False
+    axs[3,0].axison = False
     axs[3,2].axison = False
-    axs[3,0].set_xlabel('Proper Motion [km s$^{-1}$]', fontsize=14)
-    axs[2,1].set_xlabel('Proper Motion [km s$^{-1}$]', fontsize=14)
-    axs[2,2].set_xlabel('Proper Motion [km s$^{-1}$]', fontsize=14)
-    plt.suptitle('{0} - Number of analogs = {1}'.format(galaxy, len(gal_data['Weight'])), fontsize=14)
+    axs[2,0].set_xlabel('Proper Motion [km s$^{-1}$]', fontsize=20)
+    axs[3,1].set_xlabel('Proper Motion [km s$^{-1}$]', fontsize=20)
+    axs[2,2].set_xlabel('Proper Motion [km s$^{-1}$]', fontsize=20)
+    #
+    x_max = np.max(x)
+    axs[0,0].set_xlim(0, x_max+5)
+    axs[1,0].set_xlim(0, x_max+5)
+    axs[2,0].set_xlim(0, x_max+5)
+    axs[0,1].set_xlim(0, x_max+5)
+    axs[1,1].set_xlim(0, x_max+5)
+    axs[2,1].set_xlim(0, x_max+5)
+    axs[3,1].set_xlim(0, x_max+5)
+    axs[0,2].set_xlim(0, x_max+5)
+    axs[1,2].set_xlim(0, x_max+5)
+    axs[2,2].set_xlim(0, x_max+5)
+    plt.suptitle('{0} - Number of analogs = {1}'.format(galaxy, len(gal_data['Weight'])), fontsize=22)
     plt.tight_layout()
+    plt.subplots_adjust(wspace=0.30, hspace=0)
     #plt.show()
     plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/proper_motion_corr/'+satellite_name+'_vtans.pdf')
     plt.close()
