@@ -48,6 +48,28 @@ mw_sats = ['HIZSS 3(A)', 'HIZSS 3B', 'NGC 55', 'LMC', 'SMC', 'IC 4662', 'IC 5152
            'Willman 1', 'Phoenix 2', 'Cetus 3', 'Carina 3', 'Eridanus 3', 'Segue 2', 'Triangulum 2', 'Horologium 2', 'Tucana 3',\
            'Segue 1', 'DES J0225+0304', 'Virgo 1', 'Draco 2', 'Cetus 2']
 
+
+mw_sats_1Mpc = ['Antlia 2', 'Aquarius 2', 'Bootes 1', 'Bootes 2', 'Bootes 3', \
+                'Canes Venatici 1', 'Canes Venatici 2', 'Carina', 'Carina 2', \
+                'Carina 3', 'Cetus 2', 'Cetus 3', 'Columba 1', 'Coma Berenices', \
+                'Crater 2', 'DES J0225+0304', 'Draco', 'Draco 2', 'Eridanus 2', \
+                'Eridanus 3', 'Fornax', 'Grus 1', 'Grus 2', 'Hercules', \
+                'Horologium 1', 'Horologium 2', 'Hydra 2', 'Hydrus 1', 'Indus 1', \
+                'Indus 2', 'Leo 1', 'Leo 2', 'Leo 4', 'Leo 5', 'Leo A', 'Leo T', \
+                'Pegasus 3', 'Phoenix', 'Phoenix 2', 'Pictor 1', 'Pictor 2', \
+                'Pisces 2', 'Reticulum 2', 'Reticulum 3', 'Sagittarius 2', \
+                'Sculptor', 'Segue 1', 'Segue 2', 'Sextans 1', 'Triangulum 2', \
+                'Tucana', 'Tucana 2', 'Tucana 3', 'Tucana 4', 'Tucana 5', \
+                'Ursa Major 1', 'Ursa Major 2', 'Ursa Minor', 'Virgo 1', \
+                'Willman 1']
+
+mw_sats_proposal =  ['Horologium 2', 'Pisces 2', 'Hydra 2', 'Eridanus 2', 'Willman 1', 'Reticulum 3', \
+                     'Columba 1', 'Ursa Major 1', 'Pictor 1', 'Bootes 2', 'Grus 1', 'Tucana 5', 'Coma Berenices', \
+                     'Eridanus 3', 'Tucana 4', 'Triangulum 2', 'Sagittarius 2', 'Segue 1', 'Grus 2', 'Phoenix 2', \
+                     'Horologium 1', 'Tucana 2', 'Segue 2', 'Ursa Major 2', 'Reticulum 2', 'Ursa Minor', \
+                     'Canes Venatici 1', 'Sextans 1', 'Phoenix', 'Carina 2', 'Tucana 3', 'Carina', 'Fornax', \
+                     'Hydrus 1', 'Pegasus 3', 'Cetus 2', 'Virgo 1']
+
 # Work on master plots
 sat_mstar = []
 sat_dist = []
@@ -65,7 +87,7 @@ tapo_rec = []
 dapo_rec = []
 mhalo = []
 #
-for galaxy in mw_sats:
+for galaxy in mw_sats_1Mpc:
     #
     gal_data = sat_analysis.read_subhalo_matches(galaxy)
     satellite_name = galaxy.replace(' ', '_')
@@ -120,10 +142,9 @@ for galaxy in mw_sats:
     m = (orbit_dictionary['pericenter.num'] != -1)
     if np.sum(m) != 0:
         x = orbit_dictionary['pericenter.num'][m]
-        x_med = ut.math.percentile_weighted(x, 50, gal_data['Weight'][m])
-        x_lower = ut.math.percentile_weighted(x, 15.87, gal_data['Weight'][m])
-        x_upper = ut.math.percentile_weighted(x, 84.13, gal_data['Weight'][m])
-        nperi.append((x_med, x_lower, x_upper))
+        x_med = np.sum(x*gal_data['Weight'][m])
+        x_std = np.sqrt(np.sum((x-x_med)**2*gal_data['Weight'][m])/np.sum(gal_data['Weight'][m])/np.sum(gal_data['Weight'][m]))
+        nperi.append((x_med, x_std, -1))
     else:
         nperi.append((-1, -1, -1))
     #
@@ -225,8 +246,8 @@ sat_dist = np.asarray(sat_dist)
 first_infall = np.asarray(first_infall)
 mask = (first_infall[:,0] != -1)
 meds = first_infall[:,0]
-uppers = first_infall[:,1]
-lowers = first_infall[:,2]
+lowers = first_infall[:,1]
+uppers = first_infall[:,2]
 
 # Vs Mstar
 plt.rcParams["font.family"] = "serif"
@@ -240,7 +261,7 @@ axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('Lookback infall time [Gyr]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/infall_vs_mstar.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/infall_vs_mstar.pdf')
 plt.close()
 
 # Vs distance
@@ -250,11 +271,11 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#c76438', alpha=0.7)
-axs.set_xlabel('Host distance [kpc]', fontsize=24)
+axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('Lookback infall time [Gyr]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/infall_vs_dist.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/infall_vs_dist.pdf')
 plt.close()
 
 # Vs distance (zoom)
@@ -262,14 +283,14 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#c76438')
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#c76438', alpha=0.7)
 axs.set_xlim(0,420)
-axs.set_xlabel('Host distance [kpc]', fontsize=24)
+axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('Lookback infall time [Gyr]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/infall_vs_dist_zoom.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/infall_vs_dist_zoom.pdf')
 plt.close()
 
 
@@ -279,23 +300,22 @@ plt.close()
 """
 orbit_prop = np.asarray(nperi)
 mask = (orbit_prop[:,0] != -1)
-meds = orbit_prop[:,0]
-uppers = orbit_prop[:,1]
-lowers = orbit_prop[:,2]
+means = orbit_prop[:,0]
+stds = orbit_prop[:,1]
 
 # Vs Mstar
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#2b5b0c', alpha=0.7)
+    axs.errorbar(sat_mstar[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], means[mask][i], s=50, c='#2b5b0c', alpha=0.7)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$N_{\\rm peri}$', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/nperi_vs_mstar.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/nperi_vs_mstar.pdf')
 plt.close()
 
 # Vs distance
@@ -303,13 +323,13 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#2b5b0c', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], means[mask][i], s=50, c='#2b5b0c', alpha=0.7)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$N_{\\rm peri}$', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/nperi_vs_dist.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/nperi_vs_dist.pdf')
 plt.close()
 
 # Vs distance (zoom)
@@ -317,14 +337,14 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#2b5b0c', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], means[mask][i], s=50, c='#2b5b0c', alpha=0.7)
 axs.set_xlim(0,420)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$N_{\\rm peri}$', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/nperi_vs_dist_zoom.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/nperi_vs_dist_zoom.pdf')
 plt.close()
 
 
@@ -335,8 +355,8 @@ plt.close()
 orbit_prop = np.asarray(tperi_rec)
 mask = (orbit_prop[:,0] != -1)
 meds = orbit_prop[:,0]
-uppers = orbit_prop[:,1]
-lowers = orbit_prop[:,2]
+lowers = orbit_prop[:,1]
+uppers = orbit_prop[:,2]
 
 # Vs Mstar
 plt.rcParams["font.family"] = "serif"
@@ -350,7 +370,7 @@ axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, rec}$ [Gyr]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/tperi_rec_vs_mstar.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tperi_rec_vs_mstar.pdf')
 plt.close()
 
 # Vs distance
@@ -364,7 +384,7 @@ axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, rec}$ [Gyr]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/tperi_rec_vs_dist.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tperi_rec_vs_dist.pdf')
 plt.close()
 
 # Vs distance (zoom)
@@ -380,7 +400,7 @@ axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, rec}$ [Gyr]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/tperi_rec_vs_dist_zoom.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tperi_rec_vs_dist_zoom.pdf')
 plt.close()
 
 
@@ -391,23 +411,23 @@ plt.close()
 orbit_prop = np.asarray(dperi_rec)
 mask = (orbit_prop[:,0] != -1)
 meds = orbit_prop[:,0]
-uppers = orbit_prop[:,1]
-lowers = orbit_prop[:,2]
+lowers = orbit_prop[:,1]
+uppers = orbit_prop[:,2]
 
 # Vs Mstar
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#d05151')
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
 axs.set_xscale('log')
 axs.set_ylim(0, 140)
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, rec}$ [kpc]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/dperi_rec_vs_mstar.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dperi_rec_vs_mstar.pdf')
 plt.close()
 
 # Vs distance
@@ -415,14 +435,14 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#d05151')
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), alpha=0.7, color='#d05151', lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
 axs.set_ylim(0, 140)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, rec}$ [kpc]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/dperi_rec_vs_dist.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dperi_rec_vs_dist.pdf')
 plt.close()
 
 # Vs distance (zoom)
@@ -430,15 +450,15 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#d05151')
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
 axs.set_ylim(0, 140)
 axs.set_xlim(0,420)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, rec}$ [kpc]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/dperi_rec_vs_dist_zoom.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dperi_rec_vs_dist_zoom.pdf')
 plt.close()
 
 
@@ -449,22 +469,22 @@ plt.close()
 orbit_prop = np.asarray(vperi_rec)
 mask = (orbit_prop[:,0] != -1)
 meds = orbit_prop[:,0]
-uppers = orbit_prop[:,1]
-lowers = orbit_prop[:,2]
+lowers = orbit_prop[:,1]
+uppers = orbit_prop[:,2]
 
 # Vs Mstar
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#1542b0', lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#1542b0')
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#1542b0', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#1542b0', alpha=0.7)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri, rec}$ [km s$^{-1}$]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/vperi_rec_vs_mstar.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/vperi_rec_vs_mstar.pdf')
 plt.close()
 
 # Vs distance
@@ -472,13 +492,13 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#1542b0', lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#1542b0')
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#1542b0', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#1542b0', alpha=0.7)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri, rec}$ [km s$^{-1}$]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/vperi_rec_vs_dist.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/vperi_rec_vs_dist.pdf')
 plt.close()
 
 # Vs distance (zoom)
@@ -486,14 +506,14 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#1542b0', lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#1542b0')
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#1542b0', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#1542b0', alpha=0.7)
 axs.set_xlim(0,420)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri, rec}$ [km s$^{-1}$]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/vperi_rec_vs_dist_zoom.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/vperi_rec_vs_dist_zoom.pdf')
 plt.close()
 
 
@@ -504,22 +524,22 @@ plt.close()
 orbit_prop = np.asarray(tperi_min)
 mask = (orbit_prop[:,0] != -1)
 meds = orbit_prop[:,0]
-uppers = orbit_prop[:,1]
-lowers = orbit_prop[:,2]
+lowers = orbit_prop[:,1]
+uppers = orbit_prop[:,2]
 
 # Vs Mstar
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#780d3f')
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#780d3f', alpha=0.7)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, min}$ [Gyr]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/tperi_min_vs_mstar.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tperi_min_vs_mstar.pdf')
 plt.close()
 
 # Vs distance
@@ -527,13 +547,13 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#780d3f')
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#780d3f', alpha=0.7)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, min}$ [Gyr]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/tperi_min_vs_dist.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tperi_min_vs_dist.pdf')
 plt.close()
 
 # Vs distance (zoom)
@@ -541,14 +561,14 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#780d3f')
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#780d3f', alpha=0.7)
 axs.set_xlim(0,420)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, min}$ [Gyr]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/tperi_min_vs_dist_zoom.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tperi_min_vs_dist_zoom.pdf')
 plt.close()
 
 
@@ -559,23 +579,23 @@ plt.close()
 orbit_prop = np.asarray(dperi_min)
 mask = (orbit_prop[:,0] != -1)
 meds = orbit_prop[:,0]
-uppers = orbit_prop[:,1]
-lowers = orbit_prop[:,2]
+lowers = orbit_prop[:,1]
+uppers = orbit_prop[:,2]
 
 # Vs Mstar
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#572135')
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#572135', alpha=0.7)
 axs.set_xscale('log')
 axs.set_ylim(0, 140)
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/dperi_min_vs_mstar.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dperi_min_vs_mstar.pdf')
 plt.close()
 
 # Vs distance
@@ -583,14 +603,14 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#572135')
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#572135', alpha=0.7)
 axs.set_ylim(0, 140)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/dperi_min_vs_dist.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dperi_min_vs_dist.pdf')
 plt.close()
 
 # Vs distance (zoom)
@@ -598,15 +618,15 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#572135')
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#572135', alpha=0.7)
 axs.set_xlim(0,420)
 axs.set_ylim(0, 140)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/dperi_min_vs_dist_zoom.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dperi_min_vs_dist_zoom.pdf')
 plt.close()
 
 
@@ -617,22 +637,22 @@ plt.close()
 orbit_prop = np.asarray(vperi_min)
 mask = (orbit_prop[:,0] != -1)
 meds = orbit_prop[:,0]
-uppers = orbit_prop[:,1]
-lowers = orbit_prop[:,2]
+lowers = orbit_prop[:,1]
+uppers = orbit_prop[:,2]
 
 # Vs Mstar
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#f38e00', lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#f38e00')
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#f38e00', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#f38e00', alpha=0.7)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri, min}$ [km s$^{-1}$]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/vperi_min_vs_mstar.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/vperi_min_vs_mstar.pdf')
 plt.close()
 
 # Vs distance
@@ -640,13 +660,13 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#f38e00', lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#f38e00')
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#f38e00', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#f38e00', alpha=0.7)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri, min}$ [km s$^{-1}$]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/vperi_min_vs_dist.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/vperi_min_vs_dist.pdf')
 plt.close()
 
 # Vs distance (zoom)
@@ -654,14 +674,14 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#f38e00', lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#f38e00')
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#f38e00', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#f38e00', alpha=0.7)
 axs.set_xlim(0,420)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri, min}$ [km s$^{-1}$]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/vperi_min_vs_dist_zoom.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/vperi_min_vs_dist_zoom.pdf')
 plt.close()
 
 
@@ -672,22 +692,22 @@ plt.close()
 orbit_prop = np.asarray(tapo_rec)
 mask = (orbit_prop[:,0] != -1)
 meds = orbit_prop[:,0]
-uppers = orbit_prop[:,1]
-lowers = orbit_prop[:,2]
+lowers = orbit_prop[:,1]
+uppers = orbit_prop[:,2]
 
 # Vs Mstar
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#6e1d16')
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#6e1d16', alpha=0.7)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/tapo_rec_vs_mstar.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tapo_rec_vs_mstar.pdf')
 plt.close()
 
 # Vs distance
@@ -695,13 +715,13 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#6e1d16')
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#6e1d16', alpha=0.7)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/tapo_rec_vs_dist.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tapo_rec_vs_dist.pdf')
 plt.close()
 
 # Vs distance (zoom)
@@ -709,14 +729,14 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#6e1d16')
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#6e1d16', alpha=0.7)
 axs.set_xlim(0,420)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/tapo_rec_vs_dist_zoom.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tapo_rec_vs_dist_zoom.pdf')
 plt.close()
 
 
@@ -727,22 +747,22 @@ plt.close()
 orbit_prop = np.asarray(dapo_rec)
 mask = (orbit_prop[:,0] != -1)
 meds = orbit_prop[:,0]
-uppers = orbit_prop[:,1]
-lowers = orbit_prop[:,2]
+lowers = orbit_prop[:,1]
+uppers = orbit_prop[:,2]
 
 # Vs Mstar
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#4e2026')
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#4e2026', alpha=0.7)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/dapo_rec_vs_mstar.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dapo_rec_vs_mstar.pdf')
 plt.close()
 
 # Vs distance
@@ -750,13 +770,13 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#4e2026')
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#4e2026', alpha=0.7)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/dapo_rec_vs_dist.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dapo_rec_vs_dist.pdf')
 plt.close()
 
 # Vs distance (zoom)
@@ -764,13 +784,371 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#4e2026')
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#4e2026', alpha=0.7)
 axs.set_xlim(0,420)
 axs.set_ylim(0,500)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary/dapo_rec_vs_dist_zoom.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dapo_rec_vs_dist_zoom.pdf')
 plt.close()
+
+
+
+
+
+"""
+    Infall time plots
+"""
+first_infall = np.asarray(first_infall)
+mask = (first_infall[:,0] != -1)
+meds = first_infall[:,0]
+lowers = first_infall[:,1]
+uppers = first_infall[:,2]
+
+# Vs Mstar
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 2, figsize=(16,6))
+#
+for i in range(0, len(sat_mstar[mask])):
+    axs[0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.7, lw=3.5, capsize=0)
+    axs[0].scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#c76438', alpha=0.7)
+
+for i in range(0, len(sat_mstar[mask])):
+    axs[1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.7, lw=3.5, capsize=0)
+    axs[1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#c76438', alpha=0.7)
+#
+axs[0].set_xlim(0,420)
+#
+axs[1].set_xscale('log')
+#
+axs[0].set_xlabel('Distance from MW [kpc]', fontsize=24)
+axs[1].set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
+axs[0].set_ylabel('$t_{\\rm lookback, infall}$ [Gyr]', fontsize=24)
+#
+axs[0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True)
+axs[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True, labelleft=False)
+#
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/infall_plot.pdf')
+plt.close()
+
+
+
+
+"""
+    Pericenter number plots
+"""
+orbit_prop = np.asarray(nperi)
+mask = (orbit_prop[:,0] != -1)
+means = orbit_prop[:,0]
+stds = orbit_prop[:,1]
+
+# Vs distance (zoom)
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 2, figsize=(16,6))
+#
+for i in range(0, len(sat_mstar[mask])):
+    axs[0].errorbar(sat_dist[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
+    axs[0].scatter(sat_dist[mask][i], means[mask][i], s=50, c='#2b5b0c', alpha=0.7)
+#
+# Vs Mstar
+for i in range(0, len(sat_mstar[mask])):
+    axs[1].errorbar(sat_mstar[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
+    axs[1].scatter(sat_mstar[mask][i], means[mask][i], s=50, c='#2b5b0c', alpha=0.7)
+#
+axs[0].set_xlim(0,420)
+#
+axs[1].set_xscale('log')
+#
+axs[0].set_xlabel('Distance from MW [kpc]', fontsize=24)
+axs[1].set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
+axs[0].set_ylabel('$N_{\\rm peri}$', fontsize=24)
+#
+axs[0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True)
+axs[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True, labelleft=False)
+#
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/nperi_plot.pdf')
+plt.close()
+
+
+
+
+
+
+
+
+
+"""
+    Recent pericenter metric plots
+"""
+orbit_prop = np.asarray(tperi_rec)
+mask = (orbit_prop[:,0] != -1)
+meds = orbit_prop[:,0]
+lowers = orbit_prop[:,1]
+uppers = orbit_prop[:,2]
+#
+## Pericenter time
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(2, 2, figsize=(16,10))
+# Vs distance
+for i in range(0, len(sat_mstar[mask])):
+    axs[0,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.7, lw=3.5, capsize=0)
+    axs[0,0].scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#432471', alpha=0.7)
+#
+# Vs Mstar
+for i in range(0, len(sat_mstar[mask])):
+    axs[0,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.7, lw=3.5, capsize=0)
+    axs[0,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#432471', alpha=0.7)
+
+## Pericenter distance
+orbit_prop = np.asarray(dperi_rec)
+mask = (orbit_prop[:,0] != -1)
+meds = orbit_prop[:,0]
+lowers = orbit_prop[:,1]
+uppers = orbit_prop[:,2]
+#
+# Vs distance (zoom)
+for i in range(0, len(sat_mstar[mask])):
+    axs[1,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.7, lw=3.5, capsize=0)
+    axs[1,0].scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
+#
+# Vs Mstar
+for i in range(0, len(sat_mstar[mask])):
+    axs[1,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.7, lw=3.5, capsize=0)
+    axs[1,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
+#
+axs[0,0].set_xlim(0,420)
+axs[1,0].set_xlim(0,420)
+axs[1,0].set_ylim(0,140)
+axs[1,1].set_ylim(0,140)
+#
+axs[1,1].set_xscale('log')
+axs[0,1].set_xscale('log')
+#
+axs[0,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False)
+axs[0,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False, labelleft=False)
+axs[1,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True)
+axs[1,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True, labelleft=False)
+#
+axs[1,0].set_xlabel('Distance from MW [kpc]', fontsize=24)
+axs[1,1].set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
+axs[0,0].set_ylabel('$t_{\\rm peri, rec}$ [Gyr]', fontsize=24)
+axs[1,0].set_ylabel('$d_{\\rm peri, rec}$ [kpc]', fontsize=24)
+#
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/recent_peri_both.pdf')
+plt.close()
+
+
+
+
+
+
+
+
+
+
+"""
+    Minimum pericenter metric plots
+"""
+orbit_prop = np.asarray(tperi_min)
+mask = (orbit_prop[:,0] != -1)
+meds = orbit_prop[:,0]
+lowers = orbit_prop[:,1]
+uppers = orbit_prop[:,2]
+#
+# Vs distance (zoom)
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(2, 2, figsize=(16,10))
+#
+for i in range(0, len(sat_mstar[mask])):
+    axs[0,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.7, lw=3.5, capsize=0)
+    axs[0,0].scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#780d3f', alpha=0.7)
+#
+# Vs Mstar
+for i in range(0, len(sat_mstar[mask])):
+    axs[0,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.7, lw=3.5, capsize=0)
+    axs[0,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#780d3f', alpha=0.7)
+#
+## distance trends
+orbit_prop = np.asarray(dperi_min)
+mask = (orbit_prop[:,0] != -1)
+meds = orbit_prop[:,0]
+lowers = orbit_prop[:,1]
+uppers = orbit_prop[:,2]
+#
+# Vs distance (zoom)
+for i in range(0, len(sat_mstar[mask])):
+    axs[1,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.7, lw=3.5, capsize=0)
+    axs[1,0].scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#572135', alpha=0.7)
+#
+# Vs Mstar
+for i in range(0, len(sat_mstar[mask])):
+    axs[1,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.7, lw=3.5, capsize=0)
+    axs[1,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#572135', alpha=0.7)
+
+axs[0,0].set_xlim(0,420)
+axs[1,0].set_xlim(0,420)
+axs[1,0].set_ylim(0,140)
+axs[1,1].set_ylim(0,140)
+#
+axs[1,1].set_xscale('log')
+axs[0,1].set_xscale('log')
+#
+axs[0,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False)
+axs[0,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False, labelleft=False)
+axs[1,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True)
+axs[1,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True, labelleft=False)
+#
+axs[1,0].set_xlabel('Distance from MW [kpc]', fontsize=24)
+axs[1,1].set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
+axs[0,0].set_ylabel('$t_{\\rm peri, min}$ [Gyr]', fontsize=24)
+axs[1,0].set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
+#
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/minimum_peri_both.pdf')
+plt.close()
+
+
+
+
+
+
+"""
+    Recent apocenter metric plots
+"""
+orbit_prop = np.asarray(tapo_rec)
+mask = (orbit_prop[:,0] != -1)
+meds = orbit_prop[:,0]
+lowers = orbit_prop[:,1]
+uppers = orbit_prop[:,2]
+#
+# Vs distance (zoom)
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(2, 2, figsize=(16,10))
+#
+for i in range(0, len(sat_mstar[mask])):
+    axs[0,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.7, lw=3.5, capsize=0)
+    axs[0,0].scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#6e1d16', alpha=0.7)
+#
+# Vs Mstar
+for i in range(0, len(sat_mstar[mask])):
+    axs[0,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.7, lw=3.5, capsize=0)
+    axs[0,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#6e1d16', alpha=0.7)
+#
+# Distance trends
+orbit_prop = np.asarray(dapo_rec)
+mask = (orbit_prop[:,0] != -1)
+meds = orbit_prop[:,0]
+lowers = orbit_prop[:,1]
+uppers = orbit_prop[:,2]
+#
+# Vs distance (zoom)
+for i in range(0, len(sat_mstar[mask])):
+    axs[1,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
+    axs[1,0].scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#4e2026', alpha=0.7)
+#
+# Vs Mstar
+for i in range(0, len(sat_mstar[mask])):
+    axs[1,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
+    axs[1,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#4e2026', alpha=0.7)
+#
+axs[0,0].set_xlim(0,420)
+axs[1,0].set_xlim(0,420)
+#
+axs[0,1].set_xscale('log')
+axs[1,1].set_xscale('log')
+#
+axs[0,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False)
+axs[0,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False, labelleft=False)
+axs[1,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True)
+axs[1,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True, labelleft=False)
+#
+axs[1,0].set_xlabel('Distance from MW [kpc]', fontsize=24)
+axs[1,1].set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
+axs[0,0].set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
+axs[1,0].set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
+#
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/apocenter_both.pdf')
+plt.close()
+
+
+
+
+"""
+    Combined pericenter velocity plots
+        NOT INCLUDING IN PAPER
+"""
+orbit_prop = np.asarray(vperi_rec)
+mask_rec = (orbit_prop[:,0] != -1)
+meds_rec = orbit_prop[:,0]
+lowers_rec = orbit_prop[:,1]
+uppers_rec = orbit_prop[:,2]
+
+orbit_prop = np.asarray(vperi_min)
+mask_min = (orbit_prop[:,0] != -1)
+meds_min = orbit_prop[:,0]
+lowers_min = orbit_prop[:,1]
+uppers_min = orbit_prop[:,2]
+
+width_rec = uppers_rec[mask_rec] - lowers_rec[mask_rec]
+width_min = uppers_min[mask_min] - lowers_min[mask_min]
+
+# Vs Mstar
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+axs.errorbar(sat_mstar[mask_rec][0], meds_rec[mask_rec][0], yerr=np.array([[meds_rec[mask_rec][0]-lowers_rec[mask_rec][0]],[uppers_rec[mask_rec][0]-meds_rec[mask_rec][0]]]), color='#1542b0', alpha=0.35, lw=3.5, capsize=0)
+axs.scatter(sat_mstar[mask_rec][0], meds_rec[mask_rec][0], s=50, c='#1542b0', alpha=0.35, label='Recent')
+axs.errorbar(sat_mstar[mask_min][0], meds_min[mask_min][0], yerr=np.array([[meds_min[mask_min][0]-lowers_min[mask_min][0]],[uppers_min[mask_min][0]-meds_min[mask_min][0]]]), color='#f38e00', alpha=0.35, lw=3.5, capsize=0)
+axs.scatter(sat_mstar[mask_min][0], meds_min[mask_min][0], s=50, c='#f38e00', alpha=0.35, label='Minimum')
+for i in range(1, len(sat_mstar[mask_rec])):
+    axs.errorbar(sat_mstar[mask_rec][i], meds_rec[mask_rec][i], yerr=np.array([[meds_rec[mask_rec][i]-lowers_rec[mask_rec][i]],[uppers_rec[mask_rec][i]-meds_rec[mask_rec][i]]]), color='#1542b0', alpha=0.35, lw=3.5, capsize=0)
+    axs.scatter(sat_mstar[mask_rec][i], meds_rec[mask_rec][i], s=50, c='#1542b0', alpha=0.35)
+for i in range(1, len(sat_mstar[mask_min])):
+    axs.errorbar(sat_mstar[mask_min][i], meds_min[mask_min][i], yerr=np.array([[meds_min[mask_min][i]-lowers_min[mask_min][i]],[uppers_min[mask_min][i]-meds_min[mask_min][i]]]), color='#f38e00', alpha=0.35, lw=3.5, capsize=0)
+    axs.scatter(sat_mstar[mask_min][i], meds_min[mask_min][i], s=50, c='#f38e00', alpha=0.35)
+axs.set_xscale('log')
+axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
+axs.set_ylabel('$v_{\\rm peri}$ [km s$^{-1}$]', fontsize=24)
+axs.legend(prop={'size': 16}, loc='best')
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/vperi_both_vs_mstar.pdf')
+plt.close()
+
+
+# Vs distance
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+axs.errorbar(sat_dist[mask_rec][0], meds_rec[mask_rec][0], yerr=np.array([[meds_rec[mask_rec][0]-lowers_rec[mask_rec][0]],[uppers_rec[mask_rec][0]-meds_rec[mask_rec][0]]]), color='#1542b0', alpha=0.35, lw=3.5, capsize=0)
+axs.scatter(sat_dist[mask_rec][0], meds_rec[mask_rec][0], s=50, c='#1542b0', alpha=0.35, label='Recent')
+axs.errorbar(sat_dist[mask_min][0], meds_min[mask_min][0], yerr=np.array([[meds_min[mask_min][0]-lowers_min[mask_min][0]],[uppers_min[mask_min][0]-meds_min[mask_min][0]]]), color='#f38e00', alpha=0.35, lw=3.5, capsize=0)
+axs.scatter(sat_dist[mask_min][0], meds_min[mask_min][0], s=50, c='#f38e00', alpha=0.35, label='Minimum')
+for i in range(1, len(sat_dist[mask_rec])):
+    axs.errorbar(sat_dist[mask_rec][i], meds_rec[mask_rec][i], yerr=np.array([[meds_rec[mask_rec][i]-lowers_rec[mask_rec][i]],[uppers_rec[mask_rec][i]-meds_rec[mask_rec][i]]]), color='#1542b0', alpha=0.35, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask_rec][i], meds_rec[mask_rec][i], s=50, c='#1542b0', alpha=0.35)
+for i in range(1, len(sat_dist[mask_min])):
+    axs.errorbar(sat_dist[mask_min][i], meds_min[mask_min][i], yerr=np.array([[meds_min[mask_min][i]-lowers_min[mask_min][i]],[uppers_min[mask_min][i]-meds_min[mask_min][i]]]), color='#f38e00', alpha=0.35, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask_min][i], meds_min[mask_min][i], s=50, c='#f38e00', alpha=0.35)
+axs.set_xlim(0,420)
+axs.set_xlabel('Host distance [kpc]', fontsize=24)
+axs.set_ylabel('$v_{\\rm peri}$ [km s$^{-1}$]', fontsize=24)
+axs.legend(prop={'size': 16}, loc='best')
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/vperi_both_vs_dist.pdf')
+plt.close()
+
+
