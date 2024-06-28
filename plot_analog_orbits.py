@@ -49,14 +49,7 @@ mw_sats_1Mpc = ['Antlia 2', 'Aquarius 2', 'Bootes 1', 'Bootes 2', 'Bootes 3', \
                 'Ursa Major 1', 'Ursa Major 2', 'Ursa Minor', 'Virgo 1', \
                 'Willman 1']
 
-
-galaxy = 'Tucana'
-gal_data = sat_analysis.read_subhalo_matches(galaxy)
-satellite_name = galaxy.replace(' ', '_')
-mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=True)
-sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1='m12i', location=loc)
-match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name=galaxy, mass_err=0.35)
-#
+# Loop through all of the satellites and create a figure for each of them
 plot_data = dict()
 plot_data['Hosts'] = []
 #
@@ -114,7 +107,8 @@ for galaxy in mw_sats_1Mpc:
     plt.close()
 
 
-
+### The two case study plots for the paper
+# Creating data for Bootes 3
 galaxy = 'Bootes 3'
 gal_data = sat_analysis.read_subhalo_matches(galaxy)
 satellite_name = galaxy.replace(' ', '_')
@@ -151,7 +145,8 @@ for name in galaxies:
             plot_data_boo['orbit.distance.'+name][i][time_ind:] = mini_data['d.tot.sim'][mini_data_match_inds][i][time_ind:]
         #
         plot_data_boo['orbit.time.lb.'+name] = snaps['time'][-1] - np.flip(snaps['time'])[:mini_data['d.tot.sim'][mini_data_match_inds].shape[1]]
-#
+
+# Creating data for Carina
 galaxy = 'Carina'
 gal_data = sat_analysis.read_subhalo_matches(galaxy)
 satellite_name = galaxy.replace(' ', '_')
@@ -190,7 +185,7 @@ for name in galaxies:
         plot_data_car['orbit.time.lb.'+name] = snaps['time'][-1] - np.flip(snaps['time'])[:mini_data['d.tot.sim'][mini_data_match_inds].shape[1]]
 
 
-# The two case study plots for the paper
+# Plot the two case studies
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(2, 1, figsize=(16,12))
 #
