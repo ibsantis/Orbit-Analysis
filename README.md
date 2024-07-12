@@ -60,7 +60,7 @@ Unless otherwise explicitly stated, all units in these packages follow the same 
 
 - mass: 
 ```math
-M$_{\odot}$
+M_{\odot}
 ```
 
 - distance: kpc
