@@ -34,19 +34,23 @@ Most importantly, this package uses the FIRE-2 simulations. A handful of snapsho
     - Generalized NFW halo with an inner and outer slope
 
 ## orbit_io.py
-* Talk about second file...
+* This package contains multiple classes designed to ultimately calculate orbit parameters of simulated satellite galaxies.
 
 ## summary_io.py
-* Talk about third file...
+* This was written to create summary statistic plots with data output from orbit_io.py and model_io.py. 
+    - Data that I import was previously compiled using summary_data.py or summary_data_dmo.py
+
+## satellite_io.py
+* TBD
 
 ## summary_data.py
-* For making data dictionaries
+* For making data dictionaries to be used with summary_io.py
 
 ## paper_figs_final.py
-* For plots in first orbit paper
+* Script that contains code for figures in [this paper](https://arxiv.org/abs/2208.05977) focused on calculating the orbital dynamics and histories of satellite galaxies aroung MW-mass host galaxies.
 
 ## paper_ii_figs_final.py
-* For plots in the second orbit paper
+* Script that contains code for figures in [this paper](https://arxiv.org/abs/2309.05708) focused on comparing orbit and infall history properties from cosmological simulations to static potential idealized models.
 
 ---
 
