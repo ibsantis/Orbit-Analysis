@@ -80,7 +80,12 @@ Be sure to add this repository to your PYTHONPATH to be able to use it properly.
 
 # Using
 
+To use the code, simply import a given I/O file of interest with:
+```python
+import orbit_io
+```
+
 ---
 
 # License
-Copyright stuff...
+See the LICENSE.md file for info, but feel free to use these tools for free! (ASCL submission soon, so stay tuned.)
