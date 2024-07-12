@@ -70,7 +70,9 @@ Unless otherwise explicitly stated, all units in these packages follow the same 
 
 You can install this package by using the following command:
 
+```python
 git clone https://isantis@bitbucket.org/isantis/orbit_analysis.git
+```
 
 Be sure to add this repository to your PYTHONPATH to be able to use it properly.
 
