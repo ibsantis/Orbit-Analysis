@@ -27,7 +27,11 @@ Most importantly, this package uses the FIRE-2 simulations. A handful of snapsho
 # Contents
 
 ## model_io.py
-* Talk about first file
+* This was written to help compute parameters for different density / mass models for:
+    - Double exponential disk
+        - This accounts for an "inner" (bulge-like) and "outer" disk region
+    - NFW halo
+    - Generalized NFW halo with an inner and outer slope
 
 ## orbit_io.py
 * Talk about second file...
@@ -50,11 +54,11 @@ Most importantly, this package uses the FIRE-2 simulations. A handful of snapsho
 
 Unless otherwise explicitly stated, all units in these packages follow the same convention as the FIRE-2 simulations. Here are some of the most common property units:
 
-- mass: M_sun
+- mass: $M_{\odot}$
 - distance: kpc
-- time: Gyr
-- velocity: km s^{-1}
-- energy: km^2 s^{-2}
+- time: Gyr [10^9 yr]
+- velocity: km s$^{-1}$
+- energy: km^2 s$^{-2}$
 
 ---
 
