@@ -39,10 +39,6 @@
         - Find the particles within certain subhalos and return their distances
           and indices.
 
-    
-    OrbitMatch:
-        - Something...
-
 """
 
 import utilities as ut
