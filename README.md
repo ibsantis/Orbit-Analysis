@@ -58,11 +58,15 @@ Most importantly, this package uses the FIRE-2 simulations. A handful of snapsho
 
 Unless otherwise explicitly stated, all units in these packages follow the same convention as the FIRE-2 simulations. Here are some of the most common property units:
 
-- mass: $$M_{\odot}$$
+- mass: $M_{\odot}$
+
 - distance: kpc
-- time: Gyr [10$$^9$$ yr]
-- velocity: km s$$^{-1}$$
-- energy: km^2 s$$^{-2}$$ 
+
+- time: Gyr [10$^9$ yr]
+
+- velocity: km s$^{-1}$
+
+- energy: km^2 s$^{-2}$ 
 
 ---
 
