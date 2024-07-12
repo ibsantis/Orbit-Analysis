@@ -34,10 +34,9 @@ class MassModelFit:
 
     def __init__(self):
         """
-        Don't really know what to put in here...
-        Leaving it empty for now.
+        Initiate the fitting scheme.
         """
-        pass
+        self.fitter = LevMarLSQFitter()
 
     def disk_vert_mass_model(self, distances, masses, Amp, hz, Amp_bounds, hz_bounds, iters=100000):
         """
@@ -88,10 +87,8 @@ class MassModelFit:
         #
         # Initialize the model
         model_init = exponential_vert_mass(bounds={'amp1':Amp_bounds, 'z1':hz_bounds})
-        fit = LevMarLSQFitter()
-        #
         # Fit the model to the data and print it out
-        model_disk_vert = fit(model_init, distances[1:], np.cumsum(masses), maxiter=iters)
+        model_disk_vert = self.fitter(model_init, distances[1:], np.cumsum(masses), maxiter=iters)
         print(model_disk_vert)
         #
         return model_disk_vert
@@ -169,10 +166,8 @@ class MassModelFit:
         #
         # Initialize the model
         model_init = double_exponential_mass(bounds={'amp1':A_in_bounds, 'r1':r_in_bounds, 'amp2':A_out_bounds, 'r2':r_out_bounds})
-        fit = LevMarLSQFitter()
-        #
         # Fit the model to the data and print it out
-        model_disk_rad = fit(model_init, distances[1:], np.cumsum(masses), maxiter=iters)
+        model_disk_rad = self.fitter(model_init, distances[1:], np.cumsum(masses), maxiter=iters)
         print(model_disk_rad)
         #
         return model_disk_rad
@@ -235,18 +230,17 @@ class MassModelFit:
         #
         # Initialize the model
         model_init = nfw_mass_model(bounds={'amp':A_halo_bounds, 'a':a_halo_bounds})
-        fit = LevMarLSQFitter()
         #
         # If no maximum distance to fit to, fit over entire distance array
         if r_max == None:
             # Fit the model to the data
-            model_halo = fit(model_init, distances[r_cut_min:], np.cumsum(masses)[r_cut_min-1:], maxiter=iters)
+            model_halo = self.fitter(model_init, distances[r_cut_min:], np.cumsum(masses)[r_cut_min-1:], maxiter=iters)
         #
         else:
             # If there is a maximum distance to fit to, find the index in the distances array
             r_cut_max = np.where(distances > r_max)[0][0]
             # Fit the model to the data
-            model_halo = fit(model_init, distances[r_cut_min:r_cut_max], np.cumsum(masses)[r_cut_min-1:r_cut_max-1], maxiter=iters)
+            model_halo = self.fitter(model_init, distances[r_cut_min:r_cut_max], np.cumsum(masses)[r_cut_min-1:r_cut_max-1], maxiter=iters)
         # Print out and return the model
         print(model_halo)
         #
@@ -326,18 +320,17 @@ class MassModelFit:
         #
         # Initialize the model
         model_init = two_power_beta_fixed(bounds={'amp':A_halo_bounds, 'a':a_halo_bounds, 'alpha':slope_in_bounds, 'beta':slope_out_bounds})
-        fit = LevMarLSQFitter()
         #
         # If there is no maximum radius to fit to, fit over entire distance array
         if r_max == None:
             # Fit the model to the data and print it out
-            model_halo = fit(model_init, distances[r_cut_min:], np.cumsum(masses)[r_cut_min-1:], maxiter=iters)
+            model_halo = self.fitter(model_init, distances[r_cut_min:], np.cumsum(masses)[r_cut_min-1:], maxiter=iters)
         #
         else:
             # If there is a maximum radius to fit to, find the corresponding index in the distance array
             r_cut_max = np.where(distances > r_max)[0][0]
             # Fit the model to the data and print it out
-            model_halo = fit(model_init, distances[r_cut_min:r_cut_max], np.cumsum(masses)[r_cut_min-1:r_cut_max-1], maxiter=iters)
+            model_halo = self.fitter(model_init, distances[r_cut_min:r_cut_max], np.cumsum(masses)[r_cut_min-1:r_cut_max-1], maxiter=iters)
         #
         print(model_halo)
         #
@@ -351,6 +344,7 @@ class DensityModelFit:
         Don't really have anything to put in here yet...
         Leaving blank for now.
         """
+        self.fitter = LevMarLSQFitter()
         pass
 
     def disk_vert_dens_model(self, distances, densities, Amp, hz, Amp_bounds, hz_bounds, iters=100000):
@@ -400,10 +394,8 @@ class DensityModelFit:
         #
         # Initialize the model
         model_init = exponential_vert_density(bounds={'amp1':Amp_bounds, 'z1':hz_bounds})
-        fit = LevMarLSQFitter()
-        #
         # Fit the model to the data and print it out
-        model_disk_vert = fit(model_init, distances[1:], densities, maxiter=iters)
+        model_disk_vert = self.fitter(model_init, distances[1:], densities, maxiter=iters)
         print(model_disk_vert)
         #
         return model_disk_vert
@@ -482,10 +474,8 @@ class DensityModelFit:
             #
             # Initialize the model
             model_init = double_exponential_density(bounds={'amp1':A_in_bounds, 'r1':r_in_bounds, 'amp2':A_out_bounds, 'r2':r_out_bounds})
-            fit = LevMarLSQFitter()
-            #
             # Fit the model to the data and print it out
-            model_disk_rad = fit(model_init, distances[1:], densities, maxiter=iters)
+            model_disk_rad = self.fitter(model_init, distances[1:], densities, maxiter=iters)
             print(model_disk_rad)
             #
             return model_disk_rad
@@ -501,11 +491,10 @@ class DensityModelFit:
             # Initialize a model for the inner and outer region seperately
             model_init_1 = double_exponential_density(bounds={'amp':A_in_bounds, 'r_s':r_in_bounds})
             model_init_2 = double_exponential_density(bounds={'amp':A_out_bounds, 'r_s':r_out_bounds})
-            fit = LevMarLSQFitter()
             #
             # Fit the models to the data, combine them, and print them out
-            model_disk_rad_1 = fit(model_init_1, distances[1:cut], densities[:cut-1], maxiter=iters)
-            model_disk_rad_2 = fit(model_init_2, distances[cut:], densities[cut-1:], maxiter=iters)
+            model_disk_rad_1 = self.fitter(model_init_1, distances[1:cut], densities[:cut-1], maxiter=iters)
+            model_disk_rad_2 = self.fitter(model_init_2, distances[cut:], densities[cut-1:], maxiter=iters)
             model_disk_rad = model_disk_rad_1+model_disk_rad_2
             print(model_disk_rad)
             #
