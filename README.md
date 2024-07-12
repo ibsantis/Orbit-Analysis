@@ -62,7 +62,7 @@ Unless otherwise explicitly stated, all units in these packages follow the same 
 - distance: kpc
 - time: Gyr [10$$^9$$ yr]
 - velocity: km s$$^{-1}$$
-- energy: km^2 s$$^{-2}$$
+- energy: km^2 s$$^{-2}$$ 
 
 ---
 
