@@ -6,7 +6,20 @@
 
     @author: Isaiah Santistevan <ibsantistevan@ucdavis.edu>
 
-        TBD
+    This package contains several classes intended to read data, 
+    match simulated subhalos to satellite galaxies around the MW, 
+    and some analysis functions. Below is a brief description of the
+    various classes included:
+
+    SatelliteRead:
+        - Defines the home and simulation directories and the number 
+          of host galaxies
+    
+    SatelliteMatch:
+        - 
+    
+    SatelliteAnalysis:
+        - 
 
 """
 
@@ -101,25 +114,25 @@ class SatelliteMatch:
             indices.
 
         VARIABLES:
-            tree         : dictionary
-                           This is the halo merger tree, read in by Andrew's function
-                           "halo.io.IO.read_tree" from halo_io.py
+            - tree         : dictionary
+                             This is the halo merger tree, read in by Andrew's function
+                             "halo.io.IO.read_tree" from halo_io.py
 
-            gal1         : string
-                           Name of the MW-mass galaxy you are interested in.
-                           If analyzing the LG-pairs, this is the name of the
-                           first host (Romeo, Thelma, Romulus).
+            - gal1         : string
+                             Name of the MW-mass galaxy you are interested in.
+                             If analyzing the LG-pairs, this is the name of the
+                             first host (Romeo, Thelma, Romulus).
 
-            location     : string
-                           Name of where you are working (peloton, stampede, or on
-                           my mac).
+            - location     : string
+                             Name of where you are working (peloton, stampede, or on
+                             my mac).
 
-            host         : integer (1 or 2)
-                           Host number. This is 1 for the 'm12' hosts, and could be
-                           1 or 2 for the LG-pair hosts.
+            - host         : integer (1 or 2)
+                             Host number. This is 1 for the 'm12' hosts, and could be
+                             1 or 2 for the LG-pair hosts.
             
-            minimum_mass : integer
-                           The minimum mass to select satellites down to.
+            - minimum_mass : integer
+                             The minimum mass to select satellites down to.
 
         NOTES:
             - Returns a 2D array:
@@ -166,18 +179,45 @@ class SatelliteMatch:
 
     def satellite_mhalo(self, mstar):
         """
-        TBD
+        DESCRIPTION:
+            Approximates the halo mass of a satellite galaxy based on
+            the SMHM fitting data above.
 
-        Want to add more criteria, like a minimum mass, particle number, etc
+        VARIABLES:
+            - mstar : float
+                      This is the stellar mass of a satellite galaxy
+
+        NOTES:
+            - Returns the log of the halo mass for a satellite of a 
+              given stellar mass.
         """
         mhalo = (mstar - self.smhm_constant)/self.smhm_slope
-        return mhalo # this is the log of the halo mass actually...
+        return mhalo 
     
     def lg_satellite_properties(self, lg_data, galaxy_name, mass_err=0.35):
         """
-        TBD
+        DESCRIPTION:
+            Using a CSV file, create a dictionary of satellite properties
+            and uncertainties
 
-        Create a dictionary of properties for a given LG satellite from the CSV table
+        VARIABLES:
+            - lg_data     : pandas dataframe
+                            This is the stellar mass of a satellite galaxy.
+            
+            - galaxy_name : string
+                            The name of the satellite galaxy
+            
+            - mass_err    : float
+                            The log of the error in halo mass that we accept.
+
+        NOTES:
+            - Must already read in a CSV that contains various properties about
+              the satellite galaxies, such as: stellar mass, host distance (and error),
+              radial velocity with respect to the host (and error), and tangential
+              velocity with respect ot the host (and error); the host is the MW
+              in the file that I use.
+            - We choose a halo mass error of 0.35 dex, but did not affect end results
+              for choices from 0.25 - 0.45; see Paper III for details.
         """
         #
         satellite_dict = {}
@@ -199,7 +239,44 @@ class SatelliteMatch:
 
     def subhalo_data(self, tree=None, mini=None, snapshot_data=None):
         """
-        TBD
+        DESCRIPTION:
+            Uses either the halo tree or the mini-data files that I previously
+            created to make a dictionary of properties that we care about for
+            the subhalos.
+
+        VARIABLES:
+            - tree          : dictionary
+                              Halo tree from the FIRE simualtions.
+            
+            - mini          : dictionary
+                              A smaller version of the halo tree from the FIRE simulations.
+                              Contains data useful from Papers I, II, and III.
+            
+            - snapshot_data : dictionary
+                              A dictionary that contains snapshot indices, times, 
+                              and redshifts.
+
+        NOTES:
+            - Saves a dictionary that contains:
+                - Total distance with respect to the center of the host
+                - Radial velocity with respect to the center of the host
+                - Tangential velocity with respect to the center of the host
+                - Peak halo mass
+                - Snapshot indices
+            
+            - For all dictionary elements beside the peak halo mass, the element
+              is a 2D array:
+                - Each row in the array corresponds to a particular subhalo
+                - Each element in that row corresponds to a particular snapshot
+                    - These elements correspond to z = 0, and go backward in time, i.e.
+                      element 0, is for z = 0
+            
+            - The snapshot array is more for indexing corresponding to the same convention in
+              the original FIRE simulations. Most simulations have snapshots from 0, which is the
+              beginning of the simulation, to 600 (sometimes 500), which is the end of the
+              simulation, i.e. z = 0.
+
+            - If a satellite existed before the host, we set its properties to -1.
         """
         # Create a sub-dictionary for the properties of interest
         sim_sats = {}
@@ -244,14 +321,17 @@ class SatelliteMatch:
     def subhalo_match(self, indices, subhalos, satellite, snapshot_data, lookback_window=1, max_sigma=3, probability_max=99):
         """
         DESCRIPTION:
-            TBD
+            Given a real satellite's distance, velocity (radial and/or tangential), and 
+            halo mass, find analogs in the simulations to within the specified limits. Does
+            not require all 4 properties to find matches, can mix and match.
 
         VARIABLES:
             indices         : 2D array
                               The halo tree indices of subhalos in the simulations
 
             subhalos        : dictionary
-                              This is a subset of simulation data that includes 
+                              This is a subset of simulation data created with 
+                              "subhalo_data()" and includes:
                               - total distance from host
                               - radial velocity
                               - tangential velocity
@@ -267,14 +347,31 @@ class SatelliteMatch:
                               - stellar mass
                               - peak subhalo mass using the SMHM relation from Paper I and "satellite_mhalo()"
 
+            snapshot_data   : dictionary
+                              A dictionary that contains snapshot indices, times, 
+                              and redshifts.
+
             lookback_window : integer
                               Lookback time (Gyr) to search for satellite analogs
             
             max_sigma       : integer
                               Threshold of how much error we allow in selecting satellites
+            
+            probability_max : integer
+                              A "sigma" for the N-dimensional Gaussian for the selection properties (distance
+                              velocity (radial and tangential), and mass)
 
         NOTES:
-            - Temporarily adding notes so that I can get VS Code to accept another commit
+            - Produces a dictionary that contains:
+                - The peak halo mass (normal and log) for the subhalo matches
+                - Indices to point to the analogs in the mass array (created in the function) and in
+                  the original halo tree from the FIRE simulations (at z = 0)
+                - The snapshot that the subhalo analog is matched with the satellite
+                - The weight, which is a measure of how "good" of a match the subhalo is
+                - The value of the N-dimensional Gaussian with the given weights; also
+                  kind of a measure of how "good" a match is.
+            - We don't have to worry about double counting a match across snapshots.
+            - Lots of code previously written by Andrew Wetzel.
         """
         # Figure out how many snapshots to search for satellites from the snapshot file
         max_time_window = snapshot_data['time'][-1] - lookback_window
@@ -404,13 +501,27 @@ class SatelliteMatch:
     def mass_weighting(self, weights, mass_array_subs, mass_sat, SMHM_slope=0.44):
         """
         DESCRIPTION:
-            TBD
+            Re-normalizes an array of weights based on a mass array. This is so that
+            the resultant orbit property results aren't skewed toward values more
+            represented by lower-mass subhalos (the mass function is steep and we
+            have many more low-mass subhalos).
 
         VARIABLES:
-            TBD
+            - weights         : array or list
+                                An array or list of weights for subhalos analogs of a given satellite.
+
+            - mass_array_subs : array or list
+                                An array or list of subhalo masses for the analogs.
+
+            - mass_sat        : float
+                                The peak halo mass for the satellite we are interested in.
+
+            - SMHM_slope      : float
+                                Value for the slope of the stellar mass - halo mass relation.
 
         NOTES:
-            - TBD
+            - Returns an array of equal length to the "weights" variable.
+            - This only re-normalizes the weights based on their peak halo mass.
         """
         # Take the log of the masses
         mass_log_sub = np.log10(mass_array_subs)
@@ -428,6 +539,8 @@ class SatelliteMatch:
     def write_subhalo_matches(self, satellite, hosts, indices, weights, snapshots, params):
         """
         DESCRIPTION:
+            After finding matches based on the methods above, "subhalo_match()" 
+            and "mass_weighting()", save the data to a text file.
             Want this to be the middle step where I save files that include:
                 - Host
                 - Tree index
@@ -436,10 +549,38 @@ class SatelliteMatch:
                 - sigma_dif ( I actually don't think I need this one... ) 
 
         VARIABLES:
-            TBD
+            - satellite : string
+                          Name of the satellite of interest
+
+            - hosts     : list or array
+                          List of strings, where each element is the name of a host
+                          galaxy from the FIRE simulations
+
+            - indices   : list or array
+                          List of the subhalo analog indices in the halo tree from
+                          the FIRE simulations
+
+            - weights   : array or list
+                          Array of weights that were calculated from "subhalo_match()"
+                          and "mass_weighting()". These are the subhalo analog weights.
+
+            - snapshots : list or array
+                          List of snapshots that the subhalo analogs were matched at.
+                          Correspond to the original snapshots in the FIRE simulations.
+
+            - params    : list
+                          List of parameters used in the matching schemes above. 
+                          Contains: [error in halo dex, the sigma error we choose in
+                          the phase-space selection, the max sigma (probability) in the
+                          N-dimensional Gaussian]
 
         NOTES:
-            - TBD
+            - (Could improve the documentation above)
+            - Writes some header info and the following data to a text file:
+                - FIRE simulation host galaxy name
+                - Halo tree index (at z = 0)
+                - Subhalo analog weight
+                - Snapshot that the analog was found at
         """
         # If the file exists, then append to it, otherwise create it
         file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/'
@@ -461,6 +602,9 @@ class SatelliteMatch:
             file_object.close()
             print('Finished writing to file.')
 
+
+
+########### Add documentation for everything in here!
 class SatelliteAnalysis(SatelliteRead):
 
     def __init__(self, gal1, location):
