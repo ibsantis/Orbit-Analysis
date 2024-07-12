@@ -34,11 +34,11 @@
           which could cause numerical problems in Galpy.
 
     OrbitTree:
-        - Something...
+        - Creates a "tree" structure to efficiently select particles within
+          the subhalos. Makes use of the KDTree method.
+        - Find the particles within certain subhalos and return their distances
+          and indices.
 
-    OrbitPlot:
-        - Includes methods to plot different orbital properties.
-          [I don't really use this anymore, but this could be improved and useful later.]
     
     OrbitMatch:
         - Something...
@@ -1838,104 +1838,3 @@ class OrbitTree(OrbitAnalysis):
         #
         return pos, ind
 
-class OrbitPlot(OrbitAnalysis):
-
-    def __init__(self, tree, gal1, location, host, selection='star'):
-        """
-        This is required to inherit the subhalo indices defined from
-        OrbitAnalysis.__init__()
-        """
-        OrbitAnalysis.__init__(self, tree, gal1, location, host, selection=selection)
-
-    def multi_plot(self, host_rads, infall_dict, peri_dict, time_dict, sim_dist, sim_vel, sim_ell, model_orbits, model_times, host=1):
-        #
-        # Set up the model stuff
-        d_model = model_orbits.r(model_times)
-        v_model = np.sqrt(model_orbits.vx(model_times)**2 + model_orbits.vy(model_times)**2 + model_orbits.vz(model_times)**2)
-        L_model = model_orbits.L(model_times)
-        #
-        # Loop over the number of subhalos
-        for i in range(0, self.shape[0]):
-            # Check to see if the subhalo fell in and experienced a pericenter
-            if (infall_dict['check'][i]):
-                #
-                # Set up the distances and times to plot
-                d_mask = (sim_dist[i] >= 0)
-                d_data = sim_dist[i][d_mask]
-                #
-                lookback_time = np.flip(time_dict['time'][-1] - time_dict['time'])
-                times = lookback_time[:len(d_data)]
-                #
-                v_data = sim_vel[i][:len(times)]
-                L_data = sim_ell['ang.mom.total'][i][:len(times)]
-                #
-                # Set up the figure
-                plt.rcParams["font.family"] = "serif"
-                plt.figure(figsize=(10, 12))
-                ax1 = plt.subplot(311)
-                ax2 = plt.subplot(312, sharex=ax1)
-                ax3 = plt.subplot(313, sharex=ax2)
-                #
-                # Plot the distances
-                ax1.plot(times, d_data, 'k', label='Simulation')
-                ax1.plot(-1*model_times, d_model[i], label='Model', alpha=0.5)
-                ax1.plot(times, host_rads[:len(times)], 'k', alpha=0.3)
-                ax1.set_xlim(times[-1], times[0])
-                #
-                # Check to see if there were infall, pericenter, or apocenter events
-                infall = infall_dict['check'][i]
-                peri = peri_dict['pericenter.check'][i]
-                #
-                # If there were, plot when they occurred
-                if infall:
-                    infall_time = infall_dict['first.infall.time.lb'][i]
-                    ax1.axvline(x=infall_time, ymin=0, ymax=1, color='k', linestyle=':')
-                #
-                if peri:
-                    for j in peri_dict['pericenter.time.lb'][i][peri_dict['pericenter.time.lb'][i] != -1]:
-                        ax1.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
-                #
-                # Set the labels and save the figure
-                ax1.set_ylim(top=np.nanmax(d_data)+100)
-                ax1.label_outer()
-                ax1.set_ylabel('Host Distance [kpc]', fontsize=20)
-                ax1.legend(prop={'size': 16})
-                #
-                # Plot the velocity data
-                ax2.plot(times, v_data, 'k')
-                ax2.plot(-1*model_times, v_model[i], alpha=0.5)
-                ax2.set_xlim(times[-1], times[0])
-                ax2.label_outer()
-                if infall == True:
-                    infall_time = infall_dict['first.infall.time.lb'][i]
-                    ax2.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
-                if peri:
-                    for j in peri_dict['pericenter.time.lb'][i][peri_dict['pericenter.time.lb'][i] != -1]:
-                        ax2.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
-                #
-                ax2.set_ylabel('Total velocity [km s$^{-1}$]', fontsize=20)
-                #
-                # Plot the velocity data
-                ax3.plot(times, L_data/1000, 'k')
-                ax3.plot(-1*model_times, np.linalg.norm(L_model[i], axis=1)/1000, alpha=0.5)
-                ax3.set_xlim(times[-1], times[0])
-                ax3.set_ylabel('$\\ell$ [$10^3$ kpc km s$^{-1}$]', fontsize=20)
-                if infall == True:
-                    infall_time = infall_dict['first.infall.time.lb'][i]
-                    ax3.axvline(infall_time, ymin=0, ymax=1, color='k', linestyle=':')
-                if peri:
-                    for j in peri_dict['pericenter.time.lb'][i][peri_dict['pericenter.time.lb'][i] != -1]:
-                        ax3.axvline(x=j, ymin=0, ymax=1, color='#9400D3', linestyle=':')
-                #
-                ax3.set_xlabel('Lookback time [Gyr]', fontsize=32)
-                plt.tight_layout()
-                plt.subplots_adjust(wspace=0, hspace=0)
-                #
-                if self.num_gal == 1:
-                    plt.savefig(self.home_dir+'/orbit_data/plots/subhalo_integration/'+self.galaxy+'/'+self.galaxy+'_sub_'+str(i+1)+'.pdf')
-                if self.num_gal == 2:
-                    if host == 1:
-                        plt.savefig(self.home_dir+'/orbit_data/plots/subhalo_integration/'+self.gal_1+'/'+self.gal_1+'_sub_'+str(i+1)+'.pdf')
-                    if host == 2:
-                        plt.savefig(self.home_dir+'/orbit_data/plots/subhalo_integration/'+self.gal_2+'/'+self.gal_2+'_sub_'+str(i+1)+'.pdf')
-                plt.close()

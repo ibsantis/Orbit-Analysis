@@ -70,7 +70,6 @@ if sim_data.num_gal == 1:
     # This initializes the classes and makes sure they inherit from the OrbitRead class
     orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location=loc, host=1, dmo=False)
     orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.galaxy, location=loc, host=1, dmo=False)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.galaxy, location=loc, host=1, dmo=False)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
@@ -274,7 +273,6 @@ if sim_data.num_gal == 2:
     # This initializes the classes and makes sure they inherit from the OrbitRead class
     orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location=loc, host=1, dmo=False)
     orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location=loc, host=1, dmo=False)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location=loc, host=1, dmo=False)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
@@ -477,7 +475,6 @@ if sim_data.num_gal == 2:
     # This initializes the classes and makes sure they inherit from the OrbitRead class
     orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.gal_1, location=loc, host=2, dmo=False)
     orbit_gal = orbit_io.OrbitGalpy(tree=halt, gal1=sim_data.gal_1, location=loc, host=2, dmo=False)
-    orbit_plot = orbit_io.OrbitPlot(tree=halt, gal1=sim_data.gal_1, location=loc, host=2, dmo=False)
     #
     # Run the pipeline on the simulation data
     halt_dists = orbits.halo_distances(tree=halt, host=2) # set host=1 for the first host, host=2 for the other
