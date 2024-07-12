@@ -13,7 +13,6 @@
     OrbitRead:
         - Defines the home and simulation directories, sets the number of host galaxies,
           and reads in the potential profile fitting data for Galpy.
-            [Need to adopt this into my actual code...]
 
     OrbitAnalysis:
         - Applies a selection function to the satellites. Satellites at z = 0 must
