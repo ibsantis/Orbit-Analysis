@@ -42,7 +42,8 @@ class SatelliteRead:
 
     def __init__(self, gal1, location, dmo=False):
         """
-        Set the home directory, simulation directory, and number of galaxies
+        DESCRIPTION
+            Set the home directory, simulation directory, and number of galaxies
 
         VARIABLES:
             - gal1     : string
