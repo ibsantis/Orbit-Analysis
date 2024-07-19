@@ -16,10 +16,14 @@
           of host galaxies
     
     SatelliteMatch:
-        - 
+        - Functions to find subhalo analogs for a given satellite, and
+          calculate weights based on how good of a "match" they are;
+          can save data.
     
     SatelliteAnalysis:
-        - 
+        - Read in analog data and use it to make a dictionary of
+          orbit properties for the analogs; some plotting functions that
+          might be useful.
 
 """
 
@@ -33,7 +37,7 @@ import pandas as pd
 import galpy
 import os
 
-# Have a class that reads in the data
+
 class SatelliteRead:
 
     def __init__(self, gal1, location, dmo=False):
@@ -104,7 +108,7 @@ class SatelliteRead:
         if dmo:
             self.simulation_dir += '_dm'
 
-# Have a class that matches the satellites
+
 class SatelliteMatch:
 
     def __init__(self, gal1, location, tree=None, mini=None, host=1, minimum_mass=1e8):
@@ -603,34 +607,53 @@ class SatelliteMatch:
             print('Finished writing to file.')
 
 
-
-########### Add documentation for everything in here!
 class SatelliteAnalysis(SatelliteRead):
 
     def __init__(self, gal1, location):
         """
         DESCRIPTION:
-            TBD
+            Mainly used for reading subhalo analog data, creating orbit property distributions,
+            and other schemes for plotting.
 
         VARIABLES:
-            TBD
+            - gal1 : string
+                     Name of the MW-mass galaxy you are interested in.
+                     If analyzing the LG-pairs, this is the name of the
+                     first host (Romeo, Thelma, Romulus).
+            
+            - location : string
+                         Name of where you are working (peloton, stampede, or on
+                         my mac).
 
         NOTES:
-            TBD
+            Instatiates the SatelliteRead class so that we can use its methods too.
         """
-        # Want to inherit the OrbitRead class so that I can adapt pipeline for LG runs
         SatelliteRead.__init__(self, gal1, location, dmo=False)
 
     def read_subhalo_matches(self, satellite, home_dir=None):
         """
         DESCRIPTION:
-            Read in the files with the weights and put the data in a dictionary or something like that.
+            Read in the files with the weights and create a Pandas dataframe object.
 
         VARIABLES:
-            TBD
+            - satellite : string
+                          Name of the MW satellite that you want to read in.
+            
+            - home_dir  : string
+                          Path to where the weight files are stored for a satellite.
 
         NOTES:
-            - TBD
+            - Returns a Pandas dataframe that contains:
+                - The MW-mass host name that the analog lives in.
+                - The z = 0 halo tree index for reference.
+                - The "weight" of a subhalo for the satellite in question. This
+                  is calculated with the methods in the SatelliteMatch class
+                  above.
+                - The snapshot that the subhalo is matched at. We want this so that
+                  we can set that time to be "t = 0" and look at it's orbit and 
+                  orbit properties before this instace. We do not care about the analog
+                  after this new "t = 0". This would be akin to seeing what a 
+                  satellite would do in the "future".
         """
         # If the file exists, then open it
         satellite_name = satellite.replace(' ', '_')
@@ -645,21 +668,54 @@ class SatelliteAnalysis(SatelliteRead):
     
     def orbit_property_distribution(self, sim_name, mini_sim_data, sat_match_data, time_array):
         """
-            Probably want to save all of these to a dictionary, then combine the dictionary with a master dictionary later in a master script
+        DESCRIPTION:
+            Using the satellite data, and the subhalo analog data, compile the interesting
+            orbit history properties together in a dictionary.
+
+        VARIABLES:
+            - sim_name       : string
+                               The name of the MW-mass host in the FIRE sims.
+                               Limited to m12b, m12c, m12f, m12i, m12m, m12w, m12z, Romeo,
+                               Juliet, Thelma, Louise, Romulus, & Remus.
+
+            - mini_sim_data  : dictionary
+                               A dictionary containing a lot of information for all of the 
+                               subhalos within a FIRE simulation. Includes: distances, velocities,
+                               infall times, and TONS of other information.
+
+            - sat_match_data : dictionary
+                               A dictionary containing: z = 0 halo tree indices for each subhalo analog
+                               to the satellite in question, the host galaxy that it belongs to, 
+                               the weight of the analog to the satellite, and the snapshot that it is 
+                               matched at.
+                               This is what "read_subhalo_matches()" returns.
+            
+            - time_array     : dictionary
+                               Contains all of the snapshots, times, redshifts, and other time-
+                               related information from the FIRE simulation. 
+
+        NOTES:
+            - Returns a dictionary containing all of the orbit properties that we are interested in:
+                - First infall lookback times [Gyr]
+                - Peak subhalo mass [M_sun]
+                - Pericenter number, distance [kpc], velocity [km/s], and lookback time [Gyr] (both minimum 
+                  and recent pericenters)
+                - Apocenter distance [kpc] and lookback time [Gyr]
+                - Orbit distance [kpc]
+                - Radial and tangential velocity [km/s]
+            - Any values in this array that are "-1" are null values, i.e., there is no value for that
+              particular property and subhalo.
         """
         d = dict()
         #
-        # for sim_name in galaxy_name_list: ############# Nex time incorporate the loop over all hosts into the function
+        # for sim_name in galaxy_name_list: ############# Next time incorporate the loop over all hosts into the function
         #
-        # get the matches for a simulation host
+        # Get the matches for a simulation host
         mask = (sat_match_data['Host'] == sim_name)
-        # get an array of the tree indices that are matches in m12m
+        # Get an array of the tree indices that are matches in m12m
         subhalo_inds = np.asarray(sat_match_data['Halo tree index'][mask])
         # Get indices within the mini data to select properties
         mini_data_match_inds = np.asarray([np.where(i == mini_sim_data['indices.z0'][:,0])[0][0] for i in subhalo_inds])
-        #
-        # Need to check if subhalo fell in after match. If so, then don't count it.
-        #mini_data_match_inds = (mini_data_match_inds[mini_sim_data['first.infall.snap'][mini_data_match_inds] < sat_match_data['Snapshot at match'][mask]])
         #
         # Find the infall time
         # Snapshot at match
@@ -722,7 +778,31 @@ class SatelliteAnalysis(SatelliteRead):
     def binning_scheme(self, x, xtype, binsize, binedges=None):
         """
         DESCRIPTION:
-            Function that makes bins... finish later.
+            Function that takes in an array, a bin size (and bin edges if you want)
+            and creates an array that contains the bin values, as well as the
+            "half bin" value (useful for plotting).
+
+        VARIABLES:
+            - x        : 1D array
+                         Array that you want to discretize into bins.
+
+            - xtype    : string
+                         The property that you are binning. This is important because
+                         binning discrete things like pericenter number is handled 
+                         differently and binning masses involves logs.
+                         Just use the dictionary keys that are output from 
+                         "orbit_property_distribution()"
+
+            - binsize  : int or float
+                         How big you want the size of the bins to be.
+
+            - binedges : tuple (I think)
+                         Specifies the edges of the bin array you want. If left "None"
+                         then the function will return a bin array that includes a 
+                         bin below the smallest datapoint in x, and above the highest.
+
+        NOTES:
+            - Same thing from "summary_io.py". 
         """
         if 'M.' in xtype:
             x = np.log10(x)
@@ -761,7 +841,37 @@ class SatelliteAnalysis(SatelliteRead):
     def median_and_scatter(self, x, y, xtype, ytype, bins):
         """
         DESCRIPTION:
-            Function that finds median and scatter... finish later.
+            Function that calculates what the median trend is for a data array and bin array.
+
+        VARIABLES:
+            - x        : 1D array
+                         The x-axis property that you are plotting and binning up.
+
+            - y        : 1D array
+                         The y-axis property that you are plotting
+
+            - xtype    : string
+                         The property that you are binning. This is important because
+                         binning discrete things like pericenter number is handled 
+                         differently and binning masses involves logs.
+                         Just use the dictionary keys that are output from 
+                         "orbit_property_distribution()"
+            
+            - ytype    : string
+                         The property that you are binning. This is important because
+                         binning discrete things like pericenter number is handled 
+                         differently and binning masses involves logs.
+                         Just use the dictionary keys that are output from 
+                         "orbit_property_distribution()"
+
+            - bins     : int or float
+                         The array of bins for the plot.
+
+        NOTES:
+            - Same thing from "summary_io.py". 
+            - Loops through the bins, takes data within the bin, and calculates the median in
+              that bin, along with the 68th and 95th percentile values.
+            - Not really used a lot for Paper III, but used a lot in Paper I and Paper II.
         """
         onesigp = 84.13
         onesigm = 15.87
