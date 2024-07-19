@@ -1,3 +1,8 @@
+
+"""
+    ...
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
@@ -9,11 +14,20 @@ import time
 
 print('Starting the script at {0}'.format(time.strftime("%H:%M:%S", time.localtime())))
 
-sim_data = orbit_io.OrbitRead(gal1='m12r', location='mac')
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location='mac')
+host = 1
 print('Set paths')
-
-data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy)
+#
+if sim_data.num_gal == 1:
+    data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy)
+else:
+    if host == 1:
+        sim_data.galaxy = sim_data.gal_1
+    elif host == 2:
+        sim_data.galaxy = sim_data.gal_2
+    data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy)
 print('Read in the data')
+
 data['d.sim'][data['d.sim'] == -1] = np.nan
 print('Done converting null values')
 for i in range(0, len(data['d.sim'])):
