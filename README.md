@@ -15,10 +15,10 @@ This package makes use of the following:
 - [gizmo_analysis](https://bitbucket.org/awetzel/gizmo_analysis)
 - [halo_analysis](https://bitbucket.org/awetzel/halo_analysis)
 - [utilities](https://bitbucket.org/awetzel/utilities)
-- numpy
-- scipy
-- astropy
-- matplotlib
+- [numpy](https://numpy.org/)
+- [scipy](https://scipy.org/)
+- [astropy](https://www.astropy.org/)
+- [matplotlib](https://matplotlib.org/)
 
 Most importantly, this package uses the FIRE-2 simulations. A handful of snapshot data, and halo catalogs, for the MW-mass galaxies are hosted [here](https://flathub.flatironinstitute.org/fire) at the Flatiron Institute. For a brief description of the simulations and everything included in the publically available data, see this [public data release paper](https://ui.adsabs.harvard.edu/abs/2023ApJS..265...44W/abstract).
 
@@ -41,10 +41,10 @@ Most importantly, this package uses the FIRE-2 simulations. A handful of snapsho
     - Data that I import was previously compiled using summary_data.py or summary_data_dmo.py
 
 ## satellite_io.py
-* TBD
+* For finding subhalo analogs to MW satellites, calculating their weights, saving analogs to a file. With analogs, create a dictionary of orbit history properties for statistical analysis.
 
 ## summary_data.py
-* For making data dictionaries to be used with summary_io.py
+* For making data dictionaries to be used with summary_io.py.
 
 ## paper_figs_final.py
 * Script that contains code for figures in [this paper](https://arxiv.org/abs/2208.05977) focused on calculating the orbital dynamics and histories of satellite galaxies aroung MW-mass host galaxies.
@@ -58,11 +58,11 @@ Most importantly, this package uses the FIRE-2 simulations. A handful of snapsho
 
 Unless otherwise explicitly stated, all units in these packages follow the same convention as the FIRE-2 simulations. Here are some of the most common property units:
 
-- mass: $M_{\odot}$
+- mass: M_{sun}
 - distance: kpc
-- time: Gyr [10$^9$ yr]
-- velocity: km s$^{-1}$
-- energy: km^2 s$^{-2}$ 
+- time: Gyr [10^9 yr]
+- velocity: km s^{-1}
+- energy: km^2 s^{-2}
 
 ---
 
