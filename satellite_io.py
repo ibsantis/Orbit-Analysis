@@ -741,6 +741,7 @@ class SatelliteAnalysis(SatelliteRead):
         d['pericenter.min.vel'] = (-1)*np.ones(len(mini_data_match_inds))
         d['apocenter.time.lb'] = (-1)*np.ones(len(mini_data_match_inds))
         d['apocenter.dist'] = (-1)*np.ones(len(mini_data_match_inds))
+        d['L.tot.sim'] = (-1)*np.ones(len(mini_data_match_inds))
         d['distance'] = (-1)*np.ones(len(mini_data_match_inds))
         d['velocity.rad'] = (-1)*np.ones(len(mini_data_match_inds))
         d['velocity.tan'] = (-1)*np.ones(len(mini_data_match_inds))
@@ -772,6 +773,7 @@ class SatelliteAnalysis(SatelliteRead):
             d['distance'][i] = mini_sim_data['d.tot.sim'][mini_data_match_inds][i][time_ind]
             d['velocity.rad'][i] = mini_sim_data['v.rad.sim'][mini_data_match_inds][i][time_ind]
             d['velocity.tan'][i] = mini_sim_data['v.tan.sim'][mini_data_match_inds][i][time_ind]
+            d['L.tot.sim'][i] = mini_sim_data['L.tot.sim'][mini_data_match_inds][i][time_ind]
             #
         #
         return d
