@@ -87,6 +87,7 @@ vperi_min = []
 tapo_rec = []
 dapo_rec = []
 elltot = []
+vtot = []
 mhalo = []
 #
 for galaxy in mw_sats_1Mpc:
@@ -238,6 +239,17 @@ for galaxy in mw_sats_1Mpc:
         dapo_rec.append((x_med, x_lower, x_upper))
     else:
         dapo_rec.append((-1, -1, -1))
+    #
+    # Angular momentum at match
+    m = (orbit_dictionary['L.tot.sim'] != -1)
+    if np.sum(m) != 0:
+        x = orbit_dictionary['L.tot.sim'][m]
+        x_med = ut.math.percentile_weighted(x, 50, gal_data['Weight'][m])
+        x_lower = ut.math.percentile_weighted(x, 15.87, gal_data['Weight'][m])
+        x_upper = ut.math.percentile_weighted(x, 84.13, gal_data['Weight'][m])
+        elltot.append((x_med, x_lower, x_upper))
+    else:
+        elltot.append((-1, -1, -1))
     
 
 sat_mstar = np.asarray(sat_mstar)
@@ -797,6 +809,83 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dapo_rec_vs_dist_zoom.pdf')
 plt.close()
+
+
+
+"""
+    Specific Angular momentum plots
+"""
+orbit_prop = np.asarray(elltot)
+mask = (orbit_prop[:,0] != -1)
+meds = orbit_prop[:,0]
+lowers = orbit_prop[:,1]
+uppers = orbit_prop[:,2]
+
+# Vs Mstar
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(sat_mstar[mask])):
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i]/1e4, s=50, c='#4e2026', alpha=0.7)
+axs.set_xscale('log')
+axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
+axs.set_ylabel('$\\ell [10^4\ kpc\ km\ s^{-1}]$', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/ell_vs_mstar.pdf')
+plt.close()
+
+# Vs Mstar (zoom)
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(sat_mstar[mask])):
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i]/1e4, s=50, c='#4e2026', alpha=0.7)
+axs.set_xscale('log')
+axs.set_ylim(0, 5)
+axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
+axs.set_ylabel('$\\ell [10^4\ kpc\ km\ s^{-1}]$', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/ell_vs_mstar_zoom.pdf')
+plt.close()
+
+# Vs distance
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(sat_mstar[mask])):
+    axs.errorbar(sat_dist[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i]/1e4, s=50, c='#4e2026', alpha=0.7)
+axs.set_xlabel('Host distance [kpc]', fontsize=24)
+axs.set_ylabel('$\\ell [10^4\ kpc\ km\ s^{-1}]$', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/ell_vs_dist.pdf')
+plt.close()
+
+# Vs distance (zoom)
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(sat_mstar[mask])):
+    axs.errorbar(sat_dist[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i]/1e4, s=50, c='#4e2026', alpha=0.7)
+axs.set_xlabel('Host distance [kpc]', fontsize=24)
+axs.set_ylabel('$\\ell [10^4\ kpc\ km\ s^{-1}]$', fontsize=24)
+axs.set_xlim(0, 420)
+axs.set_ylim(0, 5)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/ell_vs_dist_zoom.pdf')
+plt.close()
+
+
+
+
+
 
 
 
