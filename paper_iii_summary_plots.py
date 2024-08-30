@@ -35,7 +35,8 @@ print('Set paths')
 # Read in the snapshot dictionary and the entire tree
 lg_data = pd.read_csv(sim_data.home_dir+'/orbit_data/paper_III/localgroup_galaxies_condensed.csv', index_col=0)
 
-galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'm12z', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12j', 'm12n']
+#galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'm12z', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12j', 'm12n']
+galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12n']
 
 mw_sats = ['HIZSS 3(A)', 'HIZSS 3B', 'NGC 55', 'LMC', 'SMC', 'IC 4662', 'IC 5152', 'NGC 6822', 'NGC 3109', 'IC 3104', \
            'Sextans B', 'DDO 190', 'DDO 125', 'Sextans A', 'NGC 4163', 'Sagittarius dSph', 'UGC 8508', 'Fornax', 'UGC 4879', \
@@ -85,6 +86,7 @@ dperi_min = []
 vperi_min = []
 tapo_rec = []
 dapo_rec = []
+elltot = []
 mhalo = []
 #
 for galaxy in mw_sats_1Mpc:
@@ -110,6 +112,7 @@ for galaxy in mw_sats_1Mpc:
     orbit_dictionary['apocenter.time.lb'] = np.zeros(gal_data.shape[0])
     orbit_dictionary['apocenter.dist'] = np.zeros(gal_data.shape[0])
     orbit_dictionary['halo.mass.peak'] = np.zeros(gal_data.shape[0])
+    orbit_dictionary['L.tot.sim'] = np.zeros(gal_data.shape[0])
     orbit_dictionary['distance'] = np.zeros(gal_data.shape[0])
     orbit_dictionary['velocity.rad'] = np.zeros(gal_data.shape[0])
     orbit_dictionary['velocity.tan'] = np.zeros(gal_data.shape[0])
@@ -794,7 +797,6 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dapo_rec_vs_dist_zoom.pdf')
 plt.close()
-
 
 
 

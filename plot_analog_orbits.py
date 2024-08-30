@@ -33,7 +33,8 @@ print('Set paths')
 # Read in the snapshot dictionary and the entire tree
 lg_data = pd.read_csv(sim_data.home_dir+'/orbit_data/paper_III/localgroup_galaxies_condensed.csv', index_col=0)
 
-galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'm12z', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12j', 'm12n']
+#galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'm12z', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12j', 'm12n']
+galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12n']
 
 mw_sats_1Mpc = ['Antlia 2', 'Aquarius 2', 'Bootes 1', 'Bootes 2', 'Bootes 3', \
                 'Canes Venatici 1', 'Canes Venatici 2', 'Carina', 'Carina 2', \
@@ -97,10 +98,12 @@ for galaxy in mw_sats_1Mpc:
         if name in plot_data['Hosts']:
             for i in range(0, plot_data['orbit.distance.'+name].shape[0]):
                 mask = (plot_data['orbit.distance.'+name][i] != -1)
-                axs.plot(plot_data['orbit.time.lb.'+name][mask]-plot_data['orbit.time.lb.'+name][mask][0], plot_data['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=0.2)
+                axs.plot(plot_data['orbit.time.lb.'+name][mask]-plot_data['orbit.time.lb.'+name][mask][0], plot_data['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=0.1)
     #
     axs.set_xlabel('Lookback Time [Gyr]', fontsize=24)
     axs.set_ylabel('Distance [kpc]', fontsize=24)
+    axs.set_xlim(0,13.78)
+    #axs.set_ylim(-5,400)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/orbits/'+galaxy+'_orbits_all.pdf')
