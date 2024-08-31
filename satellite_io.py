@@ -745,7 +745,7 @@ class SatelliteAnalysis(SatelliteRead):
         d['distance'] = (-1)*np.ones(len(mini_data_match_inds))
         d['velocity.rad'] = (-1)*np.ones(len(mini_data_match_inds))
         d['velocity.tan'] = (-1)*np.ones(len(mini_data_match_inds))
-        d['velocity.tot'] = (-1)*np.ones(len(mini_data_match_inds))
+        d['v.tot.sim'] = (-1)*np.ones(len(mini_data_match_inds))
         #
         for i in range(0, len(mini_data_match_inds)):
             mask_peri = (mini_sim_data['pericenter.time.sim'][mini_data_match_inds][i] != -1)
