@@ -640,7 +640,7 @@ class SatelliteAnalysis(SatelliteRead):
         """
         SatelliteRead.__init__(self, gal1, location, dmo=False)
 
-    def read_subhalo_matches(self, satellite, home_dir=None):
+    def read_subhalo_matches(self, satellite, home_dir=None, err_tweak=1):
         """
         DESCRIPTION:
             Read in the files with the weights and create a Pandas dataframe object.
@@ -667,10 +667,10 @@ class SatelliteAnalysis(SatelliteRead):
         """
         # If the file exists, then open it
         satellite_name = satellite.replace(' ', '_')
-        if home_dir:
-            file_path = home_dir+'/weights_'+satellite_name+'.txt'
+        if err_tweak == 1:
+            file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_'+satellite_name+'.txt'
         else:
-            file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/weights_'+satellite_name+'.txt'
+            file_path = self.home_dir+f'/orbit_data/hdf5_files/satellite_matching/err_tweak_{err_tweak}/weights_'+satellite_name+'.txt'
         header_info = ['Host', 'Halo tree index', 'Weight', 'Snapshot at match']
         data = pd.read_csv(file_path, skiprows=5, names=header_info)
         #
