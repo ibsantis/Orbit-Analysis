@@ -39,12 +39,12 @@ lg_data = pd.read_csv(sim_data.home_dir+'/orbit_data/paper_III/localgroup_galaxi
 galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12n']
 
 # Based on HALO mass
-# galaxies_high = ['m12b', 'm12c', 'm12f', 'm12m', 'Thelma', 'Romulus', 'm12n']
-# galaxies_low = ['m12i', 'm12w', 'Romeo', 'Juliet', 'Louise', 'Remus']
+galaxies_high = ['m12b', 'm12c', 'm12f', 'm12m', 'Thelma', 'Romulus', 'm12n']
+galaxies_low = ['m12i', 'm12w', 'Romeo', 'Juliet', 'Louise', 'Remus']
 
 # Based on GALAXY mass
-galaxies_high = ['m12b', 'm12f', 'm12i', 'm12m', 'Romeo', 'Thelma', 'Romulus']
-galaxies_low = ['m12c', 'm12w', 'Juliet', 'Louise', 'Remus', 'm12n']
+# galaxies_high = ['m12b', 'm12f', 'm12i', 'm12m', 'Romeo', 'Thelma', 'Romulus']
+# galaxies_low = ['m12c', 'm12w', 'Juliet', 'Louise', 'Remus', 'm12n']
 
 
 mw_sats_1Mpc = ['Antlia 2', 'Aquarius 2', 'Bootes 1', 'Bootes 2', 'Bootes 3', \
@@ -113,6 +113,8 @@ for galaxy in mw_sats_1Mpc:
     orbit_dictionary['apocenter.time.lb'] = (-1)*np.ones(gal_data.shape[0])
     orbit_dictionary['apocenter.dist'] = (-1)*np.ones(gal_data.shape[0])
     orbit_dictionary['halo.mass.peak'] = (-1)*np.ones(gal_data.shape[0])
+    orbit_dictionary['L.tot.sim'] = (-1)*np.ones(gal_data.shape[0])
+    orbit_dictionary['v.tot.sim'] = (-1)*np.ones(gal_data.shape[0])
     orbit_dictionary['distance'] = (-1)*np.ones(gal_data.shape[0])
     orbit_dictionary['velocity.rad'] = (-1)*np.ones(gal_data.shape[0])
     orbit_dictionary['velocity.tan'] = (-1)*np.ones(gal_data.shape[0])
@@ -856,6 +858,7 @@ axs.set_xscale('log')
 axs.set_ylim(0, 150)
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
+axs.legend(prop={'size': 16}, loc='best')
 plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/hi_vs_lo/dperi_min_vs_mstar.pdf')
@@ -882,6 +885,7 @@ for i in range(1, len(sat_dist[mask_lo])):
 axs.set_ylim(0, 150)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
+axs.legend(prop={'size': 16}, loc='best')
 plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/hi_vs_lo/dperi_min_vs_dist.pdf')
@@ -909,6 +913,7 @@ axs.set_ylim(0, 150)
 axs.set_xlim(0, 420)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
+axs.legend(prop={'size': 16}, loc='best')
 plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/hi_vs_lo/dperi_min_vs_dist_zoom.pdf')
@@ -952,6 +957,7 @@ for i in range(1, len(sat_mstar[mask_lo])):
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
+axs.legend(prop={'size': 16}, loc='best')
 plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/hi_vs_lo/tapo_rec_vs_mstar.pdf')
@@ -977,6 +983,7 @@ for i in range(1, len(sat_dist[mask_lo])):
 #
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
+axs.legend(prop={'size': 16}, loc='best')
 plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/hi_vs_lo/tapo_rec_vs_dist.pdf')
@@ -1003,6 +1010,7 @@ for i in range(1, len(sat_dist[mask_lo])):
 axs.set_xlim(0, 420)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
+axs.legend(prop={'size': 16}, loc='best')
 plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/hi_vs_lo/tapo_rec_vs_dist_zoom.pdf')
@@ -1046,6 +1054,7 @@ for i in range(1, len(sat_mstar[mask_lo])):
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
+axs.legend(prop={'size': 16}, loc='best')
 plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/hi_vs_lo/dapo_rec_vs_mstar.pdf')
@@ -1071,6 +1080,7 @@ for i in range(1, len(sat_dist[mask_lo])):
 #
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
+axs.legend(prop={'size': 16}, loc='best')
 plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/hi_vs_lo/dapo_rec_vs_dist.pdf')
@@ -1097,20 +1107,10 @@ for i in range(1, len(sat_dist[mask_lo])):
 axs.set_xlim(0,420)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
+axs.legend(prop={'size': 16}, loc='best')
 plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/hi_vs_lo/dapo_rec_vs_dist_zoom.pdf')
 plt.close()
-
-
-
-
-
-
-
-
-
-
-
 
 
