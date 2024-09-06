@@ -550,7 +550,7 @@ class SatelliteMatch:
         #
         return weights_new
     
-    def write_subhalo_matches(self, satellite, hosts, indices, weights, snapshots, params):
+    def write_subhalo_matches(self, satellite, hosts, indices, weights, snapshots, params, err_tweak=1):
         """
         DESCRIPTION:
             After finding matches based on the methods above, "subhalo_match()" 
@@ -597,7 +597,10 @@ class SatelliteMatch:
                 - Snapshot that the analog was found at
         """
         # If the file exists, then append to it, otherwise create it
-        file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/'
+        if err_tweak == 1:
+            file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/fiducial/'
+        else:
+            file_path = self.home_dir+f'/orbit_data/hdf5_files/satellite_matching/err_tweak_{err_tweak}/'
         satellite_name = satellite.replace(' ', '_')
         if os.path.isfile(file_path+'weights_'+satellite_name+'.txt'):
             print('File exists. Delete or move it elsewhere.')
