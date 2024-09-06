@@ -199,7 +199,7 @@ class SatelliteMatch:
         mhalo = (mstar - self.smhm_constant)/self.smhm_slope
         return mhalo 
     
-    def lg_satellite_properties(self, lg_data, galaxy_name, mass_err=0.35):
+    def lg_satellite_properties(self, lg_data, galaxy_name, mass_err=0.35, err_tweak=1):
         """
         DESCRIPTION:
             Using a CSV file, create a dictionary of satellite properties
@@ -214,6 +214,9 @@ class SatelliteMatch:
             
             - mass_err    : float
                             The log of the error in halo mass that we accept.
+            
+            - err_tweak   : float
+                            A factor to tweak any ".err" keys by. Default is 1.
 
         NOTES:
             - Must already read in a CSV that contains various properties about
@@ -233,12 +236,18 @@ class SatelliteMatch:
             raise ValueError('* galaxy name = {0} not in the input catalog!'.format(galaxy_name))
         #
         for prop_name in lg_data[galaxy_name].keys():
-            satellite_dict[prop_name] = lg_data[galaxy_name][prop_name]
+            value = lg_data[galaxy_name][prop_name]
+            #
+            # Check if key is an "error" property
+            if '.err' in prop_name:
+                satellite_dict[prop_name] = value * err_tweak
+            else:
+                satellite_dict[prop_name] = value
         #
         log_mass_halo = self.satellite_mhalo(np.log10(satellite_dict['mass.star']))
         mass_halo = 10**(log_mass_halo)
         satellite_dict['mass.peak'] = mass_halo
-        satellite_dict['mass.peak.err'] = mass_err
+        satellite_dict['mass.peak.err'] = mass_err * err_tweak
         #
         return satellite_dict
 
