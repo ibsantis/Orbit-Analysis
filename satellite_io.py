@@ -235,6 +235,8 @@ class SatelliteMatch:
         else:
             raise ValueError('* galaxy name = {0} not in the input catalog!'.format(galaxy_name))
         #
+        if (err_tweak == 1) and (specific_err_key == None):
+            print("USING DEFAULT SETTINGS AND RECREATING FIDUCIAL FILE SELECTION.")
         for prop_name, value in lg_data[galaxy_name].items():
             if prop_name == specific_err_key:
                 satellite_dict[prop_name] = value * err_tweak
