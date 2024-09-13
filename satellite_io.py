@@ -246,7 +246,7 @@ class SatelliteMatch:
         log_mass_halo = self.satellite_mhalo(np.log10(satellite_dict['mass.star']))
         mass_halo = 10**(log_mass_halo)
         satellite_dict['mass.peak'] = mass_halo
-        satellite_dict['mass.peak.err'] = mass_err * err_tweak if specific_err_key == 'mass.peak.error' else mass_err
+        satellite_dict['mass.peak.err'] = mass_err * err_tweak if specific_err_key == 'mass.peak.err' else mass_err
         #
         return satellite_dict
 
