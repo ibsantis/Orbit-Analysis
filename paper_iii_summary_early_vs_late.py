@@ -39,8 +39,8 @@ lg_data = pd.read_csv(sim_data.home_dir+'/orbit_data/paper_III/localgroup_galaxi
 galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12n']
 
 # Based on Horta et al
-galaxies_early = ['m12f', 'm12i', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise']
-galaxies_later = ['m12b', 'm12c', 'm12m', 'Romulus', 'Remus']
+galaxies_early = ['m12f', 'm12i', 'Romeo', 'Juliet', 'Thelma', 'Louise']
+galaxies_later = ['m12b', 'm12c', 'm12m', 'm12w','Romulus', 'Remus']
 
 
 mw_sats_1Mpc = ['Antlia 2', 'Aquarius 2', 'Bootes 1', 'Bootes 2', 'Bootes 3', \
@@ -1367,3 +1367,66 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/ke_vs_dist_zoom.pdf')
 plt.close()
+
+
+
+numerator = np.abs(meds_early[mask_early*mask_later] - meds_later[mask_early*mask_later])
+denominator = 0.5*((uppers_early[mask_early*mask_later] - lowers_early[mask_early*mask_later]) + (uppers_later[mask_early*mask_later] - lowers_later[mask_early*mask_later]))
+def making_plots(num, den, propname):
+    #
+    print('Some useful stuff:')
+    outliers = (num/den)[num/den > 1]
+    outliers_sats = np.asarray(mw_sats_1Mpc)[mask_early*mask_later][num/den > 1]
+    print(f'    * Values above 1: {outliers}')
+    print(f'    * Sats with values above 1: {outliers_sats}')
+    # Vs Mstar
+    plt.rcParams["font.family"] = "serif"
+    f, axs = plt.subplots(1, 1, figsize=(10,8))
+    axs.scatter(sat_mstar[mask_early*mask_later], num/den, s=50, c='#c76438', alpha=0.5)
+    axs.set_xscale('log')
+    axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
+    axs.set_ylabel('|$\\Delta$ median| / Average width of scatters', fontsize=24)
+    axs.hlines(0, np.min(sat_mstar[mask_early*mask_later]), np.max(sat_mstar[mask_early*mask_later]), color='k', linestyle='dashed', alpha=0.3)
+    plt.tight_layout()
+    #plt.show()
+    plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/comp/'+propname+'_vs_mass_comparison.pdf')
+    plt.close()
+
+    plt.rcParams["font.family"] = "serif"
+    f, axs = plt.subplots(1, 1, figsize=(10,8))
+    axs.scatter(sat_mstar[mask_early*mask_later], num/den, s=50, c='#c76438', alpha=0.5)
+    axs.set_xscale('log')
+    axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
+    axs.set_ylabel('|$\\Delta$ median| / Average width of scatters', fontsize=24)
+    axs.set_ylim(-0.05,1.05)
+    axs.hlines(0, np.min(sat_mstar[mask_early*mask_later]), np.max(sat_mstar[mask_early*mask_later]), color='k', linestyle='dashed', alpha=0.3)
+    plt.tight_layout()
+    #plt.show()
+    plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/comp/'+propname+'_vs_mass_comparison_zoom.pdf')
+    plt.close()
+
+    # Vs distance
+    plt.rcParams["font.family"] = "serif"
+    f, axs = plt.subplots(1, 1, figsize=(10,8))
+    axs.scatter(sat_dist[mask_early*mask_later], num/den, s=50, c='#c76438', alpha=0.5)
+    axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
+    axs.set_ylabel('|$\\Delta$ median| / Average width of scatters', fontsize=24)
+    axs.hlines(0, np.min(sat_dist[mask_early*mask_later]), np.max(sat_dist[mask_early*mask_later]), color='k', linestyle='dashed', alpha=0.3)
+    plt.tight_layout()
+    #plt.show()
+    plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/comp/'+propname+'_vs_dist_comparison.pdf')
+    plt.close()
+
+    plt.rcParams["font.family"] = "serif"
+    f, axs = plt.subplots(1, 1, figsize=(10,8))
+    axs.scatter(sat_dist[mask_early*mask_later], num/den, s=50, c='#c76438', alpha=0.5)
+    axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
+    axs.set_ylabel('|$\\Delta$ median| / Average width of scatters', fontsize=24)
+    axs.set_ylim(-0.05,1.05)
+    axs.set_xlim(0, 420)
+    axs.hlines(0, np.min(sat_dist[mask_early*mask_later]), np.max(sat_dist[mask_early*mask_later]), color='k', linestyle='dashed', alpha=0.3)
+    plt.tight_layout()
+    #plt.show()
+    plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/comp/'+propname+'_vs_dist_comparison_zoom.pdf')
+    plt.close()
+
