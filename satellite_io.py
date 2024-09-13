@@ -199,7 +199,7 @@ class SatelliteMatch:
         mhalo = (mstar - self.smhm_constant)/self.smhm_slope
         return mhalo 
     
-    def lg_satellite_properties(self, lg_data, galaxy_name, mass_err=0.35, err_tweak=1):
+    def lg_satellite_properties(self, lg_data, galaxy_name, mass_err=0.35, err_tweak=1, specific_err_key=None):
         """
         DESCRIPTION:
             Using a CSV file, create a dictionary of satellite properties
@@ -235,11 +235,8 @@ class SatelliteMatch:
         else:
             raise ValueError('* galaxy name = {0} not in the input catalog!'.format(galaxy_name))
         #
-        for prop_name in lg_data[galaxy_name].keys():
-            value = lg_data[galaxy_name][prop_name]
-            #
-            # Check if key is an "error" property
-            if '.err' in prop_name:
+        for prop_name, value in lg_data[galaxy_name].items():
+            if prop_name == specific_err_key:
                 satellite_dict[prop_name] = value * err_tweak
             else:
                 satellite_dict[prop_name] = value
@@ -247,7 +244,7 @@ class SatelliteMatch:
         log_mass_halo = self.satellite_mhalo(np.log10(satellite_dict['mass.star']))
         mass_halo = 10**(log_mass_halo)
         satellite_dict['mass.peak'] = mass_halo
-        satellite_dict['mass.peak.err'] = mass_err * err_tweak
+        satellite_dict['mass.peak.err'] = mass_err * err_tweak if specific_err_key == 'mass.peak.error' else mass_err
         #
         return satellite_dict
 
@@ -550,7 +547,7 @@ class SatelliteMatch:
         #
         return weights_new
     
-    def write_subhalo_matches(self, satellite, hosts, indices, weights, snapshots, params, err_tweak=1):
+    def write_subhalo_matches(self, satellite, hosts, indices, weights, snapshots, params, file_path):
         """
         DESCRIPTION:
             After finding matches based on the methods above, "subhalo_match()" 
@@ -596,11 +593,12 @@ class SatelliteMatch:
                 - Subhalo analog weight
                 - Snapshot that the analog was found at
         """
+        ##### Commenting this out for now and requiring it as a parameter in the function
         # If the file exists, then append to it, otherwise create it
-        if err_tweak == 1:
-            file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/fiducial/'
-        else:
-            file_path = self.home_dir+f'/orbit_data/hdf5_files/satellite_matching/err_tweak_{err_tweak}/'
+        # if err_tweak == 1:
+        #     file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/fiducial/'
+        # else:
+        #     file_path = self.home_dir+f'/orbit_data/hdf5_files/satellite_matching/err_tweak_{err_tweak}/'
         satellite_name = satellite.replace(' ', '_')
         if os.path.isfile(file_path+'weights_'+satellite_name+'.txt'):
             print('File exists. Delete or move it elsewhere.')
@@ -643,7 +641,7 @@ class SatelliteAnalysis(SatelliteRead):
         """
         SatelliteRead.__init__(self, gal1, location, dmo=False)
 
-    def read_subhalo_matches(self, satellite, home_dir=None, err_tweak=1):
+    def read_subhalo_matches(self, satellite, file_path, home_dir=None):
         """
         DESCRIPTION:
             Read in the files with the weights and create a Pandas dataframe object.
@@ -670,10 +668,11 @@ class SatelliteAnalysis(SatelliteRead):
         """
         # If the file exists, then open it
         satellite_name = satellite.replace(' ', '_')
-        if err_tweak == 1:
-            file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_'+satellite_name+'.txt'
-        else:
-            file_path = self.home_dir+f'/orbit_data/hdf5_files/satellite_matching/err_tweak_{err_tweak}/weights_'+satellite_name+'.txt'
+        #### I want to explicitly set the file path
+        # if err_tweak == 1:
+        #     file_path = self.home_dir+'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_'+satellite_name+'.txt'
+        # else:
+        #     file_path = self.home_dir+f'/orbit_data/hdf5_files/satellite_matching/err_tweak_{err_tweak}/weights_'+satellite_name+'.txt'
         header_info = ['Host', 'Halo tree index', 'Weight', 'Snapshot at match']
         data = pd.read_csv(file_path, skiprows=5, names=header_info)
         #
