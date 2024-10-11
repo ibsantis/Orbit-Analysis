@@ -37,25 +37,28 @@ print('Set paths')
 # Read in the snapshot dictionary and the entire tree
 lg_data = pd.read_csv(sim_data.home_dir+'/orbit_data/paper_III/localgroup_galaxies_condensed.csv', index_col=0)
 
-galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'm12z', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12j', 'm12n']
+galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12n']
 
-mw_sats = ['HIZSS 3(A)', 'HIZSS 3B', 'NGC 55', 'LMC', 'SMC', 'IC 4662', 'IC 5152', 'NGC 6822', 'NGC 3109', 'IC 3104', \
-           'Sextans B', 'DDO 190', 'DDO 125', 'Sextans A', 'NGC 4163', 'Sagittarius dSph', 'UGC 8508', 'Fornax', 'UGC 4879', \
-           'UGC 9128', 'GR 8', 'Leo A', 'Leo 1', 'Sagittarius dIrr', 'ESO 294-G010', 'DDO 113', 'Sculptor', 'Antlia 2', 'Aquarius (DDO 210)',\
-           'Phoenix', 'Leo 2', 'Antlia B', 'Tucana', 'KKR 3', 'Carina', 'Leo P', 'Crater 2', 'Ursa Minor', 'Sextans 1', \
-           'Draco', 'Canes Venatici 1', 'Leo T', 'Eridanus 2', 'Bootes 1', 'Hercules', 'Bootes 3', 'Sagittarius 2', \
-           'Canes Venatici 2', 'Ursa Major 1', 'Leo 4', 'Hydra 2', 'Hydrus 1', 'Carina 2', 'Ursa Major 2', 'Aquarius 2', \
-           'Indus 2', 'Coma Berenices', 'Leo 5', 'Pisces 2', 'Columba 1', 'Tucana 5', 'Pegasus 3', 'Grus 2', 'Tucana 2', \
-           'Reticulum 2', 'Horologium 1', 'Pictor 1', 'Tucana 4', 'Indus 1', 'Grus 1', 'Reticulum 3', 'Pictor 2', 'Bootes 2',\
-           'Willman 1', 'Phoenix 2', 'Cetus 3', 'Carina 3', 'Eridanus 3', 'Segue 2', 'Triangulum 2', 'Horologium 2', 'Tucana 3',\
-           'Segue 1', 'DES J0225+0304', 'Virgo 1', 'Draco 2', 'Cetus 2']
+mw_sats_1Mpc = ['Antlia 2', 'Aquarius 2', 'Bootes 1', 'Bootes 2', 'Bootes 3', \
+                'Canes Venatici 1', 'Canes Venatici 2', 'Carina', 'Carina 2', \
+                'Carina 3', 'Cetus 2', 'Cetus 3', 'Columba 1', 'Coma Berenices', \
+                'Crater 2', 'DES J0225+0304', 'Draco', 'Draco 2', 'Eridanus 2', \
+                'Eridanus 3', 'Fornax', 'Grus 1', 'Grus 2', 'Hercules', \
+                'Horologium 1', 'Horologium 2', 'Hydra 2', 'Hydrus 1', 'Indus 1', \
+                'Indus 2', 'Leo 1', 'Leo 2', 'Leo 4', 'Leo 5', 'Leo A', 'Leo T', \
+                'Pegasus 3', 'Phoenix', 'Phoenix 2', 'Pictor 1', 'Pictor 2', \
+                'Pisces 2', 'Reticulum 2', 'Reticulum 3', 'Sagittarius 2', \
+                'Sculptor', 'Segue 1', 'Segue 2', 'Sextans 1', 'Triangulum 2', \
+                'Tucana', 'Tucana 2', 'Tucana 3', 'Tucana 4', 'Tucana 5', \
+                'Ursa Major 1', 'Ursa Major 2', 'Ursa Minor', 'Virgo 1', \
+                'Willman 1']
 
 
 #galaxy = 'Sculptor'
-for galaxy in mw_sats:
+for galaxy in mw_sats_1Mpc:
     #
-    gal_data = sat_analysis.read_subhalo_matches(galaxy)
     satellite_name = galaxy.replace(' ', '_')
+    gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path=sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt')
     #
     if len(gal_data['Host']) == 0:
         continue
@@ -75,6 +78,8 @@ for galaxy in mw_sats:
     orbit_dictionary['distance'] = np.zeros(gal_data.shape[0])
     orbit_dictionary['velocity.rad'] = np.zeros(gal_data.shape[0])
     orbit_dictionary['velocity.tan'] = np.zeros(gal_data.shape[0])
+    orbit_dictionary['L.tot.sim'] = np.zeros(gal_data.shape[0])
+    orbit_dictionary['v.tot.sim'] = np.zeros(gal_data.shape[0])
     #
     for sim_name in galaxies:
         if sim_name in np.array(gal_data['Host']):

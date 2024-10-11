@@ -56,8 +56,8 @@ mw_sats_1Mpc = ['Antlia 2', 'Aquarius 2', 'Bootes 1', 'Bootes 2', 'Bootes 3', \
 #galaxy = 'Sculptor'
 for galaxy in mw_sats_1Mpc:
     #
-    gal_data = sat_analysis.read_subhalo_matches(galaxy)
     satellite_name = galaxy.replace(' ', '_')
+    gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path=sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt')
     #
     if len(gal_data['Host']) == 0:
         continue
@@ -77,6 +77,8 @@ for galaxy in mw_sats_1Mpc:
     orbit_dictionary['distance'] = np.zeros(gal_data.shape[0])
     orbit_dictionary['velocity.rad'] = np.zeros(gal_data.shape[0])
     orbit_dictionary['velocity.tan'] = np.zeros(gal_data.shape[0])
+    orbit_dictionary['L.tot.sim'] = np.zeros(gal_data.shape[0])
+    orbit_dictionary['v.tot.sim'] = np.zeros(gal_data.shape[0])
     #
     for sim_name in galaxies:
         if sim_name in np.array(gal_data['Host']):
@@ -267,7 +269,7 @@ for galaxy in mw_sats_1Mpc:
     axs[3,1].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=1, color='k', alpha=0.4, edgecolor=None)
     x_mean = np.sum(orbit_dictionary['pericenter.num']*gal_data['Weight'])/np.sum(gal_data['Weight'])
     y_mean = 1.1
-    std = np.sum((orbit_dictionary['pericenter.num']-x_mean)**2 * gal_data['Weight'])/np.sum(gal_data['Weight'])
+    std = np.sqrt(np.sum((orbit_dictionary['pericenter.num']-x_mean)**2*gal_data['Weight'])/np.sum(gal_data['Weight'])/np.sum(gal_data['Weight'][m]))
     axs[3,1].errorbar(x_mean, y_mean, xerr=std, color='k', lw=3.5, capsize=0)
     axs[3,1].scatter(x_mean, y_mean, s=75, marker='s', c='k')
     axs[3,1].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
