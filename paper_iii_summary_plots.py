@@ -92,7 +92,7 @@ mhalo = []
 #
 for galaxy in mw_sats_1Mpc:
     #
-    gal_data = sat_analysis.read_subhalo_matches(galaxy)
+    gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path=sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{galaxy}.txt')
     satellite_name = galaxy.replace(' ', '_')
     #
     if len(gal_data['Host']) == 0:
