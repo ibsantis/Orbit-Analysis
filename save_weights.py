@@ -24,7 +24,7 @@ lg_data = pd.read_csv(sim_data.home_dir+'/orbit_data/paper_III/localgroup_galaxi
 #galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'm12z', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12j', 'm12n']
 galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12n']
 
-mw_sats = ['NGC 55', 'LMC', 'SMC', 'IC 4662', 'IC 5152', 'NGC 6822', 'NGC 3109', 'IC 3104', \
+mw_sats_old = ['NGC 55', 'LMC', 'SMC', 'IC 4662', 'IC 5152', 'NGC 6822', 'NGC 3109', 'IC 3104', \
            'Sextans B', 'DDO 190', 'DDO 125', 'Sextans A', 'NGC 4163', 'Sagittarius dSph', 'UGC 8508', 'Fornax', 'UGC 4879', \
            'UGC 9128', 'GR 8', 'Leo A', 'Leo 1', 'Sagittarius dIrr', 'ESO 294-G010', 'DDO 113', 'Sculptor', 'Antlia 2', 'Aquarius (DDO 210)',\
            'Phoenix', 'Leo 2', 'Antlia B', 'Tucana', 'KKR 3', 'Carina', 'Leo P', 'Crater 2', 'Ursa Minor', 'Sextans 1', \
@@ -35,12 +35,27 @@ mw_sats = ['NGC 55', 'LMC', 'SMC', 'IC 4662', 'IC 5152', 'NGC 6822', 'NGC 3109',
            'Willman 1', 'Phoenix 2', 'Cetus 3', 'Carina 3', 'Eridanus 3', 'Segue 2', 'Triangulum 2', 'Horologium 2', 'Tucana 3',\
            'Segue 1', 'DES J0225+0304', 'Virgo 1', 'Draco 2', 'Cetus 2']
 
+mw_sats =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Bootes II', 'Bootes III', \
+               'Bootes IV', 'Bootes V', 'Canes Venatici I', 'Canes Venatici II', 'Carina', 'Carina II', \
+               'Carina III', 'Centaurus I', 'Cetus II', 'Cetus III', 'Columba I', 'Coma Berenices', \
+               'Crater II', 'Draco', 'Draco II', 'Eridanus II', 'Eridanus III', 'Eridanus IV', \
+               'Fornax', 'Grus I', 'Grus II', 'Hercules', 'Horologium I', 'Horologium II', \
+               'Hydra II', 'Hydrus I', 'Indus I', 'Leo I', 'Leo II', 'Leo IV', \
+               'Leo V', 'Leo VI', 'Leo A', 'Leo T', 'Leo Minor I', 'Pegasus III', \
+               'Pegasus IV', 'Phoenix I', 'Phoenix II', 'Pictor I', 'Pictor II', 'Pisces II', \
+               'Reticulum II', 'Reticulum III', 'Sagittarius', 'Sagittarius II', 'Sculptor', 'Segue 1', \
+               'Segue 2', 'Sextans', 'Sextans II', 'Triangulum II', 'Tucana I', 'Tucana II', \
+               'Tucana III', 'Tucana IV', 'Tucana V', 'Ursa Major I', 'Ursa Major II', 'Ursa Minor', \
+               'Virgo I', 'Virgo II', 'Virgo III', 'Willman 1']
+
+file_save_path = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/'
+
 ###### TWEAK THE CODE SO THAT IT ONLY WORKS ON ONE SATELLITE
 final_dict = dict()
 halo_mass_dex_error = 0.35
 sigma_phase_space = 3
 percent_nd_gaussian = 99 # 3 sigma
-alpha=0.58
+#alpha=0.58
 #
 start_time = time.time()
 for sat_name in mw_sats:
@@ -54,7 +69,7 @@ for sat_name in mw_sats:
     for name in galaxies:
         snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+name)
 
-        mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=True)
+        mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=False)
 
         # Get the indices of the satellites that are above a given minimum halo mass (1e8 for now)
         sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1=name, location=loc)
@@ -92,7 +107,7 @@ for sat_name in mw_sats:
     #     med_reg.append(np.median(mass_array))
     #     med_w.append(ut.math.percentile_weighted(mass_array, 50, ws))
     #
-    sat_match.write_subhalo_matches(sat_name, hosts, tree_index, ws, snapshot, param_list)
+    sat_match.write_subhalo_matches(sat_name, hosts, tree_index, ws, snapshot, param_list, file_save_path)
 
 # Checking how the mass weighting affects the mass distribution
 # sat_mass = np.log10(np.asarray(sat_mass))
