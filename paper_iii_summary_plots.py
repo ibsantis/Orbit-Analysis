@@ -49,20 +49,32 @@ mw_sats = ['HIZSS 3(A)', 'HIZSS 3B', 'NGC 55', 'LMC', 'SMC', 'IC 4662', 'IC 5152
            'Willman 1', 'Phoenix 2', 'Cetus 3', 'Carina 3', 'Eridanus 3', 'Segue 2', 'Triangulum 2', 'Horologium 2', 'Tucana 3',\
            'Segue 1', 'DES J0225+0304', 'Virgo 1', 'Draco 2', 'Cetus 2']
 
-
-mw_sats_1Mpc = ['Antlia 2', 'Aquarius 2', 'Bootes 1', 'Bootes 2', 'Bootes 3', \
-                'Canes Venatici 1', 'Canes Venatici 2', 'Carina', 'Carina 2', \
-                'Carina 3', 'Cetus 2', 'Cetus 3', 'Columba 1', 'Coma Berenices', \
-                'Crater 2', 'DES J0225+0304', 'Draco', 'Draco 2', 'Eridanus 2', \
-                'Eridanus 3', 'Fornax', 'Grus 1', 'Grus 2', 'Hercules', \
-                'Horologium 1', 'Horologium 2', 'Hydra 2', 'Hydrus 1', 'Indus 1', \
-                'Indus 2', 'Leo 1', 'Leo 2', 'Leo 4', 'Leo 5', 'Leo A', 'Leo T', \
-                'Pegasus 3', 'Phoenix', 'Phoenix 2', 'Pictor 1', 'Pictor 2', \
-                'Pisces 2', 'Reticulum 2', 'Reticulum 3', 'Sagittarius 2', \
-                'Sculptor', 'Segue 1', 'Segue 2', 'Sextans 1', 'Triangulum 2', \
-                'Tucana', 'Tucana 2', 'Tucana 3', 'Tucana 4', 'Tucana 5', \
-                'Ursa Major 1', 'Ursa Major 2', 'Ursa Minor', 'Virgo 1', \
-                'Willman 1']
+# mw_sats_1Mpc_old = ['Antlia 2', 'Aquarius 2', 'Bootes 1', 'Bootes 2', 'Bootes 3', \
+#                 'Canes Venatici 1', 'Canes Venatici 2', 'Carina', 'Carina 2', \
+#                 'Carina 3', 'Cetus 2', 'Cetus 3', 'Columba 1', 'Coma Berenices', \
+#                 'Crater 2', 'DES J0225+0304', 'Draco', 'Draco 2', 'Eridanus 2', \
+#                 'Eridanus 3', 'Fornax', 'Grus 1', 'Grus 2', 'Hercules', \
+#                 'Horologium 1', 'Horologium 2', 'Hydra 2', 'Hydrus 1', 'Indus 1', \
+#                 'Indus 2', 'Leo 1', 'Leo 2', 'Leo 4', 'Leo 5', 'Leo A', 'Leo T', \
+#                 'Pegasus 3', 'Phoenix', 'Phoenix 2', 'Pictor 1', 'Pictor 2', \
+#                 'Pisces 2', 'Reticulum 2', 'Reticulum 3', 'Sagittarius 2', \
+#                 'Sculptor', 'Segue 1', 'Segue 2', 'Sextans 1', 'Triangulum 2', \
+#                 'Tucana', 'Tucana 2', 'Tucana 3', 'Tucana 4', 'Tucana 5', \
+#                 'Ursa Major 1', 'Ursa Major 2', 'Ursa Minor', 'Virgo 1', \
+#                 'Willman 1']
+                
+mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Bootes II', 'Bootes III', \
+                    'Bootes IV', 'Bootes V', 'Canes Venatici I', 'Canes Venatici II', 'Carina', 'Carina II', \
+                    'Carina III', 'Centaurus I', 'Cetus II', 'Cetus III', 'Columba I', 'Coma Berenices', \
+                    'Crater II', 'Draco', 'Draco II', 'Eridanus II', 'Eridanus III', 'Eridanus IV', \
+                    'Fornax', 'Grus I', 'Grus II', 'Hercules', 'Horologium I', 'Horologium II', \
+                    'Hydra II', 'Hydrus I', 'Indus I', 'Leo I', 'Leo II', 'Leo IV', \
+                    'Leo V', 'Leo VI', 'Leo A', 'Leo T', 'Leo Minor I', 'Pegasus III', \
+                    'Pegasus IV', 'Phoenix I', 'Phoenix II', 'Pictor I', 'Pictor II', 'Pisces II', \
+                    'Reticulum II', 'Reticulum III', 'Sagittarius', 'Sagittarius II', 'Sculptor', 'Segue 1', \
+                    'Segue 2', 'Sextans', 'Sextans II', 'Triangulum II', 'Tucana I', 'Tucana II', \
+                    'Tucana III', 'Tucana IV', 'Tucana V', 'Ursa Major I', 'Ursa Major II', 'Ursa Minor', \
+                    'Virgo I', 'Virgo II', 'Virgo III', 'Willman 1']
 
 mw_sats_proposal =  ['Horologium 2', 'Pisces 2', 'Hydra 2', 'Eridanus 2', 'Willman 1', 'Reticulum 3', \
                      'Columba 1', 'Ursa Major 1', 'Pictor 1', 'Bootes 2', 'Grus 1', 'Tucana 5', 'Coma Berenices', \
@@ -92,8 +104,9 @@ mhalo = []
 #
 for galaxy in mw_sats_1Mpc:
     #
-    gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path=sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{galaxy}.txt')
     satellite_name = galaxy.replace(' ', '_')
+    file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
+    gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
     #
     if len(gal_data['Host']) == 0:
         continue
@@ -298,6 +311,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#c76438', alpha=0.7)
+axs.set_xlim(xmin=0)
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('Lookback infall time [Gyr]', fontsize=24)
 plt.tight_layout()
@@ -312,7 +326,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#c76438', alpha=0.7)
-axs.set_xlim(0,420)
+axs.set_xlim(0,425)
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('Lookback infall time [Gyr]', fontsize=24)
 plt.tight_layout()
@@ -352,6 +366,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], means[mask][i], s=50, c='#2b5b0c', alpha=0.7)
+axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$N_{\\rm peri}$', fontsize=24)
 plt.tight_layout()
@@ -366,7 +381,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], means[mask][i], s=50, c='#2b5b0c', alpha=0.7)
-axs.set_xlim(0,420)
+axs.set_xlim(0,425)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$N_{\\rm peri}$', fontsize=24)
 plt.tight_layout()
@@ -407,6 +422,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#432471', alpha=0.7)
+axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, rec}$ [Gyr]', fontsize=24)
 plt.tight_layout()
@@ -421,8 +437,8 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#432471', alpha=0.7)
-axs.set_xlim(0,420)
-axs.set_ylim(-0.2, 8)
+axs.set_xlim(0,425)
+#axs.set_ylim(-0.2, 8)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, rec}$ [Gyr]', fontsize=24)
 plt.tight_layout()
@@ -465,6 +481,7 @@ for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), alpha=0.7, color='#d05151', lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
 axs.set_ylim(0, 140)
+axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, rec}$ [kpc]', fontsize=24)
 plt.tight_layout()
@@ -480,7 +497,7 @@ for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
 axs.set_ylim(0, 140)
-axs.set_xlim(0,420)
+axs.set_xlim(0,425)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, rec}$ [kpc]', fontsize=24)
 plt.tight_layout()
@@ -521,6 +538,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#1542b0', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#1542b0', alpha=0.7)
+axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri, rec}$ [km s$^{-1}$]', fontsize=24)
 plt.tight_layout()
@@ -535,7 +553,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#1542b0', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#1542b0', alpha=0.7)
-axs.set_xlim(0,420)
+axs.set_xlim(0,425)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri, rec}$ [km s$^{-1}$]', fontsize=24)
 plt.tight_layout()
@@ -576,6 +594,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#780d3f', alpha=0.7)
+axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, min}$ [Gyr]', fontsize=24)
 plt.tight_layout()
@@ -590,7 +609,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#780d3f', alpha=0.7)
-axs.set_xlim(0,420)
+axs.set_xlim(0,425)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, min}$ [Gyr]', fontsize=24)
 plt.tight_layout()
@@ -647,7 +666,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#572135', alpha=0.7)
-axs.set_xlim(0,420)
+axs.set_xlim(0,425)
 axs.set_ylim(0, 140)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
@@ -689,6 +708,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#f38e00', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#f38e00', alpha=0.7)
+axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri, min}$ [km s$^{-1}$]', fontsize=24)
 plt.tight_layout()
@@ -703,7 +723,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#f38e00', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#f38e00', alpha=0.7)
-axs.set_xlim(0,420)
+axs.set_xlim(0,425)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri, min}$ [km s$^{-1}$]', fontsize=24)
 plt.tight_layout()
@@ -744,6 +764,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#6e1d16', alpha=0.7)
+axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
 plt.tight_layout()
@@ -758,7 +779,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#6e1d16', alpha=0.7)
-axs.set_xlim(0,420)
+axs.set_xlim(0,425)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
 plt.tight_layout()
@@ -799,6 +820,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#4e2026', alpha=0.7)
+axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
 plt.tight_layout()
@@ -813,7 +835,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#4e2026', alpha=0.7)
-axs.set_xlim(0,420)
+axs.set_xlim(0,425)
 axs.set_ylim(0,500)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
@@ -871,6 +893,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i]/1e4, s=50, c='#4e2026', alpha=0.7)
+axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$\\ell [10^4\ kpc\ km\ s^{-1}]$', fontsize=24)
 plt.tight_layout()
@@ -927,6 +950,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i]/1e4, s=50, c='#4e2026', alpha=0.7)
+axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('Specific Kinetic Energy $[10^4\ km^2\ s^{-2}]$', fontsize=24)
 plt.tight_layout()
@@ -978,7 +1002,7 @@ for i in range(0, len(sat_mstar[mask])):
     axs[1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.7, lw=3.5, capsize=0)
     axs[1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#c76438', alpha=0.7)
 #
-axs[0].set_xlim(0,420)
+axs[0].set_xlim(0,425)
 #
 axs[1].set_xscale('log')
 #
@@ -1018,7 +1042,7 @@ for i in range(0, len(sat_mstar[mask])):
     axs[1].errorbar(sat_mstar[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
     axs[1].scatter(sat_mstar[mask][i], means[mask][i], s=50, c='#2b5b0c', alpha=0.7)
 #
-axs[0].set_xlim(0,420)
+axs[0].set_xlim(0,425)
 #
 axs[1].set_xscale('log')
 #
@@ -1033,11 +1057,6 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/nperi_plot.pdf')
 plt.close()
-
-
-
-
-
 
 
 
@@ -1081,8 +1100,8 @@ for i in range(0, len(sat_mstar[mask])):
     axs[1,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.7, lw=3.5, capsize=0)
     axs[1,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
 #
-axs[0,0].set_xlim(0,420)
-axs[1,0].set_xlim(0,420)
+axs[0,0].set_xlim(0,425)
+axs[1,0].set_xlim(0,425)
 axs[1,0].set_ylim(0,140)
 axs[1,1].set_ylim(0,140)
 #
@@ -1103,12 +1122,6 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/recent_peri_both.pdf')
 plt.close()
-
-
-
-
-
-
 
 
 
@@ -1152,8 +1165,8 @@ for i in range(0, len(sat_mstar[mask])):
     axs[1,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.7, lw=3.5, capsize=0)
     axs[1,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#572135', alpha=0.7)
 
-axs[0,0].set_xlim(0,420)
-axs[1,0].set_xlim(0,420)
+axs[0,0].set_xlim(0,425)
+axs[1,0].set_xlim(0,425)
 axs[1,0].set_ylim(0,140)
 axs[1,1].set_ylim(0,140)
 #
@@ -1174,8 +1187,6 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/minimum_peri_both.pdf')
 plt.close()
-
-
 
 
 
@@ -1219,8 +1230,8 @@ for i in range(0, len(sat_mstar[mask])):
     axs[1,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
     axs[1,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#4e2026', alpha=0.7)
 #
-axs[0,0].set_xlim(0,420)
-axs[1,0].set_xlim(0,420)
+axs[0,0].set_xlim(0,425)
+axs[1,0].set_xlim(0,425)
 #
 axs[0,1].set_xscale('log')
 axs[1,1].set_xscale('log')
@@ -1300,7 +1311,7 @@ for i in range(1, len(sat_dist[mask_rec])):
 for i in range(1, len(sat_dist[mask_min])):
     axs.errorbar(sat_dist[mask_min][i], meds_min[mask_min][i], yerr=np.array([[meds_min[mask_min][i]-lowers_min[mask_min][i]],[uppers_min[mask_min][i]-meds_min[mask_min][i]]]), color='#f38e00', alpha=0.35, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask_min][i], meds_min[mask_min][i], s=50, c='#f38e00', alpha=0.35)
-axs.set_xlim(0,420)
+axs.set_xlim(0,425)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri}$ [km s$^{-1}$]', fontsize=24)
 axs.legend(prop={'size': 16}, loc='best')
