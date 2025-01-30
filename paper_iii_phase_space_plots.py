@@ -147,9 +147,10 @@ for galaxy in mw_sats_1Mpc:
     plt.close()
 
 
-galaxy = 'Aquarius 2'
-gal_data = sat_analysis.read_subhalo_matches(galaxy)
+galaxy = 'Leo IV'
 satellite_name = galaxy.replace(' ', '_')
+file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
+gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
 mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=True)
 sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1='m12i', location=loc)
 match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name=galaxy, mass_err=0.35)
@@ -169,11 +170,13 @@ orbit_dictionary['halo.mass.peak'] = np.zeros(gal_data.shape[0])
 orbit_dictionary['distance'] = np.zeros(gal_data.shape[0])
 orbit_dictionary['velocity.rad'] = np.zeros(gal_data.shape[0])
 orbit_dictionary['velocity.tan'] = np.zeros(gal_data.shape[0])
+orbit_dictionary['L.tot.sim'] = np.zeros(gal_data.shape[0])
+orbit_dictionary['v.tot.sim'] = np.zeros(gal_data.shape[0])
 #
 for sim_name in galaxies:
     if sim_name in np.array(gal_data['Host']):
         # Read in the mini data and snapshot information
-        mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_name+'_all_subhalos', verbose=True)
+        mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_name+'_all_subhalos', verbose=False)
         snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+sim_name)
         #
         orbit_history = sat_analysis.orbit_property_distribution(sim_name, mini_data, gal_data, snaps)
@@ -208,20 +211,20 @@ axs[1,0].axhspan(match['host.velocity.rad']-match['host.velocity.rad.err'], matc
 axs[1,1].axhspan(match['host.velocity.rad']-match['host.velocity.rad.err'], match['host.velocity.rad']+match['host.velocity.rad.err'], alpha=0.1, color='b', zorder=0)
 axs[2,0].axhspan(match['host.distance.total']-match['host.distance.total.err'], match['host.distance.total']+match['host.distance.total.err'], alpha=0.1, color='b', zorder=0)
 #
-axs[0,0].set_ylabel('Tangential velocity [km s$^{-1}$]', fontsize=17)
-axs[1,0].set_ylabel('Radial velocity [km s$^{-1}$]', fontsize=17)
-axs[2,0].set_ylabel('Distance [kpc]', fontsize=17)
-axs[2,0].set_xlabel('log $M_{\\rm halo, peak}$', fontsize=17)
-axs[1,1].set_xlabel('Distance [kpc]', fontsize=17)
-axs[0,2].set_xlabel('Radial velocity [km s$^{-1}$]', fontsize=17)
+axs[0,0].set_ylabel('Tangential velocity [km s$^{-1}$]', fontsize=18)
+axs[1,0].set_ylabel('Radial velocity [km s$^{-1}$]', fontsize=18)
+axs[2,0].set_ylabel('Distance [kpc]', fontsize=20)
+axs[2,0].set_xlabel('log $M_{\\rm halo, peak}$', fontsize=24)
+axs[1,1].set_xlabel('Distance [kpc]', fontsize=24)
+axs[0,2].set_xlabel('Radial velocity [km s$^{-1}$]', fontsize=20)
 #
-plt.suptitle('{0} - Number of analogs = {1}'.format(galaxy, len(gal_data['Weight'])), fontsize=20)
-axs[0,0].tick_params(axis='both', which='major', labelbottom=False, labelsize=14)
-axs[1,0].tick_params(axis='both', which='major', labelbottom=False, labelsize=14)
-axs[2,0].tick_params(axis='both', which='major', labelsize=14)
-axs[0,1].tick_params(axis='both', which='major', labelbottom=False, labelleft=False, labelsize=14)
-axs[1,1].tick_params(axis='both', which='major', labelsize=14, labelleft=False)
-axs[0,2].tick_params(axis='both', which='major', labelsize=14, labelleft=False)
+#plt.suptitle('{0} - Number of analogs = {1}'.format(galaxy, len(gal_data['Weight'])), fontsize=20)
+axs[0,0].tick_params(axis='both', which='major', labelbottom=False, labelsize=18)
+axs[1,0].tick_params(axis='both', which='major', labelbottom=False, labelsize=18)
+axs[2,0].tick_params(axis='both', which='major', labelsize=18)
+axs[0,1].tick_params(axis='both', which='major', labelbottom=False, labelleft=False, labelsize=18)
+axs[1,1].tick_params(axis='both', which='major', labelsize=18, labelleft=False)
+axs[0,2].tick_params(axis='both', which='major', labelsize=18, labelleft=False)
 #
 axs[1,2].axison = False
 axs[2,1].axison = False

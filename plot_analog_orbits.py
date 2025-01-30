@@ -124,47 +124,8 @@ for galaxy in mw_sats_1Mpc:
     plt.close()
 
 
-### The two case study plots for the paper
-# Creating data for Bootes 3
-galaxy = 'Pegasus III'
-satellite_name = galaxy.replace(' ', '_')
-file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
-gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
-mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=True)
-sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1='m12i', location=loc)
-match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name=galaxy, mass_err=0.35)
-#
-plot_data_boo = dict()
-plot_data_boo['Hosts'] = []
-#
-for name in galaxies:
-    mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=True)
-    snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+name)
-    #
-    # get the matches for a simulation host
-    mask = (gal_data['Host'] == name)
-    # get an array of the tree indices that are matches in m12m
-    subhalo_inds = np.asarray(gal_data['Halo tree index'][mask])
-    # Get indices within the mini data to select properties
-    mini_data_match_inds = np.asarray([np.where(i == mini_data['indices.z0'][:,0])[0][0] for i in subhalo_inds])
-    #
-    if len(mini_data_match_inds != 0):
-        plot_data_boo['Hosts'].append(name)
-        # Find the infall time
-        # Snapshot at match
-        time_at_match = snaps['time'][gal_data['Snapshot at match'][mask]]
-        #
-        plot_data_boo['orbit.distance.'+name] = (-1)*np.ones(mini_data['d.tot.sim'][mini_data_match_inds].shape)
-        #
-        for i in range(0, len(mini_data_match_inds)):
-            #
-            # Get the "lookback" snapshot to the match to get the radial and tangential velocity information
-            time_ind = snaps['index'][-1] - np.where(np.min(np.abs(time_at_match[i] - snaps['time'])) == np.abs(time_at_match[i] - snaps['time']))[0][0]
-            plot_data_boo['orbit.distance.'+name][i][time_ind:] = mini_data['d.tot.sim'][mini_data_match_inds][i][time_ind:]
-        #
-        plot_data_boo['orbit.time.lb.'+name] = snaps['time'][-1] - np.flip(snaps['time'])[:mini_data['d.tot.sim'][mini_data_match_inds].shape[1]]
-
-# Creating data for Carina
+### The four case study plots for the paper
+# Leo II
 galaxy = 'Leo II'
 satellite_name = galaxy.replace(' ', '_')
 file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
@@ -173,8 +134,8 @@ mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_da
 sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1='m12i', location=loc)
 match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name=galaxy, mass_err=0.35)
 #
-plot_data_car = dict()
-plot_data_car['Hosts'] = []
+plot_data_leo_ii = dict()
+plot_data_leo_ii['Hosts'] = []
 #
 for name in galaxies:
     mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=True)
@@ -188,56 +149,197 @@ for name in galaxies:
     mini_data_match_inds = np.asarray([np.where(i == mini_data['indices.z0'][:,0])[0][0] for i in subhalo_inds])
     #
     if len(mini_data_match_inds != 0):
-        plot_data_car['Hosts'].append(name)
+        plot_data_leo_ii['Hosts'].append(name)
         # Find the infall time
         # Snapshot at match
         time_at_match = snaps['time'][gal_data['Snapshot at match'][mask]]
         #
-        plot_data_car['orbit.distance.'+name] = (-1)*np.ones(mini_data['d.tot.sim'][mini_data_match_inds].shape)
+        plot_data_leo_ii['orbit.distance.'+name] = (-1)*np.ones(mini_data['d.tot.sim'][mini_data_match_inds].shape)
         #
         for i in range(0, len(mini_data_match_inds)):
             #
             # Get the "lookback" snapshot to the match to get the radial and tangential velocity information
             time_ind = snaps['index'][-1] - np.where(np.min(np.abs(time_at_match[i] - snaps['time'])) == np.abs(time_at_match[i] - snaps['time']))[0][0]
-            plot_data_car['orbit.distance.'+name][i][time_ind:] = mini_data['d.tot.sim'][mini_data_match_inds][i][time_ind:]
+            plot_data_leo_ii['orbit.distance.'+name][i][time_ind:] = mini_data['d.tot.sim'][mini_data_match_inds][i][time_ind:]
         #
-        plot_data_car['orbit.time.lb.'+name] = snaps['time'][-1] - np.flip(snaps['time'])[:mini_data['d.tot.sim'][mini_data_match_inds].shape[1]]
+        plot_data_leo_ii['orbit.time.lb.'+name] = snaps['time'][-1] - np.flip(snaps['time'])[:mini_data['d.tot.sim'][mini_data_match_inds].shape[1]]
+
+# Leo IV
+galaxy = 'Leo IV'
+satellite_name = galaxy.replace(' ', '_')
+file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
+gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
+mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=True)
+sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1='m12i', location=loc)
+match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name=galaxy, mass_err=0.35)
+#
+plot_data_leo_iv = dict()
+plot_data_leo_iv['Hosts'] = []
+#
+for name in galaxies:
+    mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=True)
+    snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+name)
+    #
+    # get the matches for a simulation host
+    mask = (gal_data['Host'] == name)
+    # get an array of the tree indices that are matches in m12m
+    subhalo_inds = np.asarray(gal_data['Halo tree index'][mask])
+    # Get indices within the mini data to select properties
+    mini_data_match_inds = np.asarray([np.where(i == mini_data['indices.z0'][:,0])[0][0] for i in subhalo_inds])
+    #
+    if len(mini_data_match_inds != 0):
+        plot_data_leo_iv['Hosts'].append(name)
+        # Find the infall time
+        # Snapshot at match
+        time_at_match = snaps['time'][gal_data['Snapshot at match'][mask]]
+        #
+        plot_data_leo_iv['orbit.distance.'+name] = (-1)*np.ones(mini_data['d.tot.sim'][mini_data_match_inds].shape)
+        #
+        for i in range(0, len(mini_data_match_inds)):
+            #
+            # Get the "lookback" snapshot to the match to get the radial and tangential velocity information
+            time_ind = snaps['index'][-1] - np.where(np.min(np.abs(time_at_match[i] - snaps['time'])) == np.abs(time_at_match[i] - snaps['time']))[0][0]
+            plot_data_leo_iv['orbit.distance.'+name][i][time_ind:] = mini_data['d.tot.sim'][mini_data_match_inds][i][time_ind:]
+        #
+        plot_data_leo_iv['orbit.time.lb.'+name] = snaps['time'][-1] - np.flip(snaps['time'])[:mini_data['d.tot.sim'][mini_data_match_inds].shape[1]]
+
+# Aquarius III
+galaxy = 'Aquarius III'
+satellite_name = galaxy.replace(' ', '_')
+file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
+gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
+mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=True)
+sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1='m12i', location=loc)
+match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name=galaxy, mass_err=0.35)
+#
+plot_data_aqu_iii = dict()
+plot_data_aqu_iii['Hosts'] = []
+#
+for name in galaxies:
+    mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=True)
+    snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+name)
+    #
+    # get the matches for a simulation host
+    mask = (gal_data['Host'] == name)
+    # get an array of the tree indices that are matches in m12m
+    subhalo_inds = np.asarray(gal_data['Halo tree index'][mask])
+    # Get indices within the mini data to select properties
+    mini_data_match_inds = np.asarray([np.where(i == mini_data['indices.z0'][:,0])[0][0] for i in subhalo_inds])
+    #
+    if len(mini_data_match_inds != 0):
+        plot_data_aqu_iii['Hosts'].append(name)
+        # Find the infall time
+        # Snapshot at match
+        time_at_match = snaps['time'][gal_data['Snapshot at match'][mask]]
+        #
+        plot_data_aqu_iii['orbit.distance.'+name] = (-1)*np.ones(mini_data['d.tot.sim'][mini_data_match_inds].shape)
+        #
+        for i in range(0, len(mini_data_match_inds)):
+            #
+            # Get the "lookback" snapshot to the match to get the radial and tangential velocity information
+            time_ind = snaps['index'][-1] - np.where(np.min(np.abs(time_at_match[i] - snaps['time'])) == np.abs(time_at_match[i] - snaps['time']))[0][0]
+            plot_data_aqu_iii['orbit.distance.'+name][i][time_ind:] = mini_data['d.tot.sim'][mini_data_match_inds][i][time_ind:]
+        #
+        plot_data_aqu_iii['orbit.time.lb.'+name] = snaps['time'][-1] - np.flip(snaps['time'])[:mini_data['d.tot.sim'][mini_data_match_inds].shape[1]]
+
+# Eridanus II
+galaxy = 'Eridanus II'
+satellite_name = galaxy.replace(' ', '_')
+file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
+gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
+mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=True)
+sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1='m12i', location=loc)
+match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name=galaxy, mass_err=0.35)
+#
+plot_data_eri_ii = dict()
+plot_data_eri_ii['Hosts'] = []
+#
+for name in galaxies:
+    mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=True)
+    snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+name)
+    #
+    # get the matches for a simulation host
+    mask = (gal_data['Host'] == name)
+    # get an array of the tree indices that are matches in m12m
+    subhalo_inds = np.asarray(gal_data['Halo tree index'][mask])
+    # Get indices within the mini data to select properties
+    mini_data_match_inds = np.asarray([np.where(i == mini_data['indices.z0'][:,0])[0][0] for i in subhalo_inds])
+    #
+    if len(mini_data_match_inds != 0):
+        plot_data_eri_ii['Hosts'].append(name)
+        # Find the infall time
+        # Snapshot at match
+        time_at_match = snaps['time'][gal_data['Snapshot at match'][mask]]
+        #
+        plot_data_eri_ii['orbit.distance.'+name] = (-1)*np.ones(mini_data['d.tot.sim'][mini_data_match_inds].shape)
+        #
+        for i in range(0, len(mini_data_match_inds)):
+            #
+            # Get the "lookback" snapshot to the match to get the radial and tangential velocity information
+            time_ind = snaps['index'][-1] - np.where(np.min(np.abs(time_at_match[i] - snaps['time'])) == np.abs(time_at_match[i] - snaps['time']))[0][0]
+            plot_data_eri_ii['orbit.distance.'+name][i][time_ind:] = mini_data['d.tot.sim'][mini_data_match_inds][i][time_ind:]
+        #
+        plot_data_eri_ii['orbit.time.lb.'+name] = snaps['time'][-1] - np.flip(snaps['time'])[:mini_data['d.tot.sim'][mini_data_match_inds].shape[1]]
 
 
 # Plot the two case studies
 plt.rcParams["font.family"] = "serif"
-f, axs = plt.subplots(2, 1, figsize=(16,12))
+f, axs = plt.subplots(4, 1, figsize=(16,12))
 #
 for name in galaxies:
-    if name in plot_data_boo['Hosts']:
-        for i in range(0, plot_data_boo['orbit.distance.'+name].shape[0]):
-            mask = (plot_data_boo['orbit.distance.'+name][i] != -1)
-            axs[0].plot(plot_data_boo['orbit.time.lb.'+name][mask]-plot_data_boo['orbit.time.lb.'+name][mask][0], plot_data_boo['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=0.2)
+    if name in plot_data_leo_ii['Hosts']:
+        for i in range(0, plot_data_leo_ii['orbit.distance.'+name].shape[0]):
+            mask = (plot_data_leo_ii['orbit.distance.'+name][i] != -1)
+            axs[0].plot(plot_data_leo_ii['orbit.time.lb.'+name][mask]-plot_data_leo_ii['orbit.time.lb.'+name][mask][0], plot_data_leo_ii['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=0.3)
 for name in galaxies:
-    if name in plot_data_car['Hosts']:
-        for i in range(0, plot_data_car['orbit.distance.'+name].shape[0]):
-            mask = (plot_data_car['orbit.distance.'+name][i] != -1)
-            axs[1].plot(plot_data_car['orbit.time.lb.'+name][mask]-plot_data_car['orbit.time.lb.'+name][mask][0], plot_data_car['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=0.2)
+    if name in plot_data_leo_iv['Hosts']:
+        for i in range(0, plot_data_leo_iv['orbit.distance.'+name].shape[0]):
+            mask = (plot_data_leo_iv['orbit.distance.'+name][i] != -1)
+            axs[1].plot(plot_data_leo_iv['orbit.time.lb.'+name][mask]-plot_data_leo_iv['orbit.time.lb.'+name][mask][0], plot_data_leo_iv['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=0.3)
+for name in galaxies:
+    if name in plot_data_aqu_iii['Hosts']:
+        for i in range(0, plot_data_aqu_iii['orbit.distance.'+name].shape[0]):
+            mask = (plot_data_aqu_iii['orbit.distance.'+name][i] != -1)
+            axs[2].plot(plot_data_aqu_iii['orbit.time.lb.'+name][mask]-plot_data_aqu_iii['orbit.time.lb.'+name][mask][0], plot_data_aqu_iii['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=0.3)
+for name in galaxies:
+    if name in plot_data_eri_ii['Hosts']:
+        for i in range(0, plot_data_eri_ii['orbit.distance.'+name].shape[0]):
+            mask = (plot_data_eri_ii['orbit.distance.'+name][i] != -1)
+            axs[3].plot(plot_data_eri_ii['orbit.time.lb.'+name][mask]-plot_data_eri_ii['orbit.time.lb.'+name][mask][0], plot_data_eri_ii['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=0.3)
 #
-r1 = mpatches.Rectangle(xy=(0.5,300),width=1.70,height=90, facecolor='#D3D3D3', alpha=1, zorder=10)
-r2 = mpatches.Rectangle(xy=(0.5,300),width=1.38,height=68, facecolor='#D3D3D3', alpha=1, zorder=10)
-axs[0].text(0.6,320,'Pegasus 3',fontsize=24, zorder=11)
-axs[1].text(0.6,320,'Leo 2',fontsize=24, zorder=11)
+r1 = mpatches.Rectangle(xy=(0.25,275),width=1.15,height=90, facecolor='#D3D3D3', alpha=1, zorder=10)
+r2 = mpatches.Rectangle(xy=(0.25,275),width=1.25,height=90, facecolor='#D3D3D3', alpha=1, zorder=10)
+r3 = mpatches.Rectangle(xy=(0.25,275),width=2.15,height=90, facecolor='#D3D3D3', alpha=1, zorder=10)
+r4 = mpatches.Rectangle(xy=(0.25,75),width=2.05,height=90, facecolor='#D3D3D3', alpha=1, zorder=10)
+axs[0].text(0.35,295,'Leo II',fontsize=24, zorder=11)
+axs[1].text(0.35,295,'Leo IV',fontsize=24, zorder=11)
+axs[2].text(0.35,295,'Aquarius III',fontsize=24, zorder=11)
+axs[3].text(0.35,95,'Eridanus II',fontsize=24, zorder=11)
 axs[0].add_patch(r1)
 axs[1].add_patch(r2)
+axs[2].add_patch(r3)
+axs[3].add_patch(r4)
 #
 axs[0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False)
-axs[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
+axs[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False)
+axs[2].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False)
+axs[3].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22)
 #
 #axs[0].set_xlabel('Lookback Time [Gyr]', fontsize=24)
 axs[0].set_xlim(0, 13.8)
 axs[1].set_xlim(0, 13.8)
+axs[2].set_xlim(0, 13.8)
+axs[3].set_xlim(0, 13.8)
 axs[0].set_ylim(0, 400)
 axs[1].set_ylim(0, 400)
-axs[1].set_xlabel('Lookback Time [Gyr]', fontsize=26)
-axs[0].set_ylabel('Distance [kpc]', fontsize=26)
-axs[1].set_ylabel('Distance [kpc]', fontsize=26)
+axs[2].set_ylim(0, 400)
+axs[3].set_ylim(0, 500)
+axs[3].set_xlabel('Lookback Time [Gyr]', fontsize=26)
+axs[0].set_ylabel('Distance [kpc]', fontsize=24)
+axs[1].set_ylabel('Distance [kpc]', fontsize=24)
+axs[2].set_ylabel('Distance [kpc]', fontsize=24)
+axs[3].set_ylabel('Distance [kpc]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/orbits/case_study_orbits_all.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/case_study_orbits_all.pdf')
 plt.close()
