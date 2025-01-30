@@ -331,7 +331,7 @@ class SatelliteMatch:
         #
         return sim_sats
     
-    def subhalo_match(self, indices, subhalos, satellite, snapshot_data, lookback_window=1, max_sigma=3, probability_max=99):
+    def subhalo_match(self, indices, subhalos, satellite, snapshot_data, lookback_window=1, max_sigma=3, probability_max=99, vrad_floor=False, vtan_floor=False, dist_floor=False):
         """
         DESCRIPTION:
             Given a real satellite's distance, velocity (radial and/or tangential), and 
@@ -404,12 +404,24 @@ class SatelliteMatch:
         #
         dof_number = len([i for i in range(0, len(properties)) if ~np.isnan(satellite[properties[i]])])
         #
-        for prop_name in properties:
-            if ~np.isnan(satellite[prop_name]) and np.isnan(satellite[prop_name+'.err']):
-                if 'dist' in prop_name:
-                    satellite[prop_name+'.err'] = 5
-                if 'vel' in prop_name:
-                    satellite[prop_name+'.err'] = 5
+        # Commenting this out because all satellites in our sample now have phase-space estimates
+        # for prop_name in properties:
+        #     if ~np.isnan(satellite[prop_name]) and np.isnan(satellite[prop_name+'.err']):
+        #         if 'dist' in prop_name:
+        #             satellite[prop_name+'.err'] = 5
+        #         if 'vel' in prop_name:
+        #             satellite[prop_name+'.err'] = 5
+        #
+        # If we want to impose a floor to the distance or velocity errors, do that here
+        if vrad_floor and satellite['host.velocity.rad.err'] < vrad_floor:
+            satellite['host.velocity.rad.err'] = vrad_floor
+        #
+        if vtan_floor and satellite['host.velocity.tan.err'] < vtan_floor:
+            satellite['host.velocity.tan.err'] = vtan_floor
+        #
+        # We want to tread distance in a fractional sense
+        if dist_floor and satellite['host.distance.total.err'] < dist_floor*satellite['host.distance.total']:
+            satellite['host.distance.total.err'] = dist_floor*satellite['host.distance.total']
         #
         if dof_number == 1:
             sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.0, 2.0, 3.0
