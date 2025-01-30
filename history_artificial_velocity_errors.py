@@ -51,12 +51,11 @@ mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Boo
                     'Virgo I', 'Virgo II', 'Virgo III', 'Willman 1']
 
 # Distance info
-err_type = 'distance'
-err_type_full = 'host.distance.total.err'
+err_type = 'vtan'
+err_type_full = 'host.velocity.tan.err'
 galaxy = 'Carina'
-#err_tweak_array = [0.01, 0.1, 0.25, 0.5, 0.9, 1.0, 1.1, 1.5, 2.0, 3.0, 4.0, 5.0]
-err_tweak_array = [0.1, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
-color_array = ['#278b46', '#278b46', '#389bc7', '#c76438', '#c76438', '#c76438', '#c76438', '#c76438', '#c76438', '#c76438', '#c76438']
+err_tweak_array = [0.1, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 2.5]
+color_array = ['#278b46', '#278b46', '#278b46', '#389bc7', '#c76438', '#c76438', '#c76438', '#c76438']
 
 for galaxy in mw_sats_1Mpc:
     galaxy_name = galaxy.replace(' ', '_')
@@ -102,7 +101,7 @@ for galaxy in mw_sats_1Mpc:
         for sim_name in galaxies:
             if sim_name in np.array(gal_data['Host']):
                 # Read in the mini data and snapshot information
-                mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_name+'_all_subhalos', verbose=True)
+                mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_name+'_all_subhalos', verbose=False)
                 snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+sim_name)
                 #
                 orbit_history = sat_analysis.orbit_property_distribution(sim_name, mini_data, gal_data, snaps)
@@ -157,7 +156,7 @@ for galaxy in mw_sats_1Mpc:
     plt.xticks(xtickArray[mask], np.asarray(xtickNames)[mask], rotation=45)
     axs.tick_params(axis='x', which='minor', bottom=False, top=False)
     axs.set_ylabel('Lookback infall time [Gyr]', fontsize=24)
-    axs.set_xlabel('Distance half-bin width [kpc]', fontsize=24)
+    axs.set_xlabel('$v_{\\rm tan}$ half-bin width [km s$^{-1}$]', fontsize=24)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/artificial_errors/{galaxy_name}/{galaxy_name}_infall_{err_type}_errors.pdf')
@@ -187,6 +186,7 @@ for galaxy in mw_sats_1Mpc:
     xtickArray = np.arange(len(listDperiRec))
     plt.rcParams["font.family"] = "serif"
     f, axs = plt.subplots(1, 1, figsize=(10,8))
+    #plt.title(f'{galaxy_name} - {err_type} tweaking')
     plt.title(f'{galaxy_name}')
     #
     for i in range(len(xtickArray[mask])):
@@ -196,7 +196,7 @@ for galaxy in mw_sats_1Mpc:
     plt.xticks(xtickArray[mask], np.asarray(xtickNames)[mask], rotation=45)
     axs.tick_params(axis='x', which='minor', bottom=False, top=False)
     axs.set_ylabel('Recent pericenter distance [kpc]', fontsize=24)
-    axs.set_xlabel('Distance half-bin width [kpc]', fontsize=24)
+    axs.set_xlabel('$v_{\\rm tan}$ half-bin width [km s$^{-1}$]', fontsize=24)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/artificial_errors/{galaxy_name}/{galaxy_name}_dperirec_{err_type}_errors.pdf')
@@ -235,7 +235,7 @@ for galaxy in mw_sats_1Mpc:
     plt.xticks(xtickArray[mask], np.asarray(xtickNames)[mask], rotation=45)
     axs.tick_params(axis='x', which='minor', bottom=False, top=False)
     axs.set_ylabel('Recent pericenter lookback time [Gyr]', fontsize=24)
-    axs.set_xlabel('Distance half-bin width [kpc]', fontsize=24)
+    axs.set_xlabel('$v_{\\rm tan}$ half-bin width [km s$^{-1}$]', fontsize=24)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/artificial_errors/{galaxy_name}/{galaxy_name}_tperirec_{err_type}_errors.pdf')
@@ -272,7 +272,7 @@ for galaxy in mw_sats_1Mpc:
     plt.xticks(xtickArray[mask], np.asarray(xtickNames)[mask], rotation=45)
     axs.tick_params(axis='x', which='minor', bottom=False, top=False)
     axs.set_ylabel('Number of pericentric passages', fontsize=24)
-    axs.set_xlabel('Distance half-bin width [kpc]', fontsize=24)
+    axs.set_xlabel('$v_{\\rm tan}$ half-bin width [km s$^{-1}$]', fontsize=24)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/artificial_errors/{galaxy_name}/{galaxy_name}_nperi_{err_type}_errors.pdf')
@@ -311,7 +311,7 @@ for galaxy in mw_sats_1Mpc:
     plt.xticks(xtickArray[mask], np.asarray(xtickNames)[mask], rotation=45)
     axs.tick_params(axis='x', which='minor', bottom=False, top=False)
     axs.set_ylabel('Minimum pericenter distance [kpc]', fontsize=24)
-    axs.set_xlabel('Distance half-bin width [kpc]', fontsize=24)
+    axs.set_xlabel('$v_{\\rm tan}$ half-bin width [km s$^{-1}$]', fontsize=24)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/artificial_errors/{galaxy_name}/{galaxy_name}_dperimin_{err_type}_errors.pdf')
@@ -350,7 +350,7 @@ for galaxy in mw_sats_1Mpc:
     plt.xticks(xtickArray[mask], np.asarray(xtickNames)[mask], rotation=45)
     axs.tick_params(axis='x', which='minor', bottom=False, top=False)
     axs.set_ylabel('Minimum pericenter lookback time [Gyr]', fontsize=24)
-    axs.set_xlabel('Distance half-bin width [kpc]', fontsize=24)
+    axs.set_xlabel('$v_{\\rm tan}$ half-bin width [km s$^{-1}$]', fontsize=24)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/artificial_errors/{galaxy_name}/{galaxy_name}_tperimin_{err_type}_errors.pdf')
@@ -389,7 +389,7 @@ for galaxy in mw_sats_1Mpc:
     plt.xticks(xtickArray[mask], np.asarray(xtickNames)[mask], rotation=45)
     axs.tick_params(axis='x', which='minor', bottom=False, top=False)
     axs.set_ylabel('Recent apocenter distance [kpc]', fontsize=24)
-    axs.set_xlabel('Distance half-bin width [kpc]', fontsize=24)
+    axs.set_xlabel('$v_{\\rm tan}$ half-bin width [km s$^{-1}$]', fontsize=24)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/artificial_errors/{galaxy_name}/{galaxy_name}_daporec_{err_type}_errors.pdf')
@@ -428,7 +428,7 @@ for galaxy in mw_sats_1Mpc:
     plt.xticks(xtickArray[mask], np.asarray(xtickNames)[mask], rotation=45)
     axs.tick_params(axis='x', which='minor', bottom=False, top=False)
     axs.set_ylabel('Recent apocenter lookback time [Gyr]', fontsize=24)
-    axs.set_xlabel('Distance half-bin width [kpc]', fontsize=24)
+    axs.set_xlabel('$v_{\\rm tan}$ half-bin width [km s$^{-1}$]', fontsize=24)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/artificial_errors/{galaxy_name}/{galaxy_name}_taporec_{err_type}_errors.pdf')
@@ -440,6 +440,12 @@ for galaxy in mw_sats_1Mpc:
 
 
 ######### This is going to be for determining the number of analogs for a given tweak. Takes a while to run though...
+err_type = 'vtan'
+err_type_full = 'host.velocity.tan.err'
+galaxy = 'Carina'
+err_tweak_array = [0.1, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 2.5]
+color_array = ['#278b46', '#278b46', '#278b46', '#389bc7', '#c76438', '#c76438', '#c76438', '#c76438']
+
 j = 0
 nums = np.zeros((len(mw_sats_1Mpc), len(err_tweak_array)))
 for galaxy in mw_sats_1Mpc:
@@ -486,7 +492,7 @@ for galaxy in mw_sats_1Mpc:
         for sim_name in galaxies:
             if sim_name in np.array(gal_data['Host']):
                 # Read in the mini data and snapshot information
-                mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_name+'_all_subhalos', verbose=True)
+                mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_name+'_all_subhalos', verbose=False)
                 snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+sim_name)
                 #
                 orbit_history = sat_analysis.orbit_property_distribution(sim_name, mini_data, gal_data, snaps)

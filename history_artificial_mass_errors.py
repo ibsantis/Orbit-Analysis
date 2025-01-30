@@ -166,7 +166,7 @@ for galaxy in mw_sats_1Mpc:
     xtickArray = np.arange(len(listInfall))
     plt.rcParams["font.family"] = "serif"
     f, axs = plt.subplots(1, 1, figsize=(10,8))
-    plt.title(f'{galaxy_name} - {err_type} tweaking')
+    plt.title(f'{galaxy_name}')
     #
     for i in range(len(xtickArray[mask])):
         axs.errorbar(xtickArray[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color=np.asarray(color_array)[mask][i], alpha=0.7, lw=4.5, capsize=0)
@@ -176,7 +176,7 @@ for galaxy in mw_sats_1Mpc:
     plt.xticks(xtickArray[mask], np.asarray(xtickNames)[mask], rotation=45)
     axs.tick_params(axis='x', which='minor', bottom=False, top=False)
     axs.set_ylabel('Lookback infall time [Gyr]', fontsize=24)
-    axs.set_xlabel('Mass bin width [dex]', fontsize=24)
+    axs.set_xlabel('$M_{\\rm halo}$ half-bin width [dex]', fontsize=24)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/artificial_errors/{galaxy_name}/{galaxy_name}_infall_{err_type}_errors.pdf')
@@ -206,7 +206,7 @@ for galaxy in mw_sats_1Mpc:
     xtickArray = np.arange(len(listDperiRec))
     plt.rcParams["font.family"] = "serif"
     f, axs = plt.subplots(1, 1, figsize=(10,8))
-    plt.title(f'{galaxy_name} - {err_type} tweaking')
+    plt.title(f'{galaxy_name}')
     #
     for i in range(len(xtickArray[mask])):
         axs.errorbar(xtickArray[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color=np.asarray(color_array)[mask][i], alpha=0.7, lw=4.5, capsize=0)
@@ -215,7 +215,7 @@ for galaxy in mw_sats_1Mpc:
     plt.xticks(xtickArray[mask], np.asarray(xtickNames)[mask], rotation=45)
     axs.tick_params(axis='x', which='minor', bottom=False, top=False)
     axs.set_ylabel('Recent pericenter distance [kpc]', fontsize=24)
-    axs.set_xlabel('Mass bin width [dex]', fontsize=24)
+    axs.set_xlabel('$M_{\\rm halo}$ half-bin width [dex]', fontsize=24)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/artificial_errors/{galaxy_name}/{galaxy_name}_dperirec_{err_type}_errors.pdf')
@@ -245,7 +245,7 @@ for galaxy in mw_sats_1Mpc:
     xtickArray = np.arange(len(listTperiRec))
     plt.rcParams["font.family"] = "serif"
     f, axs = plt.subplots(1, 1, figsize=(10,8))
-    plt.title(f'{galaxy_name} - {err_type} tweaking')
+    plt.title(f'{galaxy_name}')
     #
     for i in range(len(xtickArray[mask])):
         axs.errorbar(xtickArray[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color=np.asarray(color_array)[mask][i], alpha=0.7, lw=4.5, capsize=0)
@@ -254,7 +254,7 @@ for galaxy in mw_sats_1Mpc:
     plt.xticks(xtickArray[mask], np.asarray(xtickNames)[mask], rotation=45)
     axs.tick_params(axis='x', which='minor', bottom=False, top=False)
     axs.set_ylabel('Recent pericenter lookback time [Gyr]', fontsize=24)
-    axs.set_xlabel('Mass bin width [dex]', fontsize=24)
+    axs.set_xlabel('$M_{\\rm halo}$ half-bin width [dex]', fontsize=24)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/artificial_errors/{galaxy_name}/{galaxy_name}_tperirec_{err_type}_errors.pdf')
@@ -282,7 +282,7 @@ for galaxy in mw_sats_1Mpc:
     xtickArray = np.arange(len(listNperi))
     plt.rcParams["font.family"] = "serif"
     f, axs = plt.subplots(1, 1, figsize=(10,8))
-    plt.title(f'{galaxy_name} - {err_type} tweaking')
+    plt.title(f'{galaxy_name}')
     #
     for i in range(len(xtickArray[mask])):
         axs.errorbar(xtickArray[mask][i], means[mask][i], yerr=stds[mask][i], color=np.asarray(color_array)[mask][i], alpha=0.7, lw=4.5, capsize=0)
@@ -291,7 +291,7 @@ for galaxy in mw_sats_1Mpc:
     plt.xticks(xtickArray[mask], np.asarray(xtickNames)[mask], rotation=45)
     axs.tick_params(axis='x', which='minor', bottom=False, top=False)
     axs.set_ylabel('Number of pericentric passages', fontsize=24)
-    axs.set_xlabel('Mass bin width [dex]', fontsize=24)
+    axs.set_xlabel('$M_{\\rm halo}$ half-bin width [dex]', fontsize=24)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/artificial_errors/{galaxy_name}/{galaxy_name}_nperi_{err_type}_errors.pdf')
@@ -321,7 +321,7 @@ for galaxy in mw_sats_1Mpc:
     xtickArray = np.arange(len(listDperiMin))
     plt.rcParams["font.family"] = "serif"
     f, axs = plt.subplots(1, 1, figsize=(10,8))
-    plt.title(f'{galaxy_name} - {err_type} tweaking')
+    plt.title(f'{galaxy_name}')
     #
     for i in range(len(xtickArray[mask])):
         axs.errorbar(xtickArray[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color=np.asarray(color_array)[mask][i], alpha=0.7, lw=4.5, capsize=0)
@@ -330,7 +330,7 @@ for galaxy in mw_sats_1Mpc:
     plt.xticks(xtickArray[mask], np.asarray(xtickNames)[mask], rotation=45)
     axs.tick_params(axis='x', which='minor', bottom=False, top=False)
     axs.set_ylabel('Minimum pericenter distance [kpc]', fontsize=24)
-    axs.set_xlabel('Mass bin width [dex]', fontsize=24)
+    axs.set_xlabel('$M_{\\rm halo}$ half-bin width [dex]', fontsize=24)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/artificial_errors/{galaxy_name}/{galaxy_name}_dperimin_{err_type}_errors.pdf')
@@ -360,7 +360,7 @@ for galaxy in mw_sats_1Mpc:
     xtickArray = np.arange(len(listTperiMin))
     plt.rcParams["font.family"] = "serif"
     f, axs = plt.subplots(1, 1, figsize=(10,8))
-    plt.title(f'{galaxy_name} - {err_type} tweaking')
+    plt.title(f'{galaxy_name}')
     #
     for i in range(len(xtickArray[mask])):
         axs.errorbar(xtickArray[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color=np.asarray(color_array)[mask][i], alpha=0.7, lw=4.5, capsize=0)
@@ -369,7 +369,7 @@ for galaxy in mw_sats_1Mpc:
     plt.xticks(xtickArray[mask], np.asarray(xtickNames)[mask], rotation=45)
     axs.tick_params(axis='x', which='minor', bottom=False, top=False)
     axs.set_ylabel('Minimum pericenter lookback time [Gyr]', fontsize=24)
-    axs.set_xlabel('Mass bin width [dex]', fontsize=24)
+    axs.set_xlabel('$M_{\\rm halo}$ half-bin width [dex]', fontsize=24)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/artificial_errors/{galaxy_name}/{galaxy_name}_tperimin_{err_type}_errors.pdf')
@@ -399,7 +399,7 @@ for galaxy in mw_sats_1Mpc:
     xtickArray = np.arange(len(listDapoRec))
     plt.rcParams["font.family"] = "serif"
     f, axs = plt.subplots(1, 1, figsize=(10,8))
-    plt.title(f'{galaxy_name} - {err_type} tweaking')
+    plt.title(f'{galaxy_name}')
     #
     for i in range(len(xtickArray[mask])):
         axs.errorbar(xtickArray[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color=np.asarray(color_array)[mask][i], alpha=0.7, lw=4.5, capsize=0)
@@ -408,7 +408,7 @@ for galaxy in mw_sats_1Mpc:
     plt.xticks(xtickArray[mask], np.asarray(xtickNames)[mask], rotation=45)
     axs.tick_params(axis='x', which='minor', bottom=False, top=False)
     axs.set_ylabel('Recent apocenter distance [kpc]', fontsize=24)
-    axs.set_xlabel('Mass bin width [dex]', fontsize=24)
+    axs.set_xlabel('$M_{\\rm halo}$ half-bin width [dex]', fontsize=24)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/artificial_errors/{galaxy_name}/{galaxy_name}_daporec_{err_type}_errors.pdf')
@@ -438,7 +438,7 @@ for galaxy in mw_sats_1Mpc:
     xtickArray = np.arange(len(listTapoRec))
     plt.rcParams["font.family"] = "serif"
     f, axs = plt.subplots(1, 1, figsize=(10,8))
-    plt.title(f'{galaxy_name} - {err_type} tweaking')
+    plt.title(f'{galaxy_name}')
     #
     for i in range(len(xtickArray[mask])):
         axs.errorbar(xtickArray[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color=np.asarray(color_array)[mask][i], alpha=0.7, lw=4.5, capsize=0)
@@ -447,7 +447,7 @@ for galaxy in mw_sats_1Mpc:
     plt.xticks(xtickArray[mask], np.asarray(xtickNames)[mask], rotation=45)
     axs.tick_params(axis='x', which='minor', bottom=False, top=False)
     axs.set_ylabel('Recent apocenter lookback time [Gyr]', fontsize=24)
-    axs.set_xlabel('Mass bin width [dex]', fontsize=24)
+    axs.set_xlabel('$M_{\\rm halo}$ half-bin width [dex]', fontsize=24)
     plt.tight_layout()
     #plt.show()
     plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/artificial_errors/{galaxy_name}/{galaxy_name}_taporec_{err_type}_errors.pdf')
