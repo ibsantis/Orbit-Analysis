@@ -44,13 +44,13 @@ mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Boo
 
 
 orbit_properties = ['dperi_min', 'dperi_rec', 'tperi_min', 'tperi_rec', 'vperi_min', 'vperi_rec', 'nperi', 'dapo', 'tapo', 'infall', 'ke', 'ell']
-for property in orbit_properties:
-    file_name_median = f'{property}_median'
-    file_name_width = f'{property}_width'
-    data_median = pd.read_csv(f"/Users/isaiahsantistevan/simulation/orbit_data/paper_III/floor_tests_headers/{file_name_median}.csv")
-    data_width = pd.read_csv(f"/Users/isaiahsantistevan/simulation/orbit_data/paper_III/floor_tests_headers/{file_name_width}.csv")
+for prop in orbit_properties:
+    file_name_median = f'{prop}_median'
+    file_name_width = f'{prop}_width'
+    data_median = pd.read_csv(f"/Users/isaiahsantistevan/simulation/orbit_data/paper_III/floor_tests_headers_physical/{file_name_median}.csv")
+    data_width = pd.read_csv(f"/Users/isaiahsantistevan/simulation/orbit_data/paper_III/floor_tests_headers_physical/{file_name_width}.csv")
     #
-    print(f'starting work for property: {property}')
+    print(f'starting work for prop: {prop}')
     for galaxy in mw_sats_1Mpc:
         galaxy_name = galaxy.replace(' ', '_')
 
@@ -87,22 +87,43 @@ for property in orbit_properties:
         xtickNames = [str(satellite_data_med_transposed['Selection'][i]) for i in range(len(satellite_data_med_transposed))]
         axs[0].set_xticks(xtickArray)
         axs[1].set_xticks(xtickArray)
+        #
+        # put some vlines in some noteable selections
+        xfid = np.where('Fiducial' == np.asarray(xtickNames))[0][0]
+        x_10_10_10 = np.where('10/10/10' == np.asarray(xtickNames))[0][0]
+        x_10_5_5 = np.where('10/5/5' == np.asarray(xtickNames))[0][0]
+        x_10_7_7 = np.where('10/7/7' == np.asarray(xtickNames))[0][0]
+        x_5_5_5 = np.where('5/5/5' == np.asarray(xtickNames))[0][0]
+        x_5_7_7 = np.where('5/7/7' == np.asarray(xtickNames))[0][0]
+        axs[0].axvline(xfid, color='k', alpha=0.25)
+        axs[0].axvline(x_10_10_10, color='k', alpha=0.25)
+        axs[0].axvline(x_10_5_5, color='k', alpha=0.25)
+        axs[0].axvline(x_10_7_7, color='k', alpha=0.25)
+        axs[0].axvline(x_5_5_5, color='k', alpha=0.25)
+        axs[0].axvline(x_5_7_7, color='k', alpha=0.25)
+        axs[1].axvline(xfid, color='k', alpha=0.25)
+        axs[1].axvline(x_10_10_10, color='k', alpha=0.25)
+        axs[1].axvline(x_10_5_5, color='k', alpha=0.25)
+        axs[1].axvline(x_10_7_7, color='k', alpha=0.25)
+        axs[1].axvline(x_5_5_5, color='k', alpha=0.25)
+        axs[1].axvline(x_5_7_7, color='k', alpha=0.25)
+        #
         axs[0].set_xticklabels(np.asarray(xtickNames), rotation=90)
         axs[1].set_xticklabels(np.asarray(xtickNames), rotation=90)
         axs[1].set_xlabel('Selection')
         axs[0].set_ylabel('Median')
         axs[1].set_ylabel('Width of 68%')
-        plt.suptitle(f'{galaxy} - {property}')
+        plt.suptitle(f'{galaxy} - {prop}')
         axs[0].tick_params(axis='both', which='major', labelbottom=False, labelsize=18)
         axs[1].tick_params(axis='both', which='major', labelsize=18)
         axs[0].tick_params(axis='x', which='minor', size=0)
         axs[1].tick_params(axis='x', which='minor', size=0)
         plt.tight_layout()
         #plt.show()
-        plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/combined_floors/{galaxy_name}/{galaxy_name}_{property}_floors.pdf')
+        plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/combined_floors_physical/{galaxy_name}/{galaxy_name}_{prop}_floors.pdf')
         plt.close()
     #
-    print(f'Finished property: {property}')
+    print(f'Finished prop: {prop}')
 
 
 # Count the number of analogs for the floor selections
@@ -135,6 +156,6 @@ for galaxy in mw_sats_1Mpc:
     axs.tick_params(axis='both', which='major', labelsize=18)
     axs.tick_params(axis='x', which='minor', size=0)
     plt.tight_layout()
-    plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/combined_floors/{galaxy_name}/{galaxy_name}_number_floors.pdf')
+    plt.savefig(sim_data.home_dir+f'/orbit_data/plots/summary/paper_3/combined_floors_physical/{galaxy_name}/{galaxy_name}_number_floors.pdf')
     plt.close()
 #
