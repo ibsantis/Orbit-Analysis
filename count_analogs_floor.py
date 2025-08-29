@@ -51,9 +51,10 @@ def count_lines_without_header(file_path):
 
 count = np.zeros(len(mw_sats_1Mpc))
 i=0
+dt, vrt, vtt = 1, 1, 1
 for galaxy in mw_sats_1Mpc:
     satellite_name = galaxy.replace(' ', '_')
-    file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_tweaks/floor_0.1_7_10/weights_{satellite_name}.txt'
+    file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_{dt}_{vrt}_{vtt}/weights_{satellite_name}.txt'
     line_count = count_lines_without_header(file_path_read)
     #print(f"Number of lines excluding headers: {line_count}")
     count[i] = line_count
