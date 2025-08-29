@@ -69,7 +69,8 @@ plot_data['Hosts'] = []
 #
 for galaxy in mw_sats_1Mpc:
     satellite_name = galaxy.replace(' ', '_')
-    file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
+    #file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
+    file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_10_10_10/weights_{satellite_name}.txt'
     gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
     mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=True)
     sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1='m12i', location=loc)
@@ -122,6 +123,14 @@ for galaxy in mw_sats_1Mpc:
     #plt.show()
     plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/orbits/'+satellite_name+'_orbits_all.pdf')
     plt.close()
+
+
+
+
+
+#####PICK UP HERE....
+
+
 
 
 ### The four case study plots for the paper

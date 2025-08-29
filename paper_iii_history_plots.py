@@ -39,7 +39,7 @@ lg_data = pd.read_csv(sim_data.home_dir+'/orbit_data/paper_III/localgroup_galaxi
 
 galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12n']
 
-# mw_sats_1Mpc = ['Antlia 2', 'Aquarius 2', 'Bootes 1', 'Bootes 2', 'Bootes 3', \
+# mw_sats_1Mpc_old = ['Antlia 2', 'Aquarius 2', 'Bootes 1', 'Bootes 2', 'Bootes 3', \
 #                 'Canes Venatici 1', 'Canes Venatici 2', 'Carina', 'Carina 2', \
 #                 'Carina 3', 'Cetus 2', 'Cetus 3', 'Columba 1', 'Coma Berenices', \
 #                 'Crater 2', 'DES J0225+0304', 'Draco', 'Draco 2', 'Eridanus 2', \
@@ -71,8 +71,9 @@ mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Boo
 for galaxy in mw_sats_1Mpc:
     #
     satellite_name = galaxy.replace(' ', '_')
-    file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
-    gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
+    # file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
+    # gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
+    gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path=sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_10_10_10/weights_{satellite_name}.txt')
     #
     if len(gal_data['Host']) == 0:
         continue
@@ -299,6 +300,6 @@ for galaxy in mw_sats_1Mpc:
     plt.tight_layout()
     #plt.show()
     #plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/both_hist/'+satellite_name+'_history_both.pdf')
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/'+satellite_name+'_history_both.pdf')
+    plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/histograms/'+satellite_name+'_history_both.pdf')
     plt.close()
 

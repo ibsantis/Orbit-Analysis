@@ -71,7 +71,8 @@ mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Boo
 for galaxy in mw_sats_1Mpc:
     #
     satellite_name = galaxy.replace(' ', '_')
-    file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
+    #file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
+    file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_10_10_10/weights_{satellite_name}.txt'
     gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
     #
     if len(gal_data['Host']) == 0:
@@ -143,13 +144,14 @@ for galaxy in mw_sats_1Mpc:
     plt.tight_layout()
     plt.subplots_adjust(wspace=0.05, hspace=0)
     #plt.show()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/phase_space/'+satellite_name+'_phase_space_properties.pdf')
+    plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/phase_space/'+satellite_name+'_phase_space_properties.pdf')
     plt.close()
 
 
 galaxy = 'Leo IV'
 satellite_name = galaxy.replace(' ', '_')
-file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
+#file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
+file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_10_7_7/weights_{satellite_name}.txt'
 gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
 mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=True)
 sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1='m12i', location=loc)
@@ -183,7 +185,13 @@ for sim_name in galaxies:
         mask = np.where(sim_name == gal_data['Host'])[0]
         for key in orbit_history.keys():
             orbit_dictionary[key][mask] = orbit_history[key]
-#    
+#
+if match['host.distance.total.err'] < 10.0:
+    match['host.distance.total.err'] = 10.0
+if match['host.velocity.rad.err'] < 7.0:
+    match['host.velocity.rad.err'] = 7.0
+if match['host.velocity.tan.err'] < 7.0:
+    match['host.velocity.tan.err'] = 7.0
 #Plot the phase-space information
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(3, 3, figsize=(12,12))
