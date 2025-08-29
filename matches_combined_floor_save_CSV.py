@@ -47,26 +47,36 @@ mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Boo
                     'Virgo I', 'Virgo II', 'Virgo III', 'Willman 1']
 
 # Set up iterables and empty arrays
-floor_list = [(False, 1, 1),
-              (0.03, 1, 1),
-              (0.05, 1, 1),
-              (0.1, 1, 1),
-              (False, 5, 5),
-              (0.03, 5, 5),
-              (0.05, 5, 5),
-              (0.1, 5, 5),
-              (False, 10, 10),
-              (0.03, 10, 10),
-              (0.05, 10, 10),
-              (0.1, 10, 10),
-              (False, 5, 10),
-              (0.03, 5, 10),
-              (0.05, 5, 10),
-              (0.1, 5, 10),
-              (False, 7, 10),
-              (0.03, 7, 10),
-              (0.05, 7, 10),
-              (0.1, 7, 10)]
+floor_list = [(1, 1, 1),
+              (1, 3, 3),
+              (1, 3, 5),
+              (1, 5, 5),
+              (1, 7, 7),
+              (1, 10, 10),
+              (3, 1, 1),
+              (3, 3, 3),
+              (3, 3, 5),
+              (3, 5, 5),
+              (3, 7, 7),
+              (3, 10, 10),
+              (5, 1, 1),
+              (5, 3, 3),
+              (5, 3, 5),
+              (5, 5, 5),
+              (5, 7, 7),
+              (5, 10, 10),
+              (7, 1, 1),
+              (7, 3, 3),
+              (7, 3, 5),
+              (7, 5, 5),
+              (7, 7, 7),
+              (7, 10, 10),
+              (10, 1, 1),
+              (10, 3, 3),
+              (10, 3, 5),
+              (10, 5, 5),
+              (10, 7, 7),
+              (10, 10, 10)]
 #
 first_infall = (-1)*np.ones((len(mw_sats_1Mpc), len(floor_list)))
 nperi = (-1)*np.ones((len(mw_sats_1Mpc), len(floor_list)))
@@ -111,7 +121,7 @@ for i, (floor_d, floor_vr, floor_vt) in enumerate(floor_list):
     for j, galaxy in enumerate(mw_sats_1Mpc):
         #
         satellite_name = galaxy.replace(' ', '_')
-        file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_tweaks/floor_{floor_d_str}_{floor_vr_str}_{floor_vt_str}/weights_{satellite_name}.txt'
+        file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_{floor_d_str}_{floor_vr_str}_{floor_vt_str}/weights_{satellite_name}.txt'
         gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
         #
         if len(gal_data['Host']) == 0:
@@ -307,28 +317,28 @@ for i, (floor_d, floor_vr, floor_vt) in enumerate(floor_list):
 
 
 
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/infall_median.csv", first_infall, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/nperi_median.csv", nperi, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/tperi_rec_median.csv", tperi_rec, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/dperi_rec_median.csv", dperi_rec, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/vperi_rec_median.csv", vperi_rec, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/tperi_min_median.csv", tperi_min, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/dperi_min_median.csv", dperi_min, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/vperi_min_median.csv", vperi_min, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/tapo_median.csv", tapo_rec, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/dapo_median.csv", dapo_rec, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/ell_median.csv", elltot, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/ke_median.csv", ketot, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/infall_median.csv", first_infall, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/nperi_median.csv", nperi, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/tperi_rec_median.csv", tperi_rec, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/dperi_rec_median.csv", dperi_rec, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/vperi_rec_median.csv", vperi_rec, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/tperi_min_median.csv", tperi_min, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/dperi_min_median.csv", dperi_min, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/vperi_min_median.csv", vperi_min, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/tapo_median.csv", tapo_rec, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/dapo_median.csv", dapo_rec, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/ell_median.csv", elltot, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/ke_median.csv", ketot, delimiter=',', fmt='%.6f')
 
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/infall_width.csv", first_infall_68, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/nperi_width.csv", nperi_68, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/tperi_rec_width.csv", tperi_rec_68, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/dperi_rec_width.csv", dperi_rec_68, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/vperi_rec_width.csv", vperi_rec_68, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/tperi_min_width.csv", tperi_min_68, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/dperi_min_width.csv", dperi_min_68, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/vperi_min_width.csv", vperi_min_68, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/tapo_width.csv", tapo_rec_68, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/dapo_width.csv", dapo_rec_68, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/ell_width.csv", elltot_68, delimiter=',', fmt='%.6f')
-np.savetxt("simulation/orbit_data/paper_III/floor_testing/ke_width.csv", ketot_68, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/infall_width.csv", first_infall_68, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/nperi_width.csv", nperi_68, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/tperi_rec_width.csv", tperi_rec_68, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/dperi_rec_width.csv", dperi_rec_68, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/vperi_rec_width.csv", vperi_rec_68, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/tperi_min_width.csv", tperi_min_68, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/dperi_min_width.csv", dperi_min_68, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/vperi_min_width.csv", vperi_min_68, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/tapo_width.csv", tapo_rec_68, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/dapo_width.csv", dapo_rec_68, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/ell_width.csv", elltot_68, delimiter=',', fmt='%.6f')
+np.savetxt("simulation/orbit_data/paper_III/floor_testing_physical/ke_width.csv", ketot_68, delimiter=',', fmt='%.6f')

@@ -41,10 +41,11 @@ halo_mass_dex_error = 0.35
 sigma_phase_space = 3
 percent_nd_gaussian = 99 # 3 sigma
 #
-floor_d = 0.1
-floor_vr = 7
-floor_vt = 10
-floor_type = 'combined'
+floor_d = 10
+floor_vr = 5
+floor_vt = 7
+#floor_type = 'combined'
+floor_type = 'combined_physical'
 ######
 if floor_d == False:
     floor_d_str = "F"
@@ -88,7 +89,7 @@ for sat_name in mw_sats_1Mpc:
         satellite_match = sat_match.subhalo_match(sat_match.sub_inds, subhalos=subhalo_dict, 
                                                   satellite=match, snapshot_data=snaps, lookback_window=1, 
                                                   max_sigma=sigma_phase_space, probability_max=percent_nd_gaussian, 
-                                                  vrad_floor=floor_vr, vtan_floor=floor_vt, dist_floor=floor_d)
+                                                  vrad_floor=floor_vr, vtan_floor=floor_vt, dist_floor=floor_d, dist_frac_floor=False)
 
         mask = (satellite_match['mass.index'] != -1)
         for i in range(0, len(satellite_match['mass.index'][mask])):

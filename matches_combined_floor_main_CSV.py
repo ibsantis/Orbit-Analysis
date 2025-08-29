@@ -7,12 +7,45 @@ import numpy as np
 """
 
 # Define the column headers
-header_row = ["Satellite", "Fiducial", \
-                "F/1/1", "3/1/1", "5/1/1", "10/1/1", \
-                "F/5/5", "3/5/5", "5/5/5", "10/5/5", \
-                "F/10/10", "3/10/10", "5/10/10", "10/10/10", \
-                "F/5/10", "3/5/10", "5/5/10", "10/5/10",\
-                "F/7/10", "3/7/10", "5/7/10", "10/7/10"] 
+# header_row = ["Satellite", "Fiducial", \
+#                 "F/1/1", "3/1/1", "5/1/1", "10/1/1", \
+#                 "F/5/5", "3/5/5", "5/5/5", "10/5/5", \
+#                 "F/10/10", "3/10/10", "5/10/10", "10/10/10", \
+#                 "F/5/10", "3/5/10", "5/5/10", "10/5/10",\
+#                 "F/7/10", "3/7/10", "5/7/10", "10/7/10"] 
+
+header_row = ["Satellite", 
+              "Fiducial",
+              "1/1/1",
+              "1/3/3",
+              "1/3/5",
+              "1/5/5",
+              "1/7/7",
+              "1/10/10",
+              "3/1/1",
+              "3/3/3",
+              "3/3/5",
+              "3/5/5",
+              "3/7/7",
+              "3/10/10",
+              "5/1/1",
+              "5/3/3",
+              "5/3/5",
+              "5/5/5",
+              "5/7/7",
+              "5/10/10",
+              "7/1/1",
+              "7/3/3",
+              "7/3/5",
+              "7/5/5",
+              "7/7/7",
+              "7/10/10",
+              "10/1/1",
+              "10/3/3",
+              "10/3/5",
+              "10/5/5",
+              "10/7/7",
+              "10/10/10"]
 
 # Define the row headers
 header_col = ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Bootes II', 'Bootes III', \
@@ -29,12 +62,12 @@ header_col = ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Bootes II
               'Virgo I', 'Virgo II', 'Virgo III', 'Willman 1']
 
 # Read the CSV with the floor data for the different selections
-property = 'vperi_min'
+property = 'vperi_rec'
 file_name = f'{property}_median'
-data = np.loadtxt(f"/Users/isaiahsantistevan/simulation/orbit_data/paper_III/floor_testing/{file_name}.csv", delimiter=",")
+data = np.loadtxt(f"/Users/isaiahsantistevan/simulation/orbit_data/paper_III/floor_testing_physical/{file_name}.csv", delimiter=",")
 
 # Read in the CSV with the fiducial data
-file_name_other = 'v_peri,min'
+file_name_other = 'v_peri,rec'
 other_data = np.loadtxt(f"/Users/isaiahsantistevan/simulation/orbit_data/paper_III/paper_iii_summary/{file_name_other}-Table 1.csv", delimiter=",", skiprows=1, usecols=(1,2,3))
 column_to_insert = other_data[:, 0]  # Extract the second column (index 1)
 
@@ -49,7 +82,7 @@ data_with_headers = np.vstack((header_row, data_with_col_header))
 
 # Save the updated array to a new CSV file
 np.savetxt(
-    f"/Users/isaiahsantistevan/simulation/orbit_data/paper_III/floor_tests_headers/{file_name}.csv",
+    f"/Users/isaiahsantistevan/simulation/orbit_data/paper_III/floor_tests_headers_physical/{file_name}.csv",
     data_with_headers,
     delimiter=",",
     fmt="%s"
@@ -58,12 +91,10 @@ np.savetxt(
 print("CSV file for the median data saved.")
 
 
-
-
 # Now do the same thing for the widths
 # Read the CSV with the floor data for the different selections
 file_name = f'{property}_width'
-data = np.loadtxt(f"/Users/isaiahsantistevan/simulation/orbit_data/paper_III/floor_testing/{file_name}.csv", delimiter=",")
+data = np.loadtxt(f"/Users/isaiahsantistevan/simulation/orbit_data/paper_III/floor_testing_physical/{file_name}.csv", delimiter=",")
 
 lower = other_data[:, 1]
 upper = other_data[:, 2]
@@ -86,7 +117,7 @@ data_with_headers = np.vstack((header_row, data_with_col_header))
 
 # Save the updated array to a new CSV file
 np.savetxt(
-    f"/Users/isaiahsantistevan/simulation/orbit_data/paper_III/floor_tests_headers/{file_name}.csv",
+    f"/Users/isaiahsantistevan/simulation/orbit_data/paper_III/floor_tests_headers_physical/{file_name}.csv",
     data_with_headers,
     delimiter=",",
     fmt="%s"
