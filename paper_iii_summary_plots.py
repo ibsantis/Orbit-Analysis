@@ -38,16 +38,16 @@ lg_data = pd.read_csv(sim_data.home_dir+'/orbit_data/paper_III/localgroup_galaxi
 #galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'm12z', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12j', 'm12n']
 galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12n']
 
-mw_sats = ['HIZSS 3(A)', 'HIZSS 3B', 'NGC 55', 'LMC', 'SMC', 'IC 4662', 'IC 5152', 'NGC 6822', 'NGC 3109', 'IC 3104', \
-           'Sextans B', 'DDO 190', 'DDO 125', 'Sextans A', 'NGC 4163', 'Sagittarius dSph', 'UGC 8508', 'Fornax', 'UGC 4879', \
-           'UGC 9128', 'GR 8', 'Leo A', 'Leo 1', 'Sagittarius dIrr', 'ESO 294-G010', 'DDO 113', 'Sculptor', 'Antlia 2', 'Aquarius (DDO 210)',\
-           'Phoenix', 'Leo 2', 'Antlia B', 'Tucana', 'KKR 3', 'Carina', 'Leo P', 'Crater 2', 'Ursa Minor', 'Sextans 1', \
-           'Draco', 'Canes Venatici 1', 'Leo T', 'Eridanus 2', 'Bootes 1', 'Hercules', 'Bootes 3', 'Sagittarius 2', \
-           'Canes Venatici 2', 'Ursa Major 1', 'Leo 4', 'Hydra 2', 'Hydrus 1', 'Carina 2', 'Ursa Major 2', 'Aquarius 2', \
-           'Indus 2', 'Coma Berenices', 'Leo 5', 'Pisces 2', 'Columba 1', 'Tucana 5', 'Pegasus 3', 'Grus 2', 'Tucana 2', \
-           'Reticulum 2', 'Horologium 1', 'Pictor 1', 'Tucana 4', 'Indus 1', 'Grus 1', 'Reticulum 3', 'Pictor 2', 'Bootes 2',\
-           'Willman 1', 'Phoenix 2', 'Cetus 3', 'Carina 3', 'Eridanus 3', 'Segue 2', 'Triangulum 2', 'Horologium 2', 'Tucana 3',\
-           'Segue 1', 'DES J0225+0304', 'Virgo 1', 'Draco 2', 'Cetus 2']
+# mw_sats = ['HIZSS 3(A)', 'HIZSS 3B', 'NGC 55', 'LMC', 'SMC', 'IC 4662', 'IC 5152', 'NGC 6822', 'NGC 3109', 'IC 3104', \
+#            'Sextans B', 'DDO 190', 'DDO 125', 'Sextans A', 'NGC 4163', 'Sagittarius dSph', 'UGC 8508', 'Fornax', 'UGC 4879', \
+#            'UGC 9128', 'GR 8', 'Leo A', 'Leo 1', 'Sagittarius dIrr', 'ESO 294-G010', 'DDO 113', 'Sculptor', 'Antlia 2', 'Aquarius (DDO 210)',\
+#            'Phoenix', 'Leo 2', 'Antlia B', 'Tucana', 'KKR 3', 'Carina', 'Leo P', 'Crater 2', 'Ursa Minor', 'Sextans 1', \
+#            'Draco', 'Canes Venatici 1', 'Leo T', 'Eridanus 2', 'Bootes 1', 'Hercules', 'Bootes 3', 'Sagittarius 2', \
+#            'Canes Venatici 2', 'Ursa Major 1', 'Leo 4', 'Hydra 2', 'Hydrus 1', 'Carina 2', 'Ursa Major 2', 'Aquarius 2', \
+#            'Indus 2', 'Coma Berenices', 'Leo 5', 'Pisces 2', 'Columba 1', 'Tucana 5', 'Pegasus 3', 'Grus 2', 'Tucana 2', \
+#            'Reticulum 2', 'Horologium 1', 'Pictor 1', 'Tucana 4', 'Indus 1', 'Grus 1', 'Reticulum 3', 'Pictor 2', 'Bootes 2',\
+#            'Willman 1', 'Phoenix 2', 'Cetus 3', 'Carina 3', 'Eridanus 3', 'Segue 2', 'Triangulum 2', 'Horologium 2', 'Tucana 3',\
+#            'Segue 1', 'DES J0225+0304', 'Virgo 1', 'Draco 2', 'Cetus 2']
 
 # mw_sats_1Mpc_old = ['Antlia 2', 'Aquarius 2', 'Bootes 1', 'Bootes 2', 'Bootes 3', \
 #                 'Canes Venatici 1', 'Canes Venatici 2', 'Carina', 'Carina 2', \
@@ -76,12 +76,12 @@ mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Boo
                     'Tucana III', 'Tucana IV', 'Tucana V', 'Ursa Major I', 'Ursa Major II', 'Ursa Minor', \
                     'Virgo I', 'Virgo II', 'Virgo III', 'Willman 1']
 
-mw_sats_proposal =  ['Horologium 2', 'Pisces 2', 'Hydra 2', 'Eridanus 2', 'Willman 1', 'Reticulum 3', \
-                     'Columba 1', 'Ursa Major 1', 'Pictor 1', 'Bootes 2', 'Grus 1', 'Tucana 5', 'Coma Berenices', \
-                     'Eridanus 3', 'Tucana 4', 'Triangulum 2', 'Sagittarius 2', 'Segue 1', 'Grus 2', 'Phoenix 2', \
-                     'Horologium 1', 'Tucana 2', 'Segue 2', 'Ursa Major 2', 'Reticulum 2', 'Ursa Minor', \
-                     'Canes Venatici 1', 'Sextans 1', 'Phoenix', 'Carina 2', 'Tucana 3', 'Carina', 'Fornax', \
-                     'Hydrus 1', 'Pegasus 3', 'Cetus 2', 'Virgo 1']
+# mw_sats_proposal =  ['Horologium 2', 'Pisces 2', 'Hydra 2', 'Eridanus 2', 'Willman 1', 'Reticulum 3', \
+#                      'Columba 1', 'Ursa Major 1', 'Pictor 1', 'Bootes 2', 'Grus 1', 'Tucana 5', 'Coma Berenices', \
+#                      'Eridanus 3', 'Tucana 4', 'Triangulum 2', 'Sagittarius 2', 'Segue 1', 'Grus 2', 'Phoenix 2', \
+#                      'Horologium 1', 'Tucana 2', 'Segue 2', 'Ursa Major 2', 'Reticulum 2', 'Ursa Minor', \
+#                      'Canes Venatici 1', 'Sextans 1', 'Phoenix', 'Carina 2', 'Tucana 3', 'Carina', 'Fornax', \
+#                      'Hydrus 1', 'Pegasus 3', 'Cetus 2', 'Virgo 1']
 
 # Work on master plots
 sat_mstar = []
@@ -102,10 +102,21 @@ elltot = []
 ketot = []
 mhalo = []
 #
+#
+counts = pd.read_csv(f"/Users/isaiahsantistevan/simulation/orbit_data/paper_III/floor_analogs.csv", index_col=0)
 for galaxy in mw_sats_1Mpc:
     #
     satellite_name = galaxy.replace(' ', '_')
-    file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
+    ##
+    # First figure out if a particular satellite has fewer than 10 analogs
+    # - if it does, then use the 10-10-10 selection
+    # - if it has more, then use the 5-5-5 selection
+    if counts['5/5/5'].loc[galaxy] >= 10:
+        file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_5_5_5/weights_{satellite_name}.txt'
+    else:
+        file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_10_10_10/weights_{satellite_name}.txt'
+    ##
+    #file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
     gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
     #
     if len(gal_data['Host']) == 0:
@@ -465,7 +476,7 @@ for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
 axs.set_xscale('log')
-axs.set_ylim(0, 140)
+axs.set_ylim(0, 160)
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, rec}$ [kpc]', fontsize=24)
 plt.tight_layout()
@@ -480,7 +491,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), alpha=0.7, color='#d05151', lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
-axs.set_ylim(0, 140)
+axs.set_ylim(0, 160)
 axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, rec}$ [kpc]', fontsize=24)
@@ -496,7 +507,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
-axs.set_ylim(0, 140)
+axs.set_ylim(0, 160)
 axs.set_xlim(0,425)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, rec}$ [kpc]', fontsize=24)
@@ -636,7 +647,7 @@ for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#572135', alpha=0.7)
 axs.set_xscale('log')
-axs.set_ylim(0, 140)
+axs.set_ylim(0, 160)
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
 plt.tight_layout()
@@ -651,7 +662,7 @@ f, axs = plt.subplots(1, 1, figsize=(10,8))
 for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#572135', alpha=0.7)
-axs.set_ylim(0, 140)
+axs.set_ylim(0, 160)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
 plt.tight_layout()
@@ -667,7 +678,7 @@ for i in range(0, len(sat_mstar[mask])):
     axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.7, lw=3.5, capsize=0)
     axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#572135', alpha=0.7)
 axs.set_xlim(0,425)
-axs.set_ylim(0, 140)
+axs.set_ylim(0, 160)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
 plt.tight_layout()
@@ -1102,8 +1113,8 @@ for i in range(0, len(sat_mstar[mask])):
 #
 axs[0,0].set_xlim(0,425)
 axs[1,0].set_xlim(0,425)
-axs[1,0].set_ylim(0,140)
-axs[1,1].set_ylim(0,140)
+axs[1,0].set_ylim(0,160)
+axs[1,1].set_ylim(0,160)
 #
 axs[1,1].set_xscale('log')
 axs[0,1].set_xscale('log')
@@ -1167,8 +1178,8 @@ for i in range(0, len(sat_mstar[mask])):
 
 axs[0,0].set_xlim(0,425)
 axs[1,0].set_xlim(0,425)
-axs[1,0].set_ylim(0,140)
-axs[1,1].set_ylim(0,140)
+axs[1,0].set_ylim(0,160)
+axs[1,1].set_ylim(0,160)
 #
 axs[1,1].set_xscale('log')
 axs[0,1].set_xscale('log')
