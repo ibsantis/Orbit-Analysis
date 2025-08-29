@@ -331,7 +331,7 @@ class SatelliteMatch:
         #
         return sim_sats
     
-    def subhalo_match(self, indices, subhalos, satellite, snapshot_data, lookback_window=1, max_sigma=3, probability_max=99, vrad_floor=False, vtan_floor=False, dist_floor=False):
+    def subhalo_match(self, indices, subhalos, satellite, snapshot_data, lookback_window=1, max_sigma=3, probability_max=99, vrad_floor=False, vtan_floor=False, dist_floor=False, dist_frac_floor=False):
         """
         DESCRIPTION:
             Given a real satellite's distance, velocity (radial and/or tangential), and 
@@ -413,15 +413,19 @@ class SatelliteMatch:
         #             satellite[prop_name+'.err'] = 5
         #
         # If we want to impose a floor to the distance or velocity errors, do that here
-        if vrad_floor and satellite['host.velocity.rad.err'] < vrad_floor:
+        if vrad_floor is not False and satellite['host.velocity.rad.err'] < vrad_floor:
             satellite['host.velocity.rad.err'] = vrad_floor
         #
-        if vtan_floor and satellite['host.velocity.tan.err'] < vtan_floor:
+        if vtan_floor is not False and satellite['host.velocity.tan.err'] < vtan_floor:
             satellite['host.velocity.tan.err'] = vtan_floor
         #
         # We want to tread distance in a fractional sense
-        if dist_floor and satellite['host.distance.total.err'] < dist_floor*satellite['host.distance.total']:
+        if dist_frac_floor is not False and dist_floor is False and satellite['host.distance.total.err'] < dist_floor*satellite['host.distance.total']:
             satellite['host.distance.total.err'] = dist_floor*satellite['host.distance.total']
+        #
+        # We want to tread distance in a fractional sense
+        if dist_floor is not False and dist_frac_floor is False and satellite['host.distance.total.err'] < dist_floor:
+            satellite['host.distance.total.err'] = dist_floor
         #
         if dof_number == 1:
             sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.0, 2.0, 3.0
