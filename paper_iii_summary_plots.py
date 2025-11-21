@@ -19,7 +19,7 @@ import gizmo_analysis as gizmo
 import utilities as ut
 import numpy as np
 import pandas as pd
-import satellite_io
+from orbit_analysis import satellite_io
 import matplotlib
 from matplotlib import pyplot as plt
 import time
