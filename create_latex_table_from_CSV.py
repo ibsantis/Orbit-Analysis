@@ -15,8 +15,8 @@ for _, row in data.iterrows():
     formatted_row = [galaxy_name]  # Start the row with the galaxy name
     for i in range(1, 31, 3):  # Start after the name column and group by 3 columns
         main = row[i]
-        error_upper = row[i + 1]
-        error_lower = row[i + 2]
+        error_lower = row[i + 1]
+        error_upper = row[i + 2]
         formatted_value = f"${main}^{{{error_upper}}}_{{{error_lower}}}$"
         formatted_row.append(formatted_value)
     latex_rows.append(" & ".join(formatted_row) + " \\\\")
