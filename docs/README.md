@@ -1,0 +1,1 @@
+Docs and structure notes.
