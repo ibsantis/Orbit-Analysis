@@ -26,8 +26,8 @@ from astropy.modeling.models import custom_model
 from astropy.modeling.fitting import LevMarLSQFitter
 from astropy.constants import G
 from scipy import special
-import orbit_io
-import model_io
+from orbit_analysis import orbit_io
+from orbit_analysis import model_io
 print('Read in the tools')
 
 ### Set path and initial parameters
