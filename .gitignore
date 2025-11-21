@@ -13,3 +13,5 @@ data/
 scratch/
 output/
 logs/
+slurm_submit.py
+submit_peloton.py
