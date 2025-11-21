@@ -1,15 +1,54 @@
-# macOS / editor
-.DS_Store
-.vscode/
-
-# python
+# Python
 __pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.dist-info/
+build/
+dist/
+.eggs/
+.pytest_cache/
+.coverage
+coverage.xml
 
-# notebooks
+# Jupyter
 .ipynb_checkpoints/
 
-# local data / scratch
+# Envs
+.env
+.venv/
+venv/
+env/
+
+# OS/IDE
+.DS_Store
+.vscode/
+*.code-workspace
+
+# Project-local configs (untracked on purpose)
+config_local.py
+paths_local.py
+
+# Run/analysis outputs (local-only)
 data/
 scratch/
 output/
+outputs/
+results/
+figs/
+figures/
 logs/
+tmp/
+temp/
+
+# Cluster wrappers
+cluster/
+*.slurm
+*.pbs
+*.sbatch
+
+# Archives
+*.zip
+*.tar.gz
