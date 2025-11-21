@@ -38,21 +38,7 @@ print('Set paths')
 lg_data = pd.read_csv(sim_data.home_dir+'/orbit_data/paper_III/localgroup_galaxies_condensed.csv', index_col=0)
 
 #galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'm12z', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12j', 'm12n']
-galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12n']
-
-# mw_sats_1Mpc_old = ['Antlia 2', 'Aquarius 2', 'Bootes 1', 'Bootes 2', 'Bootes 3', \
-#                 'Canes Venatici 1', 'Canes Venatici 2', 'Carina', 'Carina 2', \
-#                 'Carina 3', 'Cetus 2', 'Cetus 3', 'Columba 1', 'Coma Berenices', \
-#                 'Crater 2', 'DES J0225+0304', 'Draco', 'Draco 2', 'Eridanus 2', \
-#                 'Eridanus 3', 'Fornax', 'Grus 1', 'Grus 2', 'Hercules', \
-#                 'Horologium 1', 'Horologium 2', 'Hydra 2', 'Hydrus 1', 'Indus 1', \
-#                 'Indus 2', 'Leo 1', 'Leo 2', 'Leo 4', 'Leo 5', 'Leo A', 'Leo T', \
-#                 'Pegasus 3', 'Phoenix', 'Phoenix 2', 'Pictor 1', 'Pictor 2', \
-#                 'Pisces 2', 'Reticulum 2', 'Reticulum 3', 'Sagittarius 2', \
-#                 'Sculptor', 'Segue 1', 'Segue 2', 'Sextans 1', 'Triangulum 2', \
-#                 'Tucana', 'Tucana 2', 'Tucana 3', 'Tucana 4', 'Tucana 5', \
-#                 'Ursa Major 1', 'Ursa Major 2', 'Ursa Minor', 'Virgo 1', \
-#                 'Willman 1']
+galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12n', 'm12q', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus']
 
 mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Bootes II', 'Bootes III', \
                     'Bootes IV', 'Bootes V', 'Canes Venatici I', 'Canes Venatici II', 'Carina', 'Carina II', \
@@ -67,12 +53,16 @@ mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Boo
                     'Tucana III', 'Tucana IV', 'Tucana V', 'Ursa Major I', 'Ursa Major II', 'Ursa Minor', \
                     'Virgo I', 'Virgo II', 'Virgo III', 'Willman 1']
 
+n_555 = [12, 330, 378, 83, 131, 3, 2, 305, 42, 213, 15, 13, 75, 89, 125, 5, 243, 153, 43, 13, 26, 57, 4, 125, 4, 99, 99, 111, 163, 301, 212, 49, 52, 0, 25, 167, 255, 347, 18, 67, 517, 362, 178, 13, 387, 127, 77, 363, 104, 954, 2, 107, 4, 103, 20, 12, 42, 17, 15, 151, 0, 183, 113, 193, 261, 20, 62, 87, 45, 53]
+
 #galaxy = 'Sculptor'
-for galaxy in mw_sats_1Mpc:
+for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
     #
     satellite_name = galaxy.replace(' ', '_')
-    #file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
-    file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_10_10_10/weights_{satellite_name}.txt'
+    if n_555[sat_idx] < 10:
+        file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_10_10_10/weights_{satellite_name}.txt'
+    else:
+        file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_5_5_5/weights_{satellite_name}.txt'
     gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
     #
     if len(gal_data['Host']) == 0:
@@ -148,10 +138,10 @@ for galaxy in mw_sats_1Mpc:
     plt.close()
 
 
-galaxy = 'Leo IV'
+galaxy = 'Canes Venatici II'
 satellite_name = galaxy.replace(' ', '_')
 #file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
-file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_10_7_7/weights_{satellite_name}.txt'
+file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_5_5_5/weights_{satellite_name}.txt'
 gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
 mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=True)
 sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1='m12i', location=loc)
@@ -186,12 +176,13 @@ for sim_name in galaxies:
         for key in orbit_history.keys():
             orbit_dictionary[key][mask] = orbit_history[key]
 #
-if match['host.distance.total.err'] < 10.0:
-    match['host.distance.total.err'] = 10.0
-if match['host.velocity.rad.err'] < 7.0:
-    match['host.velocity.rad.err'] = 7.0
-if match['host.velocity.tan.err'] < 7.0:
-    match['host.velocity.tan.err'] = 7.0
+if match['host.distance.total.err'] < 5.0:
+    match['host.distance.total.err'] = 5.0
+if match['host.velocity.rad.err'] < 5.0:
+    match['host.velocity.rad.err'] = 5.0
+if match['host.velocity.tan.err'] < 5.0:
+    match['host.velocity.tan.err'] = 5.0
+#
 #Plot the phase-space information
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(3, 3, figsize=(12,12))
@@ -241,5 +232,5 @@ axs[2,2].axison = False
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.05, hspace=0)
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/phase_space_example.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/case_study_phase_space.pdf')
 plt.close()

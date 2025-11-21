@@ -36,7 +36,7 @@ print('Set paths')
 lg_data = pd.read_csv(sim_data.home_dir+'/orbit_data/paper_III/localgroup_galaxies_condensed.csv', index_col=0)
 
 #galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'm12z', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12j', 'm12n']
-galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12n']
+galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12n', 'm12q', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus']
 
 # mw_sats = ['HIZSS 3(A)', 'HIZSS 3B', 'NGC 55', 'LMC', 'SMC', 'IC 4662', 'IC 5152', 'NGC 6822', 'NGC 3109', 'IC 3104', \
 #            'Sextans B', 'DDO 190', 'DDO 125', 'Sextans A', 'NGC 4163', 'Sagittarius dSph', 'UGC 8508', 'Fornax', 'UGC 4879', \
@@ -103,20 +103,17 @@ ketot = []
 mhalo = []
 #
 #
-counts = pd.read_csv(f"/Users/isaiahsantistevan/simulation/orbit_data/paper_III/floor_analogs.csv", index_col=0)
-for galaxy in mw_sats_1Mpc:
+
+n_555 = [12, 330, 378, 83, 131, 3, 2, 305, 42, 213, 15, 13, 75, 89, 125, 5, 243, 153, 43, 13, 26, 57, 4, 125, 4, 99, 99, 111, 163, 301, 212, 49, 52, 0, 25, 167, 255, 347, 18, 67, 517, 362, 178, 13, 387, 127, 77, 363, 104, 954, 2, 107, 4, 103, 20, 12, 42, 17, 15, 151, 0, 183, 113, 193, 261, 20, 62, 87, 45, 53]
+
+#galaxy = 'Sculptor'
+for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
     #
     satellite_name = galaxy.replace(' ', '_')
-    ##
-    # First figure out if a particular satellite has fewer than 10 analogs
-    # - if it does, then use the 10-10-10 selection
-    # - if it has more, then use the 5-5-5 selection
-    if counts['5/5/5'].loc[galaxy] >= 10:
-        file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_5_5_5/weights_{satellite_name}.txt'
-    else:
+    if n_555[sat_idx] < 10:
         file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_10_10_10/weights_{satellite_name}.txt'
-    ##
-    #file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
+    else:
+        file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_5_5_5/weights_{satellite_name}.txt'
     gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
     #
     if len(gal_data['Host']) == 0:
@@ -992,6 +989,10 @@ plt.close()
 
 
 
+
+LMC_idxs = [11, 12, 28, 31, 44, 48]
+
+
 """
     Infall time plots
 """
@@ -1013,6 +1014,20 @@ for i in range(0, len(sat_mstar[mask])):
     axs[1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.7, lw=3.5, capsize=0)
     axs[1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#c76438', alpha=0.7)
 #
+for i in LMC_idxs:
+    #
+    x_dist = sat_dist[i]
+    x_mstar = sat_mstar[i]
+    y = meds[i]
+    yerr = np.array([[y - lowers[i]], [uppers[i] - y]])
+    #
+    axs[0].errorbar(x_dist, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0].scatter(x_dist, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+
+    # --- Stellar mass panel (right) ---
+    axs[1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1].scatter(x_mstar, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+#
 axs[0].set_xlim(0,425)
 #
 axs[1].set_xscale('log')
@@ -1026,7 +1041,7 @@ axs[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=2
 #
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/infall_plot.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/infall_plot_LMC_marked.pdf')
 plt.close()
 
 
@@ -1053,6 +1068,20 @@ for i in range(0, len(sat_mstar[mask])):
     axs[1].errorbar(sat_mstar[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
     axs[1].scatter(sat_mstar[mask][i], means[mask][i], s=50, c='#2b5b0c', alpha=0.7)
 #
+for i in LMC_idxs:
+    #
+    x_dist = sat_dist[i]
+    x_mstar = sat_mstar[i]
+    y = means[i]
+    yerr = stds[i]
+    #
+    axs[0].errorbar(x_dist, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0].scatter(x_dist, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+
+    # --- Stellar mass panel (right) ---
+    axs[1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1].scatter(x_mstar, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+#
 axs[0].set_xlim(0,425)
 #
 axs[1].set_xscale('log')
@@ -1066,7 +1095,7 @@ axs[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=2
 #
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/nperi_plot.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/nperi_plot_LMC_marked.pdf')
 plt.close()
 
 
@@ -1093,7 +1122,21 @@ for i in range(0, len(sat_mstar[mask])):
 for i in range(0, len(sat_mstar[mask])):
     axs[0,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.7, lw=3.5, capsize=0)
     axs[0,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#432471', alpha=0.7)
+#
+for i in LMC_idxs:
+    #
+    x_dist = sat_dist[i]
+    x_mstar = sat_mstar[i]
+    y = meds[mask][i]
+    yerr = np.array([[y - lowers[i]], [uppers[i] - y]])
+    #
+    axs[0,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0,0].scatter(x_dist, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 
+    # --- Stellar mass panel (right) ---
+    axs[0,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0,1].scatter(x_mstar, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+#
 ## Pericenter distance
 orbit_prop = np.asarray(dperi_rec)
 mask = (orbit_prop[:,0] != -1)
@@ -1110,6 +1153,20 @@ for i in range(0, len(sat_mstar[mask])):
 for i in range(0, len(sat_mstar[mask])):
     axs[1,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.7, lw=3.5, capsize=0)
     axs[1,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
+#
+for i in LMC_idxs:
+    #
+    x_dist = sat_dist[i]
+    x_mstar = sat_mstar[i]
+    y = meds[i]
+    yerr = np.array([[y - lowers[i]], [uppers[i] - y]])
+    #
+    axs[1,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1,0].scatter(x_dist, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+
+    # --- Stellar mass panel (right) ---
+    axs[1,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1,1].scatter(x_mstar, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 #
 axs[0,0].set_xlim(0,425)
 axs[1,0].set_xlim(0,425)
@@ -1131,7 +1188,7 @@ axs[1,0].set_ylabel('$d_{\\rm peri, rec}$ [kpc]', fontsize=24)
 #
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/recent_peri_both.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/recent_peri_both_LMC_marked.pdf')
 plt.close()
 
 
@@ -1159,6 +1216,20 @@ for i in range(0, len(sat_mstar[mask])):
     axs[0,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.7, lw=3.5, capsize=0)
     axs[0,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#780d3f', alpha=0.7)
 #
+for i in LMC_idxs:
+    #
+    x_dist = sat_dist[i]
+    x_mstar = sat_mstar[i]
+    y = meds[i]
+    yerr = np.array([[y - lowers[i]], [uppers[i] - y]])
+    #
+    axs[0,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0,0].scatter(x_dist, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+
+    # --- Stellar mass panel (right) ---
+    axs[0,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0,1].scatter(x_mstar, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+#
 ## distance trends
 orbit_prop = np.asarray(dperi_min)
 mask = (orbit_prop[:,0] != -1)
@@ -1175,7 +1246,21 @@ for i in range(0, len(sat_mstar[mask])):
 for i in range(0, len(sat_mstar[mask])):
     axs[1,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.7, lw=3.5, capsize=0)
     axs[1,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#572135', alpha=0.7)
+#
+for i in LMC_idxs:
+    #
+    x_dist = sat_dist[i]
+    x_mstar = sat_mstar[i]
+    y = meds[i]
+    yerr = np.array([[y - lowers[i]], [uppers[i] - y]])
+    #
+    axs[1,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1,0].scatter(x_dist, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 
+    # --- Stellar mass panel (right) ---
+    axs[1,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1,1].scatter(x_mstar, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+#
 axs[0,0].set_xlim(0,425)
 axs[1,0].set_xlim(0,425)
 axs[1,0].set_ylim(0,160)
@@ -1196,7 +1281,7 @@ axs[1,0].set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
 #
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/minimum_peri_both.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/minimum_peri_both_LMC_marked.pdf')
 plt.close()
 
 
@@ -1224,6 +1309,20 @@ for i in range(0, len(sat_mstar[mask])):
     axs[0,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.7, lw=3.5, capsize=0)
     axs[0,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#6e1d16', alpha=0.7)
 #
+for i in LMC_idxs:
+    #
+    x_dist = sat_dist[i]
+    x_mstar = sat_mstar[i]
+    y = meds[i]
+    yerr = np.array([[y - lowers[i]], [uppers[i] - y]])
+    #
+    axs[0,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0,0].scatter(x_dist, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+
+    # --- Stellar mass panel (right) ---
+    axs[0,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0,1].scatter(x_mstar, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+#
 # Distance trends
 orbit_prop = np.asarray(dapo_rec)
 mask = (orbit_prop[:,0] != -1)
@@ -1240,6 +1339,20 @@ for i in range(0, len(sat_mstar[mask])):
 for i in range(0, len(sat_mstar[mask])):
     axs[1,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
     axs[1,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#4e2026', alpha=0.7)
+#
+for i in LMC_idxs:
+    #
+    x_dist = sat_dist[i]
+    x_mstar = sat_mstar[i]
+    y = meds[i]
+    yerr = np.array([[y - lowers[i]], [uppers[i] - y]])
+    #
+    axs[1,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1,0].scatter(x_dist, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+
+    # --- Stellar mass panel (right) ---
+    axs[1,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1,1].scatter(x_mstar, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 #
 axs[0,0].set_xlim(0,425)
 axs[1,0].set_xlim(0,425)
@@ -1259,7 +1372,7 @@ axs[1,0].set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
 #
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/apocenter_both.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/apocenter_both_LMC_marked.pdf')
 plt.close()
 
 

@@ -6,7 +6,7 @@
     = Integrating subhalos =
     ========================
 
-    Save the mini-data files that I use...
+    Save the mini-data files that are used for Paper III
 
 """
 
@@ -24,8 +24,9 @@ import sys
 print('Read in the tools')
 
 ### Set path and initial parameters
-loc = 'stampede'
-sim_data = orbit_io.OrbitRead(gal1='m12j', location=loc, fire3=True)
+loc = 'mac'
+f3=False
+sim_data = orbit_io.OrbitRead(gal1='Romulus', location=loc, fire3=f3)
 plotting = False
 aligned = True
 point_mass = False
@@ -39,31 +40,43 @@ print('Set paths')
 
 # Read in the snapshot dictionary and the entire tree
 snaps = ut.simulation.read_snapshot_times(directory=sim_data.simulation_dir) # Saves snapshots, redshifts, lookback times, etc. to an array
-halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', species='star', host_number=sim_data.num_gal, assign_hosts_rotation=aligned, catalog_hdf5_directory='catalog_hdf5')
-part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'redshift', 0, simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=aligned)
+halt = halo.io.IO.read_tree(simulation_directory=sim_data.simulation_dir, file_kind='hdf5', host_number=sim_data.num_gal, assign_hosts_rotation=aligned, catalog_hdf5_directory='catalog_hdf5')
+#part = gizmo.io.Read.read_snapshots(['star','gas','dark'], 'redshift', 0, simulation_directory=sim_data.simulation_dir, assign_hosts_rotation=aligned)
 
 # Find the mass ratio to multiply the host radius
-mass_ratio = ut.particle.get_halo_properties(part)['mass']/halt['mass'][halt['host.index'][0]]
+#mass_ratio = ut.particle.get_halo_properties(part)['mass']/halt['mass'][halt['host.index'][0]]
+#del(part)
+
+#old_data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+f'/orbit_data/hdf5_files/summary_data_old/data_{sim_data.galaxy}_all_subhalos')
+old_data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+f'/orbit_data/hdf5_files/summary_data_old/data_{sim_data.gal_2}_all_subhalos')
+mass_ratio = old_data['host.mass.ratio']
+del(old_data)
+
+# For m12q_r7100
+#mass_ratio = 1.69e12/(halt['mass'][halt['host.index'][0]])
+# For m12n_r7100
+#mass_ratio = 1.65e12/(halt['mass'][halt['host.index'][0]])
+
 #
 # This initializes the classes and makes sure they inherit from the OrbitRead class
-orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location=loc, host=1, selection='halo', fire3=True)
+orbits = orbit_io.OrbitAnalysis(tree=halt, gal1=sim_data.galaxy, location=loc, host=2, selection='halo', fire3=f3)
 #
 # Run the pipeline on the simulation data
-halt_dists = orbits.halo_distances(tree=halt) # set host=1 for the first host, host=2 for the other
+halt_dists = orbits.halo_distances(tree=halt, host=2) # set host=1 for the first host, host=2 for the other
 halt_dists_3d = orbits.halo_distances(tree=halt, dist_type='3d')
-halt_vels = orbits.halo_velocities(halt, vel_type='total')
-halt_rad_vels = orbits.halo_velocities(halt, vel_type='rad')
-halt_tan_vels = orbits.halo_velocities(halt, vel_type='tan')
+halt_vels = orbits.halo_velocities(halt, vel_type='total', host=2)
+halt_rad_vels = orbits.halo_velocities(halt, vel_type='rad', host=2)#*(-1)################# Might have to change this back...
+halt_tan_vels = orbits.halo_velocities(halt, vel_type='tan', host=2)
 #
-host_mhalo = halt['mass'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
-host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host.index'][0])]
+host_mhalo = halt['mass'][halt.prop('progenitor.main.indices', halt['host2.index'][0])]
+host_radii = halt['radius'][halt.prop('progenitor.main.indices', halt['host2.index'][0])]
 #
 halt_dists_norm = orbits.halo_distances_norm(halt_dists, host_radii*mass_ratio)
 infall_info = orbits.infall_times(halt_dists_norm, snaps)
-infall_info_any = orbits.first_infall_any(halt, snaps)
+infall_info_any = orbits.first_infall_any(halt, snaps, host=2)
 peris = orbits.pericenter_interp(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
 apos = orbits.apocenter_interp(distances=halt_dists, velocities=halt_vels, time_array=snaps, infall_array=infall_info)
-angs = orbits.angular_momentum(tree=halt)
+angs = orbits.angular_momentum(tree=halt, host=2)
 periods = orbits.orbit_period(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
 eccs = orbits.eccentricity(distances=halt_dists, velocities=halt_vels, virial_radii=host_radii, time_array=snaps, infall_array=infall_info)
 
@@ -75,8 +88,8 @@ data_dict['indices.z0'] = orbits.sub_inds
 data_dict['id'] = np.arange(len(orbits.sub_inds[:,0]))+1
 #
 # Stellar mass of the subhalos at z = 0 and peak stellar mass
-data_dict['M.star.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
-data_dict['M.star.peak'] = halt.prop('star.mass.peak', orbits.sub_inds[:,0])
+# data_dict['M.star.z0'] = halt['star.mass'][orbits.sub_inds[:,0]]
+# data_dict['M.star.peak'] = halt.prop('star.mass.peak', orbits.sub_inds[:,0])
 data_dict['M.halo.z0'] = halt['mass'][orbits.sub_inds[:,0]]
 data_dict['M.halo.peak'] = halt.prop('mass.peak', orbits.sub_inds[:,0])
 #
@@ -158,10 +171,22 @@ data_dict['host.radius'] = host_radii*mass_ratio
 data_dict['host.mass'] = host_mhalo*mass_ratio
 data_dict['host.mass.ratio'] = mass_ratio
 #
-print('The host mass at z=0 without the mass ratio is:', halt['mass'][halt['host.index'][0]])
-print('The host radius at z=0 without the mass ratio is:', halt['radius'][halt['host.index'][0]])
-print('The host mass at z=0 with the mass ratio is:', halt['mass'][halt['host.index'][0]]*mass_ratio)
-print('The host radius at z=0 with the mass ratio is:', halt['radius'][halt['host.index'][0]]*mass_ratio)
+print('The host mass at z=0 without the mass ratio is:', halt['mass'][halt['host2.index'][0]])
+print('The host radius at z=0 without the mass ratio is:', halt['radius'][halt['host2.index'][0]])
+print('The host mass at z=0 with the mass ratio is:', halt['mass'][halt['host2.index'][0]]*mass_ratio)
+print('The host radius at z=0 with the mass ratio is:', halt['radius'][halt['host2.index'][0]]*mass_ratio)
 print('The mass ratio is:', mass_ratio)
 
-ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
+#ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy, dict_or_array_to_write=data_dict, verbose=True)
+#ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.galaxy+'_all_subhalos', dict_or_array_to_write=data_dict, verbose=True)
+ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+sim_data.gal_2+'_all_subhalos', dict_or_array_to_write=data_dict, verbose=True)
+
+# prev_data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data_recent-maybe-wrong/data_'+sim_data.galaxy+'_all_subhalos')
+# old_data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data_old/data_'+sim_data.galaxy+'_all_subhalos')
+prev_data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data_recent-maybe-wrong/data_'+sim_data.gal_2+'_all_subhalos')
+old_data = ut.io.file_hdf5(file_name_base=sim_data.home_dir+'/orbit_data/hdf5_files/summary_data_old/data_'+sim_data.gal_2+'_all_subhalos')
+
+
+print(f"Number of subhalos in NEW data: {data_dict['indices.z0'][:,0].shape[0]}")
+print(f"Number of subhalos in RECENT data: {prev_data['indices.z0'][:,0].shape[0]}")
+print(f"Number of subhalos in OLD data: {old_data['indices.z0'][:,0].shape[0]}")

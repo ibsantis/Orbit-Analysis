@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# pyright: reportOperatorIssue=false
 
 """
     =========================================
@@ -37,21 +38,7 @@ print('Set paths')
 # Read in the snapshot dictionary and the entire tree
 lg_data = pd.read_csv(sim_data.home_dir+'/orbit_data/paper_III/localgroup_galaxies_condensed.csv', index_col=0)
 
-galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12n']
-
-# mw_sats_1Mpc_old = ['Antlia 2', 'Aquarius 2', 'Bootes 1', 'Bootes 2', 'Bootes 3', \
-#                 'Canes Venatici 1', 'Canes Venatici 2', 'Carina', 'Carina 2', \
-#                 'Carina 3', 'Cetus 2', 'Cetus 3', 'Columba 1', 'Coma Berenices', \
-#                 'Crater 2', 'DES J0225+0304', 'Draco', 'Draco 2', 'Eridanus 2', \
-#                 'Eridanus 3', 'Fornax', 'Grus 1', 'Grus 2', 'Hercules', \
-#                 'Horologium 1', 'Horologium 2', 'Hydra 2', 'Hydrus 1', 'Indus 1', \
-#                 'Indus 2', 'Leo 1', 'Leo 2', 'Leo 4', 'Leo 5', 'Leo A', 'Leo T', \
-#                 'Pegasus 3', 'Phoenix', 'Phoenix 2', 'Pictor 1', 'Pictor 2', \
-#                 'Pisces 2', 'Reticulum 2', 'Reticulum 3', 'Sagittarius 2', \
-#                 'Sculptor', 'Segue 1', 'Segue 2', 'Sextans 1', 'Triangulum 2', \
-#                 'Tucana', 'Tucana 2', 'Tucana 3', 'Tucana 4', 'Tucana 5', \
-#                 'Ursa Major 1', 'Ursa Major 2', 'Ursa Minor', 'Virgo 1', \
-#                 'Willman 1']
+galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12n', 'm12q', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus']
 
 mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Bootes II', 'Bootes III', \
                     'Bootes IV', 'Bootes V', 'Canes Venatici I', 'Canes Venatici II', 'Carina', 'Carina II', \
@@ -67,13 +54,17 @@ mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Boo
                     'Virgo I', 'Virgo II', 'Virgo III', 'Willman 1']
 
 
+n_555 = [12, 330, 378, 83, 131, 3, 2, 305, 42, 213, 15, 13, 75, 89, 125, 5, 243, 153, 43, 13, 26, 57, 4, 125, 4, 99, 99, 111, 163, 301, 212, 49, 52, 0, 25, 167, 255, 347, 18, 67, 517, 362, 178, 13, 387, 127, 77, 363, 104, 954, 2, 107, 4, 103, 20, 12, 42, 17, 15, 151, 0, 183, 113, 193, 261, 20, 62, 87, 45, 53]
+
 #galaxy = 'Sculptor'
-for galaxy in mw_sats_1Mpc:
+for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
     #
     satellite_name = galaxy.replace(' ', '_')
-    # file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/fiducial/weights_{satellite_name}.txt'
-    # gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
-    gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path=sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_10_10_10/weights_{satellite_name}.txt')
+    if n_555[sat_idx] < 10:
+        file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_10_10_10/weights_{satellite_name}.txt'
+    else:
+        file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_5_5_5/weights_{satellite_name}.txt'
+    gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
     #
     if len(gal_data['Host']) == 0:
         continue
@@ -96,6 +87,7 @@ for galaxy in mw_sats_1Mpc:
     orbit_dictionary['L.tot.sim'] = np.zeros(gal_data.shape[0])
     orbit_dictionary['v.tot.sim'] = np.zeros(gal_data.shape[0])
     #
+    reionization_distances = np.zeros(gal_data.shape[0])
     for sim_name in galaxies:
         if sim_name in np.array(gal_data['Host']):
             # Read in the mini data and snapshot information
@@ -103,9 +95,11 @@ for galaxy in mw_sats_1Mpc:
             snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+sim_name)
             #
             orbit_history = sat_analysis.orbit_property_distribution(sim_name, mini_data, gal_data, snaps)
+            reionDists = sat_analysis.reionization_distance(sim_name, mini_data, gal_data, snaps)
             mask = np.where(sim_name == gal_data['Host'])[0]
             for key in orbit_history.keys():
                 orbit_dictionary[key][mask] = orbit_history[key]
+            reionization_distances[mask] = reionDists[mask]
     if len(orbit_history['distance']) == 0:
         continue
     #
@@ -275,8 +269,23 @@ for galaxy in mw_sats_1Mpc:
     axs[2,2].set_xlabel('Minimum pericenter velocity [km s$^{-1}$]', fontsize=18)
     axs[2,2].tick_params(axis='both', which='major', labelsize=14)
     #
-    # Blank subpanel
-    axs[3,0].axison = False
+    m = (reionization_distances >= 0)
+    if np.sum(m) != 0:
+        x = reionization_distances[m]
+        binss, half_binss = sat_analysis.binning_scheme(x, 'z.dist', 80)
+        p = np.histogram(x, binss, density=True, weights=gal_data['Weight'][m])
+        axs[3,0].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=80, color='k', alpha=0.4, edgecolor=None)
+        #axs[3,0].hist(x, binss, density=True, weights=gal_data['Weight'][m], linestyle='solid', linewidth=2, histtype='stepfilled', color='k', alpha=0.4)
+        x_med = ut.math.percentile_weighted(x, 50, gal_data['Weight'][m])
+        y_med = 1.1
+        sigma_one_om = ut.math.percentile_weighted(x, 15.87, gal_data['Weight'][m])
+        sigma_one_op = ut.math.percentile_weighted(x, 84.13, gal_data['Weight'][m])
+        axs[3,0].errorbar(x_med, y_med, xerr=np.array([[x_med-sigma_one_om],[sigma_one_op-x_med]]), color='k', lw=3.5, capsize=0)
+        axs[3,0].scatter(x_med, y_med, s=75, marker='s', c='k')
+        axs[3,0].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
+        axs[3,0].hist(x, binss, density=True, weights=gal_data['Weight'][m], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
+    axs[3,0].set_xlabel('Reionization distance [kpc co-moving]', fontsize=18)
+    axs[3,0].tick_params(axis='both', which='major', labelsize=14)
     #
     m = (orbit_dictionary['pericenter.num'] != -1)
     x = orbit_dictionary['pericenter.num']
@@ -293,10 +302,57 @@ for galaxy in mw_sats_1Mpc:
     axs[3,1].set_xlabel('Number of pericentric passages', fontsize=18)
     axs[3,1].tick_params(axis='both', which='major', labelsize=14)
     #
+    N_analogs = len(gal_data['Weight'])
+    galaxy_tex = galaxy.replace(" ", r"\ ")
+    info_lines1 = [
+        rf"$\mathbf{{{galaxy_tex}}}$: {N_analogs} analogs"
+    ]
+    sig_d = lg_data[galaxy]['host.distance.total.err']
+    sig_vrad = lg_data[galaxy]['host.velocity.rad.err']
+    sig_vtan = lg_data[galaxy]['host.velocity.tan.err']
+    if N_analogs > 10:
+        if sig_d < 5:
+            sig_d = 5.0
+        if sig_vrad < 5:
+            sig_vrad = 5.0
+        if sig_vtan < 5:
+            sig_vtan = 5.0
+    else:
+        if sig_d < 10:
+            sig_d = 10.0
+        if sig_vrad < 10:
+            sig_vrad = 10.0
+        if sig_vtan < 10:
+            sig_vtan = 10.0
+    info_lines2 = [
+        rf"$d$: {lg_data[galaxy]['host.distance.total']:.2f} $\pm$ {sig_d:.2f} kpc",
+        rf"$v_{{\rm rad}}$: {lg_data[galaxy]['host.velocity.rad']:.2f} $\pm$ {sig_vrad:.2f} km/s",
+        rf"$v_{{\rm tan}}$: {lg_data[galaxy]['host.velocity.tan']:.2f} $\pm$ {sig_vtan:.2f} km/s",
+    ]
+    info_text1 = "\n".join(info_lines1)
+    info_text2 = "\n".join(info_lines2)
+
+    # --- Turn the panel into a clean text area
+    axs[3,2].set_axis_off()
+    axs[3,2].text(
+        0.01, 0.97, info_text1,
+        transform=axs[3,2].transAxes,
+        ha="left", va="top",
+        fontsize=20,
+        linespacing=1.4,
+        bbox=dict(boxstyle="square,pad=0.3", fc="white", ec="black", lw=1.0)
+    )
+    axs[3,2].text(
+        0.01, 0.70, info_text2,
+        transform=axs[3,2].transAxes,
+        ha="left", va="top",
+        fontsize=18,
+        linespacing=1.4
+    )
     # Blank subpanel
-    axs[3,2].axison = False
+    #axs[3,2].axison = False
     #
-    plt.suptitle('{0} - Number of analogs = {1}'.format(galaxy, len(gal_data['Weight'])), fontsize=20)
+    #plt.suptitle('{0} - Number of analogs = {1}'.format(galaxy, len(gal_data['Weight'])), fontsize=20)
     plt.tight_layout()
     #plt.show()
     #plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/both_hist/'+satellite_name+'_history_both.pdf')

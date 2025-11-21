@@ -22,7 +22,7 @@ print('Set paths')
 # Read in the snapshot dictionary and the entire tree
 lg_data = pd.read_csv(sim_data.home_dir+'/orbit_data/paper_III/localgroup_galaxies_condensed.csv', index_col=0)
 
-galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12n']
+galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12n', 'm12q', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus']
                 
 mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Bootes II', 'Bootes III', \
                     'Bootes IV', 'Bootes V', 'Canes Venatici I', 'Canes Venatici II', 'Carina', 'Carina II', \
@@ -41,9 +41,9 @@ halo_mass_dex_error = 0.35
 sigma_phase_space = 3
 percent_nd_gaussian = 99 # 3 sigma
 #
-floor_d = 10
+floor_d = 5
 floor_vr = 5
-floor_vt = 7
+floor_vt = 5
 #floor_type = 'combined'
 floor_type = 'combined_physical'
 ######

@@ -36,30 +36,29 @@ print('Set paths')
 # Read in the snapshot dictionary and the entire tree
 lg_data = pd.read_csv(sim_data.home_dir+'/orbit_data/paper_III/localgroup_galaxies_condensed.csv', index_col=0)
 
-galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus', 'm12n']
-
-# Based on HALO mass
-# galaxies_high = ['m12b', 'm12c', 'm12f', 'm12m', 'Thelma', 'Romulus', 'm12n']
-# galaxies_low = ['m12i', 'm12w', 'Romeo', 'Juliet', 'Louise', 'Remus']
+galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12n', 'm12q', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus']
 
 # Based on GALAXY mass
-galaxies_high = ['m12b', 'm12f', 'm12i', 'm12m', 'Romeo', 'Thelma', 'Romulus']
-galaxies_low = ['m12c', 'm12w', 'Juliet', 'Louise', 'Remus', 'm12n']
+galaxies_high = ['m12m', 'Romulus', 'm12b', 'm12f', 'Thelma', 'Romeo', 'm12i']
+galaxies_low = ['m12c', 'm12q', 'm12w', 'm12n', 'Remus', 'Juliet', 'Louise']
+
+# Based on HALO mass
+# galaxies_high = ['Romulus', 'm12f', 'm12q', 'm12n', 'm12m', 'm12b', 'Thelma']
+# galaxies_low = ['m12c', 'Romeo', 'm12i', 'Remus', 'Louise', 'm12w', 'Juliet']
 
 
-mw_sats_1Mpc = ['Antlia 2', 'Aquarius 2', 'Bootes 1', 'Bootes 2', 'Bootes 3', \
-                'Canes Venatici 1', 'Canes Venatici 2', 'Carina', 'Carina 2', \
-                'Carina 3', 'Cetus 2', 'Cetus 3', 'Columba 1', 'Coma Berenices', \
-                'Crater 2', 'DES J0225+0304', 'Draco', 'Draco 2', 'Eridanus 2', \
-                'Eridanus 3', 'Fornax', 'Grus 1', 'Grus 2', 'Hercules', \
-                'Horologium 1', 'Horologium 2', 'Hydra 2', 'Hydrus 1', 'Indus 1', \
-                'Indus 2', 'Leo 1', 'Leo 2', 'Leo 4', 'Leo 5', 'Leo A', 'Leo T', \
-                'Pegasus 3', 'Phoenix', 'Phoenix 2', 'Pictor 1', 'Pictor 2', \
-                'Pisces 2', 'Reticulum 2', 'Reticulum 3', 'Sagittarius 2', \
-                'Sculptor', 'Segue 1', 'Segue 2', 'Sextans 1', 'Triangulum 2', \
-                'Tucana', 'Tucana 2', 'Tucana 3', 'Tucana 4', 'Tucana 5', \
-                'Ursa Major 1', 'Ursa Major 2', 'Ursa Minor', 'Virgo 1', \
-                'Willman 1']
+mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Bootes II', 'Bootes III', \
+                    'Bootes IV', 'Bootes V', 'Canes Venatici I', 'Canes Venatici II', 'Carina', 'Carina II', \
+                    'Carina III', 'Centaurus I', 'Cetus II', 'Cetus III', 'Columba I', 'Coma Berenices', \
+                    'Crater II', 'Draco', 'Draco II', 'Eridanus II', 'Eridanus III', 'Eridanus IV', \
+                    'Fornax', 'Grus I', 'Grus II', 'Hercules', 'Horologium I', 'Horologium II', \
+                    'Hydra II', 'Hydrus I', 'Indus I', 'Leo I', 'Leo II', 'Leo IV', \
+                    'Leo V', 'Leo VI', 'Leo A', 'Leo T', 'Leo Minor I', 'Pegasus III', \
+                    'Pegasus IV', 'Phoenix I', 'Phoenix II', 'Pictor I', 'Pictor II', 'Pisces II', \
+                    'Reticulum II', 'Reticulum III', 'Sagittarius', 'Sagittarius II', 'Sculptor', 'Segue 1', \
+                    'Segue 2', 'Sextans', 'Sextans II', 'Triangulum II', 'Tucana I', 'Tucana II', \
+                    'Tucana III', 'Tucana IV', 'Tucana V', 'Ursa Major I', 'Ursa Major II', 'Ursa Minor', \
+                    'Virgo I', 'Virgo II', 'Virgo III', 'Willman 1']
 
 # Work on master plots
 sat_mstar = []
@@ -90,10 +89,17 @@ tapo_rec_lo = []
 dapo_rec_lo = []
 mhalo_lo = []
 #
-for galaxy in mw_sats_1Mpc:
+n_555 = [12, 330, 378, 83, 131, 3, 2, 305, 42, 213, 15, 13, 75, 89, 125, 5, 243, 153, 43, 13, 26, 57, 4, 125, 4, 99, 99, 111, 163, 301, 212, 49, 52, 0, 25, 167, 255, 347, 18, 67, 517, 362, 178, 13, 387, 127, 77, 363, 104, 954, 2, 107, 4, 103, 20, 12, 42, 17, 15, 151, 0, 183, 113, 193, 261, 20, 62, 87, 45, 53]
+
+#galaxy = 'Sculptor'
+for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
     #
-    gal_data = sat_analysis.read_subhalo_matches(galaxy)
     satellite_name = galaxy.replace(' ', '_')
+    if n_555[sat_idx] < 10:
+        file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_10_10_10/weights_{satellite_name}.txt'
+    else:
+        file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_5_5_5/weights_{satellite_name}.txt'
+    gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
     #
     if len(gal_data['Host']) == 0:
         continue
@@ -1115,8 +1121,6 @@ plt.close()
 
 
 
-numerator = np.abs(meds_hi[mask_hi*mask_lo] - meds_lo[mask_hi*mask_lo])
-denominator = 0.5*((uppers_hi[mask_hi*mask_lo] - lowers_hi[mask_hi*mask_lo]) + (uppers_lo[mask_hi*mask_lo] - lowers_lo[mask_hi*mask_lo]))
 def making_plots(num, den, propname):
     #
     print('Some useful stuff:')
@@ -1174,4 +1178,147 @@ def making_plots(num, den, propname):
     #plt.show()
     plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/hi_vs_lo/'+propname+'_vs_dist_comparison_zoom.pdf')
     plt.close()
+
+# Infall time
+first_infall_hi = np.asarray(first_infall_hi)
+mask_hi = (first_infall_hi[:,0] != -1)
+meds_hi = first_infall_hi[:,0]
+lowers_hi = first_infall_hi[:,1]
+uppers_hi = first_infall_hi[:,2]
+#
+first_infall_lo = np.asarray(first_infall_lo)
+mask_lo = (first_infall_lo[:,0] != -1)
+meds_lo = first_infall_lo[:,0]
+lowers_lo = first_infall_lo[:,1]
+uppers_lo = first_infall_lo[:,2]
+#
+numerator = np.abs(meds_hi[mask_hi*mask_lo] - meds_lo[mask_hi*mask_lo])
+denominator = 0.5*((uppers_hi[mask_hi*mask_lo] - lowers_hi[mask_hi*mask_lo]) + (uppers_lo[mask_hi*mask_lo] - lowers_lo[mask_hi*mask_lo]))
+#
+making_plots(numerator, denominator, 'infall')
+
+# Pericenter number
+orbit_prop = np.asarray(nperi_hi)
+mask_hi = (orbit_prop[:,0] != -1)
+means_hi = orbit_prop[:,0]
+stds_hi = orbit_prop[:,1]
+#
+orbit_prop = np.asarray(nperi_lo)
+mask_lo = (orbit_prop[:,0] != -1)
+means_lo = orbit_prop[:,0]
+stds_lo = orbit_prop[:,1]
+#
+numerator = np.abs(means_hi[mask_hi*mask_lo] - means_lo[mask_hi*mask_lo])
+denominator = 0.5*((uppers_hi[mask_hi*mask_lo] - lowers_hi[mask_hi*mask_lo]) + (uppers_lo[mask_hi*mask_lo] - lowers_lo[mask_hi*mask_lo]))
+#
+making_plots(numerator, denominator, 'nperi')
+
+# Recent Pericenter Time
+orbit_prop = np.asarray(tperi_rec_hi)
+mask_hi = (orbit_prop[:,0] != -1)
+meds_hi = orbit_prop[:,0]
+lowers_hi = orbit_prop[:,1]
+uppers_hi = orbit_prop[:,2]
+#
+orbit_prop = np.asarray(tperi_rec_lo)
+mask_lo = (orbit_prop[:,0] != -1)
+meds_lo = orbit_prop[:,0]
+lowers_lo = orbit_prop[:,1]
+uppers_lo = orbit_prop[:,2]
+#
+numerator = np.abs(meds_hi[mask_hi*mask_lo] - meds_lo[mask_hi*mask_lo])
+denominator = 0.5*((uppers_hi[mask_hi*mask_lo] - lowers_hi[mask_hi*mask_lo]) + (uppers_lo[mask_hi*mask_lo] - lowers_lo[mask_hi*mask_lo]))
+#
+making_plots(numerator, denominator, 'tperi_rec')
+
+# Recent pericenter distance
+orbit_prop = np.asarray(dperi_rec_hi)
+mask_hi = (orbit_prop[:,0] != -1)
+meds_hi = orbit_prop[:,0]
+lowers_hi = orbit_prop[:,1]
+uppers_hi = orbit_prop[:,2]
+#
+orbit_prop = np.asarray(dperi_rec_lo)
+mask_lo = (orbit_prop[:,0] != -1)
+meds_lo = orbit_prop[:,0]
+lowers_lo = orbit_prop[:,1]
+uppers_lo = orbit_prop[:,2]
+#
+numerator = np.abs(meds_hi[mask_hi*mask_lo] - meds_lo[mask_hi*mask_lo])
+denominator = 0.5*((uppers_hi[mask_hi*mask_lo] - lowers_hi[mask_hi*mask_lo]) + (uppers_lo[mask_hi*mask_lo] - lowers_lo[mask_hi*mask_lo]))
+#
+making_plots(numerator, denominator, 'dperi_rec')
+
+# Minimum pericenter time
+orbit_prop = np.asarray(tperi_min_hi)
+mask_hi = (orbit_prop[:,0] != -1)
+meds_hi = orbit_prop[:,0]
+lowers_hi = orbit_prop[:,1]
+uppers_hi = orbit_prop[:,2]
+#
+orbit_prop = np.asarray(tperi_min_lo)
+mask_lo = (orbit_prop[:,0] != -1)
+meds_lo = orbit_prop[:,0]
+lowers_lo = orbit_prop[:,1]
+uppers_lo = orbit_prop[:,2]
+#
+numerator = np.abs(meds_hi[mask_hi*mask_lo] - meds_lo[mask_hi*mask_lo])
+denominator = 0.5*((uppers_hi[mask_hi*mask_lo] - lowers_hi[mask_hi*mask_lo]) + (uppers_lo[mask_hi*mask_lo] - lowers_lo[mask_hi*mask_lo]))
+#
+making_plots(numerator, denominator, 'tperi_min')
+
+# Minimum pericenter distance
+orbit_prop = np.asarray(dperi_min_hi)
+mask_hi = (orbit_prop[:,0] != -1)
+meds_hi = orbit_prop[:,0]
+lowers_hi = orbit_prop[:,1]
+uppers_hi = orbit_prop[:,2]
+#
+orbit_prop = np.asarray(dperi_min_lo)
+mask_lo = (orbit_prop[:,0] != -1)
+meds_lo = orbit_prop[:,0]
+lowers_lo = orbit_prop[:,1]
+uppers_lo = orbit_prop[:,2]
+#
+numerator = np.abs(meds_hi[mask_hi*mask_lo] - meds_lo[mask_hi*mask_lo])
+denominator = 0.5*((uppers_hi[mask_hi*mask_lo] - lowers_hi[mask_hi*mask_lo]) + (uppers_lo[mask_hi*mask_lo] - lowers_lo[mask_hi*mask_lo]))
+#
+making_plots(numerator, denominator, 'dperi_min')
+
+# Recent apocenter time
+orbit_prop = np.asarray(tapo_rec_hi)
+mask_hi = (orbit_prop[:,0] != -1)
+meds_hi = orbit_prop[:,0]
+lowers_hi = orbit_prop[:,1]
+uppers_hi = orbit_prop[:,2]
+#
+orbit_prop = np.asarray(tapo_rec_lo)
+mask_lo = (orbit_prop[:,0] != -1)
+meds_lo = orbit_prop[:,0]
+lowers_lo = orbit_prop[:,1]
+uppers_lo = orbit_prop[:,2]
+#
+numerator = np.abs(meds_hi[mask_hi*mask_lo] - meds_lo[mask_hi*mask_lo])
+denominator = 0.5*((uppers_hi[mask_hi*mask_lo] - lowers_hi[mask_hi*mask_lo]) + (uppers_lo[mask_hi*mask_lo] - lowers_lo[mask_hi*mask_lo]))
+#
+making_plots(numerator, denominator, 'tapo_rec')
+
+# Recent apocenter time
+orbit_prop = np.asarray(dapo_rec_hi)
+mask_hi = (orbit_prop[:,0] != -1)
+meds_hi = orbit_prop[:,0]
+lowers_hi = orbit_prop[:,1]
+uppers_hi = orbit_prop[:,2]
+#
+orbit_prop = np.asarray(dapo_rec_lo)
+mask_lo = (orbit_prop[:,0] != -1)
+meds_lo = orbit_prop[:,0]
+lowers_lo = orbit_prop[:,1]
+uppers_lo = orbit_prop[:,2]
+#
+numerator = np.abs(meds_hi[mask_hi*mask_lo] - meds_lo[mask_hi*mask_lo])
+denominator = 0.5*((uppers_hi[mask_hi*mask_lo] - lowers_hi[mask_hi*mask_lo]) + (uppers_lo[mask_hi*mask_lo] - lowers_lo[mask_hi*mask_lo]))
+#
+making_plots(numerator, denominator, 'tapo_rec')
+
 
