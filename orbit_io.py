@@ -101,6 +101,7 @@ class OrbitRead:
             if self.num_gal == 2:
                 self.gal_1 = gal1
                 self.gal_2 = gal2
+                self.simulation_dir = self.home_dir+'/galaxies/'+self.galaxy+resolution
             else:
                 self.simulation_dir = self.home_dir+'/galaxies/'+self.galaxy+resolution
         #
@@ -529,7 +530,7 @@ class OrbitAnalysis:
                     host_infall_check[i] = True
                 else:
                     any_ind[i] = central_inds[central_inds >= 0][-1]
-                    any_star_mass[i] = tree['star.mass'][central_inds[central_inds >= 0][-1]]
+                    #any_star_mass[i] = tree['star.mass'][central_inds[central_inds >= 0][-1]]
                     any_halo_mass[i] = tree['mass'][central_inds[central_inds >= 0][-1]]
         #
         # Save arrays to a dictionary
@@ -540,7 +541,7 @@ class OrbitAnalysis:
         #
         d['host.check'] = host_infall_check
         d['any.host.ind'] = any_ind
-        d['any.host.star.mass'] = any_star_mass
+        #d['any.host.star.mass'] = any_star_mass
         d['any.host.halo.mass'] = any_halo_mass
         #
         return d
@@ -1173,6 +1174,24 @@ class OrbitAnalysis:
             the time being.
         """
         pass
+
+    def redshift_pos(self, distances, time_array, redshift=0):
+        """
+            NOT READY TO USE YET....
+        """
+        # Set string for whichever host you're interested in
+        if host == 2:
+            hindex = 'host2'
+        else:
+            hindex = 'host'
+        #
+        # Get the index for the time/redshift that we're interested in sampling
+        redshift_index = np.where(np.flip(time_array['redshift']) == redshift)[0][0]
+        #
+        # Set up null 2D array with the same shape as the subhalo index array
+        redshift_distance = distances[:,redshift_index]
+        #
+        return redshift_distance
 
 # Pick up here when documenting again...
 class OrbitGalpy(OrbitAnalysis):
