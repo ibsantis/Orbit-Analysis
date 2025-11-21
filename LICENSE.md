@@ -1,4 +1,4 @@
-Copyright 2021-2024 by Isaiah Santistevan.
+Copyright 2021-2025 by Isaiah Santistevan.
 
 This software is governed by the MIT License:
 
