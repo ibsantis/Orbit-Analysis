@@ -158,7 +158,7 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
             g_sub = g_host.create_group("subhalos")
             g_sub.create_dataset("tree.ids",       data=tree_ids)
             g_sub.create_dataset("weights",        data=weights)
-            g_sub.create_dataset("snapshot_match", data=snapshot_match)
+            g_sub.create_dataset("snapshot.at.match", data=snapshot_match)
 
             # orbit_props
             g_props = g_host.create_group("orbit.props")
@@ -202,9 +202,9 @@ def load_subhalo_orbit_properties(filename):
                 "z_reion": float or None,
             },
             "subhalos": {
-                "tree_ids":       np.ndarray (N_host,),
+                "tree.ids":       np.ndarray (N_host,),
                 "weights":        np.ndarray (N_host,) or None,
-                "snapshot_match": np.ndarray (N_host,) or None,
+                "snapshot.at.match": np.ndarray (N_host,) or None,
             },
             "orbit_props": {
                 "values": {
