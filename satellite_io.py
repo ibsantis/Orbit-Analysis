@@ -112,7 +112,7 @@ class SatelliteRead:
 
 class SatelliteMatch:
 
-    def __init__(self, gal1, location, tree=None, mini=None, host=1, minimum_mass=1e8):
+    def __init__(self, gal1, location, tree=None, mini=None, host=1, minimum_mass=1e8, fire3=False):
         """
         DESCRIPTION:
             Returns the indices of satellites along with their progenitor
@@ -163,8 +163,14 @@ class SatelliteMatch:
             else:
                 hindex = 'host'
             #
+            # Account for different snapshot numbers in FIRE-3
+            if fire3:
+                snap = 500
+            else:
+                snap = 600
+            #
             # Select the subhalo indices at z = 0
-            z0_inds = ut.array.get_indices(tree['snapshot'], 600)
+            z0_inds = ut.array.get_indices(tree['snapshot'], snap)
             z0_inds = z0_inds[z0_inds != tree[hindex+'.index'][0]]
             z0_inds = ut.array.get_indices(tree.prop('lowres.mass.frac'), [0,0.02], z0_inds)
             #
@@ -808,6 +814,33 @@ class SatelliteAnalysis(SatelliteRead):
             #
         #
         return d
+
+    def reionization_distance(self, sim_name, mini_sim_data, sat_match_data, time_array, z_reion=7):
+        """
+        Calculate the distance that satellites were at during reionization (assuming z = 7)
+        """
+        reionDists = (-1)*np.ones(sat_match_data.shape[0])
+        #
+        reionInd = np.where(np.min(np.abs(time_array['redshift'] - z_reion)) == np.abs(time_array['redshift'] - z_reion))[0][0]
+        #
+        # get the matches for a simulation host
+        mask = (sat_match_data['Host'] == sim_name)
+        # get an array of the tree indices that are matches in m12m
+        subhalo_inds = np.asarray(sat_match_data['Halo tree index'][mask])
+        # Get indices within the mini data to select properties
+        mini_data_match_inds = np.asarray([np.where(i == mini_sim_data['indices.z0'][:,0])[0][0] for i in subhalo_inds])
+        #
+        if len(mini_data_match_inds) != 0:
+            host_rows = np.where(mask)[0]
+            target_rows = host_rows
+            #
+            for i in range(len(host_rows)):
+                #
+                reionIndP = reionInd - (len(time_array['time']) - mini_sim_data['d.tot.sim'].shape[1])
+                reionDists[target_rows[i]] = np.flip(mini_sim_data['d.tot.sim'][mini_data_match_inds][i])[reionIndP]
+        #
+        reionDists *= (1+z_reion)
+        return reionDists 
 
     def binning_scheme(self, x, xtype, binsize, binedges=None):
         """
