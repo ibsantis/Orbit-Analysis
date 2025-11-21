@@ -1,0 +1,15 @@
+# macOS / editor
+.DS_Store
+.vscode/
+
+# python
+__pycache__/
+
+# notebooks
+.ipynb_checkpoints/
+
+# local data / scratch
+data/
+scratch/
+output/
+logs/

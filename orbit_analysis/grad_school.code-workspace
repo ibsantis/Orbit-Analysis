@@ -1,0 +1,13 @@
+{
+    "folders": [
+        {
+            "path": ".."
+        },
+        {
+            "path": "../../halo_analysis"
+        },
+        {
+            "path": "../../utilities"
+        }
+    ]
+}
