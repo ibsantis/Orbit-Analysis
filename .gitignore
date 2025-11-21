@@ -52,3 +52,5 @@ cluster/
 # Archives
 *.zip
 *.tar.gz
+slurm_submit.py
+submit_peloton.py
