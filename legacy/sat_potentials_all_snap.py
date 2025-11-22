@@ -41,8 +41,8 @@
 """
 
 # Import packages
-import orbit_io
-import summary_io
+from orbit_analysis import orbit_io
+from orbit_analysis import summary_io
 import halo_analysis as halo
 import gizmo_analysis as gizmo
 import utilities as ut

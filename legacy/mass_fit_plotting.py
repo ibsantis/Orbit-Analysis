@@ -18,8 +18,8 @@ import h5py
 import matplotlib
 from matplotlib import pyplot as plt
 from scipy import special
-import orbit_io
-import model_io
+from orbit_analysis import orbit_io
+from orbit_analysis import model_io
 print('Read in the tools')
 
 ### Set path and initial parameters

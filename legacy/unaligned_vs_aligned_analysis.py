@@ -20,8 +20,8 @@ from matplotlib.ticker import AutoLocator
 from matplotlib.ticker import ScalarFormatter
 from matplotlib import pyplot as plt
 from matplotlib import gridspec
-import orbit_io
-import summary_io
+from orbit_analysis import orbit_io
+from orbit_analysis import summary_io
 from scipy import interpolate
 import pandas as pd
 print('Read in the tools')

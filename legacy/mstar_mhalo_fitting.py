@@ -16,9 +16,9 @@ from scipy import special
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
-import orbit_io
-import summary_io
-import model_io
+from orbit_analysis import orbit_io
+from orbit_analysis import summary_io
+from orbit_analysis import model_io
 import pandas as pd
 print('Read in the tools')
 

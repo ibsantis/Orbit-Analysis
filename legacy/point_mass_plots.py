@@ -24,9 +24,9 @@ from matplotlib.ticker import AutoLocator
 from matplotlib.ticker import ScalarFormatter
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib import pyplot as plt
-import orbit_io
-import summary_io
-import model_io
+from orbit_analysis import orbit_io
+from orbit_analysis import summary_io
+from orbit_analysis import model_io
 from scipy import interpolate
 import pandas as pd
 from matplotlib import patches

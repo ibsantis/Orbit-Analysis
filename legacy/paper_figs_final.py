@@ -21,8 +21,8 @@ from matplotlib.ticker import ScalarFormatter
 from matplotlib.ticker import MultipleLocator
 from matplotlib import gridspec
 from matplotlib import pyplot as plt
-import orbit_io
-import summary_io
+from orbit_analysis import orbit_io
+from orbit_analysis import summary_io
 from scipy import interpolate
 import pandas as pd
 print('Read in the tools')

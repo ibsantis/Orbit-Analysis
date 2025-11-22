@@ -21,7 +21,7 @@ import gizmo_analysis as gizmo
 import utilities as ut
 import numpy as np
 import h5py
-import orbit_io
+from orbit_analysis import orbit_io
 print('Read in the tools')
 
 ### Set path and initial parameters

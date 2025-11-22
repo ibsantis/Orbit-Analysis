@@ -31,7 +31,7 @@ import halo_analysis as halo
 import gizmo_analysis as gizmo
 import utilities as ut
 import numpy as np
-import orbit_io
+from orbit_analysis import orbit_io
 print('Read in the tools')
 
 ### Set path and initial parameters
