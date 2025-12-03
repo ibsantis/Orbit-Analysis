@@ -60,15 +60,19 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
     else:
         file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_5_5_5/weights_{satellite_name}.txt'
     gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
-    mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=True)
+    mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=False)
     sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1='m12i', location=loc)
     match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name=galaxy, mass_err=0.35)
     #
     plot_data = dict()
     plot_data['Hosts'] = []
     #
+    alpha_min = 0.0
+    alpha_max = 1.0
+    alpha_gal = np.asarray(alpha_min + (alpha_max - alpha_min)* gal_data['Weight']/gal_data['Weight'].max())
+    #
     for name in galaxies:
-        mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=True)
+        mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=False)
         snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+name)
         #
         # get the matches for a simulation host
@@ -101,7 +105,7 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
         if name in plot_data['Hosts']:
             for i in range(0, plot_data['orbit.distance.'+name].shape[0]):
                 mask = (plot_data['orbit.distance.'+name][i] != -1)
-                axs.plot(plot_data['orbit.time.lb.'+name][mask]-plot_data['orbit.time.lb.'+name][mask][0], plot_data['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=0.1)
+                axs.plot(plot_data['orbit.time.lb.'+name][mask]-plot_data['orbit.time.lb.'+name][mask][0], plot_data['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=alpha_gal[i])
     #
     axs.set_xlabel('Lookback Time [Gyr]', fontsize=24)
     axs.set_ylabel('Distance [kpc]', fontsize=24)
@@ -109,9 +113,12 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
     axs.set_ylim(-5,400)
     plt.tight_layout()
     #plt.show()
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/orbits/'+satellite_name+'_orbits_all.pdf')
+    plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/orbits_alpha/'+satellite_name+'_orbits_all.pdf')
     plt.close()
 
+
+
+galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12n', 'm12q', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus']
 
 ### The four case study plots for the paper
 # Bootes V
@@ -126,7 +133,9 @@ match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name=galaxy, m
 plot_dat_bootes_v = dict()
 plot_dat_bootes_v['Hosts'] = []
 #
-galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12n', 'm12q', 'm12w', 'Romeo', 'Juliet', 'Thelma', 'Louise', 'Romulus', 'Remus']
+alpha_min = 0
+alpha_max = 1
+alpha_bootes_v = np.asarray(alpha_min + (alpha_max - alpha_min)* gal_data['Weight']/gal_data['Weight'].max())
 for name in galaxies:
     mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=False)
     snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+name)
@@ -163,15 +172,16 @@ galaxy = 'Canes Venatici II'
 satellite_name = galaxy.replace(' ', '_')
 file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_5_5_5/weights_{satellite_name}.txt'
 gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
-mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=True)
+mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=False)
 sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1='m12i', location=loc)
 match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name=galaxy, mass_err=0.35)
 #
 plot_dat_canven_ii = dict()
 plot_dat_canven_ii['Hosts'] = []
 #
+alpha_canven_ii = np.asarray(alpha_min + (alpha_max - alpha_min)* gal_data['Weight']/gal_data['Weight'].max())
 for name in galaxies:
-    mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=True)
+    mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=False)
     snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+name)
     #
     # get the matches for a simulation host
@@ -207,15 +217,16 @@ galaxy = 'Aquarius III'
 satellite_name = galaxy.replace(' ', '_')
 file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_5_5_5/weights_{satellite_name}.txt'
 gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
-mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=True)
+mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=False)
 sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1='m12i', location=loc)
 match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name=galaxy, mass_err=0.35)
 #
 plot_data_aqu_iii = dict()
 plot_data_aqu_iii['Hosts'] = []
 #
+alpha_aqu_iii = np.asarray(alpha_min + (alpha_max - alpha_min)* gal_data['Weight']/gal_data['Weight'].max())
 for name in galaxies:
-    mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=True)
+    mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=False)
     snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+name)
     #
     # get the matches for a simulation host
@@ -250,15 +261,16 @@ galaxy = 'Pegasus III'
 satellite_name = galaxy.replace(' ', '_')
 file_path_read = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/combined_physical_tweaks/floor_5_5_5/weights_{satellite_name}.txt'
 gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
-mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=True)
+mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+'m12i'+'_all_subhalos', verbose=False)
 sat_match = satellite_io.SatelliteMatch(tree=None, mini=mini_data, gal1='m12i', location=loc)
 match = sat_match.lg_satellite_properties(lg_data=lg_data, galaxy_name=galaxy, mass_err=0.35)
 #
 plot_dat_pegasus_iii = dict()
 plot_dat_pegasus_iii['Hosts'] = []
 #
+alpha_pegasus_iii = np.asarray(alpha_min + (alpha_max - alpha_min)* gal_data['Weight']/gal_data['Weight'].max())
 for name in galaxies:
-    mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=True)
+    mini_data = ut.io.file_hdf5(sim_data.home_dir+'/orbit_data/hdf5_files/summary_data/data_'+name+'_all_subhalos', verbose=False)
     snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+name)
     #
     # get the matches for a simulation host
@@ -296,22 +308,22 @@ for name in galaxies:
     if name in plot_dat_bootes_v['Hosts']:
         for i in range(0, plot_dat_bootes_v['orbit.distance.'+name].shape[0]):
             mask = (plot_dat_bootes_v['orbit.distance.'+name][i] != -1)
-            axs[0].plot(plot_dat_bootes_v['orbit.time.lb.'+name][mask]-plot_dat_bootes_v['orbit.time.lb.'+name][mask][0], plot_dat_bootes_v['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=0.3)
+            axs[0].plot(plot_dat_bootes_v['orbit.time.lb.'+name][mask]-plot_dat_bootes_v['orbit.time.lb.'+name][mask][0], plot_dat_bootes_v['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=alpha_bootes_v[i])
 for name in galaxies:
     if name in plot_dat_canven_ii['Hosts']:
         for i in range(0, plot_dat_canven_ii['orbit.distance.'+name].shape[0]):
             mask = (plot_dat_canven_ii['orbit.distance.'+name][i] != -1)
-            axs[1].plot(plot_dat_canven_ii['orbit.time.lb.'+name][mask]-plot_dat_canven_ii['orbit.time.lb.'+name][mask][0], plot_dat_canven_ii['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=0.3)
+            axs[1].plot(plot_dat_canven_ii['orbit.time.lb.'+name][mask]-plot_dat_canven_ii['orbit.time.lb.'+name][mask][0], plot_dat_canven_ii['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=alpha_canven_ii[i])
 for name in galaxies:
     if name in plot_data_aqu_iii['Hosts']:
         for i in range(0, plot_data_aqu_iii['orbit.distance.'+name].shape[0]):
             mask = (plot_data_aqu_iii['orbit.distance.'+name][i] != -1)
-            axs[2].plot(plot_data_aqu_iii['orbit.time.lb.'+name][mask]-plot_data_aqu_iii['orbit.time.lb.'+name][mask][0], plot_data_aqu_iii['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=0.3)
+            axs[2].plot(plot_data_aqu_iii['orbit.time.lb.'+name][mask]-plot_data_aqu_iii['orbit.time.lb.'+name][mask][0], plot_data_aqu_iii['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=alpha_aqu_iii[i])
 for name in galaxies:
     if name in plot_dat_pegasus_iii['Hosts']:
         for i in range(0, plot_dat_pegasus_iii['orbit.distance.'+name].shape[0]):
             mask = (plot_dat_pegasus_iii['orbit.distance.'+name][i] != -1)
-            axs[3].plot(plot_dat_pegasus_iii['orbit.time.lb.'+name][mask]-plot_dat_pegasus_iii['orbit.time.lb.'+name][mask][0], plot_dat_pegasus_iii['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=0.3)
+            axs[3].plot(plot_dat_pegasus_iii['orbit.time.lb.'+name][mask]-plot_dat_pegasus_iii['orbit.time.lb.'+name][mask][0], plot_dat_pegasus_iii['orbit.distance.'+name][i][mask], color='k', linewidth=0.5, alpha=alpha_pegasus_iii[i])
 #
 r1 = mpatches.Rectangle(xy=(0.25,275),width=1.65,height=90, facecolor='#D3D3D3', alpha=1, zorder=10)
 r2 = mpatches.Rectangle(xy=(0.25,275),width=3.00,height=90, facecolor='#D3D3D3', alpha=1, zorder=10)
@@ -347,5 +359,5 @@ axs[2].set_ylabel('Distance [kpc]', fontsize=24)
 axs[3].set_ylabel('Distance [kpc]', fontsize=24)
 plt.tight_layout()
 #plt.show()
-plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/case_study_orbits_all.pdf')
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/case_study_orbits_all_alpha.pdf')
 plt.close()
