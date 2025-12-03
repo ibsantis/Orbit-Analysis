@@ -122,7 +122,7 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
         axs[0,0].scatter(x_med, y_med, s=75, marker='s', c='k')
         axs[0,0].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
         axs[0,0].hist(x, binss, density=True, weights=gal_data['Weight'][m], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
-    axs[0,0].set_xlabel('Lookback infall time [Gyr]', fontsize=18)
+    axs[0,0].set_xlabel('$t_{\\rm lookback}$ of infall [Gyr]', fontsize=18)
     axs[0,0].tick_params(axis='both', which='major', labelsize=14)
     #
     m = (orbit_dictionary['apocenter.time.lb'] != -1)
@@ -130,36 +130,36 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
         x = orbit_dictionary['apocenter.time.lb'][m]
         binss, half_binss = sat_analysis.binning_scheme(x, 't.apo', 0.25)
         p = np.histogram(x, binss, density=True, weights=gal_data['Weight'][m])
-        axs[0,1].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=0.25, color='k', alpha=0.4, edgecolor=None)
+        axs[3,0].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=0.25, color='k', alpha=0.4, edgecolor=None)
         #axs[0,1].hist(x, binss, density=True, weights=gal_data['Weight'][m], linestyle='solid', linewidth=2, histtype='stepfilled', color='k', alpha=0.4)
         x_med = ut.math.percentile_weighted(x, 50, gal_data['Weight'][m])
         y_med = 1.1
         sigma_one_om = ut.math.percentile_weighted(x, 15.87, gal_data['Weight'][m])
         sigma_one_op = ut.math.percentile_weighted(x, 84.13, gal_data['Weight'][m])
-        axs[0,1].errorbar(x_med, y_med, xerr=np.array([[x_med-sigma_one_om],[sigma_one_op-x_med]]), color='k', lw=3.5, capsize=0)
-        axs[0,1].scatter(x_med, y_med, s=75, marker='s', c='k')
-        axs[0,1].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
-        axs[0,1].hist(x, binss, density=True, weights=gal_data['Weight'][m], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
-    axs[0,1].set_xlabel('Lookback apocenter time [Gyr]', fontsize=18)
-    axs[0,1].tick_params(axis='both', which='major', labelsize=14)
+        axs[3,0].errorbar(x_med, y_med, xerr=np.array([[x_med-sigma_one_om],[sigma_one_op-x_med]]), color='k', lw=3.5, capsize=0)
+        axs[3,0].scatter(x_med, y_med, s=75, marker='s', c='k')
+        axs[3,0].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
+        axs[3,0].hist(x, binss, density=True, weights=gal_data['Weight'][m], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
+    axs[3,0].set_xlabel('$t_{\\rm lookback}$ of apocenter [Gyr]', fontsize=18)
+    axs[3,0].tick_params(axis='both', which='major', labelsize=14)
     #
     m = (orbit_dictionary['apocenter.dist'] != -1)
     if np.sum(m) != 0:
         x = orbit_dictionary['apocenter.dist'][m]
         binss, half_binss = sat_analysis.binning_scheme(x, 'd.apo', 5)
         p = np.histogram(x, binss, density=True, weights=gal_data['Weight'][m])
-        axs[0,2].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=5, color='k', alpha=0.4, edgecolor=None)
+        axs[2,2].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=5, color='k', alpha=0.4, edgecolor=None)
         #axs[0,2].hist(x, binss, density=True, weights=gal_data['Weight'][m], linestyle='solid', linewidth=2, histtype='stepfilled', color='k', alpha=0.4)
         x_med = ut.math.percentile_weighted(x, 50, gal_data['Weight'][m])
         y_med = 1.1
         sigma_one_om = ut.math.percentile_weighted(x, 15.87, gal_data['Weight'][m])
         sigma_one_op = ut.math.percentile_weighted(x, 84.13, gal_data['Weight'][m])
-        axs[0,2].errorbar(x_med, y_med, xerr=np.array([[x_med-sigma_one_om],[sigma_one_op-x_med]]), color='k', lw=3.5, capsize=0)
-        axs[0,2].scatter(x_med, y_med, s=75, marker='s', c='k')
-        axs[0,2].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
-        axs[0,2].hist(x, binss, density=True, weights=gal_data['Weight'][m], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
-    axs[0,2].set_xlabel('Apocenter distance [kpc]', fontsize=18)
-    axs[0,2].tick_params(axis='both', which='major', labelsize=14)
+        axs[2,2].errorbar(x_med, y_med, xerr=np.array([[x_med-sigma_one_om],[sigma_one_op-x_med]]), color='k', lw=3.5, capsize=0)
+        axs[2,2].scatter(x_med, y_med, s=75, marker='s', c='k')
+        axs[2,2].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
+        axs[2,2].hist(x, binss, density=True, weights=gal_data['Weight'][m], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
+    axs[2,2].set_xlabel('Apocenter distance [kpc]', fontsize=18)
+    axs[2,2].tick_params(axis='both', which='major', labelsize=14)
     #
     m = (orbit_dictionary['pericenter.rec.time.lb'] != -1)
     if np.sum(m) != 0:
@@ -176,7 +176,7 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
         axs[1,0].scatter(x_med, y_med, s=75, marker='s', c='k')
         axs[1,0].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
         axs[1,0].hist(x, binss, density=True, weights=gal_data['Weight'][m], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
-    axs[1,0].set_xlabel('Lookback recent pericenter time [Gyr]', fontsize=18)
+    axs[1,0].set_xlabel('$t_{\\rm lookback}$ of recent pericenter [Gyr]', fontsize=18)
     axs[1,0].tick_params(axis='both', which='major', labelsize=14)
     #
     m = (orbit_dictionary['pericenter.rec.dist'] != -1)
@@ -184,8 +184,26 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
         x = orbit_dictionary['pericenter.rec.dist'][m]
         binss, half_binss = sat_analysis.binning_scheme(x, 'd.peri', 5)
         p = np.histogram(x, binss, density=True, weights=gal_data['Weight'][m])
-        axs[1,1].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=5, color='k', alpha=0.4, edgecolor=None)
+        axs[0,2].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=5, color='k', alpha=0.4, edgecolor=None)
         #axs[1,1].hist(x, binss, density=True, weights=gal_data['Weight'][m], linestyle='solid', linewidth=2, histtype='stepfilled', color='k', alpha=0.4)
+        x_med = ut.math.percentile_weighted(x, 50, gal_data['Weight'][m])
+        y_med = 1.1
+        sigma_one_om = ut.math.percentile_weighted(x, 15.87, gal_data['Weight'][m])
+        sigma_one_op = ut.math.percentile_weighted(x, 84.13, gal_data['Weight'][m])
+        axs[0,2].errorbar(x_med, y_med, xerr=np.array([[x_med-sigma_one_om],[sigma_one_op-x_med]]), color='k', lw=3.5, capsize=0)
+        axs[0,2].scatter(x_med, y_med, s=75, marker='s', c='k')
+        axs[0,2].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
+        axs[0,2].hist(x, binss, density=True, weights=gal_data['Weight'][m], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
+    axs[0,2].set_xlabel('Recent pericenter distance [kpc]', fontsize=18)
+    axs[0,2].tick_params(axis='both', which='major', labelsize=14)
+    #
+    m = (orbit_dictionary['pericenter.rec.vel'] != -1)
+    if np.sum(m) != 0:
+        x = orbit_dictionary['pericenter.rec.vel'][m]
+        binss, half_binss = sat_analysis.binning_scheme(x, 'v.peri', 10)
+        p = np.histogram(x, binss, density=True, weights=gal_data['Weight'][m])
+        axs[1,1].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=10, color='k', alpha=0.4, edgecolor=None)
+        #axs[1,2].hist(x, binss, density=True, weights=gal_data['Weight'][m], linestyle='solid', linewidth=2, histtype='stepfilled', color='k', alpha=0.4)
         x_med = ut.math.percentile_weighted(x, 50, gal_data['Weight'][m])
         y_med = 1.1
         sigma_one_om = ut.math.percentile_weighted(x, 15.87, gal_data['Weight'][m])
@@ -194,26 +212,8 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
         axs[1,1].scatter(x_med, y_med, s=75, marker='s', c='k')
         axs[1,1].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
         axs[1,1].hist(x, binss, density=True, weights=gal_data['Weight'][m], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
-    axs[1,1].set_xlabel('Recent pericenter distance [kpc]', fontsize=18)
+    axs[1,1].set_xlabel('Recent pericenter velocity [km s$^{-1}$]', fontsize=18)
     axs[1,1].tick_params(axis='both', which='major', labelsize=14)
-    #
-    m = (orbit_dictionary['pericenter.rec.vel'] != -1)
-    if np.sum(m) != 0:
-        x = orbit_dictionary['pericenter.rec.vel'][m]
-        binss, half_binss = sat_analysis.binning_scheme(x, 'v.peri', 10)
-        p = np.histogram(x, binss, density=True, weights=gal_data['Weight'][m])
-        axs[1,2].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=10, color='k', alpha=0.4, edgecolor=None)
-        #axs[1,2].hist(x, binss, density=True, weights=gal_data['Weight'][m], linestyle='solid', linewidth=2, histtype='stepfilled', color='k', alpha=0.4)
-        x_med = ut.math.percentile_weighted(x, 50, gal_data['Weight'][m])
-        y_med = 1.1
-        sigma_one_om = ut.math.percentile_weighted(x, 15.87, gal_data['Weight'][m])
-        sigma_one_op = ut.math.percentile_weighted(x, 84.13, gal_data['Weight'][m])
-        axs[1,2].errorbar(x_med, y_med, xerr=np.array([[x_med-sigma_one_om],[sigma_one_op-x_med]]), color='k', lw=3.5, capsize=0)
-        axs[1,2].scatter(x_med, y_med, s=75, marker='s', c='k')
-        axs[1,2].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
-        axs[1,2].hist(x, binss, density=True, weights=gal_data['Weight'][m], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
-    axs[1,2].set_xlabel('Recent pericenter velocity [km s$^{-1}$]', fontsize=18)
-    axs[1,2].tick_params(axis='both', which='major', labelsize=14)
     #
     m = (orbit_dictionary['pericenter.min.time.lb'] != -1)
     if np.sum(m) != 0:
@@ -230,7 +230,7 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
         axs[2,0].scatter(x_med, y_med, s=75, marker='s', c='k')
         axs[2,0].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
         axs[2,0].hist(x, binss, density=True, weights=gal_data['Weight'][m], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
-    axs[2,0].set_xlabel('Lookback minimum pericenter time [Gyr]', fontsize=18)
+    axs[2,0].set_xlabel('$t_{\\rm lookback}$ of minimum pericenter [Gyr]', fontsize=18)
     axs[2,0].tick_params(axis='both', which='major', labelsize=14)
     #
     m = (orbit_dictionary['pericenter.min.dist'] != -1)
@@ -238,8 +238,26 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
         x = orbit_dictionary['pericenter.min.dist'][m]
         binss, half_binss = sat_analysis.binning_scheme(x, 'd.peri', 5)
         p = np.histogram(x, binss, density=True, weights=gal_data['Weight'][m])
-        axs[2,1].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=5, color='k', alpha=0.4, edgecolor=None)
+        axs[1,2].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=5, color='k', alpha=0.4, edgecolor=None)
         #axs[2,1].hist(x, binss, density=True, weights=gal_data['Weight'][m], linestyle='solid', linewidth=2, histtype='stepfilled', color='k', alpha=0.4)
+        x_med = ut.math.percentile_weighted(x, 50, gal_data['Weight'][m])
+        y_med = 1.1
+        sigma_one_om = ut.math.percentile_weighted(x, 15.87, gal_data['Weight'][m])
+        sigma_one_op = ut.math.percentile_weighted(x, 84.13, gal_data['Weight'][m])
+        axs[1,2].errorbar(x_med, y_med, xerr=np.array([[x_med-sigma_one_om],[sigma_one_op-x_med]]), color='k', lw=3.5, capsize=0)
+        axs[1,2].scatter(x_med, y_med, s=75, marker='s', c='k')
+        axs[1,2].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
+        axs[1,2].hist(x, binss, density=True, weights=gal_data['Weight'][m], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
+    axs[1,2].set_xlabel('Minimum pericenter distance [kpc]', fontsize=18)
+    axs[1,2].tick_params(axis='both', which='major', labelsize=14)
+    #
+    m = (orbit_dictionary['pericenter.min.vel'] != -1)
+    if np.sum(m) != 0:
+        x = orbit_dictionary['pericenter.min.vel'][m]
+        binss, half_binss = sat_analysis.binning_scheme(x, 'v.peri', 10)
+        p = np.histogram(x, binss, density=True, weights=gal_data['Weight'][m])
+        axs[2,1].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=10, color='k', alpha=0.4, edgecolor=None)
+        #axs[2,2].hist(x, binss, density=True, weights=gal_data['Weight'][m], linestyle='solid', linewidth=2, histtype='stepfilled', color='k', alpha=0.4)
         x_med = ut.math.percentile_weighted(x, 50, gal_data['Weight'][m])
         y_med = 1.1
         sigma_one_om = ut.math.percentile_weighted(x, 15.87, gal_data['Weight'][m])
@@ -248,59 +266,41 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
         axs[2,1].scatter(x_med, y_med, s=75, marker='s', c='k')
         axs[2,1].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
         axs[2,1].hist(x, binss, density=True, weights=gal_data['Weight'][m], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
-    axs[2,1].set_xlabel('Minimum pericenter distance [kpc]', fontsize=18)
+    axs[2,1].set_xlabel('Minimum pericenter velocity [km s$^{-1}$]', fontsize=18)
     axs[2,1].tick_params(axis='both', which='major', labelsize=14)
-    #
-    m = (orbit_dictionary['pericenter.min.vel'] != -1)
-    if np.sum(m) != 0:
-        x = orbit_dictionary['pericenter.min.vel'][m]
-        binss, half_binss = sat_analysis.binning_scheme(x, 'v.peri', 10)
-        p = np.histogram(x, binss, density=True, weights=gal_data['Weight'][m])
-        axs[2,2].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=10, color='k', alpha=0.4, edgecolor=None)
-        #axs[2,2].hist(x, binss, density=True, weights=gal_data['Weight'][m], linestyle='solid', linewidth=2, histtype='stepfilled', color='k', alpha=0.4)
-        x_med = ut.math.percentile_weighted(x, 50, gal_data['Weight'][m])
-        y_med = 1.1
-        sigma_one_om = ut.math.percentile_weighted(x, 15.87, gal_data['Weight'][m])
-        sigma_one_op = ut.math.percentile_weighted(x, 84.13, gal_data['Weight'][m])
-        axs[2,2].errorbar(x_med, y_med, xerr=np.array([[x_med-sigma_one_om],[sigma_one_op-x_med]]), color='k', lw=3.5, capsize=0)
-        axs[2,2].scatter(x_med, y_med, s=75, marker='s', c='k')
-        axs[2,2].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
-        axs[2,2].hist(x, binss, density=True, weights=gal_data['Weight'][m], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
-    axs[2,2].set_xlabel('Minimum pericenter velocity [km s$^{-1}$]', fontsize=18)
-    axs[2,2].tick_params(axis='both', which='major', labelsize=14)
     #
     m = (reionization_distances >= 0)
     if np.sum(m) != 0:
         x = reionization_distances[m]
         binss, half_binss = sat_analysis.binning_scheme(x, 'z.dist', 80)
         p = np.histogram(x, binss, density=True, weights=gal_data['Weight'][m])
-        axs[3,0].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=80, color='k', alpha=0.4, edgecolor=None)
+        axs[3,2].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=80, color='k', alpha=0.4, edgecolor=None)
         #axs[3,0].hist(x, binss, density=True, weights=gal_data['Weight'][m], linestyle='solid', linewidth=2, histtype='stepfilled', color='k', alpha=0.4)
         x_med = ut.math.percentile_weighted(x, 50, gal_data['Weight'][m])
         y_med = 1.1
         sigma_one_om = ut.math.percentile_weighted(x, 15.87, gal_data['Weight'][m])
         sigma_one_op = ut.math.percentile_weighted(x, 84.13, gal_data['Weight'][m])
-        axs[3,0].errorbar(x_med, y_med, xerr=np.array([[x_med-sigma_one_om],[sigma_one_op-x_med]]), color='k', lw=3.5, capsize=0)
-        axs[3,0].scatter(x_med, y_med, s=75, marker='s', c='k')
-        axs[3,0].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
-        axs[3,0].hist(x, binss, density=True, weights=gal_data['Weight'][m], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
-    axs[3,0].set_xlabel('Reionization distance [kpc co-moving]', fontsize=18)
-    axs[3,0].tick_params(axis='both', which='major', labelsize=14)
+        axs[3,2].errorbar(x_med, y_med, xerr=np.array([[x_med-sigma_one_om],[sigma_one_op-x_med]]), color='k', lw=3.5, capsize=0)
+        axs[3,2].scatter(x_med, y_med, s=75, marker='s', c='k')
+        axs[3,2].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
+        axs[3,2].hist(x, binss, density=True, weights=gal_data['Weight'][m], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
+    axs[3,2].set_xlabel('Distance at $z = 7$ [kpc co-moving]', fontsize=18)
+    axs[3,2].tick_params(axis='both', which='major', labelsize=14)
     #
     m = (orbit_dictionary['pericenter.num'] != -1)
     x = orbit_dictionary['pericenter.num']
     binss, half_binss = sat_analysis.binning_scheme(x, 'N.peri', 1)
     p = np.histogram(x, binss, density=True, weights=gal_data['Weight'])
-    axs[3,1].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=1, color='k', alpha=0.4, edgecolor=None)
+    axs[0,1].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=1, color='k', alpha=0.4, edgecolor=None)
     x_mean = np.sum(orbit_dictionary['pericenter.num']*gal_data['Weight'])/np.sum(gal_data['Weight'])
     y_mean = 1.1
     std = np.sqrt(np.sum((orbit_dictionary['pericenter.num']-x_mean)**2*gal_data['Weight'])/np.sum(gal_data['Weight'])/np.sum(gal_data['Weight'][m]))
-    axs[3,1].errorbar(x_mean, y_mean, xerr=std, color='k', lw=3.5, capsize=0)
-    axs[3,1].scatter(x_mean, y_mean, s=75, marker='s', c='k')
-    axs[3,1].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
-    axs[3,1].hist(x, binss, density=True, weights=gal_data['Weight'], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
-    axs[3,1].set_xlabel('Number of pericentric passages', fontsize=18)
-    axs[3,1].tick_params(axis='both', which='major', labelsize=14)
+    axs[0,1].errorbar(x_mean, y_mean, xerr=std, color='k', lw=3.5, capsize=0)
+    axs[0,1].scatter(x_mean, y_mean, s=75, marker='s', c='k')
+    axs[0,1].axhline(0.5, 0, 1, linestyle='dotted', linewidth=2, color='k')
+    axs[0,1].hist(x, binss, density=True, weights=gal_data['Weight'], cumulative=True, linestyle='dashed', linewidth=2, histtype='step', color='b', alpha=0.4)
+    axs[0,1].set_xlabel('Number of pericentric passages', fontsize=18)
+    axs[0,1].tick_params(axis='both', which='major', labelsize=14)
     #
     N_analogs = len(gal_data['Weight'])
     galaxy_tex = galaxy.replace(" ", r"\ ")
@@ -325,37 +325,37 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
         if sig_vtan < 10:
             sig_vtan = 10.0
     info_lines2 = [
-        rf"$d$: {lg_data[galaxy]['host.distance.total']:.2f} $\pm$ {sig_d:.2f} kpc",
-        rf"$v_{{\rm rad}}$: {lg_data[galaxy]['host.velocity.rad']:.2f} $\pm$ {sig_vrad:.2f} km/s",
-        rf"$v_{{\rm tan}}$: {lg_data[galaxy]['host.velocity.tan']:.2f} $\pm$ {sig_vtan:.2f} km/s",
+        rf"$d$: {lg_data[galaxy]['host.distance.total']:.1f} $\pm$ {sig_d:.1f} kpc",
+        rf"$v_{{\rm rad}}$: {lg_data[galaxy]['host.velocity.rad']:.1f} $\pm$ {sig_vrad:.1f} km/s",
+        rf"$v_{{\rm tan}}$: {lg_data[galaxy]['host.velocity.tan']:.1f} $\pm$ {sig_vtan:.1f} km/s",
     ]
     info_text1 = "\n".join(info_lines1)
     info_text2 = "\n".join(info_lines2)
 
     # --- Turn the panel into a clean text area
-    axs[3,2].set_axis_off()
-    axs[3,2].text(
+    axs[3,1].set_axis_off()
+    axs[3,1].text(
         0.01, 0.97, info_text1,
-        transform=axs[3,2].transAxes,
+        transform=axs[3,1].transAxes,
         ha="left", va="top",
         fontsize=20,
         linespacing=1.4,
         bbox=dict(boxstyle="square,pad=0.3", fc="white", ec="black", lw=1.0)
     )
-    axs[3,2].text(
+    axs[3,1].text(
         0.01, 0.70, info_text2,
-        transform=axs[3,2].transAxes,
+        transform=axs[3,1].transAxes,
         ha="left", va="top",
         fontsize=18,
         linespacing=1.4
     )
     # Blank subpanel
-    #axs[3,2].axison = False
+    #axs[3,1].axison = False
     #
     #plt.suptitle('{0} - Number of analogs = {1}'.format(galaxy, len(gal_data['Weight'])), fontsize=20)
     plt.tight_layout()
     #plt.show()
     #plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/both_hist/'+satellite_name+'_history_both.pdf')
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/histograms/'+satellite_name+'_history_both.pdf')
+    plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/histograms_reorder/'+satellite_name+'_history_both.pdf')
     plt.close()
 
