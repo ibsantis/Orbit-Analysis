@@ -23,6 +23,8 @@ import satellite_io
 import matplotlib
 from matplotlib import pyplot as plt
 import time
+from scipy.stats import spearmanr
+from scipy.stats import pearsonr
 print('Read in the tools')
 
 ### Set path and initial parameters
@@ -63,18 +65,18 @@ galaxies = ['m12b', 'm12c', 'm12f', 'm12i', 'm12m', 'm12n', 'm12q', 'm12w', 'Rom
 #                 'Ursa Major 1', 'Ursa Major 2', 'Ursa Minor', 'Virgo 1', \
 #                 'Willman 1']
                 
-mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Bootes II', 'Bootes III', \
-                    'Bootes IV', 'Bootes V', 'Canes Venatici I', 'Canes Venatici II', 'Carina', 'Carina II', \
-                    'Carina III', 'Centaurus I', 'Cetus II', 'Cetus III', 'Columba I', 'Coma Berenices', \
-                    'Crater II', 'Draco', 'Draco II', 'Eridanus II', 'Eridanus III', 'Eridanus IV', \
-                    'Fornax', 'Grus I', 'Grus II', 'Hercules', 'Horologium I', 'Horologium II', \
-                    'Hydra II', 'Hydrus I', 'Indus I', 'Leo I', 'Leo II', 'Leo IV', \
-                    'Leo V', 'Leo VI', 'Leo A', 'Leo T', 'Leo Minor I', 'Pegasus III', \
-                    'Pegasus IV', 'Phoenix I', 'Phoenix II', 'Pictor I', 'Pictor II', 'Pisces II', \
-                    'Reticulum II', 'Reticulum III', 'Sagittarius', 'Sagittarius II', 'Sculptor', 'Segue 1', \
-                    'Segue 2', 'Sextans', 'Sextans II', 'Triangulum II', 'Tucana I', 'Tucana II', \
-                    'Tucana III', 'Tucana IV', 'Tucana V', 'Ursa Major I', 'Ursa Major II', 'Ursa Minor', \
-                    'Virgo I', 'Virgo II', 'Virgo III', 'Willman 1']
+# mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Bootes II', 'Bootes III', \
+#                     'Bootes IV', 'Bootes V', 'Canes Venatici I', 'Canes Venatici II', 'Carina', 'Carina II', \
+#                     'Carina III', 'Centaurus I', 'Cetus II', 'Cetus III', 'Columba I', 'Coma Berenices', \
+#                     'Crater II', 'Draco', 'Draco II', 'Eridanus II', 'Eridanus III', 'Eridanus IV', \
+#                     'Fornax', 'Grus I', 'Grus II', 'Hercules', 'Horologium I', 'Horologium II', \
+#                     'Hydra II', 'Hydrus I', 'Indus I', 'Leo I', 'Leo II', 'Leo IV', \
+#                     'Leo V', 'Leo VI', 'Leo A', 'Leo T', 'Leo Minor I', 'Pegasus III', \
+#                     'Pegasus IV', 'Phoenix I', 'Phoenix II', 'Pictor I', 'Pictor II', 'Pisces II', \
+#                     'Reticulum II', 'Reticulum III', 'Sagittarius', 'Sagittarius II', 'Sculptor', 'Segue 1', \
+#                     'Segue 2', 'Sextans', 'Sextans II', 'Triangulum II', 'Tucana I', 'Tucana II', \
+#                     'Tucana III', 'Tucana IV', 'Tucana V', 'Ursa Major I', 'Ursa Major II', 'Ursa Minor', \
+#                     'Virgo I', 'Virgo II', 'Virgo III', 'Willman 1']
 
 # mw_sats_proposal =  ['Horologium 2', 'Pisces 2', 'Hydra 2', 'Eridanus 2', 'Willman 1', 'Reticulum 3', \
 #                      'Columba 1', 'Ursa Major 1', 'Pictor 1', 'Bootes 2', 'Grus 1', 'Tucana 5', 'Coma Berenices', \
@@ -83,10 +85,25 @@ mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Boo
 #                      'Canes Venatici 1', 'Sextans 1', 'Phoenix', 'Carina 2', 'Tucana 3', 'Carina', 'Fornax', \
 #                      'Hydrus 1', 'Pegasus 3', 'Cetus 2', 'Virgo 1']
 
+mw_sats_1Mpc_no_GC =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Bootes II', 'Bootes III', \
+                    'Bootes IV', 'Bootes V', 'Canes Venatici I', 'Canes Venatici II', 'Carina', 'Carina II', \
+                    'Carina III', 'Centaurus I', 'Cetus II', 'Cetus III', 'Columba I', 'Coma Berenices', \
+                    'Crater II', 'Draco', 'Draco II', 'Eridanus II', 'Eridanus IV', \
+                    'Fornax', 'Grus I', 'Grus II', 'Hercules', 'Horologium I', 'Horologium II', \
+                    'Hydra II', 'Hydrus I', 'Indus I', 'Leo I', 'Leo II', 'Leo IV', \
+                    'Leo V', 'Leo VI', 'Leo A', 'Leo T', 'Leo Minor I', 'Pegasus III', \
+                    'Pegasus IV', 'Phoenix I', 'Phoenix II', 'Pictor I', 'Pictor II', 'Pisces II', \
+                    'Reticulum II', 'Reticulum III', 'Sagittarius', 'Sculptor', 'Segue 1', \
+                    'Segue 2', 'Sextans', 'Sextans II', 'Triangulum II', 'Tucana I', 'Tucana II', \
+                    'Tucana III', 'Tucana IV', 'Tucana V', 'Ursa Major I', 'Ursa Major II', 'Ursa Minor', \
+                    'Virgo I', 'Virgo II', 'Virgo III', 'Willman 1']
+
+
 # Work on master plots
 sat_mstar = []
 sat_dist = []
 v_tan = []
+v_rad = []
 #
 first_infall = []
 nperi = []
@@ -104,10 +121,10 @@ mhalo = []
 #
 #
 
-n_555 = [12, 330, 378, 83, 131, 3, 2, 305, 42, 213, 15, 13, 75, 89, 125, 5, 243, 153, 43, 13, 26, 57, 4, 125, 4, 99, 99, 111, 163, 301, 212, 49, 52, 0, 25, 167, 255, 347, 18, 67, 517, 362, 178, 13, 387, 127, 77, 363, 104, 954, 2, 107, 4, 103, 20, 12, 42, 17, 15, 151, 0, 183, 113, 193, 261, 20, 62, 87, 45, 53]
+n_555 = [12, 330, 378, 83, 131, 3, 2, 305, 42, 213, 15, 13, 75, 89, 125, 5, 243, 153, 43, 13, 26, 57, 125, 4, 99, 99, 111, 163, 301, 212, 49, 52, 0, 25, 167, 255, 347, 18, 67, 517, 362, 178, 13, 387, 127, 77, 363, 104, 954, 2, 4, 103, 20, 12, 42, 17, 15, 151, 0, 183, 113, 193, 261, 20, 62, 87, 45, 53]
 
 #galaxy = 'Sculptor'
-for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
+for sat_idx, galaxy in enumerate(mw_sats_1Mpc_no_GC):
     #
     satellite_name = galaxy.replace(' ', '_')
     if n_555[sat_idx] < 10:
@@ -117,10 +134,13 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
     gal_data = sat_analysis.read_subhalo_matches(galaxy, file_path_read)
     #
     if len(gal_data['Host']) == 0:
+        print(satellite_name)
         continue
     #
     sat_mstar.append(lg_data[galaxy]['mass.star'])
     sat_dist.append(lg_data[galaxy]['host.distance.total'])
+    v_tan.append(lg_data[galaxy]['host.velocity.tan'])
+    v_rad.append(lg_data[galaxy]['host.velocity.rad'])
     #
     orbit_dictionary = dict()
     orbit_dictionary['first.infall.time.lb'] = np.zeros(gal_data.shape[0])
@@ -284,9 +304,19 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
     else:
         ketot.append((-1, -1, -1))
     
-
 sat_mstar = np.asarray(sat_mstar)
 sat_dist = np.asarray(sat_dist)
+v_tan = np.asarray(v_tan)
+v_rad = np.asarray(v_rad)
+
+
+def correlations(property1, property2, corr_type='spearman'):
+    if corr_type == 'spearman':
+        x1, x2 = spearmanr(property1, property2)
+    else:
+        x1, x2 = pearsonr(property1, property2)
+    return x1, x2
+
 
 """
     Infall time plots
@@ -302,8 +332,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#c76438', alpha=0.7)
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#c76438', alpha=0.7)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('Lookback infall time [Gyr]', fontsize=24)
@@ -317,8 +347,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#c76438', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#c76438', alpha=0.7)
 axs.set_xlim(xmin=0)
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('Lookback infall time [Gyr]', fontsize=24)
@@ -332,8 +362,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#c76438', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#c76438', alpha=0.7)
 axs.set_xlim(0,425)
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('Lookback infall time [Gyr]', fontsize=24)
@@ -341,6 +371,46 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/infall_vs_dist_zoom.pdf')
 plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_rad[mask])):
+    axs.errorbar(v_rad[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask][i], meds[mask][i], s=75, c='#c76438', alpha=0.7)
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('Lookback infall time [Gyr]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/infall_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_tan[mask])):
+    axs.errorbar(v_tan[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask][i], meds[mask][i], s=75, c='#c76438', alpha=0.7)
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('Lookback infall time [Gyr]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/infall_vs_vtan.pdf')
+plt.close()
+
+print("# Spearman correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='spearman')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='spearman')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='spearman')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='spearman')}")
+
+print("# Pearson correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='pearson')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='pearson')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='pearson')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='pearson')}")
 
 
 
@@ -357,8 +427,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], means[mask][i], s=50, c='#2b5b0c', alpha=0.7)
+    axs.errorbar(sat_mstar[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], means[mask][i], s=75, c='#2b5b0c', alpha=0.7)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$N_{\\rm peri}$', fontsize=24)
@@ -372,8 +442,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], means[mask][i], s=50, c='#2b5b0c', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], means[mask][i], s=75, c='#2b5b0c', alpha=0.7)
 axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$N_{\\rm peri}$', fontsize=24)
@@ -387,8 +457,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], means[mask][i], s=50, c='#2b5b0c', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], means[mask][i], s=75, c='#2b5b0c', alpha=0.7)
 axs.set_xlim(0,425)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$N_{\\rm peri}$', fontsize=24)
@@ -397,6 +467,45 @@ plt.tight_layout()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/nperi_vs_dist_zoom.pdf')
 plt.close()
 
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_rad[mask])):
+    axs.errorbar(v_rad[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask][i], means[mask][i], s=75, c='#2b5b0c', alpha=0.7)
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$N_{\\rm peri}$', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/nperi_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_tan[mask])):
+    axs.errorbar(v_tan[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask][i], means[mask][i], s=75, c='#2b5b0c', alpha=0.7)
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$N_{\\rm peri}$', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/nperi_vs_vtan.pdf')
+plt.close()
+
+print("# Spearman correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], means[mask], corr_type='spearman')}")
+print(f"dist: {correlations(sat_dist[mask], means[mask], corr_type='spearman')}")
+print(f"vrad: {correlations(v_rad[mask], means[mask], corr_type='spearman')}")
+print(f"vtan: {correlations(v_tan[mask], means[mask], corr_type='spearman')}")
+
+print("# Pearson correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], means[mask], corr_type='pearson')}")
+print(f"dist: {correlations(sat_dist[mask], means[mask], corr_type='pearson')}")
+print(f"vrad: {correlations(v_rad[mask], means[mask], corr_type='pearson')}")
+print(f"vtan: {correlations(v_tan[mask], means[mask], corr_type='pearson')}")
 
 
 """
@@ -413,8 +522,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#432471', alpha=0.7)
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#432471', alpha=0.7)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, rec}$ [Gyr]', fontsize=24)
@@ -428,8 +537,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#432471', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#432471', alpha=0.7)
 axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, rec}$ [Gyr]', fontsize=24)
@@ -443,8 +552,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#432471', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#432471', alpha=0.7)
 axs.set_xlim(0,425)
 #axs.set_ylim(-0.2, 8)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
@@ -453,6 +562,47 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tperi_rec_vs_dist_zoom.pdf')
 plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_rad[mask])):
+    axs.errorbar(v_rad[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask][i], meds[mask][i], s=75, c='#432471', alpha=0.7)
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$t_{\\rm peri, rec}$ [Gyr]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tperi_rec_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_tan[mask])):
+    axs.errorbar(v_tan[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask][i], meds[mask][i], s=75, c='#432471', alpha=0.7)
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$t_{\\rm peri, rec}$ [Gyr]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tperi_rec_vs_vtan.pdf')
+plt.close()
+
+print("# Spearman correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='spearman')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='spearman')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='spearman')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='spearman')}")
+
+print("# Pearson correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='pearson')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='pearson')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='pearson')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='pearson')}")
+
 
 
 
@@ -470,8 +620,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#d05151', alpha=0.7)
 axs.set_xscale('log')
 axs.set_ylim(0, 160)
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
@@ -486,8 +636,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), alpha=0.7, color='#d05151', lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), alpha=0.5, color='#d05151', lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#d05151', alpha=0.7)
 axs.set_ylim(0, 160)
 axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
@@ -502,8 +652,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#d05151', alpha=0.7)
 axs.set_ylim(0, 160)
 axs.set_xlim(0,425)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
@@ -512,6 +662,48 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dperi_rec_vs_dist_zoom.pdf')
 plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_rad[mask])):
+    axs.errorbar(v_rad[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask][i], meds[mask][i], s=75, c='#d05151', alpha=0.7)
+axs.set_ylim(0, 160)
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$d_{\\rm peri, rec}$ [kpc]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dperi_rec_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_tan[mask])):
+    axs.errorbar(v_tan[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask][i], meds[mask][i], s=75, c='#d05151', alpha=0.7)
+axs.set_ylim(0, 160)
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$d_{\\rm peri, rec}$ [kpc]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dperi_rec_vs_vtan.pdf')
+plt.close()
+
+print("# Spearman correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='spearman')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='spearman')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='spearman')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='spearman')}")
+
+print("# Pearson correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='pearson')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='pearson')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='pearson')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='pearson')}")
 
 
 
@@ -529,8 +721,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#1542b0', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#1542b0', alpha=0.7)
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#1542b0', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#1542b0', alpha=0.7)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri, rec}$ [km s$^{-1}$]', fontsize=24)
@@ -544,8 +736,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#1542b0', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#1542b0', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#1542b0', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#1542b0', alpha=0.7)
 axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri, rec}$ [km s$^{-1}$]', fontsize=24)
@@ -559,8 +751,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#1542b0', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#1542b0', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#1542b0', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#1542b0', alpha=0.7)
 axs.set_xlim(0,425)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri, rec}$ [km s$^{-1}$]', fontsize=24)
@@ -568,6 +760,46 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/vperi_rec_vs_dist_zoom.pdf')
 plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_rad[mask])):
+    axs.errorbar(v_rad[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#1542b0', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask][i], meds[mask][i], s=75, c='#1542b0', alpha=0.7)
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$v_{\\rm peri, rec}$ [km s$^{-1}$]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/vperi_rec_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_tan[mask])):
+    axs.errorbar(v_tan[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#1542b0', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask][i], meds[mask][i], s=75, c='#1542b0', alpha=0.7)
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$v_{\\rm peri, rec}$ [km s$^{-1}$]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/vperi_rec_vs_vtan.pdf')
+plt.close()
+
+print("# Spearman correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='spearman')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='spearman')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='spearman')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='spearman')}")
+
+print("# Pearson correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='pearson')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='pearson')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='pearson')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='pearson')}")
 
 
 
@@ -585,8 +817,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#780d3f', alpha=0.7)
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#780d3f', alpha=0.7)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, min}$ [Gyr]', fontsize=24)
@@ -600,8 +832,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#780d3f', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#780d3f', alpha=0.7)
 axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, min}$ [Gyr]', fontsize=24)
@@ -615,8 +847,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#780d3f', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#780d3f', alpha=0.7)
 axs.set_xlim(0,425)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, min}$ [Gyr]', fontsize=24)
@@ -624,6 +856,46 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tperi_min_vs_dist_zoom.pdf')
 plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_rad[mask])):
+    axs.errorbar(v_rad[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask][i], meds[mask][i], s=75, c='#780d3f', alpha=0.7)
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$t_{\\rm peri, min}$ [Gyr]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tperi_min_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_tan[mask])):
+    axs.errorbar(v_tan[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask][i], meds[mask][i], s=75, c='#780d3f', alpha=0.7)
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$t_{\\rm peri, min}$ [Gyr]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tperi_min_vs_vtan.pdf')
+plt.close()
+
+print("# Spearman correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='spearman')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='spearman')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='spearman')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='spearman')}")
+
+print("# Pearson correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='pearson')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='pearson')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='pearson')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='pearson')}")
 
 
 
@@ -641,8 +913,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#572135', alpha=0.7)
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#572135', alpha=0.7)
 axs.set_xscale('log')
 axs.set_ylim(0, 160)
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
@@ -657,8 +929,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#572135', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#572135', alpha=0.7)
 axs.set_ylim(0, 160)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
@@ -672,8 +944,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#572135', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#572135', alpha=0.7)
 axs.set_xlim(0,425)
 axs.set_ylim(0, 160)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
@@ -682,6 +954,48 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dperi_min_vs_dist_zoom.pdf')
 plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_rad[mask])):
+    axs.errorbar(v_rad[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask][i], meds[mask][i], s=75, c='#572135', alpha=0.7)
+axs.set_ylim(0, 160)
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dperi_min_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_tan[mask])):
+    axs.errorbar(v_tan[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask][i], meds[mask][i], s=75, c='#572135', alpha=0.7)
+axs.set_ylim(0, 160)
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dperi_min_vs_vtan.pdf')
+plt.close()
+
+print("# Spearman correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='spearman')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='spearman')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='spearman')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='spearman')}")
+
+print("# Pearson correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='pearson')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='pearson')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='pearson')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='pearson')}")
 
 
 
@@ -699,8 +1013,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#f38e00', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#f38e00', alpha=0.7)
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#f38e00', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#f38e00', alpha=0.7)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri, min}$ [km s$^{-1}$]', fontsize=24)
@@ -714,8 +1028,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#f38e00', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#f38e00', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#f38e00', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#f38e00', alpha=0.7)
 axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri, min}$ [km s$^{-1}$]', fontsize=24)
@@ -729,8 +1043,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#f38e00', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#f38e00', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#f38e00', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#f38e00', alpha=0.7)
 axs.set_xlim(0,425)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri, min}$ [km s$^{-1}$]', fontsize=24)
@@ -738,6 +1052,46 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/vperi_min_vs_dist_zoom.pdf')
 plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_rad[mask])):
+    axs.errorbar(v_rad[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#f38e00', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask][i], meds[mask][i], s=75, c='#f38e00', alpha=0.7)
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$v_{\\rm peri, min}$ [km s$^{-1}$]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/vperi_min_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_tan[mask])):
+    axs.errorbar(v_tan[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#f38e00', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask][i], meds[mask][i], s=75, c='#f38e00', alpha=0.7)
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$v_{\\rm peri, min}$ [km s$^{-1}$]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/vperi_min_vs_vtan.pdf')
+plt.close()
+
+print("# Spearman correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='spearman')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='spearman')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='spearman')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='spearman')}")
+
+print("# Pearson correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='pearson')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='pearson')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='pearson')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='pearson')}")
 
 
 
@@ -755,8 +1109,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#6e1d16', alpha=0.7)
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#6e1d16', alpha=0.7)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
@@ -770,8 +1124,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#6e1d16', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#6e1d16', alpha=0.7)
 axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
@@ -785,8 +1139,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#6e1d16', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#6e1d16', alpha=0.7)
 axs.set_xlim(0,425)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
@@ -794,6 +1148,46 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tapo_rec_vs_dist_zoom.pdf')
 plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_rad[mask])):
+    axs.errorbar(v_rad[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask][i], meds[mask][i], s=75, c='#6e1d16', alpha=0.7)
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tapo_rec_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_tan[mask])):
+    axs.errorbar(v_tan[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask][i], meds[mask][i], s=75, c='#6e1d16', alpha=0.7)
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tapo_rec_vs_vtan.pdf')
+plt.close()
+
+print("# Spearman correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='spearman')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='spearman')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='spearman')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='spearman')}")
+
+print("# Pearson correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='pearson')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='pearson')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='pearson')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='pearson')}")
 
 
 
@@ -811,8 +1205,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#4e2026', alpha=0.7)
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#4e2026', alpha=0.7)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
@@ -826,8 +1220,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#4e2026', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#4e2026', alpha=0.7)
 axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
@@ -841,8 +1235,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#4e2026', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#4e2026', alpha=0.7)
 axs.set_xlim(0,425)
 axs.set_ylim(0,500)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
@@ -851,6 +1245,46 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dapo_rec_vs_dist_zoom.pdf')
 plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_rad[mask])):
+    axs.errorbar(v_rad[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask][i], meds[mask][i], s=75, c='#4e2026', alpha=0.7)
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dapo_rec_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_tan[mask])):
+    axs.errorbar(v_tan[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask][i], meds[mask][i], s=75, c='#4e2026', alpha=0.7)
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dapo_rec_vs_vtan.pdf')
+plt.close()
+
+print("# Spearman correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='spearman')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='spearman')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='spearman')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='spearman')}")
+
+print("# Pearson correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='pearson')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='pearson')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='pearson')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='pearson')}")
 
 
 
@@ -868,8 +1302,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i]/1e4, s=50, c='#4e2026', alpha=0.7)
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i]/1e4, s=75, c='#4e2026', alpha=0.7)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$\\ell [10^4\ kpc\ km\ s^{-1}]$', fontsize=24)
@@ -883,8 +1317,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i]/1e4, s=50, c='#4e2026', alpha=0.7)
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i]/1e4, s=75, c='#4e2026', alpha=0.7)
 axs.set_xscale('log')
 axs.set_ylim(0, 5)
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
@@ -899,8 +1333,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i]/1e4, s=50, c='#4e2026', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i]/1e4, s=75, c='#4e2026', alpha=0.7)
 axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$\\ell [10^4\ kpc\ km\ s^{-1}]$', fontsize=24)
@@ -914,8 +1348,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i]/1e4, s=50, c='#4e2026', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i]/1e4, s=75, c='#4e2026', alpha=0.7)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$\\ell [10^4\ kpc\ km\ s^{-1}]$', fontsize=24)
 axs.set_xlim(0, 420)
@@ -941,8 +1375,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_mstar[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask][i], meds[mask][i]/1e4, s=50, c='#4e2026', alpha=0.7)
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i]/1e4, s=75, c='#4e2026', alpha=0.7)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('Specific Kinetic Energy $[10^4\ km^2\ s^{-2}]$', fontsize=24)
@@ -956,8 +1390,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i]/1e4, s=50, c='#4e2026', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i]/1e4, s=75, c='#4e2026', alpha=0.7)
 axs.set_xlim(xmin=0)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('Specific Kinetic Energy $[10^4\ km^2\ s^{-2}]$', fontsize=24)
@@ -971,8 +1405,8 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs.errorbar(sat_dist[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask][i], meds[mask][i]/1e4, s=50, c='#4e2026', alpha=0.7)
+    axs.errorbar(sat_dist[mask][i], meds[mask][i]/1e4, yerr=np.array([[meds[mask][i]/1e4-lowers[mask][i]/1e4],[uppers[mask][i]/1e4-meds[mask][i]/1e4]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i]/1e4, s=75, c='#4e2026', alpha=0.7)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('Specific Kinetic Energy $[10^4\ km^2\ s^{-2}]$', fontsize=24)
 axs.set_xlim(0, 420)
@@ -984,13 +1418,178 @@ plt.close()
 
 
 
+dreion = np.array([[1349.4, 1331.1, 1933.0],
+                [1433.7, 1022.1, 1999.6],
+                [1627.9, 1168.4, 2267.1],
+                [1707.8, 1067.4, 1914.7],
+                [1468.8, 1054.6, 2064.1],
+                [1196.0, 788.4, 1686.8],
+                [2380.0, 1918.5, 2841.5],
+                [1137.4, 735.2, 1727.6],
+                [1499.7, 1240.0, 2167.9],
+                [1564.8, 1141.3, 2292.7],
+                [1506.6, 1248.7, 1918.4],
+                [1740.4, 1492.2, 1858.9],
+                [1447.6, 609.8, 2109.6],
+                [1312.5, 973.5, 1615.9],
+                [1451.1, 717.8, 1942.3],
+                [3521.4, 2093.9, 3583.8],
+                [1839.7, 1409.2, 2370.4],
+                [1415.6, 879.9, 2070.8],
+                [1414.0, 1233.2, 1723.5],
+                [1509.4, 1480.3, 2136.7],
+                [1287.6, 671.7, 1489.0],
+                [2472.4, 1653.7, 2872.8],
+                [1290.0, 794.3, 2398.0],
+                [2233.3, 1907.0, 2378.0],
+                [1367.1, 963.7, 1892.9],
+                [1041.7, 844.8, 1619.7],
+                [1716.3, 1457.0, 2357.7],
+                [1227.1, 868.3, 1896.5],
+                [1582.9, 1137.6, 2395.1],
+                [1760.4, 1215.5, 2193.8],
+                [1974.7, 1047.5, 2531.6],
+                [1579.1, 1167.3, 2120.3],
+                [2545.0, 2545.0, 2545.0],
+                [1615.8, 1045.1, 1972.8],
+                [1581.1, 1170.5, 2379.0],
+                [1653.8, 1266.3, 2081.9],
+                [1630.2, 1125.7, 2179.7],
+                [2342.3, 1524.9, 2424.9],
+                [2010.8, 1577.4, 3029.5],
+                [1570.3, 1017.5, 2148.5],
+                [1829.7, 1285.3, 2347.6],
+                [1286.9, 846.6, 2071.4],
+                [2871.8, 2108.8, 3011.3],
+                [1682.1, 1165.6, 2233.8],
+                [1828.5, 1322.4, 2403.0],
+                [1467.7, 944.5, 2116.5],
+                [1823.5, 1327.4, 2337.6],
+                [972.8, 813.1, 1441.1],
+                [1464.7, 988.4, 2105.5],
+                [1489.5, 1120.6, 1489.5],
+                [1606.9, 1238.8, 2169.9],
+                [1114.8, 875.0, 1735.1],
+                [1055.4, 735.7, 1418.1],
+                [1794.5, 1622.7, 2027.7],
+                [1685.5, 1360.8, 2874.2],
+                [1324.6, 822.9, 1759.6],
+                [3121.5, 3052.1, 3191.0],
+                [1400.6, 906.1, 1781.8],
+                [803.8, 803.8, 803.8],
+                [1074.2, 830.9, 1602.2],
+                [1124.4, 805.9, 1558.2],
+                [1529.3, 1016.5, 2023.5],
+                [1304.5, 822.5, 2064.0],
+                [1972.6, 1450.6, 1980.8],
+                [1623.0, 1073.7, 2512.3],
+                [1347.2, 1074.1, 2049.8],
+                [1983.2, 1600.1, 2502.8],
+                [886.2, 499.0, 1105.4]])
+
+"""
+    Recent apocenter distance plots
+"""
+orbit_prop = np.asarray(dreion)
+mask = (orbit_prop[:,0] != -1)
+meds = orbit_prop[:,0]/1000
+lowers = orbit_prop[:,1]/1000
+uppers = orbit_prop[:,2]/1000
+
+# Vs Mstar
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(sat_mstar[mask])):
+    axs.errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#4e2026', alpha=0.7)
+axs.set_xscale('log')
+axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
+axs.set_ylabel('Distance at $z=7$ [Mpc co-moving]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dreion_rec_vs_mstar.pdf')
+plt.close()
+
+# Vs distance
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(sat_mstar[mask])):
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#4e2026', alpha=0.7)
+axs.set_xlim(xmin=0)
+axs.set_xlabel('Host distance [kpc]', fontsize=24)
+axs.set_ylabel('Distance at $z=7$ [Mpc co-moving]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dreion_rec_vs_dist.pdf')
+plt.close()
+
+# Vs distance (zoom)
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(sat_mstar[mask])):
+    axs.errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#4e2026', alpha=0.7)
+axs.set_xlim(0,425)
+#axs.set_ylim(0,500)
+axs.set_xlabel('Host distance [kpc]', fontsize=24)
+axs.set_ylabel('Distance at $z=7$ [Mpc co-moving]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dreion_rec_vs_dist_zoom.pdf')
+plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_rad[mask])):
+    axs.errorbar(v_rad[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask][i], meds[mask][i], s=75, c='#4e2026', alpha=0.7)
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('Distance at $z=7$ [Mpc co-moving]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dreion_rec_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+for i in range(0, len(v_tan[mask])):
+    axs.errorbar(v_tan[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask][i], meds[mask][i], s=75, c='#4e2026', alpha=0.7)
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('Distance at $z=7$ [Mpc co-moving]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dreion_rec_vs_vtan.pdf')
+plt.close()
+
+print("# Spearman correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='spearman')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='spearman')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='spearman')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='spearman')}")
+
+print("# Pearson correlations with: ")
+print(f"mass: {correlations(sat_mstar[mask], meds[mask], corr_type='pearson')}")
+print(f"dist: {correlations(sat_dist[mask], meds[mask], corr_type='pearson')}")
+print(f"vrad: {correlations(v_rad[mask], meds[mask], corr_type='pearson')}")
+print(f"vtan: {correlations(v_tan[mask], meds[mask], corr_type='pearson')}")
 
 
 
 
 
 
-LMC_idxs = [11, 12, 28, 31, 44, 48]
+
+
+LMC_idxs = [11, 12, 27, 30, 43, 47]
 
 
 """
@@ -1007,12 +1606,12 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 2, figsize=(16,6))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs[0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.7, lw=3.5, capsize=0)
-    axs[0].scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#c76438', alpha=0.7)
+    axs[0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs[0].scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#c76438', alpha=0.7)
 
 for i in range(0, len(sat_mstar[mask])):
-    axs[1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.7, lw=3.5, capsize=0)
-    axs[1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#c76438', alpha=0.7)
+    axs[1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs[1].scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#c76438', alpha=0.7)
 #
 for i in LMC_idxs:
     #
@@ -1021,12 +1620,12 @@ for i in LMC_idxs:
     y = meds[i]
     yerr = np.array([[y - lowers[i]], [uppers[i] - y]])
     #
-    axs[0].errorbar(x_dist, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
-    axs[0].scatter(x_dist, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+    axs[0].errorbar(x_dist, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0].scatter(x_dist, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 
     # --- Stellar mass panel (right) ---
-    axs[1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
-    axs[1].scatter(x_mstar, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+    axs[1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1].scatter(x_mstar, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 #
 axs[0].set_xlim(0,425)
 #
@@ -1060,13 +1659,13 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 2, figsize=(16,6))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs[0].errorbar(sat_dist[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
-    axs[0].scatter(sat_dist[mask][i], means[mask][i], s=50, c='#2b5b0c', alpha=0.7)
+    axs[0].errorbar(sat_dist[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.5, lw=1.5, capsize=0)
+    axs[0].scatter(sat_dist[mask][i], means[mask][i], s=75, c='#2b5b0c', alpha=0.7)
 #
 # Vs Mstar
 for i in range(0, len(sat_mstar[mask])):
-    axs[1].errorbar(sat_mstar[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.7, lw=3.5, capsize=0)
-    axs[1].scatter(sat_mstar[mask][i], means[mask][i], s=50, c='#2b5b0c', alpha=0.7)
+    axs[1].errorbar(sat_mstar[mask][i], means[mask][i], yerr=stds[mask][i], color='#2b5b0c', alpha=0.5, lw=1.5, capsize=0)
+    axs[1].scatter(sat_mstar[mask][i], means[mask][i], s=75, c='#2b5b0c', alpha=0.7)
 #
 for i in LMC_idxs:
     #
@@ -1075,12 +1674,12 @@ for i in LMC_idxs:
     y = means[i]
     yerr = stds[i]
     #
-    axs[0].errorbar(x_dist, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
-    axs[0].scatter(x_dist, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+    axs[0].errorbar(x_dist, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0].scatter(x_dist, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 
     # --- Stellar mass panel (right) ---
-    axs[1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
-    axs[1].scatter(x_mstar, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+    axs[1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1].scatter(x_mstar, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 #
 axs[0].set_xlim(0,425)
 #
@@ -1115,13 +1714,13 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(2, 2, figsize=(16,10))
 # Vs distance
 for i in range(0, len(sat_mstar[mask])):
-    axs[0,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.7, lw=3.5, capsize=0)
-    axs[0,0].scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#432471', alpha=0.7)
+    axs[0,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.5, lw=1.5, capsize=0)
+    axs[0,0].scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#432471', alpha=0.7)
 #
 # Vs Mstar
 for i in range(0, len(sat_mstar[mask])):
-    axs[0,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.7, lw=3.5, capsize=0)
-    axs[0,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#432471', alpha=0.7)
+    axs[0,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#432471', alpha=0.5, lw=1.5, capsize=0)
+    axs[0,1].scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#432471', alpha=0.7)
 #
 for i in LMC_idxs:
     #
@@ -1130,12 +1729,12 @@ for i in LMC_idxs:
     y = meds[mask][i]
     yerr = np.array([[y - lowers[i]], [uppers[i] - y]])
     #
-    axs[0,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
-    axs[0,0].scatter(x_dist, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+    axs[0,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0,0].scatter(x_dist, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 
     # --- Stellar mass panel (right) ---
-    axs[0,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
-    axs[0,1].scatter(x_mstar, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+    axs[0,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0,1].scatter(x_mstar, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 #
 ## Pericenter distance
 orbit_prop = np.asarray(dperi_rec)
@@ -1146,13 +1745,13 @@ uppers = orbit_prop[:,2]
 #
 # Vs distance (zoom)
 for i in range(0, len(sat_mstar[mask])):
-    axs[1,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.7, lw=3.5, capsize=0)
-    axs[1,0].scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
+    axs[1,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.5, lw=1.5, capsize=0)
+    axs[1,0].scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#d05151', alpha=0.7)
 #
 # Vs Mstar
 for i in range(0, len(sat_mstar[mask])):
-    axs[1,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.7, lw=3.5, capsize=0)
-    axs[1,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#d05151', alpha=0.7)
+    axs[1,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#d05151', alpha=0.5, lw=1.5, capsize=0)
+    axs[1,1].scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#d05151', alpha=0.7)
 #
 for i in LMC_idxs:
     #
@@ -1161,12 +1760,12 @@ for i in LMC_idxs:
     y = meds[i]
     yerr = np.array([[y - lowers[i]], [uppers[i] - y]])
     #
-    axs[1,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
-    axs[1,0].scatter(x_dist, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+    axs[1,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1,0].scatter(x_dist, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 
     # --- Stellar mass panel (right) ---
-    axs[1,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
-    axs[1,1].scatter(x_mstar, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+    axs[1,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1,1].scatter(x_mstar, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 #
 axs[0,0].set_xlim(0,425)
 axs[1,0].set_xlim(0,425)
@@ -1208,13 +1807,13 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(2, 2, figsize=(16,10))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs[0,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.7, lw=3.5, capsize=0)
-    axs[0,0].scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#780d3f', alpha=0.7)
+    axs[0,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.5, lw=1.5, capsize=0)
+    axs[0,0].scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#780d3f', alpha=0.7)
 #
 # Vs Mstar
 for i in range(0, len(sat_mstar[mask])):
-    axs[0,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.7, lw=3.5, capsize=0)
-    axs[0,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#780d3f', alpha=0.7)
+    axs[0,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#780d3f', alpha=0.5, lw=1.5, capsize=0)
+    axs[0,1].scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#780d3f', alpha=0.7)
 #
 for i in LMC_idxs:
     #
@@ -1223,12 +1822,12 @@ for i in LMC_idxs:
     y = meds[i]
     yerr = np.array([[y - lowers[i]], [uppers[i] - y]])
     #
-    axs[0,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
-    axs[0,0].scatter(x_dist, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+    axs[0,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0,0].scatter(x_dist, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 
     # --- Stellar mass panel (right) ---
-    axs[0,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
-    axs[0,1].scatter(x_mstar, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+    axs[0,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0,1].scatter(x_mstar, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 #
 ## distance trends
 orbit_prop = np.asarray(dperi_min)
@@ -1239,13 +1838,13 @@ uppers = orbit_prop[:,2]
 #
 # Vs distance (zoom)
 for i in range(0, len(sat_mstar[mask])):
-    axs[1,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.7, lw=3.5, capsize=0)
-    axs[1,0].scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#572135', alpha=0.7)
+    axs[1,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.5, lw=1.5, capsize=0)
+    axs[1,0].scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#572135', alpha=0.7)
 #
 # Vs Mstar
 for i in range(0, len(sat_mstar[mask])):
-    axs[1,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.7, lw=3.5, capsize=0)
-    axs[1,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#572135', alpha=0.7)
+    axs[1,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#572135', alpha=0.5, lw=1.5, capsize=0)
+    axs[1,1].scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#572135', alpha=0.7)
 #
 for i in LMC_idxs:
     #
@@ -1254,12 +1853,12 @@ for i in LMC_idxs:
     y = meds[i]
     yerr = np.array([[y - lowers[i]], [uppers[i] - y]])
     #
-    axs[1,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
-    axs[1,0].scatter(x_dist, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+    axs[1,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1,0].scatter(x_dist, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 
     # --- Stellar mass panel (right) ---
-    axs[1,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
-    axs[1,1].scatter(x_mstar, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+    axs[1,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1,1].scatter(x_mstar, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 #
 axs[0,0].set_xlim(0,425)
 axs[1,0].set_xlim(0,425)
@@ -1301,13 +1900,13 @@ plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(2, 2, figsize=(16,10))
 #
 for i in range(0, len(sat_mstar[mask])):
-    axs[0,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.7, lw=3.5, capsize=0)
-    axs[0,0].scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#6e1d16', alpha=0.7)
+    axs[0,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.5, lw=1.5, capsize=0)
+    axs[0,0].scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#6e1d16', alpha=0.7)
 #
 # Vs Mstar
 for i in range(0, len(sat_mstar[mask])):
-    axs[0,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.7, lw=3.5, capsize=0)
-    axs[0,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#6e1d16', alpha=0.7)
+    axs[0,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#6e1d16', alpha=0.5, lw=1.5, capsize=0)
+    axs[0,1].scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#6e1d16', alpha=0.7)
 #
 for i in LMC_idxs:
     #
@@ -1316,12 +1915,12 @@ for i in LMC_idxs:
     y = meds[i]
     yerr = np.array([[y - lowers[i]], [uppers[i] - y]])
     #
-    axs[0,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
-    axs[0,0].scatter(x_dist, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+    axs[0,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0,0].scatter(x_dist, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 
     # --- Stellar mass panel (right) ---
-    axs[0,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
-    axs[0,1].scatter(x_mstar, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+    axs[0,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0,1].scatter(x_mstar, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 #
 # Distance trends
 orbit_prop = np.asarray(dapo_rec)
@@ -1332,13 +1931,13 @@ uppers = orbit_prop[:,2]
 #
 # Vs distance (zoom)
 for i in range(0, len(sat_mstar[mask])):
-    axs[1,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
-    axs[1,0].scatter(sat_dist[mask][i], meds[mask][i], s=50, c='#4e2026', alpha=0.7)
+    axs[1,0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs[1,0].scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#4e2026', alpha=0.7)
 #
 # Vs Mstar
 for i in range(0, len(sat_mstar[mask])):
-    axs[1,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.7, lw=3.5, capsize=0)
-    axs[1,1].scatter(sat_mstar[mask][i], meds[mask][i], s=50, c='#4e2026', alpha=0.7)
+    axs[1,1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#4e2026', alpha=0.5, lw=1.5, capsize=0)
+    axs[1,1].scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#4e2026', alpha=0.7)
 #
 for i in LMC_idxs:
     #
@@ -1347,12 +1946,12 @@ for i in LMC_idxs:
     y = meds[i]
     yerr = np.array([[y - lowers[i]], [uppers[i] - y]])
     #
-    axs[1,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
-    axs[1,0].scatter(x_dist, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+    axs[1,0].errorbar(x_dist, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1,0].scatter(x_dist, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 
     # --- Stellar mass panel (right) ---
-    axs[1,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=3.5, capsize=0, zorder=6, alpha=0.7)
-    axs[1,1].scatter(x_mstar, y, s=50, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+    axs[1,1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1,1].scatter(x_mstar, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
 #
 axs[0,0].set_xlim(0,425)
 axs[1,0].set_xlim(0,425)
@@ -1373,6 +1972,58 @@ axs[1,0].set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
 plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/apocenter_both_LMC_marked.pdf')
+plt.close()
+
+
+"""
+    Reionization plots
+"""
+orbit_prop = np.asarray(dreion)
+mask = (orbit_prop[:,0] != -1)
+meds = orbit_prop[:,0]/1000
+lowers = orbit_prop[:,1]/1000
+uppers = orbit_prop[:,2]/1000
+
+# Vs Mstar
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 2, figsize=(16,6))
+#
+for i in range(0, len(sat_mstar[mask])):
+    axs[0].errorbar(sat_dist[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#3E3A7A', alpha=0.5, lw=1.5, capsize=0)
+    axs[0].scatter(sat_dist[mask][i], meds[mask][i], s=75, c='#3E3A7A', alpha=0.7)
+
+for i in range(0, len(sat_mstar[mask])):
+    axs[1].errorbar(sat_mstar[mask][i], meds[mask][i], yerr=np.array([[meds[mask][i]-lowers[mask][i]],[uppers[mask][i]-meds[mask][i]]]), color='#3E3A7A', alpha=0.5, lw=1.5, capsize=0)
+    axs[1].scatter(sat_mstar[mask][i], meds[mask][i], s=75, c='#3E3A7A', alpha=0.7)
+#
+for i in LMC_idxs:
+    #
+    x_dist = sat_dist[i]
+    x_mstar = sat_mstar[i]
+    y = meds[i]
+    yerr = np.array([[y - lowers[i]], [uppers[i] - y]])
+    #
+    axs[0].errorbar(x_dist, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[0].scatter(x_dist, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+
+    # --- Stellar mass panel (right) ---
+    axs[1].errorbar(x_mstar, y, yerr=yerr, color='k', lw=1.5, capsize=0, zorder=6, alpha=0.7)
+    axs[1].scatter(x_mstar, y, s=75, marker='*', color='k', edgecolor='k', zorder=7, alpha=0.7)
+#
+axs[0].set_xlim(0,425)
+#
+axs[1].set_xscale('log')
+#
+axs[0].set_xlabel('Distance from MW [kpc]', fontsize=24)
+axs[1].set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
+axs[0].set_ylabel('Distance at $z=7$ [Mpc co-mov.]', fontsize=22)
+#
+axs[0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True)
+axs[1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True, labelleft=False)
+#
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/dreion_plot_LMC_marked.pdf')
 plt.close()
 
 
@@ -1401,16 +2052,16 @@ width_min = uppers_min[mask_min] - lowers_min[mask_min]
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_mstar[mask_rec][0], meds_rec[mask_rec][0], yerr=np.array([[meds_rec[mask_rec][0]-lowers_rec[mask_rec][0]],[uppers_rec[mask_rec][0]-meds_rec[mask_rec][0]]]), color='#1542b0', alpha=0.35, lw=3.5, capsize=0)
-axs.scatter(sat_mstar[mask_rec][0], meds_rec[mask_rec][0], s=50, c='#1542b0', alpha=0.35, label='Recent')
-axs.errorbar(sat_mstar[mask_min][0], meds_min[mask_min][0], yerr=np.array([[meds_min[mask_min][0]-lowers_min[mask_min][0]],[uppers_min[mask_min][0]-meds_min[mask_min][0]]]), color='#f38e00', alpha=0.35, lw=3.5, capsize=0)
-axs.scatter(sat_mstar[mask_min][0], meds_min[mask_min][0], s=50, c='#f38e00', alpha=0.35, label='Minimum')
+axs.errorbar(sat_mstar[mask_rec][0], meds_rec[mask_rec][0], yerr=np.array([[meds_rec[mask_rec][0]-lowers_rec[mask_rec][0]],[uppers_rec[mask_rec][0]-meds_rec[mask_rec][0]]]), color='#1542b0', alpha=0.35, lw=1.5, capsize=0)
+axs.scatter(sat_mstar[mask_rec][0], meds_rec[mask_rec][0], s=75, c='#1542b0', alpha=0.35, label='Recent')
+axs.errorbar(sat_mstar[mask_min][0], meds_min[mask_min][0], yerr=np.array([[meds_min[mask_min][0]-lowers_min[mask_min][0]],[uppers_min[mask_min][0]-meds_min[mask_min][0]]]), color='#f38e00', alpha=0.35, lw=1.5, capsize=0)
+axs.scatter(sat_mstar[mask_min][0], meds_min[mask_min][0], s=75, c='#f38e00', alpha=0.35, label='Minimum')
 for i in range(1, len(sat_mstar[mask_rec])):
-    axs.errorbar(sat_mstar[mask_rec][i], meds_rec[mask_rec][i], yerr=np.array([[meds_rec[mask_rec][i]-lowers_rec[mask_rec][i]],[uppers_rec[mask_rec][i]-meds_rec[mask_rec][i]]]), color='#1542b0', alpha=0.35, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_rec][i], meds_rec[mask_rec][i], s=50, c='#1542b0', alpha=0.35)
+    axs.errorbar(sat_mstar[mask_rec][i], meds_rec[mask_rec][i], yerr=np.array([[meds_rec[mask_rec][i]-lowers_rec[mask_rec][i]],[uppers_rec[mask_rec][i]-meds_rec[mask_rec][i]]]), color='#1542b0', alpha=0.35, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_rec][i], meds_rec[mask_rec][i], s=75, c='#1542b0', alpha=0.35)
 for i in range(1, len(sat_mstar[mask_min])):
-    axs.errorbar(sat_mstar[mask_min][i], meds_min[mask_min][i], yerr=np.array([[meds_min[mask_min][i]-lowers_min[mask_min][i]],[uppers_min[mask_min][i]-meds_min[mask_min][i]]]), color='#f38e00', alpha=0.35, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_min][i], meds_min[mask_min][i], s=50, c='#f38e00', alpha=0.35)
+    axs.errorbar(sat_mstar[mask_min][i], meds_min[mask_min][i], yerr=np.array([[meds_min[mask_min][i]-lowers_min[mask_min][i]],[uppers_min[mask_min][i]-meds_min[mask_min][i]]]), color='#f38e00', alpha=0.35, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_min][i], meds_min[mask_min][i], s=75, c='#f38e00', alpha=0.35)
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri}$ [km s$^{-1}$]', fontsize=24)
@@ -1425,16 +2076,16 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_rec][0], meds_rec[mask_rec][0], yerr=np.array([[meds_rec[mask_rec][0]-lowers_rec[mask_rec][0]],[uppers_rec[mask_rec][0]-meds_rec[mask_rec][0]]]), color='#1542b0', alpha=0.35, lw=3.5, capsize=0)
-axs.scatter(sat_dist[mask_rec][0], meds_rec[mask_rec][0], s=50, c='#1542b0', alpha=0.35, label='Recent')
-axs.errorbar(sat_dist[mask_min][0], meds_min[mask_min][0], yerr=np.array([[meds_min[mask_min][0]-lowers_min[mask_min][0]],[uppers_min[mask_min][0]-meds_min[mask_min][0]]]), color='#f38e00', alpha=0.35, lw=3.5, capsize=0)
-axs.scatter(sat_dist[mask_min][0], meds_min[mask_min][0], s=50, c='#f38e00', alpha=0.35, label='Minimum')
+axs.errorbar(sat_dist[mask_rec][0], meds_rec[mask_rec][0], yerr=np.array([[meds_rec[mask_rec][0]-lowers_rec[mask_rec][0]],[uppers_rec[mask_rec][0]-meds_rec[mask_rec][0]]]), color='#1542b0', alpha=0.35, lw=1.5, capsize=0)
+axs.scatter(sat_dist[mask_rec][0], meds_rec[mask_rec][0], s=75, c='#1542b0', alpha=0.35, label='Recent')
+axs.errorbar(sat_dist[mask_min][0], meds_min[mask_min][0], yerr=np.array([[meds_min[mask_min][0]-lowers_min[mask_min][0]],[uppers_min[mask_min][0]-meds_min[mask_min][0]]]), color='#f38e00', alpha=0.35, lw=1.5, capsize=0)
+axs.scatter(sat_dist[mask_min][0], meds_min[mask_min][0], s=75, c='#f38e00', alpha=0.35, label='Minimum')
 for i in range(1, len(sat_dist[mask_rec])):
-    axs.errorbar(sat_dist[mask_rec][i], meds_rec[mask_rec][i], yerr=np.array([[meds_rec[mask_rec][i]-lowers_rec[mask_rec][i]],[uppers_rec[mask_rec][i]-meds_rec[mask_rec][i]]]), color='#1542b0', alpha=0.35, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_rec][i], meds_rec[mask_rec][i], s=50, c='#1542b0', alpha=0.35)
+    axs.errorbar(sat_dist[mask_rec][i], meds_rec[mask_rec][i], yerr=np.array([[meds_rec[mask_rec][i]-lowers_rec[mask_rec][i]],[uppers_rec[mask_rec][i]-meds_rec[mask_rec][i]]]), color='#1542b0', alpha=0.35, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_rec][i], meds_rec[mask_rec][i], s=75, c='#1542b0', alpha=0.35)
 for i in range(1, len(sat_dist[mask_min])):
-    axs.errorbar(sat_dist[mask_min][i], meds_min[mask_min][i], yerr=np.array([[meds_min[mask_min][i]-lowers_min[mask_min][i]],[uppers_min[mask_min][i]-meds_min[mask_min][i]]]), color='#f38e00', alpha=0.35, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_min][i], meds_min[mask_min][i], s=50, c='#f38e00', alpha=0.35)
+    axs.errorbar(sat_dist[mask_min][i], meds_min[mask_min][i], yerr=np.array([[meds_min[mask_min][i]-lowers_min[mask_min][i]],[uppers_min[mask_min][i]-meds_min[mask_min][i]]]), color='#f38e00', alpha=0.35, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_min][i], meds_min[mask_min][i], s=75, c='#f38e00', alpha=0.35)
 axs.set_xlim(0,425)
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$v_{\\rm peri}$ [km s$^{-1}$]', fontsize=24)
