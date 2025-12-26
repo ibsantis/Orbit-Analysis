@@ -43,23 +43,38 @@ galaxies_early = ['m12f', 'm12i', 'Romeo', 'Juliet', 'Thelma', 'Louise']
 galaxies_later = ['m12b', 'm12c', 'm12m', 'm12w','Romulus', 'Remus']
 
 
-mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Bootes II', 'Bootes III', \
+# mw_sats_1Mpc =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Bootes II', 'Bootes III', \
+#                     'Bootes IV', 'Bootes V', 'Canes Venatici I', 'Canes Venatici II', 'Carina', 'Carina II', \
+#                     'Carina III', 'Centaurus I', 'Cetus II', 'Cetus III', 'Columba I', 'Coma Berenices', \
+#                     'Crater II', 'Draco', 'Draco II', 'Eridanus II', 'Eridanus III', 'Eridanus IV', \
+#                     'Fornax', 'Grus I', 'Grus II', 'Hercules', 'Horologium I', 'Horologium II', \
+#                     'Hydra II', 'Hydrus I', 'Indus I', 'Leo I', 'Leo II', 'Leo IV', \
+#                     'Leo V', 'Leo VI', 'Leo A', 'Leo T', 'Leo Minor I', 'Pegasus III', \
+#                     'Pegasus IV', 'Phoenix I', 'Phoenix II', 'Pictor I', 'Pictor II', 'Pisces II', \
+#                     'Reticulum II', 'Reticulum III', 'Sagittarius', 'Sagittarius II', 'Sculptor', 'Segue 1', \
+#                     'Segue 2', 'Sextans', 'Sextans II', 'Triangulum II', 'Tucana I', 'Tucana II', \
+#                     'Tucana III', 'Tucana IV', 'Tucana V', 'Ursa Major I', 'Ursa Major II', 'Ursa Minor', \
+#                     'Virgo I', 'Virgo II', 'Virgo III', 'Willman 1']
+
+mw_sats_1Mpc_no_GC =     ['Antlia II', 'Aquarius II', 'Aquarius III', 'Bootes I', 'Bootes II', 'Bootes III', \
                     'Bootes IV', 'Bootes V', 'Canes Venatici I', 'Canes Venatici II', 'Carina', 'Carina II', \
                     'Carina III', 'Centaurus I', 'Cetus II', 'Cetus III', 'Columba I', 'Coma Berenices', \
-                    'Crater II', 'Draco', 'Draco II', 'Eridanus II', 'Eridanus III', 'Eridanus IV', \
+                    'Crater II', 'Draco', 'Draco II', 'Eridanus II', 'Eridanus IV', \
                     'Fornax', 'Grus I', 'Grus II', 'Hercules', 'Horologium I', 'Horologium II', \
                     'Hydra II', 'Hydrus I', 'Indus I', 'Leo I', 'Leo II', 'Leo IV', \
                     'Leo V', 'Leo VI', 'Leo A', 'Leo T', 'Leo Minor I', 'Pegasus III', \
                     'Pegasus IV', 'Phoenix I', 'Phoenix II', 'Pictor I', 'Pictor II', 'Pisces II', \
-                    'Reticulum II', 'Reticulum III', 'Sagittarius', 'Sagittarius II', 'Sculptor', 'Segue 1', \
+                    'Reticulum II', 'Reticulum III', 'Sagittarius', 'Sculptor', 'Segue 1', \
                     'Segue 2', 'Sextans', 'Sextans II', 'Triangulum II', 'Tucana I', 'Tucana II', \
                     'Tucana III', 'Tucana IV', 'Tucana V', 'Ursa Major I', 'Ursa Major II', 'Ursa Minor', \
                     'Virgo I', 'Virgo II', 'Virgo III', 'Willman 1']
+
 
 # Work on master plots
 sat_mstar = []
 sat_dist = []
 v_tan = []
+v_rad = []
 #
 first_infall_early = []
 nperi_early = []
@@ -74,6 +89,7 @@ dapo_rec_early = []
 ell_early = []
 ketot_early = []
 mhalo_early = []
+dreion_early = []
 #
 first_infall_later = []
 nperi_later = []
@@ -88,11 +104,12 @@ dapo_rec_later = []
 ell_later = []
 ketot_later = []
 mhalo_later = []
+dreion_later = []
 #
-n_555 = [12, 330, 378, 83, 131, 3, 2, 305, 42, 213, 15, 13, 75, 89, 125, 5, 243, 153, 43, 13, 26, 57, 4, 125, 4, 99, 99, 111, 163, 301, 212, 49, 52, 0, 25, 167, 255, 347, 18, 67, 517, 362, 178, 13, 387, 127, 77, 363, 104, 954, 2, 107, 4, 103, 20, 12, 42, 17, 15, 151, 0, 183, 113, 193, 261, 20, 62, 87, 45, 53]
+n_555 = [12, 330, 378, 83, 131, 3, 2, 305, 42, 213, 15, 13, 75, 89, 125, 5, 243, 153, 43, 13, 26, 57, 125, 4, 99, 99, 111, 163, 301, 212, 49, 52, 0, 25, 167, 255, 347, 18, 67, 517, 362, 178, 13, 387, 127, 77, 363, 104, 954, 2, 4, 103, 20, 12, 42, 17, 15, 151, 0, 183, 113, 193, 261, 20, 62, 87, 45, 53]
 
 #galaxy = 'Sculptor'
-for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
+for sat_idx, galaxy in enumerate(mw_sats_1Mpc_no_GC):
     #
     satellite_name = galaxy.replace(' ', '_')
     if n_555[sat_idx] < 10:
@@ -106,6 +123,8 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
     #
     sat_mstar.append(lg_data[galaxy]['mass.star'])
     sat_dist.append(lg_data[galaxy]['host.distance.total'])
+    v_rad.append(lg_data[galaxy]['host.velocity.rad'])
+    v_tan.append(lg_data[galaxy]['host.velocity.tan'])
     #
     orbit_dictionary = dict()
     orbit_dictionary['first.infall.time.lb'] = (-1)*np.ones(gal_data.shape[0])
@@ -124,6 +143,7 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
     orbit_dictionary['velocity.rad'] = (-1)*np.ones(gal_data.shape[0])
     orbit_dictionary['velocity.tan'] = (-1)*np.ones(gal_data.shape[0])
     orbit_dictionary['v.tot.sim'] = (-1)*np.ones(gal_data.shape[0])
+    reionization_distances = np.zeros(gal_data.shape[0])
     #
     maskEarly = np.array([True if gal_data['Host'][i] in galaxies_early else False for i in range(len(gal_data['Host']))])
     maskLater = np.array([True if gal_data['Host'][i] in galaxies_later else False for i in range(len(gal_data['Host']))])
@@ -135,11 +155,34 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
             snaps = ut.simulation.read_snapshot_times(directory=sim_data.home_dir+'/galaxies/snapshot_times/'+sim_name)
             #
             orbit_history = sat_analysis.orbit_property_distribution(sim_name, mini_data, gal_data, snaps)
+            reionDists = sat_analysis.reionization_distance(sim_name, mini_data, gal_data, snaps)
             mask = np.where(sim_name == gal_data['Host'])[0]
             for key in orbit_history.keys():
                 orbit_dictionary[key][mask] = orbit_history[key]
+            reionization_distances[mask] = reionDists[mask]
     if len(orbit_history['distance']) == 0:
         continue
+    #
+    # Reionization distances
+    m = (reionization_distances >= 0)
+    if np.sum(m * maskEarly) != 0:
+        x = reionization_distances[m * maskEarly]
+        x_med = ut.math.percentile_weighted(x, 50, gal_data['Weight'][m * maskEarly])
+        x_lower = ut.math.percentile_weighted(x, 15.87, gal_data['Weight'][m * maskEarly])
+        x_upper = ut.math.percentile_weighted(x, 84.13, gal_data['Weight'][m * maskEarly])
+        dreion_early.append((x_med, x_lower, x_upper))
+        #
+    else:
+        dreion_early.append((-1, -1, -1))
+    #
+    if np.sum(m * maskLater) != 0:
+        x = reionization_distances[m * maskLater]
+        x_med = ut.math.percentile_weighted(x, 50, gal_data['Weight'][m * maskLater])
+        x_lower = ut.math.percentile_weighted(x, 15.87, gal_data['Weight'][m * maskLater])
+        x_upper = ut.math.percentile_weighted(x, 84.13, gal_data['Weight'][m * maskLater])
+        dreion_later.append((x_med, x_lower, x_upper))
+    else:
+        dreion_later.append((-1, -1, -1))
     #
     # Infall times
     m = (orbit_dictionary['first.infall.time.lb'] != -1)
@@ -382,39 +425,40 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
 
 sat_mstar = np.asarray(sat_mstar)
 sat_dist = np.asarray(sat_dist)
-
+v_rad = np.asarray(v_rad)
+v_tan = np.asarray(v_tan)
 
 """
     Infall time plots
 """
-first_infall_early = np.asarray(first_infall_early)
-mask_early = (first_infall_early[:,0] != -1)
-meds_early = first_infall_early[:,0]
-lowers_early = first_infall_early[:,1]
-uppers_early = first_infall_early[:,2]
+orbit_prop = np.asarray(first_infall_early)
+mask_early = (orbit_prop[:,0] != -1)
+meds_early = orbit_prop[:,0]
+lowers_early = orbit_prop[:,1]
+uppers_early = orbit_prop[:,2]
 #
-first_infall_later = np.asarray(first_infall_later)
-mask_later = (first_infall_later[:,0] != -1)
-meds_later = first_infall_later[:,0]
-lowers_later = first_infall_later[:,1]
-uppers_later = first_infall_later[:,2]
+orbit_prop = np.asarray(first_infall_later)
+mask_later = (orbit_prop[:,0] != -1)
+meds_later = orbit_prop[:,0]
+lowers_later = orbit_prop[:,1]
+uppers_later = orbit_prop[:,2]
 
 # Vs Mstar
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 axs.set_xscale('log')
 axs.legend(prop={'size': 16}, loc='best')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
@@ -428,18 +472,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('Lookback infall time [Gyr]', fontsize=24)
@@ -453,18 +497,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('Lookback infall time [Gyr]', fontsize=24)
@@ -474,6 +518,55 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/infall_vs_dist_zoom.pdf')
 plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_rad[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_rad[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_rad[mask_early])):
+    # axs.errorbar(v_rad[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(v_rad[mask_later])):
+    # axs.errorbar(v_rad[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('Lookback infall time [Gyr]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/infall_vs_vrad.pdf')
+plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_tan[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_tan[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_tan[mask_early])):
+    # axs.errorbar(v_tan[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(v_tan[mask_later])):
+    # axs.errorbar(v_tan[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('Lookback infall time [Gyr]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/infall_vs_vtan.pdf')
+plt.close()
+
 
 
 
@@ -494,19 +587,19 @@ stds_later = orbit_prop[:,1]
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_mstar[mask_early][0], means_early[mask_early][0], yerr=stds_early[mask_early][0], color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_early][0], means_early[mask_early][0], yerr=stds_early[mask_early][0], color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_early][0], means_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_mstar[mask_later][0], means_later[mask_later][0], yerr=stds_later[mask_later][0], color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_later][0], means_later[mask_later][0], yerr=stds_later[mask_later][0], color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_later][0], means_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_mstar[mask_early][i], means_early[mask_early][i], yerr=stds_early[mask_early][i], color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_early][i], means_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_early][i], means_early[mask_early][i], yerr=stds_early[mask_early][i], color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_early][i], means_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 #
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_mstar[mask_later][i], means_later[mask_later][i], yerr=stds_later[mask_later][i], color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_later][i], means_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_later][i], means_later[mask_later][i], yerr=stds_later[mask_later][i], color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_later][i], means_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
@@ -522,19 +615,19 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_mstar[mask_early][0], means_early[mask_early][0], yerr=stds_early[mask_early][0], color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_early][0], means_early[mask_early][0], yerr=stds_early[mask_early][0], color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_early][0], means_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_mstar[mask_later][0], means_later[mask_later][0], yerr=stds_later[mask_later][0], color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_later][0], means_later[mask_later][0], yerr=stds_later[mask_later][0], color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_later][0], means_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_mstar[mask_early][i], means_early[mask_early][i], yerr=stds_early[mask_early][i], color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_early][i], means_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_early][i], means_early[mask_early][i], yerr=stds_early[mask_early][i], color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_early][i], means_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 #
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_mstar[mask_later][i], means_later[mask_later][i], yerr=stds_later[mask_later][i], color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_later][i], means_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_later][i], means_later[mask_later][i], yerr=stds_later[mask_later][i], color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_later][i], means_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xscale('log')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
@@ -550,19 +643,19 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], means_early[mask_early][0], yerr=stds_early[mask_early][0], color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], means_early[mask_early][0], yerr=stds_early[mask_early][0], color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], means_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], means_later[mask_later][0], yerr=stds_later[mask_later][0], color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], means_later[mask_later][0], yerr=stds_later[mask_later][0], color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], means_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], means_early[mask_early][i], yerr=stds_early[mask_early][i], color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], means_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], means_early[mask_early][i], yerr=stds_early[mask_early][i], color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], means_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 #
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], means_later[mask_later][i], yerr=stds_later[mask_later][i], color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], means_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], means_later[mask_later][i], yerr=stds_later[mask_later][i], color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], means_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$N_{\\rm peri}$', fontsize=24)
@@ -577,19 +670,19 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], means_early[mask_early][0], yerr=stds_early[mask_early][0], color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], means_early[mask_early][0], yerr=stds_early[mask_early][0], color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], means_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], means_later[mask_later][0], yerr=stds_later[mask_later][0], color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], means_later[mask_later][0], yerr=stds_later[mask_later][0], color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], means_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], means_early[mask_early][i], yerr=stds_early[mask_early][i], color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], means_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], means_early[mask_early][i], yerr=stds_early[mask_early][i], color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], means_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 #
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], means_later[mask_later][i], yerr=stds_later[mask_later][i], color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], means_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], means_later[mask_later][i], yerr=stds_later[mask_later][i], color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], means_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Host distance [kpc]', fontsize=24)
 axs.set_ylabel('$N_{\\rm peri}$', fontsize=24)
@@ -599,6 +692,60 @@ axs.set_ylim(0, 8)
 plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/nperi_vs_dist_zoom.pdf')
+plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_rad[mask_early][0], means_early[mask_early][0], yerr=stds_early[mask_early][0], color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_early][0], means_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_rad[mask_later][0], means_later[mask_later][0], yerr=stds_later[mask_later][0], color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_later][0], means_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_rad[mask_early])):
+    # axs.errorbar(v_rad[mask_early][i], means_early[mask_early][i], yerr=stds_early[mask_early][i], color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_early][i], means_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+#
+for i in range(1, len(v_rad[mask_later])):
+    # axs.errorbar(v_rad[mask_later][i], means_later[mask_later][i], yerr=stds_later[mask_later][i], color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_later][i], means_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+#
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$N_{\\rm peri}$', fontsize=24)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_ylim(ymin=0)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/nperi_vs_vrad.pdf')
+plt.close()
+
+# Vs tan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_tan[mask_early][0], means_early[mask_early][0], yerr=stds_early[mask_early][0], color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_early][0], means_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_tan[mask_later][0], means_later[mask_later][0], yerr=stds_later[mask_later][0], color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_later][0], means_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_tan[mask_early])):
+    # axs.errorbar(v_tan[mask_early][i], means_early[mask_early][i], yerr=stds_early[mask_early][i], color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_early][i], means_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+#
+for i in range(1, len(v_tan[mask_later])):
+    # axs.errorbar(v_tan[mask_later][i], means_later[mask_later][i], yerr=stds_later[mask_later][i], color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_later][i], means_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+#
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$N_{\\rm peri}$', fontsize=24)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_ylim(ymin=0)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/nperi_vs_vtan.pdf')
 plt.close()
 
 
@@ -622,18 +769,18 @@ uppers_later = orbit_prop[:,2]
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 axs.set_xscale('log')
 axs.legend(prop={'size': 16}, loc='best')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
@@ -647,18 +794,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 axs.set_xscale('log')
 axs.set_ylim(0, 5)
 axs.legend(prop={'size': 16}, loc='best')
@@ -673,18 +820,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, rec}$ [Gyr]', fontsize=24)
@@ -698,18 +845,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, rec}$ [Gyr]', fontsize=24)
@@ -719,6 +866,54 @@ axs.set_ylim(0, 5)
 plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/tperi_rec_vs_dist_zoom.pdf')
+plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_rad[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_rad[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_rad[mask_early])):
+    # axs.errorbar(v_rad[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(v_rad[mask_later])):
+    # axs.errorbar(v_rad[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$t_{\\rm peri, rec}$ [Gyr]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/tperi_rec_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_tan[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_tan[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_tan[mask_early])):
+    # axs.errorbar(v_tan[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(v_tan[mask_later])):
+    # axs.errorbar(v_tan[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$t_{\\rm peri, rec}$ [Gyr]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/tperi_rec_vs_vtan.pdf')
 plt.close()
 
 
@@ -742,18 +937,18 @@ uppers_later = orbit_prop[:,2]
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 axs.set_xscale('log')
 axs.legend(prop={'size': 16}, loc='best')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
@@ -767,18 +962,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 axs.set_xscale('log')
 axs.set_ylim(0, 150)
 axs.legend(prop={'size': 16}, loc='best')
@@ -793,18 +988,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, rec}$ [kpc]', fontsize=24)
@@ -818,18 +1013,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, rec}$ [kpc]', fontsize=24)
@@ -840,6 +1035,53 @@ plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/dperi_rec_vs_dist_zoom.pdf')
 plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_rad[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_rad[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_rad[mask_early])):
+    # axs.errorbar(v_rad[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(v_rad[mask_later])):
+    # axs.errorbar(v_rad[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$d_{\\rm peri, rec}$ [kpc]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/dperi_rec_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_tan[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_tan[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_tan[mask_early])):
+    # axs.errorbar(v_tan[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(v_tan[mask_later])):
+    # axs.errorbar(v_tan[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$d_{\\rm peri, rec}$ [kpc]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/dperi_rec_vs_vtan.pdf')
 
 
 
@@ -862,18 +1104,18 @@ uppers_later = orbit_prop[:,2]
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 axs.set_xscale('log')
 axs.legend(prop={'size': 16}, loc='best')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
@@ -887,18 +1129,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, min}$ [Gyr]', fontsize=24)
@@ -912,18 +1154,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm peri, min}$ [Gyr]', fontsize=24)
@@ -932,6 +1174,54 @@ axs.set_xlim(0, 420)
 plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/tperi_min_vs_dist_zoom.pdf')
+plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_rad[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_rad[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_rad[mask_early])):
+    # axs.errorbar(v_rad[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(v_rad[mask_later])):
+    # axs.errorbar(v_rad[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$t_{\\rm peri, min}$ [Gyr]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/tperi_min_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_tan[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_tan[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_tan[mask_early])):
+    # axs.errorbar(v_tan[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(v_tan[mask_later])):
+    # axs.errorbar(v_tan[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$t_{\\rm peri, min}$ [Gyr]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/tperi_min_vs_vtan.pdf')
 plt.close()
 
 
@@ -955,18 +1245,18 @@ uppers_later = orbit_prop[:,2]
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 axs.set_xscale('log')
 axs.legend(prop={'size': 16}, loc='best')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
@@ -980,18 +1270,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
@@ -1005,18 +1295,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
@@ -1025,6 +1315,54 @@ axs.set_xlim(0, 420)
 plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/dperi_min_vs_dist_zoom.pdf')
+plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_rad[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_rad[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_rad[mask_early])):
+    # axs.errorbar(v_rad[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(v_rad[mask_later])):
+    # axs.errorbar(v_rad[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/dperi_min_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_tan[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_tan[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_tan[mask_early])):
+    # axs.errorbar(v_tan[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(v_tan[mask_later])):
+    # axs.errorbar(v_tan[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$d_{\\rm peri, min}$ [kpc]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/dperi_min_vs_vtan.pdf')
 plt.close()
 
 
@@ -1048,18 +1386,18 @@ uppers_later = orbit_prop[:,2]
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 axs.set_xscale('log')
 axs.legend(prop={'size': 16}, loc='best')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
@@ -1073,18 +1411,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
@@ -1094,6 +1432,53 @@ plt.tight_layout()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/tapo_rec_vs_dist.pdf')
 plt.close()
 
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_rad[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_rad[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_rad[mask_early])):
+    # axs.errorbar(v_rad[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(v_rad[mask_later])):
+    # axs.errorbar(v_rad[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/tapo_rec_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_tan[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_tan[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_tan[mask_early])):
+    # axs.errorbar(v_tan[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(v_tan[mask_later])):
+    # axs.errorbar(v_tan[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$t_{\\rm apo, rec}$ [Gyr]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/tapo_rec_vs_vtan.pdf')
+plt.close()
 
 
 """
@@ -1115,18 +1500,18 @@ uppers_later = orbit_prop[:,2]
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 axs.set_xscale('log')
 axs.legend(prop={'size': 16}, loc='best')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
@@ -1140,18 +1525,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
@@ -1159,6 +1544,169 @@ axs.legend(prop={'size': 16}, loc='best')
 plt.tight_layout()
 #plt.show()
 plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/dapo_rec_vs_dist.pdf')
+plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_rad[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_rad[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_rad[mask_early])):
+    # axs.errorbar(v_rad[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(v_rad[mask_later])):
+    # axs.errorbar(v_rad[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/dapo_rec_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_tan[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_tan[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_tan[mask_early])):
+    # axs.errorbar(v_tan[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(v_tan[mask_later])):
+    # axs.errorbar(v_tan[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$d_{\\rm apo, rec}$ [kpc]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/dapo_rec_vs_vtan.pdf')
+plt.close()
+
+
+
+"""
+    Reionization distance plots
+"""
+orbit_prop = np.asarray(dreion_early)
+mask_early = (orbit_prop[:,0] != -1)
+meds_early = orbit_prop[:,0]/1000
+lowers_early = orbit_prop[:,1]/1000
+uppers_early = orbit_prop[:,2]/1000
+#
+orbit_prop = np.asarray(dreion_later)
+mask_later = (orbit_prop[:,0] != -1)
+meds_later = orbit_prop[:,0]/1000
+lowers_later = orbit_prop[:,1]/1000
+uppers_later = orbit_prop[:,2]/1000
+
+# Vs Mstar
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(sat_mstar[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(sat_mstar[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(sat_mstar[mask_early])):
+    # axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(sat_mstar[mask_later])):
+    # axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.set_xscale('log')
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
+axs.set_ylabel('$d(z = 7)$ [Mpc]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/dreion_vs_mstar.pdf')
+plt.close()
+
+# Vs distance
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(sat_mstar[mask_early])):
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(sat_mstar[mask_later])):
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+#
+axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
+axs.set_ylabel('$d(z = 7)$ [Mpc]', fontsize=24)
+axs.legend(prop={'size': 16}, loc='best')
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/dreion_vs_dist.pdf')
+plt.close()
+
+# Vs vrad
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_rad[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_rad[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_rad[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_rad[mask_early])):
+    # axs.errorbar(v_rad[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(v_rad[mask_later])):
+    # axs.errorbar(v_rad[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_rad[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$v_{\\rm rad}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$d(z = 7)$ [Mpc]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/dreion_vs_vrad.pdf')
+plt.close()
+
+# Vs vtan
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(1, 1, figsize=(10,8))
+#
+# axs.errorbar(v_tan[mask_early][0], meds_early[mask_early][0], yerr=np.array([[meds_early[mask_early][0]-lowers_early[mask_early][0]],[uppers_early[mask_early][0]-meds_early[mask_early][0]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_early][0], meds_early[mask_early][0], s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
+#
+# axs.errorbar(v_tan[mask_later][0], meds_later[mask_later][0], yerr=np.array([[meds_later[mask_later][0]-lowers_later[mask_later][0]],[uppers_later[mask_later][0]-meds_later[mask_later][0]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+axs.scatter(v_tan[mask_later][0], meds_later[mask_later][0], s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
+#
+for i in range(1, len(v_tan[mask_early])):
+    # axs.errorbar(v_tan[mask_early][i], meds_early[mask_early][i], yerr=np.array([[meds_early[mask_early][i]-lowers_early[mask_early][i]],[uppers_early[mask_early][i]-meds_early[mask_early][i]]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_early][i], meds_early[mask_early][i], s=50, c='#c76438', alpha=0.75)
+for i in range(1, len(v_tan[mask_later])):
+    # axs.errorbar(v_tan[mask_later][i], meds_later[mask_later][i], yerr=np.array([[meds_later[mask_later][i]-lowers_later[mask_later][i]],[uppers_later[mask_later][i]-meds_later[mask_later][i]]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(v_tan[mask_later][i], meds_later[mask_later][i], s=50, c='#389BC7', alpha=0.75)
+axs.legend(prop={'size': 16}, loc='best')
+axs.set_xlabel('$v_{\\rm tan}$ [km s$^{-1}$]', fontsize=24)
+axs.set_ylabel('$d(z = 7)$ [Mpc]', fontsize=24)
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/early_vs_late/dreion_vs_vtan.pdf')
 plt.close()
 
 
@@ -1182,18 +1730,18 @@ uppers_later = orbit_prop[:,2]
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0]/1e4, yerr=np.array([[meds_early[mask_early][0]/1e4-lowers_early[mask_early][0]/1e4],[uppers_early[mask_early][0]/1e4-meds_early[mask_early][0]/1e4]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0]/1e4, yerr=np.array([[meds_early[mask_early][0]/1e4-lowers_early[mask_early][0]/1e4],[uppers_early[mask_early][0]/1e4-meds_early[mask_early][0]/1e4]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_early][0], meds_early[mask_early][0]/1e4, s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0]/1e4, yerr=np.array([[meds_later[mask_later][0]/1e4-lowers_later[mask_later][0]/1e4],[uppers_later[mask_later][0]/1e4-meds_later[mask_later][0]/1e4]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0]/1e4, yerr=np.array([[meds_later[mask_later][0]/1e4-lowers_later[mask_later][0]/1e4],[uppers_later[mask_later][0]/1e4-meds_later[mask_later][0]/1e4]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_later][0], meds_later[mask_later][0]/1e4, s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i]/1e4, yerr=np.array([[meds_early[mask_early][i]/1e4-lowers_early[mask_early][i]/1e4],[uppers_early[mask_early][i]/1e4-meds_early[mask_early][i]/1e4]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i]/1e4, s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i]/1e4, yerr=np.array([[meds_early[mask_early][i]/1e4-lowers_early[mask_early][i]/1e4],[uppers_early[mask_early][i]/1e4-meds_early[mask_early][i]/1e4]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i]/1e4, s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i]/1e4, yerr=np.array([[meds_later[mask_later][i]/1e4-lowers_later[mask_later][i]/1e4],[uppers_later[mask_later][i]/1e4-meds_later[mask_later][i]/1e4]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i]/1e4, s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i]/1e4, yerr=np.array([[meds_later[mask_later][i]/1e4-lowers_later[mask_later][i]/1e4],[uppers_later[mask_later][i]/1e4-meds_later[mask_later][i]/1e4]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i]/1e4, s=50, c='#389BC7', alpha=0.75)
 axs.set_xscale('log')
 axs.legend(prop={'size': 16}, loc='best')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
@@ -1207,18 +1755,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0]/1e4, yerr=np.array([[meds_early[mask_early][0]/1e4-lowers_early[mask_early][0]/1e4],[uppers_early[mask_early][0]/1e4-meds_early[mask_early][0]/1e4]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0]/1e4, yerr=np.array([[meds_early[mask_early][0]/1e4-lowers_early[mask_early][0]/1e4],[uppers_early[mask_early][0]/1e4-meds_early[mask_early][0]/1e4]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_early][0], meds_early[mask_early][0]/1e4, s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0]/1e4, yerr=np.array([[meds_later[mask_later][0]/1e4-lowers_later[mask_later][0]/1e4],[uppers_later[mask_later][0]/1e4-meds_later[mask_later][0]/1e4]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0]/1e4, yerr=np.array([[meds_later[mask_later][0]/1e4-lowers_later[mask_later][0]/1e4],[uppers_later[mask_later][0]/1e4-meds_later[mask_later][0]/1e4]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_later][0], meds_later[mask_later][0]/1e4, s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i]/1e4, yerr=np.array([[meds_early[mask_early][i]/1e4-lowers_early[mask_early][i]/1e4],[uppers_early[mask_early][i]/1e4-meds_early[mask_early][i]/1e4]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i]/1e4, s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i]/1e4, yerr=np.array([[meds_early[mask_early][i]/1e4-lowers_early[mask_early][i]/1e4],[uppers_early[mask_early][i]/1e4-meds_early[mask_early][i]/1e4]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i]/1e4, s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i]/1e4, yerr=np.array([[meds_later[mask_later][i]/1e4-lowers_later[mask_later][i]/1e4],[uppers_later[mask_later][i]/1e4-meds_later[mask_later][i]/1e4]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i]/1e4, s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i]/1e4, yerr=np.array([[meds_later[mask_later][i]/1e4-lowers_later[mask_later][i]/1e4],[uppers_later[mask_later][i]/1e4-meds_later[mask_later][i]/1e4]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i]/1e4, s=50, c='#389BC7', alpha=0.75)
 axs.set_xscale('log')
 axs.legend(prop={'size': 16}, loc='best')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
@@ -1233,18 +1781,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0]/1e4, yerr=np.array([[meds_early[mask_early][0]/1e4-lowers_early[mask_early][0]/1e4],[uppers_early[mask_early][0]/1e4-meds_early[mask_early][0]/1e4]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0]/1e4, yerr=np.array([[meds_early[mask_early][0]/1e4-lowers_early[mask_early][0]/1e4],[uppers_early[mask_early][0]/1e4-meds_early[mask_early][0]/1e4]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0]/1e4, s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0]/1e4, yerr=np.array([[meds_later[mask_later][0]/1e4-lowers_later[mask_later][0]/1e4],[uppers_later[mask_later][0]/1e4-meds_later[mask_later][0]/1e4]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0]/1e4, yerr=np.array([[meds_later[mask_later][0]/1e4-lowers_later[mask_later][0]/1e4],[uppers_later[mask_later][0]/1e4-meds_later[mask_later][0]/1e4]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0]/1e4, s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i]/1e4, yerr=np.array([[meds_early[mask_early][i]/1e4-lowers_early[mask_early][i]/1e4],[uppers_early[mask_early][i]/1e4-meds_early[mask_early][i]/1e4]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i]/1e4, s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i]/1e4, yerr=np.array([[meds_early[mask_early][i]/1e4-lowers_early[mask_early][i]/1e4],[uppers_early[mask_early][i]/1e4-meds_early[mask_early][i]/1e4]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i]/1e4, s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i]/1e4, yerr=np.array([[meds_later[mask_later][i]/1e4-lowers_later[mask_later][i]/1e4],[uppers_later[mask_later][i]/1e4-meds_later[mask_later][i]/1e4]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i]/1e4, s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i]/1e4, yerr=np.array([[meds_later[mask_later][i]/1e4-lowers_later[mask_later][i]/1e4],[uppers_later[mask_later][i]/1e4-meds_later[mask_later][i]/1e4]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i]/1e4, s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('$\\ell$ [kpc km s$^{-1}$]', fontsize=24)
@@ -1258,18 +1806,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0]/1e4, yerr=np.array([[meds_early[mask_early][0]/1e4-lowers_early[mask_early][0]/1e4],[uppers_early[mask_early][0]/1e4-meds_early[mask_early][0]/1e4]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0]/1e4, yerr=np.array([[meds_early[mask_early][0]/1e4-lowers_early[mask_early][0]/1e4],[uppers_early[mask_early][0]/1e4-meds_early[mask_early][0]/1e4]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0]/1e4, s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0]/1e4, yerr=np.array([[meds_later[mask_later][0]/1e4-lowers_later[mask_later][0]/1e4],[uppers_later[mask_later][0]/1e4-meds_later[mask_later][0]/1e4]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0]/1e4, yerr=np.array([[meds_later[mask_later][0]/1e4-lowers_later[mask_later][0]/1e4],[uppers_later[mask_later][0]/1e4-meds_later[mask_later][0]/1e4]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0]/1e4, s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i]/1e4, yerr=np.array([[meds_early[mask_early][i]/1e4-lowers_early[mask_early][i]/1e4],[uppers_early[mask_early][i]/1e4-meds_early[mask_early][i]/1e4]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i]/1e4, s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i]/1e4, yerr=np.array([[meds_early[mask_early][i]/1e4-lowers_early[mask_early][i]/1e4],[uppers_early[mask_early][i]/1e4-meds_early[mask_early][i]/1e4]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i]/1e4, s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i]/1e4, yerr=np.array([[meds_later[mask_later][i]/1e4-lowers_later[mask_later][i]/1e4],[uppers_later[mask_later][i]/1e4-meds_later[mask_later][i]/1e4]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i]/1e4, s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i]/1e4, yerr=np.array([[meds_later[mask_later][i]/1e4-lowers_later[mask_later][i]/1e4],[uppers_later[mask_later][i]/1e4-meds_later[mask_later][i]/1e4]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i]/1e4, s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('$\\ell$ [kpc km s$^{-1}$]', fontsize=24)
@@ -1302,18 +1850,18 @@ uppers_later = orbit_prop[:,2]
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0]/1e4, yerr=np.array([[meds_early[mask_early][0]/1e4-lowers_early[mask_early][0]/1e4],[uppers_early[mask_early][0]/1e4-meds_early[mask_early][0]/1e4]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_early][0], meds_early[mask_early][0]/1e4, yerr=np.array([[meds_early[mask_early][0]/1e4-lowers_early[mask_early][0]/1e4],[uppers_early[mask_early][0]/1e4-meds_early[mask_early][0]/1e4]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_early][0], meds_early[mask_early][0]/1e4, s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0]/1e4, yerr=np.array([[meds_later[mask_later][0]/1e4-lowers_later[mask_later][0]/1e4],[uppers_later[mask_later][0]/1e4-meds_later[mask_later][0]/1e4]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_mstar[mask_later][0], meds_later[mask_later][0]/1e4, yerr=np.array([[meds_later[mask_later][0]/1e4-lowers_later[mask_later][0]/1e4],[uppers_later[mask_later][0]/1e4-meds_later[mask_later][0]/1e4]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_mstar[mask_later][0], meds_later[mask_later][0]/1e4, s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i]/1e4, yerr=np.array([[meds_early[mask_early][i]/1e4-lowers_early[mask_early][i]/1e4],[uppers_early[mask_early][i]/1e4-meds_early[mask_early][i]/1e4]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i]/1e4, s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_early][i], meds_early[mask_early][i]/1e4, yerr=np.array([[meds_early[mask_early][i]/1e4-lowers_early[mask_early][i]/1e4],[uppers_early[mask_early][i]/1e4-meds_early[mask_early][i]/1e4]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_early][i], meds_early[mask_early][i]/1e4, s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i]/1e4, yerr=np.array([[meds_later[mask_later][i]/1e4-lowers_later[mask_later][i]/1e4],[uppers_later[mask_later][i]/1e4-meds_later[mask_later][i]/1e4]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i]/1e4, s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_mstar[mask_later][i], meds_later[mask_later][i]/1e4, yerr=np.array([[meds_later[mask_later][i]/1e4-lowers_later[mask_later][i]/1e4],[uppers_later[mask_later][i]/1e4-meds_later[mask_later][i]/1e4]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_mstar[mask_later][i], meds_later[mask_later][i]/1e4, s=50, c='#389BC7', alpha=0.75)
 axs.set_xscale('log')
 axs.legend(prop={'size': 16}, loc='best')
 axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
@@ -1327,18 +1875,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0]/1e4, yerr=np.array([[meds_early[mask_early][0]/1e4-lowers_early[mask_early][0]/1e4],[uppers_early[mask_early][0]/1e4-meds_early[mask_early][0]/1e4]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0]/1e4, yerr=np.array([[meds_early[mask_early][0]/1e4-lowers_early[mask_early][0]/1e4],[uppers_early[mask_early][0]/1e4-meds_early[mask_early][0]/1e4]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0]/1e4, s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0]/1e4, yerr=np.array([[meds_later[mask_later][0]/1e4-lowers_later[mask_later][0]/1e4],[uppers_later[mask_later][0]/1e4-meds_later[mask_later][0]/1e4]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0]/1e4, yerr=np.array([[meds_later[mask_later][0]/1e4-lowers_later[mask_later][0]/1e4],[uppers_later[mask_later][0]/1e4-meds_later[mask_later][0]/1e4]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0]/1e4, s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i]/1e4, yerr=np.array([[meds_early[mask_early][i]/1e4-lowers_early[mask_early][i]/1e4],[uppers_early[mask_early][i]/1e4-meds_early[mask_early][i]/1e4]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i]/1e4, s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i]/1e4, yerr=np.array([[meds_early[mask_early][i]/1e4-lowers_early[mask_early][i]/1e4],[uppers_early[mask_early][i]/1e4-meds_early[mask_early][i]/1e4]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i]/1e4, s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i]/1e4, yerr=np.array([[meds_later[mask_later][i]/1e4-lowers_later[mask_later][i]/1e4],[uppers_later[mask_later][i]/1e4-meds_later[mask_later][i]/1e4]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i]/1e4, s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i]/1e4, yerr=np.array([[meds_later[mask_later][i]/1e4-lowers_later[mask_later][i]/1e4],[uppers_later[mask_later][i]/1e4-meds_later[mask_later][i]/1e4]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i]/1e4, s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('Specific Kinetic Energy [10$^4$ km$^2$ s$^{-2}$]', fontsize=24)
@@ -1352,18 +1900,18 @@ plt.close()
 plt.rcParams["font.family"] = "serif"
 f, axs = plt.subplots(1, 1, figsize=(10,8))
 #
-axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0]/1e4, yerr=np.array([[meds_early[mask_early][0]/1e4-lowers_early[mask_early][0]/1e4],[uppers_early[mask_early][0]/1e4-meds_early[mask_early][0]/1e4]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_early][0], meds_early[mask_early][0]/1e4, yerr=np.array([[meds_early[mask_early][0]/1e4-lowers_early[mask_early][0]/1e4],[uppers_early[mask_early][0]/1e4-meds_early[mask_early][0]/1e4]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_early][0], meds_early[mask_early][0]/1e4, s=50, c='#c76438', alpha=0.5, label='Early-forming hosts')
 #
-axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0]/1e4, yerr=np.array([[meds_later[mask_later][0]/1e4-lowers_later[mask_later][0]/1e4],[uppers_later[mask_later][0]/1e4-meds_later[mask_later][0]/1e4]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
+# axs.errorbar(sat_dist[mask_later][0], meds_later[mask_later][0]/1e4, yerr=np.array([[meds_later[mask_later][0]/1e4-lowers_later[mask_later][0]/1e4],[uppers_later[mask_later][0]/1e4-meds_later[mask_later][0]/1e4]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
 axs.scatter(sat_dist[mask_later][0], meds_later[mask_later][0]/1e4, s=50, c='#389BC7', alpha=0.5, label='Late-forming hosts')
 #
 for i in range(1, len(sat_mstar[mask_early])):
-    axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i]/1e4, yerr=np.array([[meds_early[mask_early][i]/1e4-lowers_early[mask_early][i]/1e4],[uppers_early[mask_early][i]/1e4-meds_early[mask_early][i]/1e4]]), color='#c76438', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i]/1e4, s=50, c='#c76438', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_early][i], meds_early[mask_early][i]/1e4, yerr=np.array([[meds_early[mask_early][i]/1e4-lowers_early[mask_early][i]/1e4],[uppers_early[mask_early][i]/1e4-meds_early[mask_early][i]/1e4]]), color='#c76438', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_early][i], meds_early[mask_early][i]/1e4, s=50, c='#c76438', alpha=0.75)
 for i in range(1, len(sat_mstar[mask_later])):
-    axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i]/1e4, yerr=np.array([[meds_later[mask_later][i]/1e4-lowers_later[mask_later][i]/1e4],[uppers_later[mask_later][i]/1e4-meds_later[mask_later][i]/1e4]]), color='#389BC7', alpha=0.5, lw=3.5, capsize=0)
-    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i]/1e4, s=50, c='#389BC7', alpha=0.5)
+    # axs.errorbar(sat_dist[mask_later][i], meds_later[mask_later][i]/1e4, yerr=np.array([[meds_later[mask_later][i]/1e4-lowers_later[mask_later][i]/1e4],[uppers_later[mask_later][i]/1e4-meds_later[mask_later][i]/1e4]]), color='#389BC7', alpha=0.5, lw=1.5, capsize=0)
+    axs.scatter(sat_dist[mask_later][i], meds_later[mask_later][i]/1e4, s=50, c='#389BC7', alpha=0.75)
 #
 axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
 axs.set_ylabel('Specific Kinetic Energy [10$^4$ km$^2$ s$^{-2}$]', fontsize=24)
@@ -1386,7 +1934,7 @@ def making_plots(num, den, propname):
     # Vs Mstar
     plt.rcParams["font.family"] = "serif"
     f, axs = plt.subplots(1, 1, figsize=(10,8))
-    axs.scatter(sat_mstar[mask_early*mask_later], num/den, s=50, c='#c76438', alpha=0.5)
+    axs.scatter(sat_mstar[mask_early*mask_later], num/den, s=50, c='#c76438', alpha=0.75)
     axs.set_xscale('log')
     axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
     axs.set_ylabel('|$\\Delta$ median| / Average width of scatters', fontsize=24)
@@ -1398,7 +1946,7 @@ def making_plots(num, den, propname):
 
     plt.rcParams["font.family"] = "serif"
     f, axs = plt.subplots(1, 1, figsize=(10,8))
-    axs.scatter(sat_mstar[mask_early*mask_later], num/den, s=50, c='#c76438', alpha=0.5)
+    axs.scatter(sat_mstar[mask_early*mask_later], num/den, s=50, c='#c76438', alpha=0.75)
     axs.set_xscale('log')
     axs.set_xlabel('$M_{\\rm star}$ [$M_{\odot}$]', fontsize=24)
     axs.set_ylabel('|$\\Delta$ median| / Average width of scatters', fontsize=24)
@@ -1412,7 +1960,7 @@ def making_plots(num, den, propname):
     # Vs distance
     plt.rcParams["font.family"] = "serif"
     f, axs = plt.subplots(1, 1, figsize=(10,8))
-    axs.scatter(sat_dist[mask_early*mask_later], num/den, s=50, c='#c76438', alpha=0.5)
+    axs.scatter(sat_dist[mask_early*mask_later], num/den, s=50, c='#c76438', alpha=0.75)
     axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
     axs.set_ylabel('|$\\Delta$ median| / Average width of scatters', fontsize=24)
     axs.hlines(0, np.min(sat_dist[mask_early*mask_later]), np.max(sat_dist[mask_early*mask_later]), color='k', linestyle='dashed', alpha=0.3)
@@ -1423,7 +1971,7 @@ def making_plots(num, den, propname):
 
     plt.rcParams["font.family"] = "serif"
     f, axs = plt.subplots(1, 1, figsize=(10,8))
-    axs.scatter(sat_dist[mask_early*mask_later], num/den, s=50, c='#c76438', alpha=0.5)
+    axs.scatter(sat_dist[mask_early*mask_later], num/den, s=50, c='#c76438', alpha=0.75)
     axs.set_xlabel('Distance from MW [kpc]', fontsize=24)
     axs.set_ylabel('|$\\Delta$ median| / Average width of scatters', fontsize=24)
     axs.set_ylim(-0.05,1.05)
