@@ -533,6 +533,208 @@ class SatelliteMatch:
         #
         return sub_match
     
+    def subhalo_match_SF(self, indices, subhalos, satellite, snapshot_data, lookback_window=1, max_sigma=3, probability_max=99, vrad_floor=False, vtan_floor=False, dist_floor=False, dist_frac_floor=False):
+        """
+        DESCRIPTION:
+            Given a real satellite's distance, velocity (radial and/or tangential), and 
+            halo mass, find analogs in the simulations to within the specified limits. Does
+            not require all 4 properties to find matches, can mix and match.
+
+            Survival function: (1+r^2)*e^(-r^2)
+
+        VARIABLES:
+            indices         : 2D array
+                              The halo tree indices of subhalos in the simulations
+
+            subhalos        : dictionary
+                              This is a subset of simulation data created with 
+                              "subhalo_data()" and includes:
+                              - total distance from host
+                              - radial velocity
+                              - tangential velocity
+                              - peak subhalo mass
+                              - snapshot numbers that it existed in
+
+            satellite       : dictionary
+                              This is data for the actual satellite we want to find matches of. 
+                              Created by "lg_satellite_properties()" and includes:
+                              - total distance from host + error
+                              - radial velocity + error
+                              - tangential velocity + error
+                              - stellar mass
+                              - peak subhalo mass using the SMHM relation from Paper I and "satellite_mhalo()"
+
+            snapshot_data   : dictionary
+                              A dictionary that contains snapshot indices, times, 
+                              and redshifts.
+
+            lookback_window : integer
+                              Lookback time (Gyr) to search for satellite analogs
+            
+            max_sigma       : integer
+                              Threshold of how much error we allow in selecting satellites
+            
+            probability_max : integer
+                              A "sigma" for the N-dimensional Gaussian for the selection properties (distance
+                              velocity (radial and tangential), and mass)
+
+        NOTES:
+            - Produces a dictionary that contains:
+                - The peak halo mass (normal and log) for the subhalo matches
+                - Indices to point to the analogs in the mass array (created in the function) and in
+                  the original halo tree from the FIRE simulations (at z = 0)
+                - The snapshot that the subhalo analog is matched with the satellite
+                - The weight, which is a measure of how "good" of a match the subhalo is
+                - The value of the N-dimensional Gaussian with the given weights; also
+                  kind of a measure of how "good" a match is.
+            - We don't have to worry about double counting a match across snapshots.
+            - Lots of code previously written by Andrew Wetzel.
+        """
+        # Figure out how many snapshots to search for satellites from the snapshot file
+        max_time_window = snapshot_data['time'][-1] - lookback_window
+        n_snapshots = snapshot_data['index'][-1] - np.where(np.min(np.abs(max_time_window - snapshot_data['time'])) == np.abs(max_time_window - snapshot_data['time']))[0][0]
+        #
+        # Set up an empty dictionary to save the actual matches to for a given observed satellite
+        sub_match = {}
+        sub_match['mass.index'] = (-1)*np.ones(indices.shape[0], int)
+        sub_match['mass.peak'] = (-1)*np.ones(indices.shape[0], int)
+        sub_match['mass.peak.log'] = (-1)*np.ones(indices.shape[0], int)
+        sub_match['tree.index'] = (-1)*np.ones(indices.shape[0], int)
+        sub_match['weight'] = (-1)*np.ones((indices.shape[0], n_snapshots))
+        sub_match['sigma.dif'] = (-1)*np.ones((indices.shape[0], n_snapshots))
+        sub_match['snapshot'] = (-1)*np.ones((indices.shape[0], n_snapshots), int)
+        #
+        properties = [prop_name for prop_name in sorted(satellite.keys()) if '.star' not in prop_name and '.err' not in prop_name and ~np.isnan(satellite[prop_name])]
+        #
+        dof_number = len([i for i in range(0, len(properties)) if ~np.isnan(satellite[properties[i]])])
+        #
+        # Commenting this out because all satellites in our sample now have phase-space estimates
+        # for prop_name in properties:
+        #     if ~np.isnan(satellite[prop_name]) and np.isnan(satellite[prop_name+'.err']):
+        #         if 'dist' in prop_name:
+        #             satellite[prop_name+'.err'] = 5
+        #         if 'vel' in prop_name:
+        #             satellite[prop_name+'.err'] = 5
+        #
+        # If we want to impose a floor to the distance or velocity errors, do that here
+        if vrad_floor is not False and satellite['host.velocity.rad.err'] < vrad_floor:
+            satellite['host.velocity.rad.err'] = vrad_floor
+        #
+        if vtan_floor is not False and satellite['host.velocity.tan.err'] < vtan_floor:
+            satellite['host.velocity.tan.err'] = vtan_floor
+        #
+        # We want to tread distance in a fractional sense
+        if dist_frac_floor is not False and dist_floor is False and satellite['host.distance.total.err'] < dist_floor*satellite['host.distance.total']:
+            satellite['host.distance.total.err'] = dist_floor*satellite['host.distance.total']
+        #
+        # We want to tread distance in a fractional sense
+        if dist_floor is not False and dist_frac_floor is False and satellite['host.distance.total.err'] < dist_floor:
+            satellite['host.distance.total.err'] = dist_floor
+        #
+        if dof_number == 1:
+            sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.0, 2.0, 3.0
+        elif dof_number == 2:
+            sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.52, 2.49, 3.44
+        elif dof_number == 3:
+            sigma_dif_68, sigma_dif_95, sigma_dif_99 = 1.88, 2.83, 3.76
+        elif dof_number == 4:
+            sigma_dif_68, sigma_dif_95, sigma_dif_99 = 2.17, 3.12, 4.03
+        else:
+            raise AssertionError('* DOF number must be between 1-4!')
+        #
+        if probability_max == 68:
+            sigma_dif_max = sigma_dif_68
+        elif probability_max == 95:
+            sigma_dif_max = sigma_dif_95
+        elif probability_max == 99:
+            sigma_dif_max = sigma_dif_99
+        else:
+            sigma_dif_max = sigma_dif_95
+        #
+        # Get subhalos within +/- N sigma * 0.35 dex of M_halo,peak 
+        mass_kind = 'mass.peak'
+        mass_halo_log = np.log10(satellite[mass_kind])
+        mass_inds = ut.array.get_indices(subhalos[mass_kind], [10**(mass_halo_log - max_sigma*satellite[mass_kind+'.err']), 10**(mass_halo_log + max_sigma*satellite[mass_kind+'.err'])])
+        #
+        # Create a list of coordinate names and property names to loop through
+        coord_names = [prop_name for prop_name in properties if prop_name != 'mass.peak']
+        #properties = [prop_name for prop_name in sorted(subhalos.keys()) if prop_name != 'snapshot']
+        #
+        # Loop through snapshots
+        for snap_ind in range(0, n_snapshots):
+            #
+            # Use satellites already selected by mass
+            match_inds = mass_inds
+            # Loop through the 6D coordinates
+            for prop_name in coord_names:
+                # Get the bin limits for a given property based on the observed satellite values and max error
+                prop_limits = ut.binning.get_bin_limits([satellite[prop_name], max_sigma*satellite[prop_name+'.err']], 'error')
+                # Set up another 2D array for the subhalo coordinates at a given snapshot
+                prop_values = subhalos[prop_name][:,snap_ind]
+                # Get the indices of the subhalos that are within the bin limits
+                match_inds = ut.array.get_indices(prop_values, prop_limits, match_inds)
+            #
+            # If there are matches, continue!
+            if len(match_inds) != 0:
+                # Set up null array to save to
+                sigma_difs_z = np.zeros(len(match_inds))
+                # Loop through the 6D + mass properties
+                for prop_name in properties:
+                    # If mass is the property, take the log of the values and calculate sigma_dif
+                    if 'mass' in prop_name:
+                        prop_values = np.log10(subhalos[prop_name][match_inds])
+                        match_prop = np.log10(satellite[prop_name])
+                        sigma_difs_z += (
+                        (prop_values - match_prop) / satellite[prop_name+'.err']
+                        ) **2
+                    # If 6D coords, do the same thing without the log
+                    else:
+                        prop_values = subhalos[prop_name][match_inds, snap_ind]
+                        sigma_difs_z += (
+                            (prop_values - satellite[prop_name]) / satellite[prop_name+'.err']
+                            ) **2
+                #
+                # Finally take the square root of sigmas
+                sigma_difs_z = np.sqrt(sigma_difs_z)
+                # Only keep cases that are within our max allowed error
+                masks = ut.array.get_indices(sigma_difs_z, [0, sigma_dif_max])
+                sigma_difs_z = sigma_difs_z[masks]
+                match_inds = match_inds[masks]
+                #
+                # If there are are still matches, continue!
+                if len(sigma_difs_z) != 0:
+                    # calculate the weights from the gaussian arguments (sigma_difs)
+                    #weights_z = ut.math.Function.gaussian_normalized(sigma_difs_z)
+                    #
+                    r = sigma_difs_z
+                    weights_z = np.exp(-0.5 * r**2) * (1 + 0.5 * r**2)
+                    #
+                    # Save all of the data to the arrays
+                    sub_match['mass.index'][match_inds] = match_inds
+                    sub_match['mass.peak'][match_inds] = subhalos['mass.peak'][match_inds]
+                    sub_match['mass.peak.log'][match_inds] = np.log10(subhalos['mass.peak'][match_inds])
+                    sub_match['tree.index'][match_inds] = self.sub_inds[:,0][match_inds]
+                    sub_match['snapshot'][match_inds, snap_ind] = np.flip(snapshot_data['index'])[:n_snapshots][snap_ind]
+                    sub_match['weight'][match_inds, snap_ind] = weights_z
+                    sub_match['sigma.dif'][match_inds, snap_ind] = sigma_difs_z
+                    # Print out the satellites that are matches for a given snapshot
+                    #print('* Satellite(s) {0} are a match at snapshot {1}'.format(match_inds, np.flip(snapshot_data['index'])[:n_snapshots][snap_ind]))
+                    # Print out how many of them are within the max errors allowed
+                    #print('* {0}, {1} within 68 percent, 95 percent limits'.format(np.sum(sigma_difs_z < sigma_dif_68), np.sum(sigma_difs_z < sigma_dif_95)))
+                #
+                # If there are no matches, print that out for the current snapshot
+                #else:
+                    #print('! no subhalos within {0} percent limits at snapshot {1}'.format(probability_max, np.flip(snapshot_data['index'])[snap_ind]))
+                #
+                # Now re-weight the subhalos so that the centroid is near the middle of the bin
+                # If I don't, then I will likely be assigning more weight to lower mass subhalos
+            #
+            # If there are no matches, print that out
+            #else:
+                #print('! no subhalos match at snapshot {0}'.format(np.flip(snapshot_data['index'])[snap_ind]))
+        #
+        return sub_match
+
     def mass_weighting(self, weights, mass_array_subs, mass_sat, SMHM_slope=0.44):
         """
         DESCRIPTION:

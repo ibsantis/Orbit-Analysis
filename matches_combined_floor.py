@@ -59,7 +59,8 @@ if floor_vt == False:
     floor_vt_str = "F"
 else:
     floor_vt_str = str(floor_vt)
-file_save_path = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/{floor_type}_tweaks/floor_{floor_d_str}_{floor_vr_str}_{floor_vt_str}/'
+#file_save_path = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching/{floor_type}_tweaks/floor_{floor_d_str}_{floor_vr_str}_{floor_vt_str}/'
+file_save_path = sim_data.home_dir+f'/orbit_data/hdf5_files/satellite_matching_survival/{floor_type}_tweaks/floor_{floor_d_str}_{floor_vr_str}_{floor_vt_str}/'
 
 # Combined tweaks
 for sat_name in mw_sats_1Mpc:
@@ -86,10 +87,14 @@ for sat_name in mw_sats_1Mpc:
         # Get the phase-space coordinates of these satellites across all snapshots
         subhalo_dict = sat_match.subhalo_data(tree=None, mini=mini_data, snapshot_data=snaps)
 
-        satellite_match = sat_match.subhalo_match(sat_match.sub_inds, subhalos=subhalo_dict, 
-                                                  satellite=match, snapshot_data=snaps, lookback_window=1, 
-                                                  max_sigma=sigma_phase_space, probability_max=percent_nd_gaussian, 
-                                                  vrad_floor=floor_vr, vtan_floor=floor_vt, dist_floor=floor_d, dist_frac_floor=False)
+        # satellite_match = sat_match.subhalo_match(sat_match.sub_inds, subhalos=subhalo_dict, 
+        #                                           satellite=match, snapshot_data=snaps, lookback_window=1, 
+        #                                           max_sigma=sigma_phase_space, probability_max=percent_nd_gaussian, 
+        #                                           vrad_floor=floor_vr, vtan_floor=floor_vt, dist_floor=floor_d, dist_frac_floor=False)
+        satellite_match = sat_match.subhalo_match_SF(sat_match.sub_inds, subhalos=subhalo_dict, 
+                                                     satellite=match, snapshot_data=snaps, lookback_window=1, 
+                                                     max_sigma=sigma_phase_space, probability_max=percent_nd_gaussian, 
+                                                     vrad_floor=floor_vr, vtan_floor=floor_vt, dist_floor=floor_d, dist_frac_floor=False)
 
         mask = (satellite_match['mass.index'] != -1)
         for i in range(0, len(satellite_match['mass.index'][mask])):
