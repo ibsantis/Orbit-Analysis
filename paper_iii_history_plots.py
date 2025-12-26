@@ -105,7 +105,7 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
     #
     # Plot the orbit history histograms
     plt.rcParams["font.family"] = "serif"
-    f, axs = plt.subplots(4, 3, figsize=(16,12))
+    f, axs = plt.subplots(5, 3, figsize=(16,15))
     #
     m = (orbit_dictionary['first.infall.time.lb'] != -1)
     if np.sum(m) != 0:
@@ -302,6 +302,22 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
     axs[0,1].set_xlabel('Number of pericentric passages', fontsize=18)
     axs[0,1].tick_params(axis='both', which='major', labelsize=14)
     #
+    x = gal_data['Weight']
+    x = x[x > 0]
+    logx = np.log10(x)
+    binss = np.linspace(-5, 0, 49)
+    half_bin = 0.5 * (binss[1] - binss[0])
+    centers = 0.5 * (binss[1:] + binss[:-1])
+    width = (binss[1] - binss[0])
+    # histogram in log-space
+    hist, edges = np.histogram(logx, bins=binss, density=True)
+    #binss, half_binss = sat_analysis.binning_scheme(x, 'Something', 0.05)
+    axs[3,1].bar(centers, hist / np.max(hist), width=width, color='k', alpha=0.4)
+    #axs[3,1].bar(p[1][:-1]+half_binss, p[0]/np.max(p[0]), width=1, color='k', alpha=0.4, edgecolor=None)
+    axs[3,1].hist(logx, bins=binss, density=True, cumulative=True, histtype='step', linestyle='dashed', linewidth=2, color='b', alpha=0.4)
+    axs[3,1].set_xlabel(r'$\log_{10}(\mathrm{Weight})$', fontsize=18)
+    axs[3,1].tick_params(axis='both', which='major', labelsize=14)
+    #
     N_analogs = len(gal_data['Weight'])
     galaxy_tex = galaxy.replace(" ", r"\ ")
     info_lines1 = [
@@ -333,29 +349,31 @@ for sat_idx, galaxy in enumerate(mw_sats_1Mpc):
     info_text2 = "\n".join(info_lines2)
 
     # --- Turn the panel into a clean text area
-    axs[3,1].set_axis_off()
-    axs[3,1].text(
+    axs[4,1].set_axis_off()
+    axs[4,1].text(
         0.01, 0.97, info_text1,
-        transform=axs[3,1].transAxes,
+        transform=axs[4,1].transAxes,
         ha="left", va="top",
         fontsize=20,
         linespacing=1.4,
         bbox=dict(boxstyle="square,pad=0.3", fc="white", ec="black", lw=1.0)
     )
-    axs[3,1].text(
+    axs[4,1].text(
         0.01, 0.70, info_text2,
-        transform=axs[3,1].transAxes,
+        transform=axs[4,1].transAxes,
         ha="left", va="top",
         fontsize=18,
         linespacing=1.4
     )
     # Blank subpanel
-    #axs[3,1].axison = False
+    axs[4,0].axison = False
+    axs[4,2].axison = False
     #
     #plt.suptitle('{0} - Number of analogs = {1}'.format(galaxy, len(gal_data['Weight'])), fontsize=20)
     plt.tight_layout()
     #plt.show()
     #plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/both_hist/'+satellite_name+'_history_both.pdf')
-    plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/histograms_reorder/'+satellite_name+'_history_both.pdf')
+    #plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/histograms_reorder/'+satellite_name+'_history_both.pdf')
+    plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/histograms_weights/'+satellite_name+'_history_both.pdf')
     plt.close()
 
