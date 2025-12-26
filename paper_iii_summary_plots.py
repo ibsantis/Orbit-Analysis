@@ -2028,6 +2028,68 @@ plt.close()
 
 
 
+"""
+    tperi vs dperi
+"""
+from matplotlib.colors import LogNorm, Normalize
+orbit_prop_1 = np.asarray(dperi_rec)
+orbit_prop_2 = np.asarray(tperi_rec)
+mask = (orbit_prop_1[:,0] != -1)&(orbit_prop_2[:,0] != -1)
+meds_1 = orbit_prop_1[:,0]
+lowers_1 = orbit_prop_1[:,1]
+uppers_1 = orbit_prop_1[:,2]
+meds_2 = orbit_prop_2[:,0]
+lowers_2 = orbit_prop_2[:,1]
+uppers_2 = orbit_prop_2[:,2]
+
+LMC_idxs = [11, 12, 27, 30, 43, 47]
+
+norm_d = Normalize(vmin=np.min(sat_dist[mask]),  vmax=np.max(sat_dist[mask]))
+norm_vr = Normalize(vmin=np.min(v_rad[mask]),  vmax=np.max(v_rad[mask]))
+norm_vt = Normalize(vmin=np.min(v_tan[mask]),  vmax=np.max(v_tan[mask]))
+norm_m = LogNorm(vmin=np.min(sat_mstar[mask]), vmax=np.max(sat_mstar[mask]))
+lmc_mask = np.zeros_like(mask, dtype=bool)
+lmc_mask[LMC_idxs] = True
+valid_lmc_mask     = mask & lmc_mask
+valid_non_lmc_mask = mask & (~lmc_mask)
+
+# Vs Mstar
+plt.rcParams["font.family"] = "serif"
+f, axs = plt.subplots(2, 2, figsize=(16,12))
+#
+sc0 = axs[0,0].scatter(meds_2[valid_non_lmc_mask], meds_1[valid_non_lmc_mask], s=75, c=sat_dist[valid_non_lmc_mask], cmap=plt.cm.plasma, alpha=0.7, norm=norm_d)
+plt.colorbar(sc0, ax=axs[0,0], label=r'$d_{\rm sat}$ [kpc]')
+axs[0,0].scatter( meds_2[valid_lmc_mask], meds_1[valid_lmc_mask], s=100, marker='*', c=sat_dist[valid_lmc_mask], cmap=plt.cm.plasma, alpha=0.7, edgecolor=None, zorder=7, norm=norm_d)
+#
+sc1 = axs[0,1].scatter(meds_2[valid_non_lmc_mask], meds_1[valid_non_lmc_mask], s=75, c=sat_mstar[valid_non_lmc_mask], cmap=plt.cm.plasma, alpha=0.7, norm=norm_m)
+plt.colorbar(sc1, ax=axs[0,1], label=r'$M_{\rm star}$ [$M_{\odot}$]]')
+axs[0,1].scatter( meds_2[valid_lmc_mask], meds_1[valid_lmc_mask], s=100, marker='*', c=sat_mstar[valid_lmc_mask], cmap=plt.cm.plasma, alpha=0.7, edgecolor=None, zorder=7, norm=norm_m)
+#
+sc2 = axs[1,0].scatter(meds_2[valid_non_lmc_mask], meds_1[valid_non_lmc_mask], s=75, c=v_rad[valid_non_lmc_mask], cmap=plt.cm.plasma, alpha=0.7, norm=norm_vr)
+plt.colorbar(sc2, ax=axs[1,0], label=r'$v_{\rm rad}$ [km/s]')
+axs[1,0].scatter( meds_2[valid_lmc_mask], meds_1[valid_lmc_mask], s=100, marker='*', c=v_rad[valid_lmc_mask], cmap=plt.cm.plasma, alpha=0.7, edgecolor=None, zorder=7, norm=norm_vr)
+#
+sc3 = axs[1,1].scatter(meds_2[valid_non_lmc_mask], meds_1[valid_non_lmc_mask], s=75, c=v_tan[valid_non_lmc_mask], cmap=plt.cm.plasma, alpha=0.7, norm=norm_vt)
+plt.colorbar(sc3, ax=axs[1,1], label=r'$v_{\rm tan}$ [km/s]')
+axs[1,1].scatter( meds_2[valid_lmc_mask], meds_1[valid_lmc_mask], s=100, marker='*', c=v_tan[valid_lmc_mask], cmap=plt.cm.plasma, alpha=0.7, edgecolor=None, zorder=7, norm=norm_vt)
+#
+axs[1,0].set_xlabel('$t_{\\rm peri,rec}$ [Gyr]', fontsize=24)
+axs[1,1].set_xlabel('$t_{\\rm peri,rec}$ [Gyr]', fontsize=24)
+axs[0,0].set_ylabel('$d_{\\rm peri,rec}$ [kpc]', fontsize=24)
+axs[1,0].set_ylabel('$d_{\\rm peri,rec}$ [kpc]', fontsize=24)
+#
+axs[0,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False)
+axs[0,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=False, labelleft=False)
+axs[1,0].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True)
+axs[1,1].tick_params(axis='both', which='both', bottom=True, top=True, labelsize=22, labelbottom=True, labelleft=False)
+#
+plt.tight_layout()
+#plt.show()
+plt.savefig(sim_data.home_dir+'/orbit_data/plots/summary/paper_3/histories/summary_1Mpc/tperi_vs_dperi.pdf')
+plt.close()
+
+
+
 
 """
     Combined pericenter velocity plots
